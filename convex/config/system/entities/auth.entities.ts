@@ -1,5 +1,5 @@
 // convex/config/system/entities/auth.entities.ts
-// ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
+// ⚠️ SYSTEM FILE - DO NOT MODIFY IN YOUR APPS
 
 /**
  * Authentication and authorization entity types

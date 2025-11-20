@@ -1,5 +1,5 @@
 // convex/config/system/entities/supporting.entities.ts
-// ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
+// ⚠️ SYSTEM FILE - DO NOT MODIFY IN YOUR APPS
 
 /**
  * Supporting feature entity types

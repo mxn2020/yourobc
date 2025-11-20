@@ -1,5 +1,5 @@
 // convex/config/system/navigation.config.ts
-// ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
+// ⚠️ SYSTEM FILE - DO NOT MODIFY IN YOUR APPS
 // This file is part of the system and will be updated with new releases.
 // To customize navigation, use convex/config/app/navigation.config.ts instead.
 

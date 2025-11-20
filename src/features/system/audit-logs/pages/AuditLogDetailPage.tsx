@@ -13,7 +13,7 @@ import {
   Info,
   Database
 } from 'lucide-react';
-import { Badge, Button, Card, CardContent, CardContent, CardHeader, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
+import { Badge, Button, Card, CardContent, CardHeader, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
 import { useMyAuditLogs } from '../hooks/useAuditLogs';
 import type { AuditLogEntry, AuditSeverity } from '../types/audit-logs.types';
 import { useToast } from '@/features/system/notifications';

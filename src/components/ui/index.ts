@@ -19,7 +19,7 @@ export { Tooltip } from './Tooltip'
 export { CostDisplay, SimpleCostDisplay } from './CostDisplay'
 
 // Layout components
-export { Card, CardHeader, CardContent, CardContent, CardFooter, CardTitle, CardDescription } from './Card'
+export { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from './Card'
 export { Section, SectionHeader, SectionTitle, SectionDescription, SectionContent, CompoundSection } from './Section'
 export { Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, TableCaption, DataTable } from './Table'
 export { ListItem, ListContainer, DataList, CompactListView } from './List'

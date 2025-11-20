@@ -3,15 +3,14 @@
 // This file automatically combines all configuration sources into unified exports
 
 // ============================================================================
-// BOILERPLATE IMPORTS (Don't modify)
+// SYSTEM IMPORTS (Don't modify)
 // ============================================================================
 import {
-  ALL_BOILERPLATE_ENTITY_TYPES,
+  ALL_SYSTEM_ENTITY_TYPES,
   SYSTEM_ENTITY_TYPES,
-  BOILERPLATE_ENTITY_TYPES,
-  BOILERPLATE_COMMENTABLE_ENTITY_TYPES,
-  BOILERPLATE_DOCUMENTABLE_ENTITY_TYPES,
-  BOILERPLATE_NOTIFIABLE_ENTITY_TYPES,
+  SYSTEM_COMMENTABLE_ENTITY_TYPES,
+  SYSTEM_DOCUMENTABLE_ENTITY_TYPES,
+  SYSTEM_NOTIFIABLE_ENTITY_TYPES,
   type SystemEntityType,
 } from './system/entities.config';
 
@@ -55,7 +54,7 @@ import { FEATURES, validateAllFeatures, isFeatureEnabled as checkFeature } from 
  * Use this constant throughout your app
  */
 export const ALL_ENTITY_TYPES = [
-  ...ALL_BOILERPLATE_ENTITY_TYPES,
+  ...ALL_SYSTEM_ENTITY_TYPES,
   ...ALL_APP_ENTITY_TYPES,
 ] as const;
 
@@ -68,7 +67,7 @@ export type EntityType = typeof ALL_ENTITY_TYPES[number];
  * All commentable entity types (system + app)
  */
 export const COMMENTABLE_ENTITY_TYPES = [
-  ...BOILERPLATE_COMMENTABLE_ENTITY_TYPES,
+  ...SYSTEM_COMMENTABLE_ENTITY_TYPES,
   ...APP_COMMENTABLE_ENTITY_TYPES,
 ] as const;
 
@@ -81,7 +80,7 @@ export type CommentableEntityType = typeof COMMENTABLE_ENTITY_TYPES[number];
  * All documentable entity types (system + app)
  */
 export const DOCUMENTABLE_ENTITY_TYPES = [
-  ...BOILERPLATE_DOCUMENTABLE_ENTITY_TYPES,
+  ...SYSTEM_DOCUMENTABLE_ENTITY_TYPES,
   ...APP_DOCUMENTABLE_ENTITY_TYPES,
 ] as const;
 
@@ -94,7 +93,7 @@ export type DocumentableEntityType = typeof DOCUMENTABLE_ENTITY_TYPES[number];
  * All notifiable entity types (system + app)
  */
 export const NOTIFIABLE_ENTITY_TYPES = [
-  ...BOILERPLATE_NOTIFIABLE_ENTITY_TYPES,
+  ...SYSTEM_NOTIFIABLE_ENTITY_TYPES,
   ...APP_NOTIFIABLE_ENTITY_TYPES,
 ] as const;
 
@@ -127,7 +126,6 @@ export const APP_CONFIG = {
   entities: {
     all: ALL_ENTITY_TYPES,
     system: SYSTEM_ENTITY_TYPES,
-    system: BOILERPLATE_ENTITY_TYPES,
     app: ALL_APP_ENTITY_TYPES,
     commentable: COMMENTABLE_ENTITY_TYPES,
     documentable: DOCUMENTABLE_ENTITY_TYPES,
@@ -142,10 +140,8 @@ export const APP_CONFIG = {
 // Entity types
 export {
   SYSTEM_ENTITY_TYPES,
-  BOILERPLATE_ENTITY_TYPES,
   APP_ENTITY_TYPES,
   ADDON_ENTITY_TYPES,
-  ALL_BOILERPLATE_ENTITY_TYPES,
   ALL_APP_ENTITY_TYPES,
 };
 

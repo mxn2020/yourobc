@@ -30,9 +30,11 @@ convex/
 │       └── {entity}/
 │           └── {module}/
 │               ├── {module}.ts       # Table definitions
+│               ├── {sub_module}.ts   # Additional tables (if needed)
 │               ├── validators.ts     # Grouped validators
 │               ├── types.ts         # Type extractions
-│               └── schemas.ts       # Schema exports
+│               ├── schemas.ts       # Schema exports
+│               └── index.ts        # Public API exports
 │
 └── lib/
     └── {category}/
@@ -75,9 +77,11 @@ convex/
 ```
 {module}/
 ├── {module}.ts          # Table definitions with validators
+├── {sub_module}.ts      # Additional tables (if needed)
 ├── validators.ts        # Grouped validators (v.union, etc.)
 ├── types.ts            # Type extractions from validators
-└── schemas.ts          # Schema export objects
+├── schemas.ts          # Schema export objects
+└── index.ts          # Public API barrel exports
 ```
 
 ### Library Directory (`convex/lib/{category}/{entity}/{module}/`)

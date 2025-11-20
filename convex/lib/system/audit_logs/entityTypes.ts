@@ -11,7 +11,7 @@
 import { v } from 'convex/values';
 import {
   SYSTEM_ENTITY_TYPES,
-  BOILERPLATE_ENTITY_TYPES,
+  SYSTEM_ENTITY_TYPES,
   ALL_APP_ENTITY_TYPES,
   COMMENTABLE_ENTITY_TYPES,
   DOCUMENTABLE_ENTITY_TYPES,
@@ -35,7 +35,7 @@ export const entityTypes = {
   coreSystem: createEntityUnion(SYSTEM_ENTITY_TYPES),
 
   // System entities (from system config)
-  system: createEntityUnion(BOILERPLATE_ENTITY_TYPES),
+  system: createEntityUnion(SYSTEM_ENTITY_TYPES),
 
   // App/addon entities (from app config)
   app: createEntityUnion(ALL_APP_ENTITY_TYPES),
