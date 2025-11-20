@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "title": "💼 Projects",
+    "description": "🔥 Manage and track your projects",
+    "keywords": "🔍 projects, project management, task tracking, kanban"
+  },
+  "dashboard": {
+    "title": "Dashboard", 
+    "description": "Your personal dashboard",
+    "keywords": "dashboard, overview, summary"
+  }
+}

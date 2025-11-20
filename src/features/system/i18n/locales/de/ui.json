@@ -1,0 +1,82 @@
+{
+  "errorModal": {
+    "setupInstructions": "Setup Instructions:",
+    "helpfulLinks": "Helpful Links:",
+    "continueWithoutAI": "Continue Without AI Models",
+    "retryAfterSetup": "Retry After Setup"
+  },
+  "errorState": {
+    "titles": {
+      "sessionExpired": "Session Expired",
+      "accessDenied": "Access Denied",
+      "connectionError": "Connection Error",
+      "invalidData": "Invalid Data",
+      "notFound": "Not Found",
+      "somethingWentWrong": "Something Went Wrong"
+    },
+    "whatToDo": "What to do:",
+    "technicalDetails": "Technical Details",
+    "errorCode": "Error Code:",
+    "permission": "Permission:",
+    "retry": "Retry",
+    "goBack": "Go Back"
+  },
+  "permissionDenied": {
+    "title": "Access Denied",
+    "defaultMessage": "You don't have permission to access {module}.",
+    "thisResource": "this resource",
+    "whatToDo": "What to do:",
+    "instructions": {
+      "contact": "Contact {contactEmail} to request access",
+      "provideDetails": "Provide your role and reason for needing access",
+      "waitForApproval": "Wait for permission to be granted"
+    },
+    "technicalDetails": "Technical Details",
+    "requiredPermission": "Required permission:",
+    "requestAccess": "Request Access",
+    "goBack": "Go Back"
+  },
+  "permissionDeniedModal": {
+    "title": "Permission Denied",
+    "adminRequired": "Administrator Access Required",
+    "accessDenied": "ACCESS_DENIED",
+    "module": "Module:",
+    "requiredPermission": "Required Permission:",
+    "whatCanIDo": "What can I do?",
+    "technicalDetails": "Technical Details",
+    "needAccess": "Need Access?",
+    "adminMessage": "This action requires administrator privileges. Contact your system administrator to discuss your access needs.",
+    "requestMessage": "Contact your administrator or team lead to request access to this feature. Be sure to explain why you need this permission for your work.",
+    "requestAccess": "Request Access",
+    "close": "Close"
+  },
+  "deleteConfirmation": {
+    "defaultTitle": "Delete Item?",
+    "youAreAboutToDelete": "You are about to delete:",
+    "defaultDescription": "This action cannot be undone.",
+    "warning": "Warning:",
+    "permanentWarning": "This action is permanent and cannot be reversed. All associated data will be permanently deleted.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleting": "Deleting..."
+  },
+  "loading": {
+    "loading": "Loading",
+    "loadingText": "Loading...",
+    "loadingContent": "Loading content"
+  },
+  "dateTimePicker": {
+    "placeholder": "Select date and time...",
+    "clearDateTime": "Clear date and time",
+    "done": "Done",
+    "hourPlaceholder": "HH",
+    "minutePlaceholder": "MM"
+  },
+  "costDisplay": {
+    "per100Calls": "/100 calls",
+    "showActualCost": "Show actual cost",
+    "showPer100": "Show cost per 100 calls",
+    "multiplier1x": "1×",
+    "multiplier100x": "100×"
+  }
+}

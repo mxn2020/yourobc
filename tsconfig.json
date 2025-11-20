@@ -1,0 +1,49 @@
+{
+  "include": [
+    "**/*.ts",
+    "**/*.tsx", "convex/schema.ts.bak",
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Stricter Type Checking (enable gradually to fix existing code) */
+    // "exactOptionalPropertyTypes": true,  // Very strict about undefined vs optional - 100+ errors
+    // "noUncheckedIndexedAccess": true,  // Safer array/object access - 300+ errors to fix first
+    // "noPropertyAccessFromIndexSignature": true,  // Requires bracket notation for index signatures
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/features/*": ["src/features/*"],
+      "@/components/*": ["src/components/*"],
+      "@/routes/*": ["src/routes/*"],
+      "@/convex/*": ["convex/*"]
+    },
+    "noEmit": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    ".backup",
+    ".nitro",
+    ".output",
+    ".tanstack",
+    "coverage",
+    "convex/**/*"
+  ]
+}

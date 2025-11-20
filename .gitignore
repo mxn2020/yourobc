@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+/build/
+/dist/
+/.output/
+/.vinxi/
+/.tanstack/
+.nitro/
+/public/build/
+/api/
+/server/build/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+
+# IDE and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Cache directories
+.cache/
+.next/
+.nuxt/
+.turbo/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Test results
+test-results/
+playwright-report/
+
+# Deployment
+.vercel/
+.netlify/
+
+# Temporary files
+tmp/
+temp/
+
+# Sentry
+.env.sentry-build-plugin
+/generated/prisma
+
+# Templates
+convex/_templates
+src/_templates

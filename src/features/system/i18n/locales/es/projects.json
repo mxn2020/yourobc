@@ -1,0 +1,217 @@
+{
+  "page": {
+    "title": "Proyectos",
+    "subtitle": "Administra y rastrea tus proyectos",
+    "createNew": "Nuevo Proyecto",
+    "allProjects": "Todos los Proyectos",
+    "myProjects": "Mis Proyectos",
+    "owned": "De Mi Propiedad",
+    "collaborating": "Colaborando",
+    "viewModes": {
+      "cards": "Tarjetas",
+      "table": "Tabla"
+    },
+    "showing": "Mostrando",
+    "of": "de",
+    "projects_one": "proyecto",
+    "projects_other": "proyectos",
+    "for": "para",
+    "noProjectsFound": "No se encontraron proyectos que coincidan con tus criterios",
+    "noProjects": "Aún no hay proyectos",
+    "tryAdjusting": "Intenta ajustar tu búsqueda o filtros",
+    "createFirst": "¡Crea tu primer proyecto para comenzar!",
+    "projectsWillAppear": "Los proyectos aparecerán aquí una vez creados.",
+    "clearAllFilters": "Limpiar todos los filtros",
+    "addNewProject": "Agregar Nuevo Proyecto",
+    "loading": "Cargando proyectos..."
+  },
+  "stats": {
+    "total": "total",
+    "active": "activos",
+    "completed": "completados",
+    "overdue": "vencidos",
+    "totalProjects": "Proyectos Totales",
+    "activeProjects": "Proyectos Activos",
+    "completedProjects": "Completados",
+    "averageProgress": "Progreso Promedio",
+    "completion": "completado",
+    "onHold": "en espera",
+    "archived": "archivados",
+    "byStatus": "Por Estado",
+    "byPriority": "Por Prioridad",
+    "byCategory": "Por Categoría",
+    "projectHealth": "Salud del Proyecto",
+    "completionRate": "Tasa de Completado",
+    "overdueProjects": "Proyectos Vencidos",
+    "needAttention": "necesitan atención",
+    "atRisk": "En Riesgo",
+    "dueSoon": "vencen pronto",
+    "noCategoriesYet": "Sin categorías aún"
+  },
+  "status": {
+    "active": "Activo",
+    "completed": "Completado",
+    "onHold": "En Espera",
+    "archived": "Archivado"
+  },
+  "priority": {
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta",
+    "urgent": "Urgente",
+    "critical": "Crítica"
+  },
+  "health": {
+    "excellent": "Excelente",
+    "good": "Bueno",
+    "warning": "Advertencia",
+    "critical": "Crítico"
+  },
+  "visibility": {
+    "public": "Público",
+    "private": "Privado",
+    "team": "Equipo"
+  },
+  "card": {
+    "progress": "Progreso",
+    "tasks": "tareas",
+    "complete": "Completo",
+    "due": "Vence:",
+    "overdue": "Vencido",
+    "days": "días",
+    "budget": "Presupuesto",
+    "spent": "Gastado",
+    "created": "Creado:",
+    "updated": "Actualizado:",
+    "collaborator": "colaborador",
+    "collaborators": "colaboradores",
+    "viewDetails": "Ver Detalles",
+    "privateLabel": "Privado"
+  },
+  "form": {
+    "sections": {
+      "basicInfo": "Información Básica",
+      "timeline": "Cronograma",
+      "settings": "Configuración del Proyecto",
+      "additionalInfo": "Información Adicional"
+    },
+    "labels": {
+      "title": "Título del Proyecto",
+      "description": "Descripción",
+      "priority": "Prioridad",
+      "visibility": "Visibilidad",
+      "category": "Categoría",
+      "tags": "Etiquetas",
+      "startDate": "Fecha de Inicio",
+      "dueDate": "Fecha de Vencimiento",
+      "estimatedHours": "Horas Estimadas",
+      "budget": "Presupuesto ($)",
+      "actualCost": "Costo Real ($)",
+      "riskLevel": "Nivel de Riesgo",
+      "client": "Cliente"
+    },
+    "placeholders": {
+      "title": "Ingrese el título del proyecto",
+      "description": "Describa su proyecto...",
+      "category": "p. ej., Desarrollo Web",
+      "tags": "Ingrese etiquetas separadas por comas (máx. 10)",
+      "client": "Nombre del cliente"
+    },
+    "helpText": {
+      "characters": "caracteres",
+      "tagsHelp": "Separe las etiquetas con comas"
+    },
+    "settings": {
+      "allowComments": "Permitir comentarios en este proyecto",
+      "requireApproval": "Requerir aprobación para cambios",
+      "emailNotifications": "Enviar notificaciones por correo electrónico",
+      "autoArchive": "Archivar automáticamente al completar"
+    },
+    "riskLevels": {
+      "low": "Riesgo Bajo",
+      "medium": "Riesgo Medio",
+      "high": "Riesgo Alto",
+      "critical": "Riesgo Crítico"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "create": "Crear Proyecto",
+      "update": "Actualizar Proyecto"
+    },
+    "validation": {
+      "titleRequired": "El título del proyecto es obligatorio",
+      "titleTooLong": "El título debe tener menos de 100 caracteres",
+      "descriptionTooLong": "La descripción debe tener menos de 2000 caracteres",
+      "dueDateBeforeStart": "La fecha de vencimiento no puede ser anterior a la fecha de inicio",
+      "invalidEstimatedHours": "Las horas estimadas deben ser un número positivo",
+      "invalidBudget": "El presupuesto debe ser un número positivo",
+      "invalidActualCost": "El costo real debe ser un número positivo",
+      "fixErrors": "Por favor corrija los errores en el formulario"
+    }
+  },
+  "table": {
+    "headers": {
+      "project": "Proyecto",
+      "status": "Estado",
+      "priority": "Prioridad",
+      "progress": "Progreso",
+      "dueDate": "Fecha de Vencimiento",
+      "collaborators": "Colaboradores",
+      "actions": "Acciones"
+    },
+    "daysLeft": "días restantes",
+    "overdue": "Vencido",
+    "noDueDate": "Sin fecha de vencimiento",
+    "member": "miembro",
+    "members": "miembros",
+    "view": "Ver",
+    "empty": "No hay proyectos para mostrar"
+  },
+  "actions": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "view": "Ver"
+  },
+  "filters": {
+    "searchPlaceholder": "Buscar proyectos por título o descripción...",
+    "allStatuses": "Todos los Estados",
+    "allPriorities": "Todas las Prioridades",
+    "allCategories": "Todas las Categorías",
+    "clearFilters": "Limpiar Filtros"
+  },
+  "quickFilters": {
+    "byStatus": "Filtro Rápido por Estado:",
+    "byPriority": "Filtro Rápido por Prioridad:",
+    "special": "Filtros Especiales:",
+    "atRisk": "En Riesgo",
+    "overdue": "Vencidos"
+  },
+  "help": {
+    "title": "¿Necesitas Ayuda?",
+    "description": "Aprende a aprovechar al máximo tu gestión de proyectos",
+    "viewDocumentation": "Ver Documentación"
+  },
+  "helpSection": {
+    "managementTips": {
+      "title": "Consejos de Gestión de Proyectos",
+      "tip1": "Mantén el estado de tus proyectos actualizado para una mejor coordinación del equipo",
+      "tip2": "Establece fechas de vencimiento realistas y actualiza el progreso regularmente",
+      "tip3": "Usa etiquetas y categorías para organizar proyectos relacionados",
+      "tip4": "Agrega colaboradores a los proyectos para visibilidad del equipo"
+    },
+    "priorityLevels": {
+      "title": "Niveles de Prioridad",
+      "urgent": "Proyectos críticos que requieren atención inmediata",
+      "high": "Proyectos importantes con plazos cercanos",
+      "medium": "Proyectos estándar con cronogramas normales",
+      "low": "Proyectos con cronogramas flexibles"
+    },
+    "statusDescriptions": {
+      "title": "Estados del Proyecto",
+      "active": "Actualmente en progreso",
+      "completed": "Proyectos finalizados",
+      "onHold": "Proyectos pausados temporalmente",
+      "archived": "Proyectos históricos que ya no están activos"
+    }
+  }
+}

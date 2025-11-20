@@ -1,0 +1,112 @@
+{
+  "websites": {
+    "title": "网站",
+    "description": "构建和管理您的网站",
+    "create": "创建网站",
+    "createDescription": "创建一个新网站以开始建立您的在线形象",
+    "edit": "编辑网站",
+    "delete": "删除网站",
+    "publish": "发布网站",
+    "unpublish": "取消发布",
+    "view": "查看网站",
+    "settings": "网站设置",
+    "pages": "页面",
+    "sections": "部分",
+    "themes": "主题",
+    "templates": "模板",
+    "collaborators": "协作者",
+    "stats": "统计",
+    "empty": "还没有网站",
+    "emptyDescription": "创建您的第一个网站以开始",
+    "loading": "加载网站中..."
+  },
+  "pages": {
+    "title": "页面",
+    "create": "创建页面",
+    "edit": "编辑页面",
+    "delete": "删除页面",
+    "publish": "发布页面",
+    "view": "查看页面",
+    "empty": "还没有页面",
+    "emptyDescription": "创建您的第一个页面"
+  },
+  "sections": {
+    "title": "部分",
+    "create": "创建部分",
+    "edit": "编辑部分",
+    "delete": "删除部分",
+    "library": "部分库",
+    "empty": "还没有部分"
+  },
+  "fields": {
+    "name": "名称",
+    "description": "描述",
+    "domain": "域名",
+    "subdomain": "子域名",
+    "status": "状态",
+    "visibility": "可见性",
+    "theme": "主题",
+    "title": "标题",
+    "slug": "短链接",
+    "path": "路径",
+    "content": "内容",
+    "excerpt": "摘要",
+    "template": "模板",
+    "layout": "布局",
+    "seo": "SEO设置",
+    "featuredImage": "特色图片",
+    "publishedAt": "发布于",
+    "scheduledAt": "计划于"
+  },
+  "status": {
+    "draft": "草稿",
+    "published": "已发布",
+    "archived": "已归档",
+    "maintenance": "维护中",
+    "scheduled": "已计划"
+  },
+  "visibility": {
+    "private": "私密",
+    "team": "团队",
+    "public": "公开"
+  },
+  "templates": {
+    "landing": "着陆页",
+    "features": "功能",
+    "about": "关于",
+    "contact": "联系",
+    "blog": "博客",
+    "services": "服务",
+    "pricing": "价格",
+    "testimonials": "推荐",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "cookies": "Cookie政策",
+    "gdpr": "GDPR",
+    "custom": "自定义"
+  },
+  "messages": {
+    "createSuccess": "网站创建成功",
+    "updateSuccess": "网站更新成功",
+    "deleteSuccess": "网站删除成功",
+    "deleteConfirm": "您确定要删除此网站吗？",
+    "publishSuccess": "网站发布成功",
+    "pageCreateSuccess": "页面创建成功",
+    "pageUpdateSuccess": "页面更新成功",
+    "pageDeleteSuccess": "页面删除成功",
+    "pagePublishSuccess": "页面发布成功"
+  },
+  "form": {
+    "placeholders": {
+      "name": "我的网站",
+      "description": "您网站的简短描述",
+      "subdomain": "mysite",
+      "domain": "example.com"
+    },
+    "buttons": {
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中..."
+    }
+  }
+}

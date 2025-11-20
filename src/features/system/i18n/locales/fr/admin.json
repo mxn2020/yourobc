@@ -1,0 +1,427 @@
+{
+  "layout": {
+    "actions": {
+      "viewActivity": "View Activity",
+      "settings": "Settings"
+    }
+  },
+  "guard": {
+    "accessDenied": {
+      "title": "Access Denied",
+      "message": "You don't have permission to access this area."
+    },
+    "insufficientRole": {
+      "title": "Insufficient Role",
+      "message": "This area requires {requiredRole} role. Your role: {userRole}"
+    },
+    "insufficientPermissions": {
+      "title": "Insufficient Permissions",
+      "message": "You don't have the required permissions for this action."
+    },
+    "notAuthenticated": "Access denied: Not authenticated",
+    "accessRestricted": {
+      "title": "Access Restricted",
+      "message": "Required role: {requiredRole}. Your role: {userRole}"
+    },
+    "permissionRequired": {
+      "title": "Permission Required",
+      "message": "You need the \"{permission}\" permission to access this content."
+    },
+    "impersonation": {
+      "disabled": "This feature is disabled during impersonation",
+      "onlyDuringImpersonation": "This content is only available during impersonation"
+    }
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "System overview and statistics",
+    "stats": {
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "adminUsers": "Admin Users",
+      "verifiedUsers": "Verified Users",
+      "aiRequests": "AI Requests",
+      "totalAICost": "Total AI Cost",
+      "totalKarma": "Total Karma",
+      "avgRequestsPerUser": "Avg Requests/User",
+      "completeProfiles": "Complete Profiles",
+      "bannedUsers": "Banned Users",
+      "avgKarmaPerUser": "Avg Karma/User",
+      "systemHealth": "System Health"
+    },
+    "periods": {
+      "thisWeek": "this week",
+      "ofTotal": "of total"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "manageUsers": "Manage Users",
+      "systemSettings": "System Settings",
+      "viewLogs": "View Logs",
+      "analytics": "Analytics"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "newUserRegistered": "New user registered",
+      "userRoleUpdated": "User role updated",
+      "systemSettingsChanged": "System settings changed",
+      "databaseBackupCompleted": "Database backup completed",
+      "viewAll": "View All Activity",
+      "timeAgo": {
+        "minutes": "{count}m ago",
+        "hours": "{count}h ago"
+      }
+    },
+    "systemHealth": {
+      "title": "System Health",
+      "database": "Database",
+      "apiServices": "API Services",
+      "storage": "Storage",
+      "status": {
+        "healthy": "Healthy",
+        "operational": "Operational",
+        "available": "{percent}% Available"
+      }
+    },
+    "keyMetrics": {
+      "title": "Key Metrics",
+      "userActivationRate": "User Activation Rate",
+      "profileCompletionRate": "Profile Completion Rate",
+      "emailVerificationRate": "Email Verification Rate",
+      "bannedUsers": "Banned Users",
+      "viewDetailed": "View Detailed Analytics"
+    },
+    "errors": {
+      "loadingDashboard": "Error Loading Dashboard",
+      "failedToLoad": "Failed to load dashboard data",
+      "retry": "Retry",
+      "noDataAvailable": "No data available"
+    }
+  },
+  "auditLogs": {
+    "title": "Audit Logs",
+    "subtitle": "Track all system activities and changes",
+    "actions": {
+      "exportCsv": "Export CSV",
+      "exportJson": "Export JSON"
+    },
+    "stats": {
+      "totalEvents": "Total Events",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month"
+    },
+    "filters": {
+      "title": "Filters",
+      "searchPlaceholder": "Search logs...",
+      "allActions": "All Actions",
+      "allEntityTypes": "All Entity Types",
+      "resetFilters": "Reset Filters",
+      "showing": "Showing {count} of {total} events"
+    },
+    "table": {
+      "columns": {
+        "timestamp": "Timestamp",
+        "user": "User",
+        "action": "Action",
+        "entityType": "Entity Type",
+        "description": "Description",
+        "details": "Details"
+      },
+      "details": {
+        "dataChanged": "Data changed",
+        "locationData": "Location data"
+      }
+    },
+    "pagination": {
+      "page": "Page {page}",
+      "showing": "{count} of {total} events",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "summary": {
+      "topActions": "Top Actions",
+      "entityTypes": "Entity Types",
+      "events": "{count} events"
+    },
+    "states": {
+      "loading": "Loading audit logs...",
+      "noLogs": "No audit logs found",
+      "clearFilters": "Clear Filters"
+    },
+    "errors": {
+      "loadingLogs": "Error Loading Audit Logs",
+      "failedToLoad": "Failed to load audit data",
+      "retry": "Retry"
+    }
+  },
+  "settings": {
+    "title": "System Settings",
+    "subtitle": "Configure application settings and preferences",
+    "tabs": {
+      "general": "General",
+      "ai": "AI Settings",
+      "security": "Security",
+      "notifications": "Notifications",
+      "featureConfig": "Feature Configuration"
+    },
+    "general": {
+      "title": "General Settings",
+      "siteName": {
+        "label": "Site Name",
+        "placeholder": "Enter site name"
+      },
+      "siteDescription": {
+        "label": "Site Description",
+        "placeholder": "Enter site description"
+      },
+      "maintenanceMode": {
+        "label": "Maintenance Mode",
+        "help": "Temporarily disable site access for maintenance"
+      },
+      "registrationEnabled": {
+        "label": "Enable Registration",
+        "help": "Allow new users to register accounts"
+      },
+      "emailVerificationRequired": {
+        "label": "Require Email Verification",
+        "help": "Users must verify their email before accessing the system"
+      },
+      "save": "Save General Settings"
+    },
+    "ai": {
+      "title": "AI Configuration",
+      "provider": {
+        "label": "AI Provider",
+        "placeholder": "Select a provider",
+        "help": "Choose your preferred AI service provider"
+      },
+      "model": {
+        "label": "AI Model",
+        "placeholder": "Select a model",
+        "help": "The default model used for AI text generation throughout the app"
+      },
+      "maxTokens": {
+        "label": "Default Max Tokens",
+        "help": "Default maximum tokens for AI responses"
+      },
+      "temperature": {
+        "label": "Default Temperature: {value}",
+        "levels": {
+          "focused": "Focused",
+          "balanced": "Balanced",
+          "creative": "Creative"
+        },
+        "help": "Default creativity level for AI responses"
+      },
+      "logging": {
+        "label": "Enable AI Logging",
+        "help": "Track AI usage, costs, and performance metrics"
+      },
+      "testConnection": {
+        "title": "Test AI Connection",
+        "description": "Verify that the AI service is working with current settings",
+        "button": "Test Connection",
+        "success": "AI connection test successful!",
+        "failed": "Test failed: {message}",
+        "results": {
+          "success": "Test Successful",
+          "failed": "Test Failed"
+        }
+      },
+      "save": "Save AI Settings"
+    },
+    "security": {
+      "title": "Security Settings",
+      "sessionTimeout": {
+        "label": "Session Timeout (seconds)",
+        "help": "How long sessions stay active (300-86400 seconds)"
+      },
+      "maxLoginAttempts": {
+        "label": "Max Login Attempts",
+        "help": "Account locks after this many failed attempts"
+      },
+      "passwordMinLength": {
+        "label": "Minimum Password Length",
+        "help": "Minimum number of characters required for passwords"
+      },
+      "requireTwoFactor": {
+        "label": "Require Two-Factor Authentication",
+        "help": "Force all users to enable 2FA for enhanced security"
+      },
+      "save": "Save Security Settings"
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "adminAlerts": {
+        "label": "Admin Alerts",
+        "help": "Receive notifications about system events and issues"
+      },
+      "userWelcomeEmail": {
+        "label": "User Welcome Emails",
+        "help": "Send welcome emails to new users upon registration"
+      },
+      "passwordResetEmail": {
+        "label": "Password Reset Emails",
+        "help": "Send password reset links via email"
+      },
+      "securityNotifications": {
+        "label": "Security Notifications",
+        "help": "Notify users of security events like login attempts"
+      },
+      "save": "Save Notification Settings"
+    },
+    "states": {
+      "loading": "Loading settings...",
+      "loadingProfile": "Loading admin profile...",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "saveSuccess": {
+        "general": "General settings saved successfully!",
+        "ai": "AI settings saved successfully!",
+        "security": "Security settings saved successfully!",
+        "notifications": "Notification settings saved successfully!"
+      }
+    }
+  },
+  "userManagement": {
+    "title": "User Management",
+    "subtitle": "Manage users, roles, and authentication",
+    "actions": {
+      "export": "Export",
+      "addUser": "Add User"
+    },
+    "filters": {
+      "searchPlaceholder": "Search users by name, email...",
+      "allRoles": "All Roles",
+      "allStatus": "All Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "reset": "Reset"
+    },
+    "bulkActions": {
+      "selected": "{count} user selected",
+      "selectedPlural": "{count} users selected",
+      "clearSelection": "Clear Selection",
+      "activateSelected": "Activate Selected",
+      "deactivateSelected": "Deactivate Selected",
+      "changeToUser": "Change to User"
+    },
+    "table": {
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "status": "Status",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "status": {
+        "banned": "Banned",
+        "active": "Active"
+      },
+      "noName": "No name",
+      "tooltips": {
+        "changeRole": "Change role",
+        "impersonate": "Impersonate user",
+        "banUser": "Ban user",
+        "unbanUser": "Unban user",
+        "moreActions": "More actions"
+      }
+    },
+    "pagination": {
+      "page": "Page {page}",
+      "showing": "{count} of {total} users",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "states": {
+      "loading": "Loading users...",
+      "loadingProfile": "Loading admin profile...",
+      "noUsers": "No users found",
+      "clearFilters": "Clear Filters"
+    },
+    "errors": {
+      "loadingUsers": "Error Loading Users",
+      "failedToLoad": "Failed to load user data",
+      "retry": "Retry"
+    },
+    "confirmations": {
+      "deleteUser": "Are you sure you want to permanently delete {name}? This action cannot be undone."
+    },
+    "timeAgo": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{count} days ago",
+      "weeksAgo": "{count} weeks ago",
+      "monthsAgo": "{count} months ago"
+    },
+    "modals": {
+      "roleChange": {
+        "title": "Change User Role",
+        "changingFor": "Changing role for: {name}",
+        "currentRole": "Current role: {role}",
+        "cancel": "Cancel",
+        "save": "Change Role",
+        "saving": "Changing..."
+      },
+      "banUser": {
+        "title": "Ban User",
+        "banningUser": "Banning: {name}",
+        "reasonLabel": "Ban Reason (optional)",
+        "reasonPlaceholder": "Enter reason for ban...",
+        "durationLabel": "Ban Duration",
+        "permanent": "Permanent",
+        "temporary": "Temporary",
+        "days": "days",
+        "cancel": "Cancel",
+        "save": "Ban User",
+        "saving": "Banning..."
+      },
+      "resetPassword": {
+        "title": "Reset User Password",
+        "resettingFor": "Resetting password for: {name}",
+        "newPasswordLabel": "New Password",
+        "newPasswordPlaceholder": "Enter new password...",
+        "confirmPasswordLabel": "Confirm Password",
+        "confirmPasswordPlaceholder": "Confirm new password...",
+        "cancel": "Cancel",
+        "save": "Reset Password",
+        "saving": "Resetting...",
+        "errors": {
+          "noMatch": "Passwords do not match",
+          "tooShort": "Password must be at least 8 characters long"
+        }
+      }
+    }
+  },
+  "configDialog": {
+    "title": "Confirm Configuration Change",
+    "summary": {
+      "changingTitle": "You are about to change:",
+      "feature": "Feature:",
+      "setting": "Setting:",
+      "from": "From:",
+      "to": "To:"
+    },
+    "restartRequired": {
+      "title": "Restart Required",
+      "description": "This change requires an application restart to take effect. The new value will be saved but won't be active until you restart the application."
+    },
+    "dependentFeatures": {
+      "title": "Dependent Features",
+      "description": "The following features depend on {feature} and may be affected by this change:"
+    },
+    "warning": "Please ensure you understand the impact of this change before proceeding. You can always reset to default values if needed.",
+    "values": {
+      "notSet": "Not set",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "confirm": "Confirm Change",
+      "confirmWithRestart": "Save & Restart Later"
+    }
+  }
+}

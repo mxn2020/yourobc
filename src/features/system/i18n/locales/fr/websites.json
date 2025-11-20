@@ -1,0 +1,112 @@
+{
+  "websites": {
+    "title": "Sites Web",
+    "description": "Créez et gérez vos sites web",
+    "create": "Créer un Site Web",
+    "createDescription": "Créez un nouveau site web pour commencer à construire votre présence en ligne",
+    "edit": "Modifier le Site Web",
+    "delete": "Supprimer le Site Web",
+    "publish": "Publier le Site Web",
+    "unpublish": "Dépublier",
+    "view": "Voir le Site Web",
+    "settings": "Paramètres du Site Web",
+    "pages": "Pages",
+    "sections": "Sections",
+    "themes": "Thèmes",
+    "templates": "Modèles",
+    "collaborators": "Collaborateurs",
+    "stats": "Statistiques",
+    "empty": "Aucun site web pour le moment",
+    "emptyDescription": "Créez votre premier site web pour commencer",
+    "loading": "Chargement des sites web..."
+  },
+  "pages": {
+    "title": "Pages",
+    "create": "Créer une Page",
+    "edit": "Modifier la Page",
+    "delete": "Supprimer la Page",
+    "publish": "Publier la Page",
+    "view": "Voir la Page",
+    "empty": "Aucune page pour le moment",
+    "emptyDescription": "Créez votre première page"
+  },
+  "sections": {
+    "title": "Sections",
+    "create": "Créer une Section",
+    "edit": "Modifier la Section",
+    "delete": "Supprimer la Section",
+    "library": "Bibliothèque de Sections",
+    "empty": "Aucune section pour le moment"
+  },
+  "fields": {
+    "name": "Nom",
+    "description": "Description",
+    "domain": "Domaine",
+    "subdomain": "Sous-domaine",
+    "status": "Statut",
+    "visibility": "Visibilité",
+    "theme": "Thème",
+    "title": "Titre",
+    "slug": "Slug",
+    "path": "Chemin",
+    "content": "Contenu",
+    "excerpt": "Extrait",
+    "template": "Modèle",
+    "layout": "Mise en page",
+    "seo": "Paramètres SEO",
+    "featuredImage": "Image en vedette",
+    "publishedAt": "Publié le",
+    "scheduledAt": "Programmé pour"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "published": "Publié",
+    "archived": "Archivé",
+    "maintenance": "Maintenance",
+    "scheduled": "Programmé"
+  },
+  "visibility": {
+    "private": "Privé",
+    "team": "Équipe",
+    "public": "Public"
+  },
+  "templates": {
+    "landing": "Page d'accueil",
+    "features": "Fonctionnalités",
+    "about": "À propos",
+    "contact": "Contact",
+    "blog": "Blog",
+    "services": "Services",
+    "pricing": "Tarifs",
+    "testimonials": "Témoignages",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "cookies": "Politique des cookies",
+    "gdpr": "RGPD",
+    "custom": "Personnalisé"
+  },
+  "messages": {
+    "createSuccess": "Site web créé avec succès",
+    "updateSuccess": "Site web mis à jour avec succès",
+    "deleteSuccess": "Site web supprimé avec succès",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce site web ?",
+    "publishSuccess": "Site web publié avec succès",
+    "pageCreateSuccess": "Page créée avec succès",
+    "pageUpdateSuccess": "Page mise à jour avec succès",
+    "pageDeleteSuccess": "Page supprimée avec succès",
+    "pagePublishSuccess": "Page publiée avec succès"
+  },
+  "form": {
+    "placeholders": {
+      "name": "Mon Site Web",
+      "description": "Une brève description de votre site web",
+      "subdomain": "monsite",
+      "domain": "exemple.com"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "buildCommand": "pnpm build:prod",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "outputDirectory": ".output/public",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "PRISMA_GENERATE_SKIP_POSTINSTALL": "false"
+    }
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1"]
+}

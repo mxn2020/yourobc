@@ -1,0 +1,82 @@
+{
+  "errorModal": {
+    "setupInstructions": "Instrucciones de configuración:",
+    "helpfulLinks": "Enlaces útiles:",
+    "continueWithoutAI": "Continuar sin modelos de IA",
+    "retryAfterSetup": "Reintentar después de configurar"
+  },
+  "errorState": {
+    "titles": {
+      "sessionExpired": "Sesión expirada",
+      "accessDenied": "Acceso denegado",
+      "connectionError": "Error de conexión",
+      "invalidData": "Datos inválidos",
+      "notFound": "No encontrado",
+      "somethingWentWrong": "Algo salió mal"
+    },
+    "whatToDo": "Qué hacer:",
+    "technicalDetails": "Detalles técnicos",
+    "errorCode": "Código de error:",
+    "permission": "Permiso:",
+    "retry": "Reintentar",
+    "goBack": "Volver"
+  },
+  "permissionDenied": {
+    "title": "Acceso denegado",
+    "defaultMessage": "No tienes permiso para acceder a {module}.",
+    "thisResource": "este recurso",
+    "whatToDo": "Qué hacer:",
+    "instructions": {
+      "contact": "Contacta a {contactEmail} para solicitar acceso",
+      "provideDetails": "Proporciona tu rol y la razón para necesitar acceso",
+      "waitForApproval": "Espera a que se te otorgue el permiso"
+    },
+    "technicalDetails": "Detalles técnicos",
+    "requiredPermission": "Permiso requerido:",
+    "requestAccess": "Solicitar acceso",
+    "goBack": "Volver"
+  },
+  "permissionDeniedModal": {
+    "title": "Permiso denegado",
+    "adminRequired": "Se requiere acceso de administrador",
+    "accessDenied": "ACCESO_DENEGADO",
+    "module": "Módulo:",
+    "requiredPermission": "Permiso requerido:",
+    "whatCanIDo": "¿Qué puedo hacer?",
+    "technicalDetails": "Detalles técnicos",
+    "needAccess": "¿Necesitas acceso?",
+    "adminMessage": "Esta acción requiere privilegios de administrador. Contacta a tu administrador del sistema para discutir tus necesidades de acceso.",
+    "requestMessage": "Contacta a tu administrador o líder de equipo para solicitar acceso a esta función. Asegúrate de explicar por qué necesitas este permiso para tu trabajo.",
+    "requestAccess": "Solicitar acceso",
+    "close": "Cerrar"
+  },
+  "deleteConfirmation": {
+    "defaultTitle": "¿Eliminar elemento?",
+    "youAreAboutToDelete": "Estás a punto de eliminar:",
+    "defaultDescription": "Esta acción no se puede deshacer.",
+    "warning": "Advertencia:",
+    "permanentWarning": "Esta acción es permanente y no se puede revertir. Todos los datos asociados se eliminarán permanentemente.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "deleting": "Eliminando..."
+  },
+  "loading": {
+    "loading": "Cargando",
+    "loadingText": "Cargando...",
+    "loadingContent": "Cargando contenido"
+  },
+  "dateTimePicker": {
+    "placeholder": "Seleccionar fecha y hora...",
+    "clearDateTime": "Limpiar fecha y hora",
+    "done": "Hecho",
+    "hourPlaceholder": "HH",
+    "minutePlaceholder": "MM"
+  },
+  "costDisplay": {
+    "per100Calls": "/100 llamadas",
+    "showActualCost": "Mostrar costo real",
+    "showPer100": "Mostrar costo por 100 llamadas",
+    "multiplier1x": "1×",
+    "multiplier100x": "100×"
+  }
+}

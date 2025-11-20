@@ -1,0 +1,112 @@
+{
+  "websites": {
+    "title": "Webseiten",
+    "description": "Erstellen und verwalten Sie Ihre Webseiten",
+    "create": "Webseite erstellen",
+    "createDescription": "Erstellen Sie eine neue Webseite, um Ihre Online-Präsenz aufzubauen",
+    "edit": "Webseite bearbeiten",
+    "delete": "Webseite löschen",
+    "publish": "Webseite veröffentlichen",
+    "unpublish": "Veröffentlichung rückgängig machen",
+    "view": "Webseite anzeigen",
+    "settings": "Webseiten-Einstellungen",
+    "pages": "Seiten",
+    "sections": "Abschnitte",
+    "themes": "Themes",
+    "templates": "Vorlagen",
+    "collaborators": "Mitarbeiter",
+    "stats": "Statistiken",
+    "empty": "Noch keine Webseiten",
+    "emptyDescription": "Erstellen Sie Ihre erste Webseite, um zu beginnen",
+    "loading": "Webseiten werden geladen..."
+  },
+  "pages": {
+    "title": "Seiten",
+    "create": "Seite erstellen",
+    "edit": "Seite bearbeiten",
+    "delete": "Seite löschen",
+    "publish": "Seite veröffentlichen",
+    "view": "Seite anzeigen",
+    "empty": "Noch keine Seiten",
+    "emptyDescription": "Erstellen Sie Ihre erste Seite"
+  },
+  "sections": {
+    "title": "Abschnitte",
+    "create": "Abschnitt erstellen",
+    "edit": "Abschnitt bearbeiten",
+    "delete": "Abschnitt löschen",
+    "library": "Abschnittsbibliothek",
+    "empty": "Noch keine Abschnitte"
+  },
+  "fields": {
+    "name": "Name",
+    "description": "Beschreibung",
+    "domain": "Domain",
+    "subdomain": "Subdomain",
+    "status": "Status",
+    "visibility": "Sichtbarkeit",
+    "theme": "Theme",
+    "title": "Titel",
+    "slug": "Slug",
+    "path": "Pfad",
+    "content": "Inhalt",
+    "excerpt": "Auszug",
+    "template": "Vorlage",
+    "layout": "Layout",
+    "seo": "SEO-Einstellungen",
+    "featuredImage": "Hauptbild",
+    "publishedAt": "Veröffentlicht am",
+    "scheduledAt": "Geplant für"
+  },
+  "status": {
+    "draft": "Entwurf",
+    "published": "Veröffentlicht",
+    "archived": "Archiviert",
+    "maintenance": "Wartung",
+    "scheduled": "Geplant"
+  },
+  "visibility": {
+    "private": "Privat",
+    "team": "Team",
+    "public": "Öffentlich"
+  },
+  "templates": {
+    "landing": "Landingpage",
+    "features": "Funktionen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "services": "Dienstleistungen",
+    "pricing": "Preise",
+    "testimonials": "Testimonials",
+    "privacy": "Datenschutzerklärung",
+    "terms": "Nutzungsbedingungen",
+    "cookies": "Cookie-Richtlinie",
+    "gdpr": "DSGVO",
+    "custom": "Benutzerdefiniert"
+  },
+  "messages": {
+    "createSuccess": "Webseite erfolgreich erstellt",
+    "updateSuccess": "Webseite erfolgreich aktualisiert",
+    "deleteSuccess": "Webseite erfolgreich gelöscht",
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Webseite löschen möchten?",
+    "publishSuccess": "Webseite erfolgreich veröffentlicht",
+    "pageCreateSuccess": "Seite erfolgreich erstellt",
+    "pageUpdateSuccess": "Seite erfolgreich aktualisiert",
+    "pageDeleteSuccess": "Seite erfolgreich gelöscht",
+    "pagePublishSuccess": "Seite erfolgreich veröffentlicht"
+  },
+  "form": {
+    "placeholders": {
+      "name": "Meine Webseite",
+      "description": "Eine kurze Beschreibung Ihrer Webseite",
+      "subdomain": "meineseite",
+      "domain": "beispiel.de"
+    },
+    "buttons": {
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert..."
+    }
+  }
+}

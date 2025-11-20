@@ -1,0 +1,180 @@
+{
+  "home": {
+    "title": "Welcome to Our Blog",
+    "subtitle": "Discover insights, tutorials, and stories from our team",
+    "searchPlaceholder": "Search articles...",
+    "featuredPosts": "Featured Posts",
+    "recentPosts": "Recent Posts",
+    "categories": "Categories",
+    "loadingCategories": "Loading categories...",
+    "noCategoriesYet": "No categories yet",
+    "newsletter": {
+      "title": "Subscribe to Newsletter",
+      "description": "Get the latest posts delivered right to your inbox.",
+      "emailPlaceholder": "Enter your email",
+      "subscribe": "Subscribe"
+    }
+  },
+  "dashboard": {
+    "title": "Blog Dashboard",
+    "provider": "Provider:",
+    "newPost": "New Post",
+    "stats": {
+      "totalPosts": "Total Posts",
+      "totalViews": "Total Views",
+      "comments": "Comments",
+      "engagement": "Engagement"
+    },
+    "quickActions": {
+      "managePosts": "Manage Posts",
+      "managePostsDesc": "View and edit all blog posts",
+      "categories": "Categories",
+      "categoriesDesc": "Organize posts by category",
+      "tags": "Tags",
+      "tagsDesc": "Manage post tags"
+    },
+    "recentDrafts": "Recent Drafts",
+    "viewAll": "View All",
+    "loading": "Loading blog service...",
+    "error": "Error:"
+  },
+  "post": {
+    "featured": "Featured",
+    "tags": "Tags",
+    "shareThisPost": "Share this post",
+    "backToBlog": "Back to Blog",
+    "notFound": "Post Not Found",
+    "notFoundDesc": "The post you're looking for doesn't exist.",
+    "loadingPost": "Loading post...",
+    "authorBio": "Author bio will be displayed here once author profiles are fully integrated.",
+    "engagement": {
+      "views": "views",
+      "likes": "likes",
+      "comments": "comments"
+    }
+  },
+  "postCard": {
+    "featured": "Featured"
+  },
+  "postList": {
+    "empty": "No posts found",
+    "loading": "Loading...",
+    "loadMore": "Load More"
+  },
+  "markdownEditor": {
+    "placeholder": "Write your content in markdown...",
+    "toolbar": {
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bold": "Bold",
+      "italic": "Italic",
+      "code": "Code",
+      "link": "Link",
+      "image": "Image",
+      "bulletList": "Bullet List",
+      "numberedList": "Numbered List",
+      "taskList": "Task List",
+      "quote": "Quote",
+      "horizontalRule": "Horizontal Rule"
+    },
+    "viewModes": {
+      "write": "Write",
+      "split": "Split",
+      "preview": "Preview"
+    },
+    "footer": {
+      "words": "words",
+      "characters": "characters",
+      "readOnly": "Read only",
+      "markdownSupported": "Markdown supported"
+    },
+    "previewPlaceholder": "Preview will appear here..."
+  },
+  "editor": {
+    "title": "Edit Post",
+    "newPost": "New Post",
+    "back": "Back",
+    "preview": "Preview",
+    "previewComingSoon": "Preview coming soon!",
+    "saveDraft": "Save Draft",
+    "schedule": "Schedule",
+    "publish": "Publish",
+    "tabs": {
+      "content": "Content",
+      "seo": "SEO",
+      "settings": "Settings"
+    },
+    "content": {
+      "titlePlaceholder": "Post title...",
+      "titleRequired": "Title is required"
+    },
+    "seo": {
+      "title": "SEO Optimization",
+      "score": "/ 100",
+      "recommendations": "Recommendations",
+      "seoTitle": "SEO Title",
+      "seoTitlePlaceholder": "Override page title for SEO",
+      "seoTitleHelp": "Recommended: 30-60 characters",
+      "seoDescription": "SEO Description",
+      "seoDescriptionPlaceholder": "Brief description for search engines",
+      "seoDescriptionHelp": "Recommended: 50-160 characters",
+      "focusKeyword": "Focus Keyword",
+      "focusKeywordPlaceholder": "Primary keyword to optimize for",
+      "seoKeywords": "SEO Keywords",
+      "seoKeywordsPlaceholder": "keyword1, keyword2, keyword3",
+      "seoKeywordsHelp": "Comma-separated list (3-8 keywords recommended)"
+    },
+    "settings": {
+      "excerpt": "Excerpt",
+      "excerptPlaceholder": "Brief summary of the post...",
+      "excerptHelp": "Leave empty to auto-generate from content",
+      "slug": "URL Slug",
+      "slugPlaceholder": "post-url-slug",
+      "slugAuto": "Auto",
+      "slugManual": "Manual",
+      "visibility": "Visibility",
+      "visibilityPublic": "Public",
+      "visibilityPrivate": "Private",
+      "visibilityUnlisted": "Unlisted",
+      "allowComments": "Allow Comments"
+    },
+    "sidebar": {
+      "category": "Category",
+      "noCategory": "No category",
+      "tags": "Tags",
+      "tagsPlaceholder": "tag1, tag2, tag3",
+      "tagsHelp": "Comma-separated list",
+      "featuredImage": "Featured Image",
+      "imageUploadComingSoon": "Image upload coming soon"
+    },
+    "schedule": {
+      "title": "Schedule Post",
+      "date": "Date",
+      "time": "Time",
+      "message": "Your post will be automatically published at the scheduled time.",
+      "cancel": "Cancel",
+      "schedulePost": "Schedule Post"
+    },
+    "messages": {
+      "draftSaved": "Draft saved",
+      "draftCreated": "Draft created",
+      "failedToSaveDraft": "Failed to save draft",
+      "postPublished": "Post published!",
+      "failedToPublish": "Failed to publish post",
+      "mustBeAuthenticated": "User must be authenticated to save posts",
+      "mustBeAuthenticatedToPublish": "User must be authenticated to publish posts",
+      "saveBeforeScheduling": "Please save the post first before scheduling",
+      "selectDateTime": "Please select both date and time",
+      "scheduledTimeMustBeFuture": "Scheduled time must be in the future",
+      "postScheduled": "Post scheduled for",
+      "failedToSchedule": "Failed to schedule post",
+      "contentValidationFailed": "Content validation failed"
+    },
+    "loading": "Loading editor..."
+  },
+  "emptyStates": {
+    "noPosts": "No posts published yet. Check back soon!",
+    "noDrafts": "No drafts yet. Create your first post!"
+  }
+}

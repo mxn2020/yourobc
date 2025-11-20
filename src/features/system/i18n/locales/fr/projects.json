@@ -1,0 +1,217 @@
+{
+  "page": {
+    "title": "Projects",
+    "subtitle": "Manage and track your projects",
+    "createNew": "New Project",
+    "allProjects": "Tous les Projets",
+    "myProjects": "Mes Projets",
+    "owned": "Mes Projets",
+    "collaborating": "Collaboration",
+    "viewModes": {
+      "cards": "Cards",
+      "table": "Table"
+    },
+    "showing": "Showing",
+    "of": "of",
+    "projects_one": "project",
+    "projects_other": "projects",
+    "for": "for",
+    "noProjectsFound": "No projects found matching your criteria",
+    "noProjects": "No projects yet",
+    "tryAdjusting": "Try adjusting your search or filters",
+    "createFirst": "Create your first project to get started!",
+    "projectsWillAppear": "Projects will appear here once created.",
+    "clearAllFilters": "Clear all filters",
+    "addNewProject": "Add New Project",
+    "loading": "Loading projects..."
+  },
+  "stats": {
+    "total": "total",
+    "active": "active",
+    "completed": "completed",
+    "overdue": "overdue",
+    "totalProjects": "Total Projects",
+    "activeProjects": "Active Projects",
+    "completedProjects": "Completed",
+    "averageProgress": "Avg Progress",
+    "completion": "completion",
+    "onHold": "on hold",
+    "archived": "archived",
+    "byStatus": "By Status",
+    "byPriority": "By Priority",
+    "byCategory": "By Category",
+    "projectHealth": "Project Health",
+    "completionRate": "Completion Rate",
+    "overdueProjects": "Overdue Projects",
+    "needAttention": "need attention",
+    "atRisk": "At Risk",
+    "dueSoon": "due soon",
+    "noCategoriesYet": "No categories yet"
+  },
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "onHold": "On Hold",
+    "archived": "Archived"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent",
+    "critical": "Critique"
+  },
+  "health": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "warning": "Warning",
+    "critical": "Critical"
+  },
+  "visibility": {
+    "public": "Public",
+    "private": "Private",
+    "team": "Équipe"
+  },
+  "card": {
+    "progress": "Progress",
+    "tasks": "tasks",
+    "complete": "Complete",
+    "due": "Due:",
+    "overdue": "Overdue",
+    "days": "days",
+    "budget": "Budget",
+    "spent": "Spent",
+    "created": "Created:",
+    "updated": "Updated:",
+    "collaborator": "collaborator",
+    "collaborators": "collaborators",
+    "viewDetails": "View Details",
+    "privateLabel": "Private"
+  },
+  "form": {
+    "sections": {
+      "basicInfo": "Basic Information",
+      "timeline": "Timeline",
+      "settings": "Project Settings",
+      "additionalInfo": "Additional Information"
+    },
+    "labels": {
+      "title": "Project Title",
+      "description": "Description",
+      "priority": "Priority",
+      "visibility": "Visibility",
+      "category": "Category",
+      "tags": "Tags",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "estimatedHours": "Estimated Hours",
+      "budget": "Budget ($)",
+      "actualCost": "Actual Cost ($)",
+      "riskLevel": "Risk Level",
+      "client": "Client"
+    },
+    "placeholders": {
+      "title": "Enter project title",
+      "description": "Describe your project...",
+      "category": "e.g., Web Development",
+      "tags": "Enter tags separated by commas (max 10)",
+      "client": "Client name"
+    },
+    "helpText": {
+      "characters": "characters",
+      "tagsHelp": "Separate tags with commas"
+    },
+    "settings": {
+      "allowComments": "Allow comments on this project",
+      "requireApproval": "Require approval for changes",
+      "emailNotifications": "Send email notifications",
+      "autoArchive": "Archiver automatiquement à la fin"
+    },
+    "riskLevels": {
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk",
+      "critical": "Critical Risk"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Project",
+      "update": "Update Project"
+    },
+    "validation": {
+      "titleRequired": "Project title is required",
+      "titleTooLong": "Title must be less than 100 characters",
+      "descriptionTooLong": "Description must be less than 2000 characters",
+      "dueDateBeforeStart": "Due date cannot be before start date",
+      "invalidEstimatedHours": "Estimated hours must be a positive number",
+      "invalidBudget": "Budget must be a positive number",
+      "invalidActualCost": "Actual cost must be a positive number",
+      "fixErrors": "Please fix the errors in the form"
+    }
+  },
+  "table": {
+    "headers": {
+      "project": "Project",
+      "status": "Status",
+      "priority": "Priority",
+      "progress": "Progress",
+      "dueDate": "Due Date",
+      "collaborators": "Collaborators",
+      "actions": "Actions"
+    },
+    "daysLeft": "days left",
+    "overdue": "Overdue",
+    "noDueDate": "No due date",
+    "member": "member",
+    "members": "members",
+    "view": "View",
+    "empty": "No projects to display"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View"
+  },
+  "filters": {
+    "searchPlaceholder": "Search projects by title or description...",
+    "allStatuses": "All Statuses",
+    "allPriorities": "All Priorities",
+    "allCategories": "All Categories",
+    "clearFilters": "Clear Filters"
+  },
+  "quickFilters": {
+    "byStatus": "Quick Filter by Status:",
+    "byPriority": "Quick Filter by Priority:",
+    "special": "Special Filters:",
+    "atRisk": "At Risk",
+    "overdue": "Overdue"
+  },
+  "help": {
+    "title": "Need Help?",
+    "description": "Learn how to make the most of your project management",
+    "viewDocumentation": "View Documentation"
+  },
+  "helpSection": {
+    "managementTips": {
+      "title": "Project Management Tips",
+      "tip1": "Keep your project status up-to-date for better team coordination",
+      "tip2": "Set realistic due dates and update progress regularly",
+      "tip3": "Use tags and categories to organize related projects",
+      "tip4": "Add collaborators to projects for team visibility"
+    },
+    "priorityLevels": {
+      "title": "Priority Levels",
+      "urgent": "Critical projects requiring immediate attention",
+      "high": "Important projects with near-term deadlines",
+      "medium": "Standard projects with normal timelines",
+      "low": "Projects with flexible timelines"
+    },
+    "statusDescriptions": {
+      "title": "Project Statuses",
+      "active": "Currently in progress",
+      "completed": "Finished projects",
+      "onHold": "Temporarily paused projects",
+      "archived": "Historical projects no longer active"
+    }
+  }
+}

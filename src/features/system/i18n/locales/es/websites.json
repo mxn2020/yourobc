@@ -1,0 +1,112 @@
+{
+  "websites": {
+    "title": "Sitios Web",
+    "description": "Construye y administra tus sitios web",
+    "create": "Crear Sitio Web",
+    "createDescription": "Crea un nuevo sitio web para comenzar a construir tu presencia en línea",
+    "edit": "Editar Sitio Web",
+    "delete": "Eliminar Sitio Web",
+    "publish": "Publicar Sitio Web",
+    "unpublish": "Despublicar",
+    "view": "Ver Sitio Web",
+    "settings": "Configuración del Sitio Web",
+    "pages": "Páginas",
+    "sections": "Secciones",
+    "themes": "Temas",
+    "templates": "Plantillas",
+    "collaborators": "Colaboradores",
+    "stats": "Estadísticas",
+    "empty": "Aún no hay sitios web",
+    "emptyDescription": "Crea tu primer sitio web para comenzar",
+    "loading": "Cargando sitios web..."
+  },
+  "pages": {
+    "title": "Páginas",
+    "create": "Crear Página",
+    "edit": "Editar Página",
+    "delete": "Eliminar Página",
+    "publish": "Publicar Página",
+    "view": "Ver Página",
+    "empty": "Aún no hay páginas",
+    "emptyDescription": "Crea tu primera página"
+  },
+  "sections": {
+    "title": "Secciones",
+    "create": "Crear Sección",
+    "edit": "Editar Sección",
+    "delete": "Eliminar Sección",
+    "library": "Biblioteca de Secciones",
+    "empty": "Aún no hay secciones"
+  },
+  "fields": {
+    "name": "Nombre",
+    "description": "Descripción",
+    "domain": "Dominio",
+    "subdomain": "Subdominio",
+    "status": "Estado",
+    "visibility": "Visibilidad",
+    "theme": "Tema",
+    "title": "Título",
+    "slug": "Slug",
+    "path": "Ruta",
+    "content": "Contenido",
+    "excerpt": "Extracto",
+    "template": "Plantilla",
+    "layout": "Diseño",
+    "seo": "Configuración SEO",
+    "featuredImage": "Imagen Destacada",
+    "publishedAt": "Publicado el",
+    "scheduledAt": "Programado para"
+  },
+  "status": {
+    "draft": "Borrador",
+    "published": "Publicado",
+    "archived": "Archivado",
+    "maintenance": "Mantenimiento",
+    "scheduled": "Programado"
+  },
+  "visibility": {
+    "private": "Privado",
+    "team": "Equipo",
+    "public": "Público"
+  },
+  "templates": {
+    "landing": "Página de Inicio",
+    "features": "Características",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "blog": "Blog",
+    "services": "Servicios",
+    "pricing": "Precios",
+    "testimonials": "Testimonios",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "cookies": "Política de Cookies",
+    "gdpr": "RGPD",
+    "custom": "Personalizado"
+  },
+  "messages": {
+    "createSuccess": "Sitio web creado exitosamente",
+    "updateSuccess": "Sitio web actualizado exitosamente",
+    "deleteSuccess": "Sitio web eliminado exitosamente",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este sitio web?",
+    "publishSuccess": "Sitio web publicado exitosamente",
+    "pageCreateSuccess": "Página creada exitosamente",
+    "pageUpdateSuccess": "Página actualizada exitosamente",
+    "pageDeleteSuccess": "Página eliminada exitosamente",
+    "pagePublishSuccess": "Página publicada exitosamente"
+  },
+  "form": {
+    "placeholders": {
+      "name": "Mi Sitio Web",
+      "description": "Una breve descripción de tu sitio web",
+      "subdomain": "misitio",
+      "domain": "ejemplo.com"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
+  }
+}

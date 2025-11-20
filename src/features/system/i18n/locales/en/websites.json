@@ -1,0 +1,180 @@
+{
+  "websites": {
+    "title": "Websites",
+    "description": "Build and manage your websites",
+    "create": "Create Website",
+    "createDescription": "Create a new website to start building your online presence",
+    "edit": "Edit Website",
+    "delete": "Delete Website",
+    "publish": "Publish Website",
+    "unpublish": "Unpublish",
+    "view": "View Website",
+    "settings": "Website Settings",
+    "pages": "Pages",
+    "sections": "Sections",
+    "themes": "Themes",
+    "templates": "Templates",
+    "collaborators": "Collaborators",
+    "stats": "Statistics",
+    "empty": "No websites yet",
+    "emptyDescription": "Create your first website to get started",
+    "loading": "Loading websites..."
+  },
+  "pages": {
+    "title": "Pages",
+    "description": "Manage website pages",
+    "create": "Create Page",
+    "edit": "Edit Page",
+    "delete": "Delete Page",
+    "publish": "Publish Page",
+    "view": "View Page",
+    "empty": "No pages yet",
+    "emptyDescription": "Create your first page"
+  },
+  "sections": {
+    "title": "Sections",
+    "create": "Create Section",
+    "edit": "Edit Section",
+    "delete": "Delete Section",
+    "library": "Section Library",
+    "empty": "No sections yet"
+  },
+  "fields": {
+    "name": "Name",
+    "description": "Description",
+    "domain": "Domain",
+    "subdomain": "Subdomain",
+    "status": "Status",
+    "visibility": "Visibility",
+    "theme": "Theme",
+    "title": "Title",
+    "slug": "Slug",
+    "path": "Path",
+    "content": "Content",
+    "excerpt": "Excerpt",
+    "template": "Template",
+    "layout": "Layout",
+    "seo": "SEO Settings",
+    "featuredImage": "Featured Image",
+    "publishedAt": "Published At",
+    "scheduledAt": "Scheduled At"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "maintenance": "Maintenance",
+    "scheduled": "Scheduled"
+  },
+  "visibility": {
+    "private": "Private",
+    "team": "Team",
+    "public": "Public"
+  },
+  "templates": {
+    "landing": "Landing Page",
+    "features": "Features",
+    "about": "About",
+    "contact": "Contact",
+    "blog": "Blog",
+    "services": "Services",
+    "pricing": "Pricing",
+    "testimonials": "Testimonials",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "gdpr": "GDPR",
+    "custom": "Custom"
+  },
+  "messages": {
+    "createSuccess": "Website created successfully",
+    "updateSuccess": "Website updated successfully",
+    "deleteSuccess": "Website deleted successfully",
+    "deleteConfirm": "Are you sure you want to delete this website?",
+    "publishSuccess": "Website published successfully",
+    "pageCreateSuccess": "Page created successfully",
+    "pageUpdateSuccess": "Page updated successfully",
+    "pageDeleteSuccess": "Page deleted successfully",
+    "pageDeleteConfirm": "Are you sure you want to delete this page?",
+    "pagePublishSuccess": "Page published successfully"
+  },
+  "actions": {
+    "edit": "Edit",
+    "view": "View",
+    "delete": "Delete",
+    "publish": "Publish",
+    "publishing": "Publishing...",
+    "deleting": "Deleting...",
+    "update": "Update"
+  },
+  "breadcrumb": {
+    "websites": "Websites",
+    "edit": "Edit"
+  },
+  "info": {
+    "title": "Website Information",
+    "domain": "Domain",
+    "subdomain": "Subdomain",
+    "visibility": "Visibility",
+    "pages": "Pages Count",
+    "lastPublished": "Last Published"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "managePages": "Manage Pages",
+    "settings": "Settings",
+    "themes": "Themes"
+  },
+  "edit": {
+    "title": "Edit Website",
+    "description": "Update website information and settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Configure website settings and preferences",
+    "tabs": {
+      "general": "General",
+      "seo": "SEO",
+      "social": "Social Media"
+    },
+    "general": {
+      "title": "General Settings",
+      "description": "Configure general website features and customizations",
+      "enableBlog": "Enable Blog",
+      "enableBlogDescription": "Enable blog functionality for your website",
+      "enableComments": "Enable Comments",
+      "enableCommentsDescription": "Allow users to comment on your content",
+      "enableAnalytics": "Enable Analytics",
+      "enableAnalyticsDescription": "Track website analytics and visitor statistics",
+      "enableCookieConsent": "Enable Cookie Consent",
+      "enableCookieConsentDescription": "Show cookie consent banner for GDPR compliance",
+      "customCss": "Custom CSS",
+      "customJs": "Custom JavaScript"
+    },
+    "seo": {
+      "title": "SEO Settings",
+      "description": "Optimize your website for search engines",
+      "siteName": "Site Name",
+      "defaultTitle": "Default Page Title",
+      "defaultDescription": "Default Meta Description",
+      "twitterHandle": "Twitter Handle"
+    },
+    "social": {
+      "title": "Social Media Links",
+      "description": "Add links to your social media profiles"
+    }
+  },
+  "form": {
+    "placeholders": {
+      "name": "My Website",
+      "description": "A brief description of your website",
+      "subdomain": "mysite",
+      "domain": "example.com"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    }
+  }
+}

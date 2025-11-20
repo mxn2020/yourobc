@@ -1,0 +1,180 @@
+{
+  "home": {
+    "title": "Bienvenido a Nuestro Blog",
+    "subtitle": "Descubre perspectivas, tutoriales e historias de nuestro equipo",
+    "searchPlaceholder": "Buscar artículos...",
+    "featuredPosts": "Publicaciones Destacadas",
+    "recentPosts": "Publicaciones Recientes",
+    "categories": "Categorías",
+    "loadingCategories": "Cargando categorías...",
+    "noCategoriesYet": "Sin categorías aún",
+    "newsletter": {
+      "title": "Suscríbete al Boletín",
+      "description": "Recibe las últimas publicaciones directamente en tu bandeja de entrada.",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "subscribe": "Suscribirse"
+    }
+  },
+  "dashboard": {
+    "title": "Panel de Blog",
+    "provider": "Proveedor:",
+    "newPost": "Nueva Publicación",
+    "stats": {
+      "totalPosts": "Publicaciones Totales",
+      "totalViews": "Vistas Totales",
+      "comments": "Comentarios",
+      "engagement": "Engagement"
+    },
+    "quickActions": {
+      "managePosts": "Gestionar Publicaciones",
+      "managePostsDesc": "Ver y editar todas las publicaciones del blog",
+      "categories": "Categorías",
+      "categoriesDesc": "Organizar publicaciones por categoría",
+      "tags": "Etiquetas",
+      "tagsDesc": "Administrar etiquetas de publicaciones"
+    },
+    "recentDrafts": "Borradores Recientes",
+    "viewAll": "Ver Todas",
+    "loading": "Cargando servicio de blog...",
+    "error": "Error:"
+  },
+  "post": {
+    "featured": "Destacado",
+    "tags": "Etiquetas",
+    "shareThisPost": "Compartir esta publicación",
+    "backToBlog": "Volver al Blog",
+    "notFound": "Publicación No Encontrada",
+    "notFoundDesc": "La publicación que buscas no existe.",
+    "loadingPost": "Cargando publicación...",
+    "authorBio": "La biografía del autor se mostrará aquí una vez que los perfiles de autor estén completamente integrados.",
+    "engagement": {
+      "views": "vistas",
+      "likes": "me gusta",
+      "comments": "comentarios"
+    }
+  },
+  "postCard": {
+    "featured": "Destacado"
+  },
+  "postList": {
+    "empty": "No se encontraron publicaciones",
+    "loading": "Cargando...",
+    "loadMore": "Cargar Más"
+  },
+  "markdownEditor": {
+    "placeholder": "Escribe tu contenido en markdown...",
+    "toolbar": {
+      "heading1": "Encabezado 1",
+      "heading2": "Encabezado 2",
+      "heading3": "Encabezado 3",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "code": "Código",
+      "link": "Enlace",
+      "image": "Imagen",
+      "bulletList": "Lista con Viñetas",
+      "numberedList": "Lista Numerada",
+      "taskList": "Lista de Tareas",
+      "quote": "Cita",
+      "horizontalRule": "Línea Horizontal"
+    },
+    "viewModes": {
+      "write": "Escribir",
+      "split": "Dividir",
+      "preview": "Vista Previa"
+    },
+    "footer": {
+      "words": "palabras",
+      "characters": "caracteres",
+      "readOnly": "Solo lectura",
+      "markdownSupported": "Markdown soportado"
+    },
+    "previewPlaceholder": "La vista previa aparecerá aquí..."
+  },
+  "editor": {
+    "title": "Editar Publicación",
+    "newPost": "Nueva Publicación",
+    "back": "Volver",
+    "preview": "Vista Previa",
+    "previewComingSoon": "¡Vista previa próximamente!",
+    "saveDraft": "Guardar Borrador",
+    "schedule": "Programar",
+    "publish": "Publicar",
+    "tabs": {
+      "content": "Contenido",
+      "seo": "SEO",
+      "settings": "Configuración"
+    },
+    "content": {
+      "titlePlaceholder": "Título de la publicación...",
+      "titleRequired": "El título es obligatorio"
+    },
+    "seo": {
+      "title": "Optimización SEO",
+      "score": "/ 100",
+      "recommendations": "Recomendaciones",
+      "seoTitle": "Título SEO",
+      "seoTitlePlaceholder": "Reemplazar título de página para SEO",
+      "seoTitleHelp": "Recomendado: 30-60 caracteres",
+      "seoDescription": "Descripción SEO",
+      "seoDescriptionPlaceholder": "Breve descripción para motores de búsqueda",
+      "seoDescriptionHelp": "Recomendado: 50-160 caracteres",
+      "focusKeyword": "Palabra Clave Principal",
+      "focusKeywordPlaceholder": "Palabra clave principal para optimizar",
+      "seoKeywords": "Palabras Clave SEO",
+      "seoKeywordsPlaceholder": "palabra1, palabra2, palabra3",
+      "seoKeywordsHelp": "Lista separada por comas (se recomiendan 3-8 palabras clave)"
+    },
+    "settings": {
+      "excerpt": "Extracto",
+      "excerptPlaceholder": "Breve resumen de la publicación...",
+      "excerptHelp": "Dejar vacío para generar automáticamente desde el contenido",
+      "slug": "URL Slug",
+      "slugPlaceholder": "slug-url-publicacion",
+      "slugAuto": "Auto",
+      "slugManual": "Manual",
+      "visibility": "Visibilidad",
+      "visibilityPublic": "Público",
+      "visibilityPrivate": "Privado",
+      "visibilityUnlisted": "No listado",
+      "allowComments": "Permitir Comentarios"
+    },
+    "sidebar": {
+      "category": "Categoría",
+      "noCategory": "Sin categoría",
+      "tags": "Etiquetas",
+      "tagsPlaceholder": "etiqueta1, etiqueta2, etiqueta3",
+      "tagsHelp": "Lista separada por comas",
+      "featuredImage": "Imagen Destacada",
+      "imageUploadComingSoon": "Subida de imagen próximamente"
+    },
+    "schedule": {
+      "title": "Programar Publicación",
+      "date": "Fecha",
+      "time": "Hora",
+      "message": "Tu publicación se publicará automáticamente a la hora programada.",
+      "cancel": "Cancelar",
+      "schedulePost": "Programar Publicación"
+    },
+    "messages": {
+      "draftSaved": "Borrador guardado",
+      "draftCreated": "Borrador creado",
+      "failedToSaveDraft": "Error al guardar el borrador",
+      "postPublished": "¡Publicación publicada!",
+      "failedToPublish": "Error al publicar la publicación",
+      "mustBeAuthenticated": "El usuario debe estar autenticado para guardar publicaciones",
+      "mustBeAuthenticatedToPublish": "El usuario debe estar autenticado para publicar publicaciones",
+      "saveBeforeScheduling": "Por favor guarda la publicación antes de programarla",
+      "selectDateTime": "Por favor selecciona fecha y hora",
+      "scheduledTimeMustBeFuture": "La hora programada debe ser en el futuro",
+      "postScheduled": "Publicación programada para",
+      "failedToSchedule": "Error al programar la publicación",
+      "contentValidationFailed": "Falló la validación del contenido"
+    },
+    "loading": "Cargando editor..."
+  },
+  "emptyStates": {
+    "noPosts": "Aún no hay publicaciones publicadas. ¡Vuelve pronto!",
+    "noDrafts": "Aún no hay borradores. ¡Crea tu primera publicación!"
+  }
+}

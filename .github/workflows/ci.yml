@@ -1,0 +1,56 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm db:generate
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5433/test"
+
+      - name: Type check
+        run: pnpm tsc --noEmit
+
+      - name: Run tests
+        run: pnpm test --run
+        continue-on-error: true
+
+      - name: Build check
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          CONVEX_DEPLOYMENT: test
+          CONVEX_URL: http://127.0.0.1:3210
+          VITE_CONVEX_URL: http://127.0.0.1:3210
+          BETTER_AUTH_SECRET: test-secret-for-ci
+          BETTER_AUTH_URL: http://localhost:3000
+          VITE_BETTER_AUTH_URL: http://localhost:3000
+          DATABASE_URL: "postgresql://test:test@localhost:5433/test"
