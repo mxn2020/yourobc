@@ -3,8 +3,8 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
-import type { AIUsageLog, AIUsageFilter, LogQueryResult } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog, AIUsageFilter, LogQueryResult } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
 import { Id } from "@/convex/_generated/dataModel";
 
 export class LogService {
@@ -25,22 +25,22 @@ export class LogService {
     limit?: number;
     offset?: number;
   } = {}) {
-    return convexQuery(api.lib.boilerplate.ai_logs.queries.getAILogs, filters);
+    return convexQuery(api.lib.system.ai_logs.queries.getAILogs, filters);
   }
 
   static getAILogQueryOptions(logId: Id<'aiLogs'>) {
-    return convexQuery(api.lib.boilerplate.ai_logs.queries.getAILog, { logId });
+    return convexQuery(api.lib.system.ai_logs.queries.getAILog, { logId });
   }
 
   static getAILogByPublicIdQueryOptions(publicId: string) {
-    return convexQuery(api.lib.boilerplate.ai_logs.queries.getAILogByPublicId, { publicId });
+    return convexQuery(api.lib.system.ai_logs.queries.getAILogByPublicId, { publicId });
   }
 
   static getAILogsStatsQueryOptions(filters: {
     startDate?: number;
     endDate?: number;
   } = {}) {
-    return convexQuery(api.lib.boilerplate.ai_logs.queries.getAILogStats, filters);
+    return convexQuery(api.lib.system.ai_logs.queries.getAILogStats, filters);
   }
 
   // ==========================================

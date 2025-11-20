@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/index.ts
+// src/features/system/supporting/virtual-lists/components/index.ts
 
 // Base components
 export { VirtualList } from './VirtualList'

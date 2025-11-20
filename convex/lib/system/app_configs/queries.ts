@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_configs/queries.ts
+// convex/lib/system/app_configs/queries.ts
 // Query functions for appConfigs module
 
 import { v } from 'convex/values';

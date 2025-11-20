@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/providers/internal/InternalIntegrationProvider.ts
+// src/features/system/integrations/providers/internal/InternalIntegrationProvider.ts
 
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -54,7 +54,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    const result = await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.createApiKey, {
+    const result = await this.convexClient.mutation(api.lib.system.integrations.mutations.createApiKey, {
       name: params.name,
       description: params.description,
       scopes: params.scopes,
@@ -72,7 +72,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.query(api.lib.boilerplate.integrations.queries.getApiKeys, {
+    return (await this.convexClient.query(api.lib.system.integrations.queries.getApiKeys, {
       userId,
     })) as ApiKey[];
   }
@@ -82,7 +82,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.revokeApiKey, {
+    await this.convexClient.mutation(api.lib.system.integrations.mutations.revokeApiKey, {
       keyId,
       revokedBy,
     });
@@ -93,7 +93,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    const result = await this.convexClient.query(api.lib.boilerplate.integrations.queries.validateApiKey, {
+    const result = await this.convexClient.query(api.lib.system.integrations.queries.validateApiKey, {
       key,
     });
 
@@ -107,7 +107,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.createWebhook, {
+    return (await this.convexClient.mutation(api.lib.system.integrations.mutations.createWebhook, {
       name: params.name,
       description: params.description,
       url: params.url,
@@ -128,7 +128,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.query(api.lib.boilerplate.integrations.queries.getWebhooks, {
+    return (await this.convexClient.query(api.lib.system.integrations.queries.getWebhooks, {
       userId,
     })) as Webhook[];
   }
@@ -138,7 +138,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.updateWebhook, {
+    await this.convexClient.mutation(api.lib.system.integrations.mutations.updateWebhook, {
       webhookId: params.webhookId,
       name: params.name,
       description: params.description,
@@ -161,7 +161,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.deleteWebhook, {
+    await this.convexClient.mutation(api.lib.system.integrations.mutations.deleteWebhook, {
       webhookId,
       userId,
     });
@@ -172,7 +172,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.testWebhook, {
+    return (await this.convexClient.mutation(api.lib.system.integrations.mutations.testWebhook, {
       webhookId,
     })) as TestWebhookResult;
   }
@@ -184,7 +184,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.createOAuthApp, {
+    return (await this.convexClient.mutation(api.lib.system.integrations.mutations.createOAuthApp, {
       name: params.name,
       description: params.description,
       redirectUris: params.redirectUris,
@@ -202,7 +202,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.query(api.lib.boilerplate.integrations.queries.getOAuthApps, {
+    return (await this.convexClient.query(api.lib.system.integrations.queries.getOAuthApps, {
       userId,
     })) as OAuthApp[];
   }
@@ -212,7 +212,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.updateOAuthApp, {
+    await this.convexClient.mutation(api.lib.system.integrations.mutations.updateOAuthApp, {
       appId: params.appId,
       name: params.name,
       description: params.description,
@@ -233,7 +233,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    await this.convexClient.mutation(api.lib.boilerplate.integrations.mutations.deleteOAuthApp, {
+    await this.convexClient.mutation(api.lib.system.integrations.mutations.deleteOAuthApp, {
       appId,
       userId,
     });
@@ -249,7 +249,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
     }
 
     return (await this.convexClient.mutation(
-      api.lib.boilerplate.integrations.mutations.createExternalIntegration,
+      api.lib.system.integrations.mutations.createExternalIntegration,
       {
         provider: params.provider,
         type: params.type,
@@ -266,7 +266,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
     }
 
     await this.convexClient.mutation(
-      api.lib.boilerplate.integrations.mutations.disconnectExternalIntegration,
+      api.lib.system.integrations.mutations.disconnectExternalIntegration,
       {
         integrationId,
         userId,
@@ -280,7 +280,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
     }
 
     return (await this.convexClient.query(
-      api.lib.boilerplate.integrations.queries.getExternalIntegrations,
+      api.lib.system.integrations.queries.getExternalIntegrations,
       {
         userId,
       }
@@ -294,7 +294,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.query(api.lib.boilerplate.integrations.queries.getRequestLogs, {
+    return (await this.convexClient.query(api.lib.system.integrations.queries.getRequestLogs, {
       apiKeyId: params.apiKeyId,
       userId: params.userId,
       method: params.method,
@@ -312,7 +312,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
     }
 
     return (await this.convexClient.query(
-      api.lib.boilerplate.integrations.queries.getIntegrationEvents,
+      api.lib.system.integrations.queries.getIntegrationEvents,
       {
         integrationId: params.integrationId,
         eventType: params.eventType,
@@ -334,7 +334,7 @@ class InternalIntegrationProvider implements IntegrationProvider {
       throw new Error("InternalIntegrationProvider not initialized");
     }
 
-    return (await this.convexClient.query(api.lib.boilerplate.integrations.queries.getUsageStats, {
+    return (await this.convexClient.query(api.lib.system.integrations.queries.getUsageStats, {
       userId,
       startDate,
       endDate,

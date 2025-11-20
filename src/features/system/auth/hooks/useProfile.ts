@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useProfile.ts
+// src/features/system/auth/hooks/useProfile.ts
 
 import { useCallback, useMemo } from 'react'
 import { profileManagementService } from '../services/ProfileManagementService'

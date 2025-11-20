@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/analytics/analytics/index.ts
+// convex/lib/system/analytics/analytics/index.ts
 // Barrel exports for analytics module
 
 // Export all types

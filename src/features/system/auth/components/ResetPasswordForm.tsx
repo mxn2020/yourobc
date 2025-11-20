@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/components/ResetPasswordForm.tsx
+// src/features/system/auth/components/ResetPasswordForm.tsx
 
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
@@ -6,7 +6,7 @@ import { Lock, Eye, EyeOff, ArrowRight, CheckCircle, Loader2 } from 'lucide-reac
 import { authService } from '../services/AuthService'
 import type { ResetPasswordFormData } from '../types/auth.types'
 import { Button, Input, Alert, AlertDescription } from '@/components/ui'
-import { useTranslation, defaultLocale } from '@/features/boilerplate/i18n'
+import { useTranslation, defaultLocale } from '@/features/system/i18n'
 import { useAuthForm } from '../hooks/useAuthForm'
 
 export function ResetPasswordForm() {

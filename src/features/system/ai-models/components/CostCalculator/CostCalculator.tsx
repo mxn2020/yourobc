@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator, DollarSign, TrendingUp, BarChart3, Info, X } from 'lucide-react';
 import { Badge, Button, Card, CardContent, CardHeader, Input, SimpleSelect as Select } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 interface CostCalculatorProps {
   models: ModelInfo[];

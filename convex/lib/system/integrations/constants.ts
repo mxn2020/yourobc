@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/constants.ts
+// convex/lib/system/integrations/constants.ts
 
 /**
  * Integrations Configuration Constants

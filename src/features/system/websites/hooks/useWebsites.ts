@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/hooks/useWebsites.ts
+// src/features/system/websites/hooks/useWebsites.ts
 
 import { websitesService } from '../services/WebsitesService'
 import type { WebsitesListOptions, CreateWebsiteData, UpdateWebsiteData, WebsiteId } from '../types'

@@ -1,4 +1,4 @@
-// features/boilerplate/projects/pages/ProjectTimelinePage.tsx
+// features/system/projects/pages/ProjectTimelinePage.tsx
 import { FC, useState, useMemo } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
 import { Card, Loading, Badge, Button } from '@/components/ui'
@@ -6,7 +6,7 @@ import { CalendarDays, Plus, CheckCircle, Circle, Clock, Flag } from 'lucide-rea
 import { useMilestones } from '../hooks/useMilestones'
 import { useCanCreateProjects } from '../hooks/useProjectPermissions'
 import { PermissionButton } from '../../../../components/Permission/PermissionButton'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 
 export const ProjectTimelinePage: FC = () => {
   const params = useParams({ strict: false })

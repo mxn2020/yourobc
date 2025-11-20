@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/index.ts
+// src/features/system/blog/hooks/index.ts
 /**
  * Blog Hooks - Barrel Export
  */

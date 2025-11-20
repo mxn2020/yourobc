@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/dashboards/dashboards/permissions.ts
+// convex/lib/system/dashboards/dashboards/permissions.ts
 // Access control and authorization logic for dashboards module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

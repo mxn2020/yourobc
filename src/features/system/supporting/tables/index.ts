@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/index.ts
+// src/features/system/supporting/tables/index.ts
 
 /**
  * Tables Module - TanStack Table Integration
@@ -16,13 +16,13 @@
  * @example
  * ```tsx
  * // Option 1: Use pattern components
- * import { SortableTable, FilterableTable } from '@/features/boilerplate/supporting'
+ * import { SortableTable, FilterableTable } from '@/features/system/supporting'
  *
  * // Option 2: Use full-featured DataTable
- * import { DataTable } from '@/features/boilerplate/supporting'
+ * import { DataTable } from '@/features/system/supporting'
  *
  * // Option 3: Use presets
- * import { tablePresets } from '@/features/boilerplate/supporting'
+ * import { tablePresets } from '@/features/system/supporting'
  * const config = tablePresets.auditLog
  * ```
  */

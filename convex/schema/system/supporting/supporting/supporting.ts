@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/supporting/supporting/supporting.ts
+// convex/schema/system/supporting/supporting/supporting.ts
 // Table definitions for supporting module
 
 import { defineTable } from 'convex/server';

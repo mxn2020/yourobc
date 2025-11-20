@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/mutations.ts
+// convex/lib/system/app_theme_settings/mutations.ts
 // Mutation functions for appThemeSettings module
 
 import { v } from 'convex/values';

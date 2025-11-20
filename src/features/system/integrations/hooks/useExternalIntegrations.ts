@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/useExternalIntegrations.ts
+// src/features/system/integrations/hooks/useExternalIntegrations.ts
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -41,18 +41,18 @@ import { ConnectExternalIntegrationParams, ExternalIntegration } from "../types"
  */
 export function useExternalIntegrations() {
   const integrations = useQuery(
-    api.lib.boilerplate.integrations.queries.getExternalIntegrations,
+    api.lib.system.integrations.queries.getExternalIntegrations,
     {}
   );
 
   const connectIntegrationMutation = useMutation(
-    api.lib.boilerplate.integrations.mutations.createExternalIntegration
+    api.lib.system.integrations.mutations.createExternalIntegration
   );
   const disconnectIntegrationMutation = useMutation(
-    api.lib.boilerplate.integrations.mutations.disconnectExternalIntegration
+    api.lib.system.integrations.mutations.disconnectExternalIntegration
   );
   const syncIntegrationMutation = useMutation(
-    api.lib.boilerplate.integrations.mutations.syncExternalIntegration
+    api.lib.system.integrations.mutations.syncExternalIntegration
   );
 
   return useMemo(
@@ -102,7 +102,7 @@ export function useExternalIntegration(
   integrationId: Id<"externalIntegrations"> | undefined
 ) {
   const integration = useQuery(
-    api.lib.boilerplate.integrations.queries.getExternalIntegration,
+    api.lib.system.integrations.queries.getExternalIntegration,
     integrationId ? { integrationId } : "skip"
   );
 
@@ -156,7 +156,7 @@ export function useExternalIntegrationsByPlatform(
  */
 export function useTestExternalIntegration() {
   const testMutation = useMutation(
-    api.lib.boilerplate.integrations.mutations.testExternalIntegration
+    api.lib.system.integrations.mutations.testExternalIntegration
   );
 
   return useMemo(
@@ -177,7 +177,7 @@ export function useTestExternalIntegration() {
  */
 export function useIntegrationHealth(integrationId: Id<"externalIntegrations"> | undefined) {
   const health = useQuery(
-    api.lib.boilerplate.integrations.queries.getIntegrationHealth,
+    api.lib.system.integrations.queries.getIntegrationHealth,
     integrationId ? { integrationId } : "skip"
   );
 

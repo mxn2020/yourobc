@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/utils/slug.ts
+// src/features/system/blog/utils/slug.ts
 /**
  * Slug Utilities
  *

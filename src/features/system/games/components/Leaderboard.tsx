@@ -17,12 +17,12 @@ export const Leaderboard = ({
   gameName = "dino-jump",
   limit = 10,
 }: LeaderboardProps) => {
-  const topScores = useQuery(api.lib.boilerplate.games.queries.getTopScores, {
+  const topScores = useQuery(api.lib.system.games.queries.getTopScores, {
     gameName,
     limit,
   });
 
-  const stats = useQuery(api.lib.boilerplate.games.queries.getGameStats, {
+  const stats = useQuery(api.lib.system.games.queries.getGameStats, {
     gameName,
   });
 

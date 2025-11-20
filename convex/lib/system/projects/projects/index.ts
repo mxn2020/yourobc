@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/projects/index.ts
+// convex/lib/system/projects/projects/index.ts
 // Public API exports for projects module
 
 // Constants

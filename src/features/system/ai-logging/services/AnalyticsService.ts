@@ -1,6 +1,6 @@
 // src/features/ai-logging/services/AnalyticsService.ts
-import type { AIUsageStats, AIUsageFilter } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageStats, AIUsageFilter } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
 import type { AnalyticsDashboardData } from '../types/analytics.types';
 
 export class AnalyticsService {

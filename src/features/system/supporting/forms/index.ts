@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/index.ts
+// src/features/system/supporting/forms/index.ts
 
 /**
  * Forms Module - TanStack Form Integration
@@ -12,13 +12,13 @@
  * @example
  * ```tsx
  * // Option 1: Use pre-built components
- * import { TextField, NumberField, SubmitButton } from '@/features/boilerplate/supporting/forms'
+ * import { TextField, NumberField, SubmitButton } from '@/features/system/supporting/forms'
  *
  * // Option 2: Use hooks and validators
- * import { validators, composeValidators } from '@/features/boilerplate/supporting/forms'
+ * import { validators, composeValidators } from '@/features/system/supporting/forms'
  *
  * // Option 3: Use presets
- * import { formPresets, getPreset } from '@/features/boilerplate/supporting/forms'
+ * import { formPresets, getPreset } from '@/features/system/supporting/forms'
  * const config = getPreset('userProfile')
  * ```
  */

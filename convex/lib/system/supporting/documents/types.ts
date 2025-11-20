@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/types.ts
+// convex/lib/system/supporting/documents/types.ts
 
 /**
  * Documents Module Types

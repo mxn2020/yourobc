@@ -1,8 +1,8 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/types.ts
+// convex/lib/system/user_profiles/user_profiles/types.ts
 // Business types and interfaces for user_profiles module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { UserRole } from '@/schema/boilerplate/user_profiles/user_profiles/types';
+import type { UserRole } from '@/schema/system/user_profiles/user_profiles/types';
 import { USER_PROFILES_CONSTANTS } from './constants';
 
 // Core entity types

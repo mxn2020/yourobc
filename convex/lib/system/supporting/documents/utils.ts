@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/utils.ts
+// convex/lib/system/supporting/documents/utils.ts
 
 /**
  * Documents Module Utilities

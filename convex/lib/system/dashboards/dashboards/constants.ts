@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/dashboards/dashboards/constants.ts
+// convex/lib/system/dashboards/dashboards/constants.ts
 // Business constants, permissions, and limits for dashboards module
 
 export const DASHBOARDS_CONSTANTS = {

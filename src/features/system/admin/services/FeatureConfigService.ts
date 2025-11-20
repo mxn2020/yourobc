@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/services/FeatureConfigService.ts
+// src/features/system/admin/services/FeatureConfigService.ts
 /**
  * Feature Configuration Service
  *

@@ -8,10 +8,10 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { aiService } from '@/features/boilerplate/ai-core';
-import type { AITranscriptionRequest } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
-import { validateModelId } from '@/features/boilerplate/ai-core/utils';
+import { aiService } from '@/features/system/ai-core';
+import type { AITranscriptionRequest } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
+import { validateModelId } from '@/features/system/ai-core/utils';
 
 interface TranscriptionRequest extends Omit<AITranscriptionRequest, 'metadata'> {
   user_id?: string;

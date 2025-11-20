@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/constants.ts
+// convex/lib/system/supporting/scheduling/constants.ts
 
 /**
  * Scheduling Constants

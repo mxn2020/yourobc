@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/utils.ts
+// convex/lib/system/app_theme_settings/utils.ts
 // Utility functions for appThemeSettings module
 
 import { APP_THEME_SETTINGS_CONSTANTS } from './constants';

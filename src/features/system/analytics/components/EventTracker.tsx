@@ -1,8 +1,8 @@
-// src/features/boilerplate/analytics/components/EventTracker.tsx
+// src/features/system/analytics/components/EventTracker.tsx
 
 import { useEffect } from "react";
 import { useAnalytics, usePageTracking, useUserIdentification } from "../hooks/useAnalytics";
-import { useAuth } from "@/features/boilerplate/auth/hooks/useAuth";
+import { useAuth } from "@/features/system/auth/hooks/useAuth";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface EventTrackerProps {

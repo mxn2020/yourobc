@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/pages/BlogDashboard.tsx
+// src/features/system/blog/pages/BlogDashboard.tsx
 /**
  * Blog Dashboard Page
  *
@@ -12,7 +12,7 @@ import { Card } from '../../../../components/ui/Card';
 import { usePosts } from '../hooks/usePosts';
 import { useBlog } from '../hooks/useBlog';
 import { PostList } from '../shared/components/PostList';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function BlogDashboard() {
   const { t } = useTranslation('blog');

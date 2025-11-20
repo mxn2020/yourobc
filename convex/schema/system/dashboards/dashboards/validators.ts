@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/dashboards/dashboards/validators.ts
+// convex/schema/system/dashboards/dashboards/validators.ts
 // Grouped validators for dashboards module
 
 import { v } from 'convex/values';

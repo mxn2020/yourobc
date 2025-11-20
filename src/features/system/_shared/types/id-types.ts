@@ -1,4 +1,4 @@
-// filepath: src/features/boilerplate/_shared/types/id-types.ts
+// filepath: src/features/system/_shared/types/id-types.ts
 /**
  * Shared ID Type Definitions
  *

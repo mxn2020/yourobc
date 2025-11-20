@@ -3,10 +3,10 @@ import { useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Eye, Database, CloudSnow, Minus } from 'lucide-react';
 import { Badge, Button, DataTable } from '@/components/ui';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
+import { getProviderColor } from '@/features/system/ai-core/utils';
 import type { LogTableProps } from '../../types/log.types';
 import type { TableColumn } from '@/types';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 
 export function LogTable({ 
   logs, 

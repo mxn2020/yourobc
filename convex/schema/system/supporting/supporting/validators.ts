@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/supporting/supporting/validators.ts
+// convex/schema/system/supporting/supporting/validators.ts
 // Grouped validators for supporting module
 
 import { v } from 'convex/values';

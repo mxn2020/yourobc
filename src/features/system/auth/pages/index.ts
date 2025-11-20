@@ -1,4 +1,4 @@
-// src/features/boilerplate/pages/index.ts
+// src/features/system/pages/index.ts
 
 export { LoginPage } from './LoginPage'
 export { SignupPage } from './SignupPage'

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/comments/components/CommentList.tsx
+// src/features/system/supporting/comments/components/CommentList.tsx
 
 import { useState } from 'react';
 import { CommentCard } from './CommentCard';

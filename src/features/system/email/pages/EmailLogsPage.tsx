@@ -3,7 +3,7 @@
 import { FC } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
 import { Mail, ArrowLeft, Filter } from 'lucide-react'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 
 export const EmailLogsPage: FC = () => {
   const params = useParams({ strict: false });

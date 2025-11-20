@@ -1,6 +1,6 @@
-// src/features/boilerplate/payments/hooks/useFeatureAccess.ts
+// src/features/system/payments/hooks/useFeatureAccess.ts
 import { paymentsService } from '../services/PaymentsService'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 
 /**
  * Hook to check feature access

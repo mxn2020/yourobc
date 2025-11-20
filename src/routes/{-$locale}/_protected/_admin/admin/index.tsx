@@ -1,10 +1,10 @@
 // routes/{-$locale}/_protected/_admin/admin/index.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { AdminDashboardPage } from '@/features/boilerplate/admin'
+import { AdminDashboardPage } from '@/features/system/admin'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/')({
@@ -34,8 +34,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/')({
 
         if (convexClient) {
           const [stats, users] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.user_profiles.queries.getProfileStats, {}),
-            convexClient.query(api.lib.boilerplate.user_profiles.queries.getAllProfiles, {
+            convexClient.query(api.lib.system.user_profiles.queries.getProfileStats, {}),
+            convexClient.query(api.lib.system.user_profiles.queries.getAllProfiles, {
               options: { limit: 10 }
             })
           ])

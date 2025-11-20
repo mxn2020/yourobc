@@ -29,8 +29,8 @@ import { AIModelManager } from './AIModelManager';
 import { CostTracker } from './CostTracker';
 import { CacheManager } from './CacheManager';
 import { ProviderManager } from './ProviderManager';
-import { validateAIRequest } from '@/features/boilerplate/ai-core/utils';
-import { formatErrorMessage } from '@/features/boilerplate/ai-core/utils';
+import { validateAIRequest } from '@/features/system/ai-core/utils';
+import { formatErrorMessage } from '@/features/system/ai-core/utils';
 import { TokenCounter } from '../utils/token-counter';
 import { isTokenUsage } from '../utils/response-formatter';
 

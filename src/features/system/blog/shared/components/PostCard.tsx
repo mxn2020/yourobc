@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/shared/components/PostCard.tsx
+// src/features/system/blog/shared/components/PostCard.tsx
 /**
  * PostCard Component
  *
@@ -11,7 +11,7 @@ import { Calendar, Clock, User, MessageCircle, Heart, Eye } from 'lucide-react';
 import { Badge } from '../../../../../components/ui/Badge';
 import type { PostCardProps } from '../../types';
 import { formatDate, getRelativeTime, formatReadTime, calculateReadTime } from '../../utils/content';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function PostCard({
   post,

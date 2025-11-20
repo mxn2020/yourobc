@@ -1,6 +1,6 @@
 // src/features/admin/hooks/useAdmin.ts
 import { useMemo } from 'react'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import { useUserManagement } from './useUserManagement'
 import { useAppSettingsManagement } from './useAppSettingsManagement'
 import { useAnalyticsAudit } from './useAnalyticsAudit'

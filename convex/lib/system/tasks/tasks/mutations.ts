@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/tasks/tasks/mutations.ts
+// convex/lib/system/tasks/tasks/mutations.ts
 // Write operations for tasks module
 
 import { mutation } from '@/generated/server';
@@ -7,7 +7,7 @@ import {
   requireCurrentUser,
   generateUniquePublicId,
 } from '@/shared/auth.helper';
-import { tasksValidators } from '@/schema/boilerplate/tasks/tasks/validators';
+import { tasksValidators } from '@/schema/system/tasks/tasks/validators';
 import { TASKS_CONSTANTS } from './constants';
 import { validateTaskData } from './utils';
 import {

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/useScheduling.ts
+// src/features/system/blog/hooks/useScheduling.ts
 /**
  * Hook for scheduling blog posts
  *

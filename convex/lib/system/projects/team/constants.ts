@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/team/constants.ts
+// convex/lib/system/projects/team/constants.ts
 
 export const TEAM_CONSTANTS = {
   ROLE: {

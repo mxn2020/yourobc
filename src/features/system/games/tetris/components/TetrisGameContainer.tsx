@@ -44,15 +44,15 @@ export const TetrisGameContainer: React.FC<TetrisGameContainerProps> = ({
   const [unlockedAchievement, setUnlockedAchievement] = useState<UnlockedAchievement | null>(null);
 
   // Convex mutations
-  const saveScore = useMutation(api.lib.boilerplate.games.core.mutations.saveScore);
-  const saveReplay = useMutation(api.lib.boilerplate.games.replays.mutations.saveReplay);
-  const unlockAchievement = useMutation(api.lib.boilerplate.games.achievements.mutations.unlockAchievement);
+  const saveScore = useMutation(api.lib.system.games.core.mutations.saveScore);
+  const saveReplay = useMutation(api.lib.system.games.replays.mutations.saveReplay);
+  const unlockAchievement = useMutation(api.lib.system.games.achievements.mutations.unlockAchievement);
 
   // Convex queries
-  const userAchievements = useQuery(api.lib.boilerplate.games.achievements.queries.getUserAchievements, {
+  const userAchievements = useQuery(api.lib.system.games.achievements.queries.getUserAchievements, {
     gameId: 'tetris',
   });
-  const leaderboard = useQuery(api.lib.boilerplate.games.core.queries.getLeaderboard, {
+  const leaderboard = useQuery(api.lib.system.games.core.queries.getLeaderboard, {
     gameId: 'tetris',
     limit: 10,
   });

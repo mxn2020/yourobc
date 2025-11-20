@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/providers/index.ts
+// src/features/system/analytics/providers/index.ts
 
 export { internalAnalyticsProvider } from "./internal/InternalAnalyticsProvider";
 

@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/config/i18n-config.ts
+// src/features/system/i18n/config/i18n-config.ts
 
 /**
  * I18n Configuration

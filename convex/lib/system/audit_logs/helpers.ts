@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/helpers.ts
+// convex/lib/system/audit_logs/helpers.ts
 
 import { MutationCtx } from '@/generated/server';
 import { getCurrentUser } from '@/shared/auth.helper';

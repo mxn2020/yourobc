@@ -2,7 +2,7 @@
 
 import { Link, useParams } from '@tanstack/react-router'
 import { Button, Card } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 
 export function NotFound({ children }: { children?: any }) {
   const params = useParams({ strict: false });

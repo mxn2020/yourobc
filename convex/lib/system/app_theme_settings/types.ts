@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/types.ts
+// convex/lib/system/app_theme_settings/types.ts
 // Type definitions for appThemeSettings module
 
 import type { Doc } from '@/generated/dataModel';

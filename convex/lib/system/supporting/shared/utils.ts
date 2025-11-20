@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/shared/utils.ts
+// convex/lib/system/supporting/scheduling/shared/utils.ts
 
 import { ScheduledEvent } from '../scheduling';
 

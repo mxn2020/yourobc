@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/tasks/tasks/permissions.ts
+// convex/lib/system/tasks/tasks/permissions.ts
 // Access control and authorization logic for tasks module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

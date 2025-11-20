@@ -13,16 +13,16 @@
  */
 
 // Import existing configs
-import { BLOG_CONFIG, validateBlogConfig } from '../../../src/features/boilerplate/blog/config';
-import { PAYMENT_CONFIG } from '../../../src/features/boilerplate/payments/config/payment-config';
-import { AUTH_CONFIG, validateAuthConfig } from '../../../src/features/boilerplate/auth/config';
-import { PROJECTS_CONFIG, validateProjectsConfig } from '../../../src/features/boilerplate/projects/config';
-import { AI_CONFIG, validateAIConfig } from '../../../src/features/boilerplate/ai-core/config';
-import { NOTIFICATIONS_CONFIG, validateNotificationsConfig } from '../../../src/features/boilerplate/notifications/config';
-import { loggerConfig } from '../../../src/features/boilerplate/logging/config/logging-config';
-import { analyticsConfig } from '../../../src/features/boilerplate/analytics/config/analytics-config';
-import { INTEGRATIONS_CONFIG } from '../../../src/features/boilerplate/integrations/config/integrations-config';
-import { getSupportingConfig } from '../../../src/features/boilerplate/supporting/config/supporting.config';
+import { BLOG_CONFIG, validateBlogConfig } from '../../../src/features/system/blog/config';
+import { PAYMENT_CONFIG } from '../../../src/features/system/payments/config/payment-config';
+import { AUTH_CONFIG, validateAuthConfig } from '../../../src/features/system/auth/config';
+import { PROJECTS_CONFIG, validateProjectsConfig } from '../../../src/features/system/projects/config';
+import { AI_CONFIG, validateAIConfig } from '../../../src/features/system/ai-core/config';
+import { NOTIFICATIONS_CONFIG, validateNotificationsConfig } from '../../../src/features/system/notifications/config';
+import { loggerConfig } from '../../../src/features/system/logging/config/logging-config';
+import { analyticsConfig } from '../../../src/features/system/analytics/config/analytics-config';
+import { INTEGRATIONS_CONFIG } from '../../../src/features/system/integrations/config/integrations-config';
+import { getSupportingConfig } from '../../../src/features/system/supporting/config/supporting.config';
 
 // ============================================
 // 1. FEATURE REGISTRY TYPE

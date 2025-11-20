@@ -3,7 +3,7 @@
 import { FC, useState, useMemo } from "react";
 import { Badge } from "@/components/ui";
 import type { Project } from "../types";
-import { useTranslation } from "@/features/boilerplate/i18n";
+import { useTranslation } from "@/features/system/i18n";
 import * as projectHelpers from "../utils/projectHelpers";
 
 interface ProjectsTableProps {

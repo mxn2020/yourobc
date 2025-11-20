@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/tasks/TaskDetailModal.tsx
+// features/system/projects/components/tasks/TaskDetailModal.tsx
 
 import { FC } from 'react'
 import {

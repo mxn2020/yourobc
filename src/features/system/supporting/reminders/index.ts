@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/reminders/index.ts
+// src/features/system/supporting/reminders/index.ts
 
 export * from './types';
 export * from './hooks';

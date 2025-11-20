@@ -192,21 +192,21 @@ window.location.href = url;
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-const accounts = useQuery(api.lib.boilerplate.stripeConnect.queries.getAllConnectedAccounts);
+const accounts = useQuery(api.lib.system.stripeConnect.queries.getAllConnectedAccounts);
 ```
 
 ### Get Active Accounts Only
 
 ```typescript
 const activeAccounts = useQuery(
-  api.lib.boilerplate.stripeConnect.queries.getActiveConnectedAccounts
+  api.lib.system.stripeConnect.queries.getActiveConnectedAccounts
 );
 ```
 
 ### Get Account Payments
 
 ```typescript
-const payments = useQuery(api.lib.boilerplate.stripeConnect.queries.getPaymentsByAccount, {
+const payments = useQuery(api.lib.system.stripeConnect.queries.getPaymentsByAccount, {
   connectedAccountId: accountId,
   limit: 50,
 });
@@ -215,7 +215,7 @@ const payments = useQuery(api.lib.boilerplate.stripeConnect.queries.getPaymentsB
 ### Get Revenue Analytics
 
 ```typescript
-const revenue = useQuery(api.lib.boilerplate.stripeConnect.queries.getAccountRevenue, {
+const revenue = useQuery(api.lib.system.stripeConnect.queries.getAccountRevenue, {
   connectedAccountId: accountId,
   startDate: Date.now() - 30 * 24 * 60 * 60 * 1000, // Last 30 days
   endDate: Date.now(),
@@ -228,7 +228,7 @@ const revenue = useQuery(api.lib.boilerplate.stripeConnect.queries.getAccountRev
 
 ```typescript
 const platformRevenue = useQuery(
-  api.lib.boilerplate.stripeConnect.queries.getPlatformRevenue,
+  api.lib.system.stripeConnect.queries.getPlatformRevenue,
   {
     startDate: startOfMonth,
     endDate: endOfMonth,

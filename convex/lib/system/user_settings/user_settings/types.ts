@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_settings/types.ts
+// convex/lib/system/user_settings/user_settings/types.ts
 // Type definitions for user settings module
 
 import type { Doc, Id } from '@/generated/dataModel';

@@ -1,8 +1,8 @@
-// convex/lib/boilerplate/projects/projects/types.ts
+// convex/lib/system/projects/projects/types.ts
 // TypeScript type definitions for projects module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { ProjectStatus, ProjectPriority, ProjectVisibility, ProjectRiskLevel } from '@/schema/boilerplate/projects/projects/types';
+import type { ProjectStatus, ProjectPriority, ProjectVisibility, ProjectRiskLevel } from '@/schema/system/projects/projects/types';
 
 // Entity types
 export type Project = Doc<'projects'>;

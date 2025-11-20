@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/configs/permissions.ts
+// convex/lib/system/email/configs/permissions.ts
 // Access control and authorization logic for email configs module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

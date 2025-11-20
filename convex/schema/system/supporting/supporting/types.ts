@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/supporting/supporting/types.ts
+// convex/schema/system/supporting/supporting/types.ts
 // Type extractions from validators for supporting module
 
 import { Infer } from 'convex/values';

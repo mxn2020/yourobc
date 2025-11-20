@@ -2,7 +2,7 @@
 
 import { defineSchema } from 'convex/server'
 
-import { boilerplateSchemas } from './schema/boilerplate'
+import { systemSchemas } from './schema/system'
 import { gameSchemas } from './schema/games'
 import { addonsSchemas } from './schema/addons'
 import { appsSchemas } from './schema/apps'
@@ -11,8 +11,8 @@ import { softwareSchemas } from './schema/software'
 
 const schema = defineSchema({
 
-  // Boilerplate System Tables
-  ...boilerplateSchemas,
+  // System System Tables
+  ...systemSchemas,
 
   // Games engine schemas
   ...gameSchemas,

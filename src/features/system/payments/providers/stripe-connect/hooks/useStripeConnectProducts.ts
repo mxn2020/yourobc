@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/hooks/useStripeConnectProducts.ts
+// src/features/system/payments/providers/stripe-connect/hooks/useStripeConnectProducts.ts
 /**
  * Stripe Connect Products Hook
  *
@@ -62,11 +62,11 @@ export function useStripeConnectProducts() {
 
   // Query products for this connected account
   const products = useQuery(
-    api.lib.boilerplate.payments.stripe_connect.queries.getProductsByAccount,
+    api.lib.system.payments.stripe_connect.queries.getProductsByAccount,
     account?._id ? { connectedAccountId: account._id } : 'skip'
   );
 
-  const upsertProduct = useMutation(api.lib.boilerplate.payments.stripe_connect.mutations.upsertClientProduct);
+  const upsertProduct = useMutation(api.lib.system.payments.stripe_connect.mutations.upsertClientProduct);
 
   /**
    * Create a new product and price for the connected account

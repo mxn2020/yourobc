@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/email/configs/types.ts
+// convex/schema/system/email/configs/types.ts
 // Type extractions from validators for email configs module
 
 import { Infer } from 'convex/values';

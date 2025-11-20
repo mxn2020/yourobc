@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/analytics/analytics/utils.ts
+// convex/lib/system/analytics/analytics/utils.ts
 // Utility functions for analytics module
 
 import { ANALYTICS_CONSTANTS } from './constants';

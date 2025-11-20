@@ -1,3 +1,3 @@
-// src/features/boilerplate/blog/providers/internal/index.ts
+// src/features/system/blog/providers/internal/index.ts
 export { InternalBlogProvider } from './InternalBlogProvider';
 export { default } from './InternalBlogProvider';

@@ -91,7 +91,7 @@ The following routes are automatically available:
 #### Display Blog Posts
 
 ```tsx
-import { usePosts, PostList } from '@/features/boilerplate/blog';
+import { usePosts, PostList } from '@/features/system/blog';
 
 function MyBlogPage() {
   const { posts, loading, hasMore, loadMore } = usePosts({
@@ -114,7 +114,7 @@ function MyBlogPage() {
 #### Display Single Post
 
 ```tsx
-import { usePost } from '@/features/boilerplate/blog';
+import { usePost } from '@/features/system/blog';
 
 function MyPostPage({ slug }: { slug: string }) {
   const { post, loading, error } = usePost({ slug });
@@ -135,7 +135,7 @@ function MyPostPage({ slug }: { slug: string }) {
 #### Use Markdown Editor
 
 ```tsx
-import { MarkdownEditor } from '@/features/boilerplate/blog';
+import { MarkdownEditor } from '@/features/system/blog';
 
 function MyEditor() {
   const [content, setContent] = useState('');
@@ -157,7 +157,7 @@ function MyEditor() {
 #### Access Blog Service Directly
 
 ```tsx
-import { useBlog } from '@/features/boilerplate/blog';
+import { useBlog } from '@/features/system/blog';
 
 function MyComponent() {
   const { service, provider, config, isReady } = useBlog();
@@ -183,7 +183,7 @@ function MyComponent() {
 #### Switch Providers
 
 ```tsx
-import { useBlog } from '@/features/boilerplate/blog';
+import { useBlog } from '@/features/system/blog';
 
 function ProviderSwitcher() {
   const { switchProvider, availableProviders } = useBlog();
@@ -203,7 +203,7 @@ function ProviderSwitcher() {
 #### Filter Posts
 
 ```tsx
-import { usePosts } from '@/features/boilerplate/blog';
+import { usePosts } from '@/features/system/blog';
 
 function FeaturedPosts() {
   const { posts, loading } = usePosts({
@@ -227,7 +227,7 @@ function FeaturedPosts() {
 Display a blog post in card format with various variants.
 
 ```tsx
-import { PostCard } from '@/features/boilerplate/blog';
+import { PostCard } from '@/features/system/blog';
 
 <PostCard
   post={post}
@@ -246,7 +246,7 @@ import { PostCard } from '@/features/boilerplate/blog';
 Display a list of blog posts with pagination.
 
 ```tsx
-import { PostList } from '@/features/boilerplate/blog';
+import { PostList } from '@/features/system/blog';
 
 <PostList
   posts={posts}
@@ -263,7 +263,7 @@ import { PostList } from '@/features/boilerplate/blog';
 Full-featured markdown editor with live preview.
 
 ```tsx
-import { MarkdownEditor } from '@/features/boilerplate/blog';
+import { MarkdownEditor } from '@/features/system/blog';
 
 <MarkdownEditor
   value={content}
@@ -386,7 +386,7 @@ await cancelSchedule(postId);
 ### Slug Utilities
 
 ```typescript
-import { generateSlug, isValidSlug, makeSlugUnique } from '@/features/boilerplate/blog';
+import { generateSlug, isValidSlug, makeSlugUnique } from '@/features/system/blog';
 
 const slug = generateSlug('My Blog Post Title'); // "my-blog-post-title"
 const valid = isValidSlug('my-slug'); // true
@@ -396,7 +396,7 @@ const unique = makeSlugUnique('my-slug', existingSlugs); // "my-slug-1"
 ### SEO Utilities
 
 ```typescript
-import { calculateSEOScore, generateMetaTags, generateShareUrls } from '@/features/boilerplate/blog';
+import { calculateSEOScore, generateMetaTags, generateShareUrls } from '@/features/system/blog';
 
 // Calculate SEO score
 const { score, recommendations } = calculateSEOScore(post);
@@ -417,7 +417,7 @@ import {
   getExcerpt,
   generateTableOfContents,
   formatDate,
-} from '@/features/boilerplate/blog';
+} from '@/features/system/blog';
 
 const readTime = calculateReadTime(content); // 5 (minutes)
 const words = countWords(content); // 1234
@@ -443,7 +443,7 @@ const date = formatDate(timestamp); // "January 1, 2024"
 ### Via Code
 
 ```typescript
-import { useBlog } from '@/features/boilerplate/blog';
+import { useBlog } from '@/features/system/blog';
 
 const { service } = useBlog();
 
@@ -492,7 +492,7 @@ await service.publishPost(postId, userId);
 
 ### Provider Configuration
 
-Edit `/src/features/boilerplate/blog/config/index.ts`:
+Edit `/src/features/system/blog/config/index.ts`:
 
 ```typescript
 export const BLOG_CONFIG = {

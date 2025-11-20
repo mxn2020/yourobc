@@ -17,7 +17,7 @@ A comprehensive analytics system with multi-provider support (Internal/Convex, G
 ### 1. Setup Provider (Root of App)
 
 ```tsx
-import { AnalyticsProvider, EventTracker } from "@/features/boilerplate/analytics";
+import { AnalyticsProvider, EventTracker } from "@/features/system/analytics";
 
 function App() {
   return (
@@ -36,7 +36,7 @@ function App() {
 ### 2. Track Custom Events
 
 ```tsx
-import { useAnalytics } from "@/features/boilerplate/analytics";
+import { useAnalytics } from "@/features/system/analytics";
 
 function MyComponent() {
   const { trackEvent } = useAnalytics();
@@ -58,7 +58,7 @@ function MyComponent() {
 ### 3. Display Metrics
 
 ```tsx
-import { useMetricValue, useMetricTrend } from "@/features/boilerplate/analytics";
+import { useMetricValue, useMetricTrend } from "@/features/system/analytics";
 
 function MetricsCard() {
   const { value, isLoading } = useMetricValue("daily_active_users", "day");
@@ -190,7 +190,7 @@ See `/convex/crons.ts` for configuration.
 ## Architecture
 
 ```
-src/features/boilerplate/analytics/
+src/features/system/analytics/
 ├── types/              # TypeScript interfaces
 ├── config/             # Provider configuration
 ├── providers/
@@ -200,7 +200,7 @@ src/features/boilerplate/analytics/
 ├── components/         # EventTracker component
 └── utils/              # Utility functions
 
-convex/lib/boilerplate/analytics/
+convex/lib/system/analytics/
 ├── types.ts            # Backend types
 ├── constants.ts        # Configuration
 ├── utils.ts            # Helper functions
@@ -229,7 +229,7 @@ convex/lib/boilerplate/analytics/
 
 ### Track AI Usage
 ```typescript
-import { analyticsService } from "@/features/boilerplate/analytics";
+import { analyticsService } from "@/features/system/analytics";
 
 await analyticsService.trackAIUsage(
   "gpt-4",
@@ -258,4 +258,4 @@ await analyticsService.trackError(
 
 ## Support
 
-For issues or questions, please refer to the main boilerplate documentation.
+For issues or questions, please refer to the main system documentation.

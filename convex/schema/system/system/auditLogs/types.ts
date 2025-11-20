@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/auditLogs/types.ts
+// convex/schema/system/system/auditLogs/types.ts
 // Type extractions from validators for auditLogs module
 
 import { Infer } from 'convex/values';

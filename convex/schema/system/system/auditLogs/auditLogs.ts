@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/auditLogs/auditLogs.ts
+// convex/schema/system/system/auditLogs/auditLogs.ts
 // Table definitions for auditLogs module
 
 import { defineTable } from 'convex/server';

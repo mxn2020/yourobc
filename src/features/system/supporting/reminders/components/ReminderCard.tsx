@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/reminders/components/ReminderCard.tsx
+// src/features/system/supporting/reminders/components/ReminderCard.tsx
 
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';

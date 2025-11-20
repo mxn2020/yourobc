@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/tasks/tasks/utils.ts
+// convex/lib/system/tasks/tasks/utils.ts
 // Validation functions and utility helpers for tasks module
 
 import { TASKS_CONSTANTS } from './constants';

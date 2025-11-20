@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/mutations.ts
+// convex/lib/system/audit_logs/mutations.ts
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';

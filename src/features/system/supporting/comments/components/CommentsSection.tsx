@@ -1,7 +1,7 @@
-// src/features/boilerplate/supporting/comments/components/CommentsSection.tsx
+// src/features/system/supporting/comments/components/CommentsSection.tsx
 
 import { useState } from 'react'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import {
   useEntityComments,
   useCreateComment,

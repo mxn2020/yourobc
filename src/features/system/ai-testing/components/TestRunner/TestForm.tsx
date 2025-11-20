@@ -3,11 +3,11 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Play } from 'lucide-react';
 import { Alert, AlertDescription, AlertIcon, Button, Input, Label, Loading, SimpleSelect as Select, Textarea } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import type { TestFormData } from '../../types/test.types';
-import type { TestType } from '@/features/boilerplate/ai-core/types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
-import type { AIOperationType } from '@/features/boilerplate/ai-core/types';
+import type { TestType } from '@/features/system/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
+import type { AIOperationType } from '@/features/system/ai-core/types';
 
 interface TestFormProps {
   initialData?: TestFormData | null;

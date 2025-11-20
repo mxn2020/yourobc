@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/services/ProjectsService.ts
+// src/features/system/projects/services/ProjectsService.ts
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
@@ -21,19 +21,19 @@ export class ProjectsService {
   // ==========================================
 
   getProjectsQueryOptions(options?: ProjectsListOptions) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getProjects, {
+    return convexQuery(api.lib.system.projects.queries.getProjects, {
       options,
     });
   }
 
   getProjectQueryOptions(projectId: ProjectId) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getProject, {
+    return convexQuery(api.lib.system.projects.queries.getProject, {
       projectId,
     });
   }
 
   getProjectByPublicIdQueryOptions(publicId: string) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getProjectByPublicId, {
+    return convexQuery(api.lib.system.projects.queries.getProjectByPublicId, {
       publicId,
     });
   }
@@ -43,23 +43,23 @@ export class ProjectsService {
     includeArchived?: boolean;
     limit?: number;
   }) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getUserProjects, options || {});
+    return convexQuery(api.lib.system.projects.queries.getUserProjects, options || {});
   }
 
   getProjectStatsQueryOptions(targetUserId?: Id<"userProfiles">) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getProjectStats, {
+    return convexQuery(api.lib.system.projects.queries.getProjectStats, {
       targetUserId,
     });
   }
 
   getProjectMembersQueryOptions(projectId: ProjectId) {
-    return convexQuery(api.lib.boilerplate.projects.queries.getProjectMembers, {
+    return convexQuery(api.lib.system.projects.queries.getProjectMembers, {
       projectId,
     });
   }
 
   getDashboardStatsQueryOptions() {
-    return convexQuery(api.lib.boilerplate.projects.queries.getDashboardStats, {});
+    return convexQuery(api.lib.system.projects.queries.getDashboardStats, {});
   }
 
   // ==========================================
@@ -127,27 +127,27 @@ export class ProjectsService {
   // ==========================================
 
   useCreateProject() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.mutations.createProject);
+    const mutationFn = useConvexMutation(api.lib.system.projects.mutations.createProject);
     return useMutation({ mutationFn });
   }
 
   useUpdateProject() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.mutations.updateProject);
+    const mutationFn = useConvexMutation(api.lib.system.projects.mutations.updateProject);
     return useMutation({ mutationFn });
   }
 
   useDeleteProject() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.mutations.deleteProject);
+    const mutationFn = useConvexMutation(api.lib.system.projects.mutations.deleteProject);
     return useMutation({ mutationFn });
   }
 
   useUpdateProjectProgress() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.mutations.updateProjectProgress);
+    const mutationFn = useConvexMutation(api.lib.system.projects.mutations.updateProjectProgress);
     return useMutation({ mutationFn });
   }
 
   useRequestAccess() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.mutations.requestAccess);
+    const mutationFn = useConvexMutation(api.lib.system.projects.mutations.requestAccess);
     return useMutation({ mutationFn });
   }
 

@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/config/logging-config.ts
+// src/features/system/logging/config/logging-config.ts
 
 import { LoggerConfig, LogLevel, FeatureLoggingConfig } from '../types/logging.types'
 import { getEnv, getEnvWithDefault, envIsNotFalse, envIsTrue } from '../../_shared/env-utils'

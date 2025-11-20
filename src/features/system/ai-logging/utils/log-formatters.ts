@@ -1,9 +1,9 @@
 // src/features/ai-logging/utils/log-formatters.ts
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 import type { FormattedExportLog } from '../types/log.types';
-import { formatLatency, formatDate, formatNumber, getStatusDisplay } from '@/features/boilerplate/ai-core/utils';
-import { formatTokenCount } from '@/features/boilerplate/ai-core/utils';
-import { formatCost } from '@/features/boilerplate/ai-core/utils';
+import { formatLatency, formatDate, formatNumber, getStatusDisplay } from '@/features/system/ai-core/utils';
+import { formatTokenCount } from '@/features/system/ai-core/utils';
+import { formatCost } from '@/features/system/ai-core/utils';
 
 export function formatLogForDisplay(log: AIUsageLog) {
   return {

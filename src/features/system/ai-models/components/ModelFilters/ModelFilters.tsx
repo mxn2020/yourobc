@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { Button, Card, CardContent, Chip, Input, SimpleSelect as Select } from '@/components/ui';
-import type { ModelFilter, ModelAvailability, ModelType, ModelProvider } from '@/features/boilerplate/ai-core/types';
+import type { ModelFilter, ModelAvailability, ModelType, ModelProvider } from '@/features/system/ai-core/types';
 
 interface ModelFiltersProps {
   filters: ModelFilter;

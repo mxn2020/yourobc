@@ -70,7 +70,7 @@ class AuditLogsService {
     }
 
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.audit_logs.queries.getAuditLogs, {
+      ...convexQuery(api.lib.system.audit_logs.queries.getAuditLogs, {
         options: convexOptions,
       }),
       staleTime: 30000, // 30 seconds
@@ -83,7 +83,7 @@ class AuditLogsService {
    */
   useMyAuditLogStats(timeWindow?: 'day' | 'week' | 'month' | 'all'): ReturnType<typeof useQuery<MyAuditLogStats>> {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.audit_logs.queries.getMyAuditLogStats, {
+      ...convexQuery(api.lib.system.audit_logs.queries.getMyAuditLogStats, {
         timeWindow,
       }),
       staleTime: 60000, // 1 minute
@@ -95,7 +95,7 @@ class AuditLogsService {
    */
   useEntityAuditLogs(entityType: AuditEntityType, entityId: string, limit?: number) {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.audit_logs.queries.getEntityAuditLogs, {
+      ...convexQuery(api.lib.system.audit_logs.queries.getEntityAuditLogs, {
         entityType,
         entityId,
         limit,
@@ -110,7 +110,7 @@ class AuditLogsService {
    */
   useUserAuditLogs(limit?: number) {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.audit_logs.queries.getUserAuditLogs, {
+      ...convexQuery(api.lib.system.audit_logs.queries.getUserAuditLogs, {
         limit,
       }),
       staleTime: 60000,
@@ -124,7 +124,7 @@ class AuditLogsService {
    */
   useCreateAuditLog() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.audit_logs.mutations.createAuditLog),
+      mutationFn: useConvexMutation(api.lib.system.audit_logs.mutations.createAuditLog),
     })
   }
 

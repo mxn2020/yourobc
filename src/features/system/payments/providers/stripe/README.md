@@ -35,7 +35,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ### 2. Basic Usage
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function PricingPage() {
   return (
@@ -59,7 +59,7 @@ function PricingPage() {
 Initiates Stripe checkout for subscriptions or one-time payments.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 // Subscription checkout
 <Stripe.CheckoutButton
@@ -101,7 +101,7 @@ import { Stripe } from '@/features/boilerplate/payments';
 Displays current subscription status with management options.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 <Stripe.SubscriptionStatus
   showDetails={true}
@@ -126,7 +126,7 @@ import { Stripe } from '@/features/boilerplate/payments';
 Opens Stripe's hosted billing portal.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 <Stripe.BillingPortalButton
   label="Manage Billing"
@@ -155,7 +155,7 @@ import { Stripe } from '@/features/boilerplate/payments';
 Displays a pricing plan with features and checkout button.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 const plan = {
   id: 'pro',
@@ -197,7 +197,7 @@ const plan = {
 Access customer data and Stripe customer ID.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function CustomerInfo() {
   const {
@@ -227,7 +227,7 @@ function CustomerInfo() {
 Create checkout sessions for subscriptions and payments.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function SubscribeButton({ priceId }) {
   const {
@@ -272,7 +272,7 @@ function SubscribeButton({ priceId }) {
 Manage user subscriptions.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function SubscriptionManager() {
   const {
@@ -336,7 +336,7 @@ function SubscriptionManager() {
 Access Stripe's hosted billing portal.
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function ManageBillingButton() {
   const {
@@ -553,7 +553,7 @@ All API keys starting with `pk_test_` and `sk_test_` are test mode.
 ### Full Subscription Flow
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function SubscriptionFlow() {
   const { subscription, isActive } = Stripe.useStripeSubscription();
@@ -592,7 +592,7 @@ function SubscriptionFlow() {
 ### Custom Checkout
 
 ```tsx
-import { Stripe } from '@/features/boilerplate/payments';
+import { Stripe } from '@/features/system/payments';
 
 function CustomCheckout() {
   const { createSubscriptionCheckout, isCreating } = Stripe.useStripeCheckout();

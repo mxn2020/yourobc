@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/dashboards/dashboards/types.ts
+// convex/lib/system/dashboards/dashboards/types.ts
 // TypeScript type definitions for dashboards module
 
 import type { Doc, Id } from '@/generated/dataModel';
@@ -9,7 +9,7 @@ import type {
   ChartType,
   AggregationType,
   FormatType,
-} from '@/schema/boilerplate/dashboards/dashboards/types';
+} from '@/schema/system/dashboards/dashboards/types';
 
 // ============================================
 // Entity Types

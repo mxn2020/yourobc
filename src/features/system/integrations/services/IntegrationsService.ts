@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/services/IntegrationsService.ts
+// src/features/system/integrations/services/IntegrationsService.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 import {

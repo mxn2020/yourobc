@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/pages/WebsiteSettingsPage.tsx
+// src/features/system/websites/pages/WebsiteSettingsPage.tsx
 
 import { FC, useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
@@ -11,10 +11,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { useTranslation } from '@/features/system/i18n'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { WebsiteId } from '../types'
 
 interface WebsiteSettingsPageProps {

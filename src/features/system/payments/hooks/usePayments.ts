@@ -1,9 +1,9 @@
-// src/features/boilerplate/payments/hooks/usePayments.ts
+// src/features/system/payments/hooks/usePayments.ts
 import { useCallback } from 'react'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import { paymentsService } from '../services/PaymentsService'
 import { useActiveProvider } from './useActiveProvider'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 import type { CheckoutOptions } from '../types'
 

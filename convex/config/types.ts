@@ -52,8 +52,8 @@ export interface EntityTypeCategory {
 export interface EntityTypesConfig {
   /** Core system entities (don't modify in apps) */
   system: string[];
-  /** Boilerplate entities (don't modify in apps) */
-  boilerplate: string[];
+  /** System entities (don't modify in apps) */
+  system: string[];
   /** App/addon specific entities (customize per app) */
   app: string[];
   /** Entities that can have comments */

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/services/BlogService.ts
+// src/features/system/blog/services/BlogService.ts
 /**
  * Blog Service - Facade Pattern
  *

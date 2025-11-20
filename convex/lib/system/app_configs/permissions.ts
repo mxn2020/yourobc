@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_configs/permissions.ts
+// convex/lib/system/app_configs/permissions.ts
 // Access control and authorization logic for appConfigs module
 
 import type { Doc } from '@/generated/dataModel';

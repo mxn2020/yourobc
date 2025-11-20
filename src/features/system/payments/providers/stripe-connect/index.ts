@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/index.ts
+// src/features/system/payments/providers/stripe-connect/index.ts
 /**
  * Stripe Connect Provider
  *

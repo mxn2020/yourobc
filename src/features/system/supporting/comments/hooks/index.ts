@@ -1,3 +1,3 @@
-// src/features/boilerplate/supporting/comments/hooks/index.ts
+// src/features/system/supporting/comments/hooks/index.ts
 
 export * from './useComments'

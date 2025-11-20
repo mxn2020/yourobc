@@ -2,12 +2,12 @@
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { UserPreferences } from '../types/preferences.types';
-import type { ModelSort } from '@/features/boilerplate/ai-core/types';
+import type { ModelSort } from '@/features/system/ai-core/types';
 import { Id } from "@/convex/_generated/dataModel";
 
 export function useModelPreferences() {
   const preferences = useQuery(
-    api.lib.boilerplate.user_settings.queries.getUserModelPreferences,
+    api.lib.system.user_settings.queries.getUserModelPreferences,
     {}
   );
   
@@ -58,18 +58,18 @@ export function useModelPreferences() {
 }
 
 export function useUpdateModelPreferences() {
-  return useMutation(api.lib.boilerplate.user_settings.mutations.updateUserModelPreferences);
+  return useMutation(api.lib.system.user_settings.mutations.updateUserModelPreferences);
 }
 
 export function useSetDefaultModel() {
-  return useMutation(api.lib.boilerplate.user_settings.mutations.setDefaultModel);
+  return useMutation(api.lib.system.user_settings.mutations.setDefaultModel);
 }
 
 export function useToggleFavoriteModel() {
-  return useMutation(api.lib.boilerplate.user_settings.mutations.toggleFavoriteModel);
+  return useMutation(api.lib.system.user_settings.mutations.toggleFavoriteModel);
 }
 
 export function useClearDefaultModel() {
-  return useMutation(api.lib.boilerplate.user_settings.mutations.clearDefaultModel);
+  return useMutation(api.lib.system.user_settings.mutations.clearDefaultModel);
 }
 

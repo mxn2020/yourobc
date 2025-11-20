@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/types/index.ts
+// src/features/system/supporting/documents/types/index.ts
 
 import type { Doc } from '@/convex/_generated/dataModel';
 

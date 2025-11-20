@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/constants/index.ts
+// src/features/system/websites/constants/index.ts
 
 export const WEBSITE_STATUS = {
   DRAFT: 'draft',

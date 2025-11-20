@@ -142,7 +142,7 @@ A comprehensive modular website system for building public-facing pages beyond t
 ### Creating a Website
 
 ```typescript
-import { useWebsites } from '@/features/boilerplate/websites'
+import { useWebsites } from '@/features/system/websites'
 
 function MyComponent() {
   const { createWebsite } = useWebsites()
@@ -163,7 +163,7 @@ function MyComponent() {
 ### Creating a Page
 
 ```typescript
-import { websitesService } from '@/features/boilerplate/websites'
+import { websitesService } from '@/features/system/websites'
 
 function MyComponent({ websiteId }) {
   const createPage = websitesService.useCreatePage()
@@ -184,7 +184,7 @@ function MyComponent({ websiteId }) {
 
 ## Configuration
 
-Edit `/src/features/boilerplate/websites/config/index.ts` to configure:
+Edit `/src/features/system/websites/config/index.ts` to configure:
 - Website limits
 - Feature flags
 - Default settings

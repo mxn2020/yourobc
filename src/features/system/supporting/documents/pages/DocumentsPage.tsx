@@ -1,7 +1,7 @@
-// src/features/boilerplate/supporting/documents/pages/DocumentsPage.tsx
+// src/features/system/supporting/documents/pages/DocumentsPage.tsx
 
 import { useState } from 'react';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

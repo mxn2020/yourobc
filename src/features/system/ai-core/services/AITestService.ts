@@ -15,10 +15,10 @@ import type {
 } from '../types/ai-core.types';
 import type { ModelProvider } from '../types/ai-models.types';
 import { AIService } from './AIService';
-import { formatErrorMessage } from '@/features/boilerplate/ai-core/utils';
-import { getProviderFromModelId } from '@/features/boilerplate/ai-core/utils';
-import { validateTestConfiguration } from '@/features/boilerplate/ai-core/utils';
-import { cleanTestParameters } from '@/features/boilerplate/ai-core/utils';
+import { formatErrorMessage } from '@/features/system/ai-core/utils';
+import { getProviderFromModelId } from '@/features/system/ai-core/utils';
+import { validateTestConfiguration } from '@/features/system/ai-core/utils';
+import { cleanTestParameters } from '@/features/system/ai-core/utils';
 import { Id } from "@/convex/_generated/dataModel";
 
 export interface TestFilter {
@@ -685,7 +685,7 @@ export class AITestService {
         metadataKeys: metadata ? Object.keys(metadata) : []
       });
 
-      const testId = await this.convexClient.mutation(api.lib.boilerplate.ai_tests.mutations.createAITest, {
+      const testId = await this.convexClient.mutation(api.lib.system.ai_tests.mutations.createAITest, {
         name: config.name,
         description: config.description,
         type: config.type,
@@ -735,7 +735,7 @@ export class AITestService {
     });
 
     try {
-      await this.convexClient.mutation(api.lib.boilerplate.ai_tests.mutations.updateTestStatus, {
+      await this.convexClient.mutation(api.lib.system.ai_tests.mutations.updateTestStatus, {
         testId,
         status,
         startedAt: options.startedAt?.getTime(),
@@ -793,7 +793,7 @@ export class AITestService {
         executedAt: result.completedAt?.getTime() || Date.now(),
       };
 
-      await this.convexClient.mutation(api.lib.boilerplate.ai_tests.mutations.addTestResult, {
+      await this.convexClient.mutation(api.lib.system.ai_tests.mutations.addTestResult, {
         testId,
         result: testResult
       });
@@ -816,7 +816,7 @@ export class AITestService {
     }
 
     try {
-      const result = await this.convexClient.query(api.lib.boilerplate.ai_tests.queries.getAITests, {
+      const result = await this.convexClient.query(api.lib.system.ai_tests.queries.getAITests, {
         modelId: filters.modelId,
         provider: filters.provider,
         type: filters.type,
@@ -847,12 +847,12 @@ export class AITestService {
       // Use public ID query if it's a public ID, otherwise use internal _id query
       if (this.isPublicId(testId)) {
         return await this.convexClient.query(
-          api.lib.boilerplate.ai_tests.queries.getAITestByPublicId,
+          api.lib.system.ai_tests.queries.getAITestByPublicId,
           { publicId: testId as string }
         );
       } else {
         return await this.convexClient.query(
-          api.lib.boilerplate.ai_tests.queries.getAITest,
+          api.lib.system.ai_tests.queries.getAITest,
           { testId: testId as Id<"aiTests"> }
         );
       }
@@ -871,7 +871,7 @@ export class AITestService {
     }
 
     try {
-      const test = await this.convexClient.query(api.lib.boilerplate.ai_tests.queries.getAITestByPublicId, {
+      const test = await this.convexClient.query(api.lib.system.ai_tests.queries.getAITestByPublicId, {
         publicId
       });
 
@@ -894,12 +894,12 @@ export class AITestService {
       // Use public ID mutation if it's a public ID, otherwise use internal _id mutation
       if (this.isPublicId(testId)) {
         await this.convexClient.mutation(
-          api.lib.boilerplate.ai_tests.mutations.deleteAITestByPublicId,
+          api.lib.system.ai_tests.mutations.deleteAITestByPublicId,
           { publicId: testId as string }
         );
       } else {
         await this.convexClient.mutation(
-          api.lib.boilerplate.ai_tests.mutations.deleteAITest,
+          api.lib.system.ai_tests.mutations.deleteAITest,
           { testId: testId as Id<"aiTests"> }
         );
       }
@@ -918,7 +918,7 @@ export class AITestService {
     }
 
     try {
-      await this.convexClient.mutation(api.lib.boilerplate.ai_tests.mutations.deleteAITestByPublicId, {
+      await this.convexClient.mutation(api.lib.system.ai_tests.mutations.deleteAITestByPublicId, {
         publicId
       });
     } catch (error) {
@@ -937,7 +937,7 @@ export class AITestService {
 
     try {
       // Backend uses JWT to identify user automatically - no userId needed
-      const stats = await this.convexClient.query(api.lib.boilerplate.ai_tests.queries.getAITestStats, {
+      const stats = await this.convexClient.query(api.lib.system.ai_tests.queries.getAITestStats, {
         timeWindow,
       });
 
@@ -1105,7 +1105,7 @@ export class AITestService {
     try {
       if (this.convexClient) {
         // Simple health check query
-        await this.convexClient.query(api.lib.boilerplate.ai_tests.queries.getAITests, {
+        await this.convexClient.query(api.lib.system.ai_tests.queries.getAITests, {
           limit: 1,
         });
         convexConnected = true;

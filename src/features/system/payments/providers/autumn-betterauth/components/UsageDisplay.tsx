@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/components/UsageDisplay.tsx
+// src/features/system/payments/providers/autumn-betterauth/components/UsageDisplay.tsx
 /**
  * Usage Display Component
  */

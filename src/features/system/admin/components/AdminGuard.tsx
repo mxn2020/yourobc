@@ -2,7 +2,7 @@
 import React from 'react'
 import { useAdminPermissions } from '../hooks/useAdmin'
 import { Loading } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface AdminGuardProps {
   children: React.ReactNode

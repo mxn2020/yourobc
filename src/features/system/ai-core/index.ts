@@ -1,4 +1,4 @@
-// src/features/boilerplate/ai-core/index.ts
+// src/features/system/ai-core/index.ts
 // Main AI Core Feature - Public API
 
 // Export singleton service

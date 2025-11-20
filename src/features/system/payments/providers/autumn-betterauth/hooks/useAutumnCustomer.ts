@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/hooks/useAutumnCustomer.ts
+// src/features/system/payments/providers/autumn-betterauth/hooks/useAutumnCustomer.ts
 /**
  * Autumn Customer Hook
  * 

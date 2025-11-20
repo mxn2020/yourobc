@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/useIntegrations.tsx
+// src/features/system/integrations/hooks/useIntegrations.tsx
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useConvexAuth } from "convex/react";
@@ -33,7 +33,7 @@ interface IntegrationsProviderProps {
  *
  * @example
  * ```tsx
- * import { IntegrationsProvider } from '@/features/boilerplate/integrations';
+ * import { IntegrationsProvider } from '@/features/system/integrations';
  *
  * function App() {
  *   return (

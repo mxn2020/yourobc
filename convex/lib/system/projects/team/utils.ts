@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/team/utils.ts
+// convex/lib/system/projects/team/utils.ts
 
 import { TEAM_CONSTANTS, ROLE_HIERARCHY } from './constants';
 import type { ProjectMember } from './types';

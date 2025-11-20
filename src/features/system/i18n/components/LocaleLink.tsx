@@ -1,8 +1,8 @@
-// src/features/boilerplate/i18n/components/LocaleLink.tsx
+// src/features/system/i18n/components/LocaleLink.tsx
 
 import { Link as TanStackLink } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { useI18n } from '@/features/boilerplate/i18n/context'
+import { useI18n } from '@/features/system/i18n/context'
 
 export function Link(props: LinkProps) {
   const { locale } = useI18n()

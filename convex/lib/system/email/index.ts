@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/index.ts
+// convex/lib/system/email/index.ts
 // convex/lib/email/index.ts
 
 export * from './constants';

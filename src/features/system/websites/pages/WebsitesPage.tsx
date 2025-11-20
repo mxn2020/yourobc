@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/pages/WebsitesPage.tsx
+// src/features/system/websites/pages/WebsitesPage.tsx
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { WebsiteCard } from '../components/WebsiteCard'
 import { WebsiteForm } from '../components/WebsiteForm'
 import type { CreateWebsiteData, Website } from '../types'
 import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function WebsitesPage() {
   const { t } = useTranslation('websites')

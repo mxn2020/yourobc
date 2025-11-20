@@ -9,8 +9,8 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { json } from '@tanstack/react-start'
-import { stripeConnectService } from '@/features/boilerplate/payments/providers/stripe-connect/services/StripeConnectService'
-import { auth } from '@/features/boilerplate/auth/lib/auth-config'
+import { stripeConnectService } from '@/features/system/payments/providers/stripe-connect/services/StripeConnectService'
+import { auth } from '@/features/system/auth/lib/auth-config'
 import { ConvexHttpClient } from 'convex/browser'
 import { api } from '@/convex/_generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
@@ -44,7 +44,7 @@ async function handleGetAccountStatus({ request }: { request: Request }) {
 
     // Get account from Convex
     const account = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccount,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccount,
       {
         accountId: accountId as Id<'connectedAccounts'>,
       }
@@ -60,7 +60,7 @@ async function handleGetAccountStatus({ request }: { request: Request }) {
 
     // Sync status back to Convex
     await convex.mutation(
-      api.lib.boilerplate.payments.stripe_connect.mutations.updateAccountStatus,
+      api.lib.system.payments.stripe_connect.mutations.updateAccountStatus,
       {
         accountId: accountId as Id<'connectedAccounts'>,
         accountStatus: accountStatus.status,

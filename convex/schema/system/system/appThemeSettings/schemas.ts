@@ -1,8 +1,8 @@
-// convex/schema/boilerplate/system/appThemeSettings/schemas.ts
+// convex/schema/system/system/appThemeSettings/schemas.ts
 // Schema exports for appThemeSettings module
 
 import { appThemeSettingsTable } from './appThemeSettings';
 
-export const boilerplateSystemAppThemeSettingsSchemas = {
+export const systemSystemAppThemeSettingsSchemas = {
   appThemeSettings: appThemeSettingsTable,
 };

@@ -1,8 +1,8 @@
-// src/features/boilerplate/pages/LoginPage.tsx
+// src/features/system/pages/LoginPage.tsx
 import React from 'react'
 import { LoginForm } from '../components/LoginForm'
 import { AuthLayout } from '../components/AuthLayout'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function LoginPage() {
   const { t } = useTranslation('auth')

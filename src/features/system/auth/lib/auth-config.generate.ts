@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/lib/auth-config.generate.ts
+// src/features/system/auth/lib/auth-config.generate.ts
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins"
 import { prismaAdapter } from "better-auth/adapters/prisma";

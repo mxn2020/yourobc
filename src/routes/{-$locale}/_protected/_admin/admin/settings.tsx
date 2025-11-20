@@ -1,11 +1,11 @@
 // src/routes/_protected/_admin/admin/settings.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { AdminSettingsPage } from '@/features/boilerplate/admin'
-import { appSettingsService } from '@/features/boilerplate/admin/services/AppSettingsService'
+import { AdminSettingsPage } from '@/features/system/admin'
+import { appSettingsService } from '@/features/system/admin/services/AppSettingsService'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/settings')({
@@ -34,8 +34,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/settin
         if (convexClient) {
           // Fetch settings in parallel
           const [appSettings, aiSettings] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.app_settings.queries.getAppSettings, {}),
-            convexClient.query(api.lib.boilerplate.app_settings.queries.getAISettings, {}),
+            convexClient.query(api.lib.system.app_settings.queries.getAppSettings, {}),
+            convexClient.query(api.lib.system.app_settings.queries.getAISettings, {}),
           ]);
 
           // Cache data using service query options

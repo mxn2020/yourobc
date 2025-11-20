@@ -6,13 +6,13 @@
 
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { api } from '@/convex/_generated/api';
-import { useCategories } from '@/features/boilerplate/blog/hooks/useCategories';
-import { getCategoriesQueryOptions } from '@/features/boilerplate/blog/services/blogQueryOptions';
+import { useCategories } from '@/features/system/blog/hooks/useCategories';
+import { getCategoriesQueryOptions } from '@/features/system/blog/services/blogQueryOptions';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui';
 import { ArrowLeft } from 'lucide-react';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { defaultLocale } from '@/features/system/i18n';
 import { createI18nSeo } from '@/utils/seo';
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/categories/')({
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/c
 
         if (convexClient) {
           const categories = await convexClient.query(
-            api.lib.boilerplate.blog.queries.getCategories,
+            api.lib.system.blog.queries.getCategories,
             {}
           );
 

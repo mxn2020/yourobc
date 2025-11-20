@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/milestones/MilestoneDetailModal.tsx
+// features/system/projects/components/milestones/MilestoneDetailModal.tsx
 
 import { FC } from 'react'
 import {

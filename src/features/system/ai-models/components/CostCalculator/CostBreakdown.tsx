@@ -1,7 +1,7 @@
 // src/features/ai-models/components/CostCalculator/CostBreakdown.tsx
 import { Card, CardContent, CardHeader } from '@/components/ui';
-import { formatCost } from '@/features/boilerplate/ai-core/utils';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import { formatCost } from '@/features/system/ai-core/utils';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 interface CostBreakdownProps {
   model: ModelInfo;

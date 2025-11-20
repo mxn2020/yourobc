@@ -1,6 +1,6 @@
 // src/routes/api/auth/test-jwt.ts
 import { createFileRoute } from '@tanstack/react-router'
-import { authService } from '@/features/boilerplate/auth'
+import { authService } from '@/features/system/auth'
 
 export const Route = createFileRoute('/api/auth/test-jwt')({
   server: {

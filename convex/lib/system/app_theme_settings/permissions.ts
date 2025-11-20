@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/permissions.ts
+// convex/lib/system/app_theme_settings/permissions.ts
 // Access control and authorization logic for appThemeSettings module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/components/DocumentList.tsx
+// src/features/system/supporting/documents/components/DocumentList.tsx
 
 import { DocumentCard } from './DocumentCard';
 import type { DocumentWithUser } from '../types';

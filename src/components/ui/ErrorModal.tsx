@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, X, ExternalLink, Key, Wifi, Brain } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from './Button';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 interface ErrorModalProps {
   isOpen: boolean;

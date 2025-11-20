@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { LogService } from '../services/LogService';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
 import type { ExportOptions } from '../types/log.types';
 
 export function useLogExport() {

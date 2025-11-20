@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/projects/permissions.ts
+// convex/lib/system/projects/projects/permissions.ts
 // Access control and authorization logic for projects module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

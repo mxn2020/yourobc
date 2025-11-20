@@ -1,4 +1,4 @@
-// src/features/boilerplate/audit-logs/components/AuditLogList.tsx
+// src/features/system/audit-logs/components/AuditLogList.tsx
 import { DataList } from '@/components/ui'
 import { Badge } from '@/components/ui'
 import { Activity, User } from 'lucide-react'

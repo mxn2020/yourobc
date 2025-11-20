@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/analytics/analytics/mutations.ts
+// convex/lib/system/analytics/analytics/mutations.ts
 // Mutation functions for analytics module
 
 import { v } from 'convex/values';

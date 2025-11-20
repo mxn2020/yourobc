@@ -1,6 +1,6 @@
 // src/features/ai-models/services/ModelService.ts
-import type { ModelInfo, ModelFilter, ModelSort } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelFilter, ModelSort } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
 
 export class ModelService {
   static async getModels(options: {

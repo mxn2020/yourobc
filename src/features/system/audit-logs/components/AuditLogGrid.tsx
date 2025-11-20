@@ -1,4 +1,4 @@
-// src/features/boilerplate/audit-logs/components/AuditLogGrid.tsx
+// src/features/system/audit-logs/components/AuditLogGrid.tsx
 
 import { Activity } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui'

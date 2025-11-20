@@ -1,4 +1,4 @@
-// filepath: src/features/boilerplate/admin/hooks/useAnalyticsAudit.ts
+// filepath: src/features/system/admin/hooks/useAnalyticsAudit.ts
 import { useState, useCallback, useMemo } from 'react'
 import { auditAnalyticsService } from '../services/AuditAnalyticsService'
 import type {

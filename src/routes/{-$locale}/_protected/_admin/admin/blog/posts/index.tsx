@@ -6,14 +6,14 @@
 
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { api } from '@/convex/_generated/api'
-import { usePosts } from '@/features/boilerplate/blog/hooks/usePosts'
+import { usePosts } from '@/features/system/blog/hooks/usePosts'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Loading } from '@/components/ui'
 import { Plus, Edit, Eye } from 'lucide-react'
-import { formatDate } from '@/features/boilerplate/blog/utils/content'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { formatDate } from '@/features/system/blog/utils/content'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 type PostsSearchParams = {
@@ -50,7 +50,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/p
         const convexClient = await getAuthenticatedConvexClient()
 
         if (convexClient) {
-          const posts = await convexClient.query(api.lib.boilerplate.blog.queries.getPosts, { limit: 50 })
+          const posts = await convexClient.query(api.lib.system.blog.queries.getPosts, { limit: 50 })
           context.queryClient.setQueryData(postsQueryKey, posts)
           console.log('✅ SSR: Posts data cached')
           console.timeEnd('Route Loader: SSR Data Fetch')

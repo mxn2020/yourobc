@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/hooks/index.ts
+// src/features/system/payments/providers/stripe-connect/hooks/index.ts
 /**
  * Stripe Connect Hooks
  *

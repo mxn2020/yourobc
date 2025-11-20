@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/provider.ts
+// src/features/system/payments/providers/autumn-betterauth/provider.ts
 /**
  * Autumn Better Auth Provider Implementation
  * 

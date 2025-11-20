@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/blog/blog/validators.ts
+// convex/schema/system/blog/blog/validators.ts
 // Grouped validators for blog module
 
 import { v } from 'convex/values';

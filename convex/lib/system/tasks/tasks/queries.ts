@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/tasks/tasks/queries.ts
+// convex/lib/system/tasks/tasks/queries.ts
 // Read operations for tasks module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { tasksValidators } from '@/schema/boilerplate/tasks/tasks/validators';
+import { tasksValidators } from '@/schema/system/tasks/tasks/validators';
 import { filterTasksByAccess, requireViewTaskAccess } from './permissions';
 import type { TaskListResponse, TaskStats, TaskFilters } from './types';
 import { TASKS_CONSTANTS } from './constants';

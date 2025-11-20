@@ -2,7 +2,7 @@
 import { forwardRef, memo } from 'react'
 import type { HTMLAttributes, ElementRef } from 'react'
 import { twMerge } from 'tailwind-merge'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface LoadingProps extends HTMLAttributes<HTMLDivElement> {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'

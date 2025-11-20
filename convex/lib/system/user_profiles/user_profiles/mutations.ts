@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/mutations.ts
+// convex/lib/system/user_profiles/user_profiles/mutations.ts
 // Write operations for user_profiles module
 
 import { mutation } from '@/generated/server';
@@ -15,7 +15,7 @@ import {
   updateExtendedMetadata
 } from './utils';
 import { vUserRole } from '@/shared/validators';
-import type { UserRole } from '@/schema/boilerplate/user_profiles/user_profiles/types';
+import type { UserRole } from '@/schema/system/user_profiles/user_profiles/types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**

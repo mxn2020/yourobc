@@ -1,6 +1,6 @@
 // src/features/ai-logging/hooks/useLogFiltering.ts
 import { useMemo, useCallback } from 'react';
-import type { AIUsageFilter, AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter, AIUsageLog } from '@/features/system/ai-core/types';
 import { 
   isLogFilterActive, 
   getActiveFilterCount, 

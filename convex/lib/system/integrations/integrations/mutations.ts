@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/mutations.ts
+// convex/lib/system/integrations/integrations/mutations.ts
 // Mutation operations for integrations module
 
 import { v } from 'convex/values';

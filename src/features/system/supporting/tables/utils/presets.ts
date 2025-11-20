@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/utils/presets.ts
+// src/features/system/supporting/tables/utils/presets.ts
 
 import type { TablePreset, TablePresetName } from '../types'
 
@@ -220,7 +220,7 @@ export const presetRecommendations = {
  */
 export const presetExamples: Record<TablePresetName, string> = {
   basic: `
-import { BasicTable } from '@/features/boilerplate/supporting'
+import { BasicTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name' },
@@ -239,7 +239,7 @@ function MyTable() {
   `.trim(),
 
   sortable: `
-import { SortableTable } from '@/features/boilerplate/supporting'
+import { SortableTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name', enableSorting: true },
@@ -259,7 +259,7 @@ function MyTable() {
   `.trim(),
 
   filterable: `
-import { FilterableTable } from '@/features/boilerplate/supporting'
+import { FilterableTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name', enableColumnFilter: true },
@@ -279,7 +279,7 @@ function MyTable() {
   `.trim(),
 
   paginated: `
-import { PaginatedTable } from '@/features/boilerplate/supporting'
+import { PaginatedTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name' },
@@ -299,7 +299,7 @@ function MyTable() {
   `.trim(),
 
   fullFeatured: `
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name', enableSorting: true },
@@ -323,8 +323,8 @@ function MyTable() {
   `.trim(),
 
   compact: `
-import { DataTable } from '@/features/boilerplate/supporting'
-import { tablePresets } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
+import { tablePresets } from '@/features/system/supporting'
 
 const preset = tablePresets.compact
 
@@ -343,7 +343,7 @@ function MyTable() {
   `.trim(),
 
   auditLog: `
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'timestamp', header: 'Timestamp', enableSorting: true },
@@ -369,7 +369,7 @@ function AuditLogTable() {
   `.trim(),
 
   dataGrid: `
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 
 const columns = [
   { id: 'select', header: ({ table }) => <SelectAllCheckbox table={table} /> },

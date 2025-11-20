@@ -8,10 +8,10 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { aiService } from '@/features/boilerplate/ai-core';
-import type { AISpeechRequest } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
-import { validateModelId } from '@/features/boilerplate/ai-core/utils';
+import { aiService } from '@/features/system/ai-core';
+import type { AISpeechRequest } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
+import { validateModelId } from '@/features/system/ai-core/utils';
 
 interface SpeechGenerateRequest extends Omit<AISpeechRequest, 'metadata'> {
   user_id?: string;

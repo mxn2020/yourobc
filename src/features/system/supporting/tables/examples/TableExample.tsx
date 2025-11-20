@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/examples/TableExample.tsx
+// src/features/system/supporting/tables/examples/TableExample.tsx
 
 import React, { useMemo } from 'react'
 import { BasicTable, DataTable, SortableTable, FilterableTable, PaginatedTable } from '../components'

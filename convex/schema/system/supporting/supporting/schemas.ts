@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/supporting/supporting/schemas.ts
+// convex/schema/system/supporting/supporting/schemas.ts
 // Schema exports for supporting module
 
 import {
@@ -10,7 +10,7 @@ import {
   availabilityPreferencesTable,
 } from './supporting';
 
-export const boilerplateSupportingSupportingSchemas = {
+export const systemSupportingSupportingSchemas = {
   wikiEntries: wikiEntriesTable,
   comments: commentsTable,
   reminders: remindersTable,

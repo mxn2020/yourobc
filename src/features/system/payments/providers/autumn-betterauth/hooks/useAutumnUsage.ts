@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/hooks/useAutumnUsage.ts
+// src/features/system/payments/providers/autumn-betterauth/hooks/useAutumnUsage.ts
 /**
  * Autumn Usage Tracking Hook
  */

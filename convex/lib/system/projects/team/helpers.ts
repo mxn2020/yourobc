@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/team/helpers.ts
+// convex/lib/system/projects/team/helpers.ts
 /**
  * Internal helper functions for team management that can be called from mutations.
  * These contain the shared business logic without mutation wrappers.
@@ -141,7 +141,7 @@ export async function addMemberInternal(
     emoji: '👥',
     isRead: false,
     actionUrl: `/projects/${data.projectId}`,
-    entityType: 'boilerplate_project_member',
+    entityType: 'system_project_member',
     entityId: memberId,
     createdAt: now,
     updatedAt: now,
@@ -153,7 +153,7 @@ export async function addMemberInternal(
     userId: invitingUser._id,
     userName: invitingUser.name || invitingUser.email || 'Unknown User',
     action: 'member.added',
-    entityType: 'boilerplate_project_member',
+    entityType: 'system_project_member',
     entityId: memberId,
     entityTitle: `Member added to ${project.title}`,
     description: `Added ${targetUser.name || targetUser.email} to project '${project.title}' as ${assignedRole}`,
@@ -222,7 +222,7 @@ export async function removeMemberInternal(
     userId: removingUser._id,
     userName: removingUser.name || removingUser.email || 'Unknown User',
     action: 'member.removed',
-    entityType: 'boilerplate_project_member',
+    entityType: 'system_project_member',
     entityId: memberId,
     entityTitle: `Member removed from ${project.title}`,
     description: `Removed ${removedUser?.name || removedUser?.email || 'user'} from project '${project.title}'`,
@@ -308,7 +308,7 @@ export async function updateMemberRoleInternal(
     userId: updatingUser._id,
     userName: updatingUser.name || updatingUser.email || 'Unknown User',
     action: 'member.role_changed',
-    entityType: 'boilerplate_project_member',
+    entityType: 'system_project_member',
     entityId: memberId,
     entityTitle: `Member role updated in ${project.title}`,
     description: `Changed ${memberUser?.name || memberUser?.email || 'user'} role from ${oldRole} to ${newRole} in project '${project.title}'`,

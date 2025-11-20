@@ -1,10 +1,10 @@
 // src/features/ai-models/components/ModelSettings/DefaultModelSettings.tsx
 import { useState } from 'react';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 import { Button, Card, CardContent, CardHeader, Modal, SimpleSelect as Select } from '@/components/ui';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { useModelPreferences, useUpdateModelPreferences } from '../../hooks/useModelPreferences';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import { Id } from "@/convex/_generated/dataModel";
 
 interface DefaultModelSettingsProps {

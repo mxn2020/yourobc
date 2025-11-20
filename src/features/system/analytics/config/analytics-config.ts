@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/config/analytics-config.ts
+// src/features/system/analytics/config/analytics-config.ts
 
 import { AnalyticsProviderType } from "../types";
 import { getEnv, getEnvWithDefault, getEnvAsNumber } from '../../_shared/env-utils';

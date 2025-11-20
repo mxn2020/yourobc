@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/integrations/integrations/schemas.ts
+// convex/schema/system/integrations/integrations/schemas.ts
 // Schema exports for integrations module
 
 import {

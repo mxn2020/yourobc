@@ -1,6 +1,6 @@
-// features/boilerplate/projects/constants/index.ts
+// features/system/projects/constants/index.ts
 
-import { PROJECT_CONSTANTS } from '@/convex/lib/boilerplate/projects/constants';
+import { PROJECT_CONSTANTS } from '@/convex/lib/system/projects/constants';
 
 // Only UI-specific constants should be here
 export { PROJECT_CONSTANTS };

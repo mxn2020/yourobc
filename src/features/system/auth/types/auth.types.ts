@@ -1,4 +1,4 @@
-// filepath: src/features/boilerplate/auth/types/auth.types.ts
+// filepath: src/features/system/auth/types/auth.types.ts
 import { EntityType } from '@/convex/types'
 import type { Id } from '@/convex/_generated/dataModel'
 import type { AuthUserId, UserProfileId } from '../../_shared/types'

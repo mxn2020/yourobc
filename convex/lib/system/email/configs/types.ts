@@ -1,8 +1,8 @@
-// convex/lib/boilerplate/email/configs/types.ts
+// convex/lib/system/email/configs/types.ts
 // TypeScript type definitions for email configs module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { EmailProvider, EmailConfigStatus } from '@/schema/boilerplate/email/configs/types';
+import type { EmailProvider, EmailConfigStatus } from '@/schema/system/email/configs/types';
 
 // Entity types
 export type EmailConfig = Doc<'emailConfigs'>;

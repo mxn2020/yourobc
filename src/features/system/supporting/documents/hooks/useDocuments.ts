@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/hooks/useDocuments.ts
+// src/features/system/supporting/documents/hooks/useDocuments.ts
 
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -14,7 +14,7 @@ export function useEntityDocuments(
   includeConfidential = false
 ) {
   return useQuery(
-    api.lib.boilerplate.supporting.documents.queries.getDocumentsByEntity,
+    api.lib.system.supporting.documents.queries.getDocumentsByEntity,
     entityType && entityId ? { entityType, entityId, includeConfidential } : 'skip'
   );
 }
@@ -24,7 +24,7 @@ export function useEntityDocuments(
  */
 export function useDocument(documentId?: Id<'documents'>) {
   return useQuery(
-    api.lib.boilerplate.supporting.documents.queries.getDocument,
+    api.lib.system.supporting.documents.queries.getDocument,
     documentId ? { documentId } : 'skip'
   );
 }
@@ -34,7 +34,7 @@ export function useDocument(documentId?: Id<'documents'>) {
  */
 export function useRecentDocuments(limit = 10) {
   return useQuery(
-    api.lib.boilerplate.supporting.documents.queries.getRecentDocuments,
+    api.lib.system.supporting.documents.queries.getRecentDocuments,
     { limit }
   );
 }
@@ -43,40 +43,40 @@ export function useRecentDocuments(limit = 10) {
  * Create a new document
  */
 export function useCreateDocument() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.createDocument);
+  return useMutation(api.lib.system.supporting.documents.mutations.createDocument);
 }
 
 /**
  * Update an existing document
  */
 export function useUpdateDocument() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.updateDocument);
+  return useMutation(api.lib.system.supporting.documents.mutations.updateDocument);
 }
 
 /**
  * Delete a document (soft delete)
  */
 export function useDeleteDocument() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.deleteDocument);
+  return useMutation(api.lib.system.supporting.documents.mutations.deleteDocument);
 }
 
 /**
  * Archive a document
  */
 export function useArchiveDocument() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.archiveDocument);
+  return useMutation(api.lib.system.supporting.documents.mutations.archiveDocument);
 }
 
 /**
  * Restore an archived document
  */
 export function useRestoreDocument() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.restoreDocument);
+  return useMutation(api.lib.system.supporting.documents.mutations.restoreDocument);
 }
 
 /**
  * Update document status
  */
 export function useUpdateDocumentStatus() {
-  return useMutation(api.lib.boilerplate.supporting.documents.mutations.updateDocumentStatus);
+  return useMutation(api.lib.system.supporting.documents.mutations.updateDocumentStatus);
 }

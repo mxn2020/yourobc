@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/members/MemberManagerModal.tsx
+// features/system/projects/components/members/MemberManagerModal.tsx
 
 import { FC, useState, useEffect } from 'react'
 import {
@@ -16,7 +16,7 @@ import { SimpleSelect } from '@/components/ui/Select'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { AlertCircle, Loader2, Search } from 'lucide-react'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import type { Id } from '@/convex/_generated/dataModel'
 
 export interface AddMemberData {

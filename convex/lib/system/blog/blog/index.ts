@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/index.ts
+// convex/lib/system/blog/blog/index.ts
 // Public API exports for blog module
 
 // Constants

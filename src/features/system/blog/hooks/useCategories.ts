@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/useCategories.ts
+// src/features/system/blog/hooks/useCategories.ts
 /**
  * Hook for fetching and managing blog categories
  */

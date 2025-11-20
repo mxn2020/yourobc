@@ -1,11 +1,11 @@
-// src/features/boilerplate/analytics/EXAMPLES.tsx
+// src/features/system/analytics/EXAMPLES.tsx
 
 import { useState } from "react";
 import { useAnalytics, useMetricValue, useMetricTrend, useAnalyticsSummary } from "./hooks";
 import { useActiveSessions } from "./hooks/useMetrics";
 import { MetricCard } from "./components";
 import { analyticsService } from "./services/AnalyticsService";
-import { useAuth } from "@/features/boilerplate/auth/hooks/useAuth";
+import { useAuth } from "@/features/system/auth/hooks/useAuth";
 
 // Mock useNavigate for examples (replace with actual router hook in your app)
 const useNavigate = () => (path: string) => window.location.href = path;

@@ -17,7 +17,7 @@ async function handleGetAISettings({ request }: { request: Request }) {
     const convex = new ConvexHttpClient(process.env.VITE_CONVEX_URL || "http://localhost:3210")
 
     // Get AI settings from Convex
-    const settings = await convex.query(api.lib.boilerplate.app_settings.queries.getAISettings, {})
+    const settings = await convex.query(api.lib.system.app_settings.queries.getAISettings, {})
 
     return Response.json(settings)
   } catch (error) {

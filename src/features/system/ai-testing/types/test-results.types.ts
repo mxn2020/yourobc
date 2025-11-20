@@ -4,9 +4,9 @@ import type {
   TestStatus, 
   TestMetrics,
   ValidationResults 
-} from '@/features/boilerplate/ai-core/types';
-import type { TokenUsage } from '@/features/boilerplate/ai-core/types';
-import type { ModelProvider } from '@/features/boilerplate/ai-core/types';
+} from '@/features/system/ai-core/types';
+import type { TokenUsage } from '@/features/system/ai-core/types';
+import type { ModelProvider } from '@/features/system/ai-core/types';
 
 export interface TestResultSummary {
   totalTests: number;

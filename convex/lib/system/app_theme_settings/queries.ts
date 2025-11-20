@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/queries.ts
+// convex/lib/system/app_theme_settings/queries.ts
 // Query functions for appThemeSettings module
 
 import { v } from 'convex/values';

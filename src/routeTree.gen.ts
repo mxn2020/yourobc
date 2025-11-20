@@ -38,9 +38,9 @@ import { Route as ApiAiModelsIndexRouteImport } from './routes/api/ai/models/ind
 import { Route as ApiAiLogsIndexRouteImport } from './routes/api/ai/logs/index'
 import { Route as Char123LocaleChar125BlogTagSlugRouteImport } from './routes/{-$locale}/blog/tag/$slug'
 import { Route as Char123LocaleChar125BlogCategorySlugRouteImport } from './routes/{-$locale}/blog/category/$slug'
-import { Route as Char123LocaleChar125ProtectedBoilerplateSettingsRouteImport } from './routes/{-$locale}/_protected/_boilerplate/settings'
-import { Route as Char123LocaleChar125ProtectedBoilerplateDashboardRouteImport } from './routes/{-$locale}/_protected/_boilerplate/dashboard'
-import { Route as Char123LocaleChar125ProtectedBoilerplateAiTestingRouteImport } from './routes/{-$locale}/_protected/_boilerplate/ai-testing'
+import { Route as Char123LocaleChar125ProtectedSystemSettingsRouteImport } from './routes/{-$locale}/_protected/_system/settings'
+import { Route as Char123LocaleChar125ProtectedSystemDashboardRouteImport } from './routes/{-$locale}/_protected/_system/dashboard'
+import { Route as Char123LocaleChar125ProtectedSystemAiTestingRouteImport } from './routes/{-$locale}/_protected/_system/ai-testing'
 import { Route as ApiPaymentsStripeWebhooksRouteImport } from './routes/api/payments/stripe/webhooks'
 import { Route as ApiPaymentsStripeResumeSubscriptionRouteImport } from './routes/api/payments/stripe/resume-subscription'
 import { Route as ApiPaymentsStripeCreateSubscriptionRouteImport } from './routes/api/payments/stripe/create-subscription'
@@ -72,33 +72,33 @@ import { Route as ApiAiGenerateSpeechRouteImport } from './routes/api/ai/generat
 import { Route as ApiAiGenerateObjectRouteImport } from './routes/api/ai/generate/object'
 import { Route as ApiAiGenerateImageRouteImport } from './routes/api/ai/generate/image'
 import { Route as ApiAiGenerateEmbeddingRouteImport } from './routes/api/ai/generate/embedding'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/notifications/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateGamesIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/games/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateEmailIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/email/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/ai-models/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/ai-logs/index'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport } from './routes/{-$locale}/_protected/_system/projects/index'
+import { Route as Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport } from './routes/{-$locale}/_protected/_system/notifications/index'
+import { Route as Char123LocaleChar125ProtectedSystemGamesIndexRouteImport } from './routes/{-$locale}/_protected/_system/games/index'
+import { Route as Char123LocaleChar125ProtectedSystemEmailIndexRouteImport } from './routes/{-$locale}/_protected/_system/email/index'
+import { Route as Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport } from './routes/{-$locale}/_protected/_system/ai-models/index'
+import { Route as Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport } from './routes/{-$locale}/_protected/_system/ai-logs/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/index'
 import { Route as ApiAiTestTestIdIndexRouteImport } from './routes/api/ai/test/$testId/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRouteImport } from './routes/{-$locale}/_protected/_boilerplate/settings/notifications'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/timeline'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsTeamRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/team'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsTasksRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/tasks'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsNewRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/new'
-import { Route as Char123LocaleChar125ProtectedBoilerplateGamesGameIdRouteImport } from './routes/{-$locale}/_protected/_boilerplate/games/$gameId'
-import { Route as Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRouteImport } from './routes/{-$locale}/_protected/_boilerplate/email/templates'
-import { Route as Char123LocaleChar125ProtectedBoilerplateEmailLogsRouteImport } from './routes/{-$locale}/_protected/_boilerplate/email/logs'
-import { Route as Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRouteImport } from './routes/{-$locale}/_protected/_boilerplate/ai-models/$modelId'
-import { Route as Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRouteImport } from './routes/{-$locale}/_protected/_boilerplate/ai-logs/$logId'
+import { Route as Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport } from './routes/{-$locale}/_protected/_system/settings/notifications'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport } from './routes/{-$locale}/_protected/_system/projects/timeline'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport } from './routes/{-$locale}/_protected/_system/projects/team'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport } from './routes/{-$locale}/_protected/_system/projects/tasks'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsNewRouteImport } from './routes/{-$locale}/_protected/_system/projects/new'
+import { Route as Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport } from './routes/{-$locale}/_protected/_system/games/$gameId'
+import { Route as Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport } from './routes/{-$locale}/_protected/_system/email/templates'
+import { Route as Char123LocaleChar125ProtectedSystemEmailLogsRouteImport } from './routes/{-$locale}/_protected/_system/email/logs'
+import { Route as Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport } from './routes/{-$locale}/_protected/_system/ai-models/$modelId'
+import { Route as Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport } from './routes/{-$locale}/_protected/_system/ai-logs/$logId'
 import { Route as Char123LocaleChar125ProtectedAdminAdminUsersRouteImport } from './routes/{-$locale}/_protected/_admin/admin/users'
 import { Route as Char123LocaleChar125ProtectedAdminAdminSettingsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/settings'
 import { Route as Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/permission-requests'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAuditLogsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/audit-logs'
 import { Route as ApiAiTestTestIdResultsRouteImport } from './routes/api/ai/test/$testId/results'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/$projectId/index'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport } from './routes/{-$locale}/_protected/_system/projects/$projectId/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminBlogIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/advanced-audit-logs/index'
-import { Route as Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRouteImport } from './routes/{-$locale}/_protected/_boilerplate/projects/$projectId/edit'
+import { Route as Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport } from './routes/{-$locale}/_protected/_system/projects/$projectId/edit'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRouteImport } from './routes/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId'
 import { Route as Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/tags/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/posts/index'
@@ -261,21 +261,21 @@ const Char123LocaleChar125BlogCategorySlugRoute =
     path: '/blog/category/$slug',
     getParentRoute: () => Char123LocaleChar125Route,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateSettingsRoute =
-  Char123LocaleChar125ProtectedBoilerplateSettingsRouteImport.update({
-    id: '/_boilerplate/settings',
+const Char123LocaleChar125ProtectedSystemSettingsRoute =
+  Char123LocaleChar125ProtectedSystemSettingsRouteImport.update({
+    id: '/_system/settings',
     path: '/settings',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateDashboardRoute =
-  Char123LocaleChar125ProtectedBoilerplateDashboardRouteImport.update({
-    id: '/_boilerplate/dashboard',
+const Char123LocaleChar125ProtectedSystemDashboardRoute =
+  Char123LocaleChar125ProtectedSystemDashboardRouteImport.update({
+    id: '/_system/dashboard',
     path: '/dashboard',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateAiTestingRoute =
-  Char123LocaleChar125ProtectedBoilerplateAiTestingRouteImport.update({
-    id: '/_boilerplate/ai-testing',
+const Char123LocaleChar125ProtectedSystemAiTestingRoute =
+  Char123LocaleChar125ProtectedSystemAiTestingRouteImport.update({
+    id: '/_system/ai-testing',
     path: '/ai-testing',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
@@ -449,39 +449,39 @@ const ApiAiGenerateEmbeddingRoute = ApiAiGenerateEmbeddingRouteImport.update({
   path: '/api/ai/generate/embedding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsIndexRouteImport.update({
-    id: '/_boilerplate/projects/',
+const Char123LocaleChar125ProtectedSystemProjectsIndexRoute =
+  Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport.update({
+    id: '/_system/projects/',
     path: '/projects/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRouteImport.update({
-    id: '/_boilerplate/notifications/',
+const Char123LocaleChar125ProtectedSystemNotificationsIndexRoute =
+  Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport.update({
+    id: '/_system/notifications/',
     path: '/notifications/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateGamesIndexRouteImport.update({
-    id: '/_boilerplate/games/',
+const Char123LocaleChar125ProtectedSystemGamesIndexRoute =
+  Char123LocaleChar125ProtectedSystemGamesIndexRouteImport.update({
+    id: '/_system/games/',
     path: '/games/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateEmailIndexRouteImport.update({
-    id: '/_boilerplate/email/',
+const Char123LocaleChar125ProtectedSystemEmailIndexRoute =
+  Char123LocaleChar125ProtectedSystemEmailIndexRouteImport.update({
+    id: '/_system/email/',
     path: '/email/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRouteImport.update({
-    id: '/_boilerplate/ai-models/',
+const Char123LocaleChar125ProtectedSystemAiModelsIndexRoute =
+  Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport.update({
+    id: '/_system/ai-models/',
     path: '/ai-models/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRouteImport.update({
-    id: '/_boilerplate/ai-logs/',
+const Char123LocaleChar125ProtectedSystemAiLogsIndexRoute =
+  Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport.update({
+    id: '/_system/ai-logs/',
     path: '/ai-logs/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
@@ -496,66 +496,66 @@ const ApiAiTestTestIdIndexRoute = ApiAiTestTestIdIndexRouteImport.update({
   path: '/api/ai/test/$testId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute =
-  Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRouteImport.update(
+const Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute =
+  Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport.update(
     {
       id: '/notifications',
       path: '/notifications',
       getParentRoute: () =>
-        Char123LocaleChar125ProtectedBoilerplateSettingsRoute,
+        Char123LocaleChar125ProtectedSystemSettingsRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRouteImport.update({
-    id: '/_boilerplate/projects/timeline',
+const Char123LocaleChar125ProtectedSystemProjectsTimelineRoute =
+  Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport.update({
+    id: '/_system/projects/timeline',
     path: '/projects/timeline',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsTeamRouteImport.update({
-    id: '/_boilerplate/projects/team',
+const Char123LocaleChar125ProtectedSystemProjectsTeamRoute =
+  Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport.update({
+    id: '/_system/projects/team',
     path: '/projects/team',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsTasksRouteImport.update({
-    id: '/_boilerplate/projects/tasks',
+const Char123LocaleChar125ProtectedSystemProjectsTasksRoute =
+  Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport.update({
+    id: '/_system/projects/tasks',
     path: '/projects/tasks',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsNewRouteImport.update({
-    id: '/_boilerplate/projects/new',
+const Char123LocaleChar125ProtectedSystemProjectsNewRoute =
+  Char123LocaleChar125ProtectedSystemProjectsNewRouteImport.update({
+    id: '/_system/projects/new',
     path: '/projects/new',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute =
-  Char123LocaleChar125ProtectedBoilerplateGamesGameIdRouteImport.update({
-    id: '/_boilerplate/games/$gameId',
+const Char123LocaleChar125ProtectedSystemGamesGameIdRoute =
+  Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport.update({
+    id: '/_system/games/$gameId',
     path: '/games/$gameId',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute =
-  Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRouteImport.update({
-    id: '/_boilerplate/email/templates',
+const Char123LocaleChar125ProtectedSystemEmailTemplatesRoute =
+  Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport.update({
+    id: '/_system/email/templates',
     path: '/email/templates',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute =
-  Char123LocaleChar125ProtectedBoilerplateEmailLogsRouteImport.update({
-    id: '/_boilerplate/email/logs',
+const Char123LocaleChar125ProtectedSystemEmailLogsRoute =
+  Char123LocaleChar125ProtectedSystemEmailLogsRouteImport.update({
+    id: '/_system/email/logs',
     path: '/email/logs',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute =
-  Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRouteImport.update({
-    id: '/_boilerplate/ai-models/$modelId',
+const Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute =
+  Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport.update({
+    id: '/_system/ai-models/$modelId',
     path: '/ai-models/$modelId',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute =
-  Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRouteImport.update({
-    id: '/_boilerplate/ai-logs/$logId',
+const Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute =
+  Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport.update({
+    id: '/_system/ai-logs/$logId',
     path: '/ai-logs/$logId',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
@@ -588,10 +588,10 @@ const ApiAiTestTestIdResultsRoute = ApiAiTestTestIdResultsRouteImport.update({
   path: '/api/ai/test/$testId/results',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRouteImport.update(
+const Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute =
+  Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport.update(
     {
-      id: '/_boilerplate/projects/$projectId/',
+      id: '/_system/projects/$projectId/',
       path: '/projects/$projectId/',
       getParentRoute: () => Char123LocaleChar125ProtectedRoute,
     } as any,
@@ -610,10 +610,10 @@ const Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute =
       getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute =
-  Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRouteImport.update(
+const Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute =
+  Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport.update(
     {
-      id: '/_boilerplate/projects/$projectId/edit',
+      id: '/_system/projects/$projectId/edit',
       path: '/projects/$projectId/edit',
       getParentRoute: () => Char123LocaleChar125ProtectedRoute,
     } as any,
@@ -711,9 +711,9 @@ export interface FileRoutesByFullPath {
   '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
   '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
   '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedBoilerplateAiTestingRoute
-  '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedBoilerplateDashboardRoute
-  '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren
+  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
+  '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
+  '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
   '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
   '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
   '/api/ai/logs': typeof ApiAiLogsIndexRoute
@@ -723,29 +723,29 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute
-  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute
-  '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute
-  '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute
-  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute
-  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute
-  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute
-  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute
-  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute
-  '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute
+  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
+  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
+  '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
+  '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
+  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
+  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
+  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
+  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
+  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
+  '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
   '/api/ai/test/$testId': typeof ApiAiTestTestIdIndexRoute
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute
-  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute
-  '/{-$locale}/email': typeof Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute
-  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute
-  '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute
-  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute
+  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
+  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
+  '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
+  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
+  '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
   '/{-$locale}/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute
+  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
   '/{-$locale}/admin/advanced-audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
   '/{-$locale}/admin/blog': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute
+  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
   '/{-$locale}/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
   '/{-$locale}/admin/blog/categories': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
   '/{-$locale}/admin/blog/posts': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
@@ -805,9 +805,9 @@ export interface FileRoutesByTo {
   '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
   '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
   '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedBoilerplateAiTestingRoute
-  '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedBoilerplateDashboardRoute
-  '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren
+  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
+  '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
+  '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
   '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
   '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
   '/api/ai/logs': typeof ApiAiLogsIndexRoute
@@ -817,29 +817,29 @@ export interface FileRoutesByTo {
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute
-  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute
-  '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute
-  '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute
-  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute
-  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute
-  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute
-  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute
-  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute
-  '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute
+  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
+  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
+  '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
+  '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
+  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
+  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
+  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
+  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
+  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
+  '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
   '/api/ai/test/$testId': typeof ApiAiTestTestIdIndexRoute
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute
-  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute
-  '/{-$locale}/email': typeof Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute
-  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute
-  '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute
-  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute
+  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
+  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
+  '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
+  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
+  '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
   '/{-$locale}/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute
+  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
   '/{-$locale}/admin/advanced-audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
   '/{-$locale}/admin/blog': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute
+  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
   '/{-$locale}/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
   '/{-$locale}/admin/blog/categories': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
   '/{-$locale}/admin/blog/posts': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
@@ -903,9 +903,9 @@ export interface FileRoutesById {
   '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
   '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
   '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/_protected/_boilerplate/ai-testing': typeof Char123LocaleChar125ProtectedBoilerplateAiTestingRoute
-  '/{-$locale}/_protected/_boilerplate/dashboard': typeof Char123LocaleChar125ProtectedBoilerplateDashboardRoute
-  '/{-$locale}/_protected/_boilerplate/settings': typeof Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren
+  '/{-$locale}/_protected/_system/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
+  '/{-$locale}/_protected/_system/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
+  '/{-$locale}/_protected/_system/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
   '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
   '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
   '/api/ai/logs/': typeof ApiAiLogsIndexRoute
@@ -915,29 +915,29 @@ export interface FileRoutesById {
   '/{-$locale}/_protected/_admin/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/_protected/_admin/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/_protected/_admin/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/_protected/_boilerplate/ai-logs/$logId': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute
-  '/{-$locale}/_protected/_boilerplate/ai-models/$modelId': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute
-  '/{-$locale}/_protected/_boilerplate/email/logs': typeof Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute
-  '/{-$locale}/_protected/_boilerplate/email/templates': typeof Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute
-  '/{-$locale}/_protected/_boilerplate/games/$gameId': typeof Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute
-  '/{-$locale}/_protected/_boilerplate/projects/new': typeof Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute
-  '/{-$locale}/_protected/_boilerplate/projects/tasks': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute
-  '/{-$locale}/_protected/_boilerplate/projects/team': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute
-  '/{-$locale}/_protected/_boilerplate/projects/timeline': typeof Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute
-  '/{-$locale}/_protected/_boilerplate/settings/notifications': typeof Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute
+  '/{-$locale}/_protected/_system/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
+  '/{-$locale}/_protected/_system/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
+  '/{-$locale}/_protected/_system/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
+  '/{-$locale}/_protected/_system/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
+  '/{-$locale}/_protected/_system/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
+  '/{-$locale}/_protected/_system/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
+  '/{-$locale}/_protected/_system/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
+  '/{-$locale}/_protected/_system/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
+  '/{-$locale}/_protected/_system/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
+  '/{-$locale}/_protected/_system/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
   '/api/ai/test/$testId/': typeof ApiAiTestTestIdIndexRoute
   '/{-$locale}/_protected/_admin/admin/': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/_protected/_boilerplate/ai-logs/': typeof Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute
-  '/{-$locale}/_protected/_boilerplate/ai-models/': typeof Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute
-  '/{-$locale}/_protected/_boilerplate/email/': typeof Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute
-  '/{-$locale}/_protected/_boilerplate/games/': typeof Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute
-  '/{-$locale}/_protected/_boilerplate/notifications/': typeof Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute
-  '/{-$locale}/_protected/_boilerplate/projects/': typeof Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute
+  '/{-$locale}/_protected/_system/ai-logs/': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
+  '/{-$locale}/_protected/_system/ai-models/': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
+  '/{-$locale}/_protected/_system/email/': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
+  '/{-$locale}/_protected/_system/games/': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
+  '/{-$locale}/_protected/_system/notifications/': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/_protected/_system/projects/': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
   '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/_protected/_boilerplate/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute
+  '/{-$locale}/_protected/_system/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
   '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
   '/{-$locale}/_protected/_admin/admin/blog/': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/_protected/_boilerplate/projects/$projectId/': typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute
+  '/{-$locale}/_protected/_system/projects/$projectId/': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
   '/{-$locale}/_protected/_admin/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
   '/{-$locale}/_protected/_admin/admin/blog/categories/': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
   '/{-$locale}/_protected/_admin/admin/blog/posts/': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
@@ -1191,9 +1191,9 @@ export interface FileRouteTypes {
     | '/api/payments/stripe/create-subscription'
     | '/api/payments/stripe/resume-subscription'
     | '/api/payments/stripe/webhooks'
-    | '/{-$locale}/_protected/_boilerplate/ai-testing'
-    | '/{-$locale}/_protected/_boilerplate/dashboard'
-    | '/{-$locale}/_protected/_boilerplate/settings'
+    | '/{-$locale}/_protected/_system/ai-testing'
+    | '/{-$locale}/_protected/_system/dashboard'
+    | '/{-$locale}/_protected/_system/settings'
     | '/{-$locale}/blog/category/$slug'
     | '/{-$locale}/blog/tag/$slug'
     | '/api/ai/logs/'
@@ -1203,29 +1203,29 @@ export interface FileRouteTypes {
     | '/{-$locale}/_protected/_admin/admin/permission-requests'
     | '/{-$locale}/_protected/_admin/admin/settings'
     | '/{-$locale}/_protected/_admin/admin/users'
-    | '/{-$locale}/_protected/_boilerplate/ai-logs/$logId'
-    | '/{-$locale}/_protected/_boilerplate/ai-models/$modelId'
-    | '/{-$locale}/_protected/_boilerplate/email/logs'
-    | '/{-$locale}/_protected/_boilerplate/email/templates'
-    | '/{-$locale}/_protected/_boilerplate/games/$gameId'
-    | '/{-$locale}/_protected/_boilerplate/projects/new'
-    | '/{-$locale}/_protected/_boilerplate/projects/tasks'
-    | '/{-$locale}/_protected/_boilerplate/projects/team'
-    | '/{-$locale}/_protected/_boilerplate/projects/timeline'
-    | '/{-$locale}/_protected/_boilerplate/settings/notifications'
+    | '/{-$locale}/_protected/_system/ai-logs/$logId'
+    | '/{-$locale}/_protected/_system/ai-models/$modelId'
+    | '/{-$locale}/_protected/_system/email/logs'
+    | '/{-$locale}/_protected/_system/email/templates'
+    | '/{-$locale}/_protected/_system/games/$gameId'
+    | '/{-$locale}/_protected/_system/projects/new'
+    | '/{-$locale}/_protected/_system/projects/tasks'
+    | '/{-$locale}/_protected/_system/projects/team'
+    | '/{-$locale}/_protected/_system/projects/timeline'
+    | '/{-$locale}/_protected/_system/settings/notifications'
     | '/api/ai/test/$testId/'
     | '/{-$locale}/_protected/_admin/admin/'
-    | '/{-$locale}/_protected/_boilerplate/ai-logs/'
-    | '/{-$locale}/_protected/_boilerplate/ai-models/'
-    | '/{-$locale}/_protected/_boilerplate/email/'
-    | '/{-$locale}/_protected/_boilerplate/games/'
-    | '/{-$locale}/_protected/_boilerplate/notifications/'
-    | '/{-$locale}/_protected/_boilerplate/projects/'
+    | '/{-$locale}/_protected/_system/ai-logs/'
+    | '/{-$locale}/_protected/_system/ai-models/'
+    | '/{-$locale}/_protected/_system/email/'
+    | '/{-$locale}/_protected/_system/games/'
+    | '/{-$locale}/_protected/_system/notifications/'
+    | '/{-$locale}/_protected/_system/projects/'
     | '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId'
-    | '/{-$locale}/_protected/_boilerplate/projects/$projectId/edit'
+    | '/{-$locale}/_protected/_system/projects/$projectId/edit'
     | '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/'
     | '/{-$locale}/_protected/_admin/admin/blog/'
-    | '/{-$locale}/_protected/_boilerplate/projects/$projectId/'
+    | '/{-$locale}/_protected/_system/projects/$projectId/'
     | '/{-$locale}/_protected/_admin/admin/blog/posts/new'
     | '/{-$locale}/_protected/_admin/admin/blog/categories/'
     | '/{-$locale}/_protected/_admin/admin/blog/posts/'
@@ -1481,25 +1481,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125BlogCategorySlugRouteImport
       parentRoute: typeof Char123LocaleChar125Route
     }
-    '/{-$locale}/_protected/_boilerplate/settings': {
-      id: '/{-$locale}/_protected/_boilerplate/settings'
+    '/{-$locale}/_protected/_system/settings': {
+      id: '/{-$locale}/_protected/_system/settings'
       path: '/settings'
       fullPath: '/{-$locale}/settings'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateSettingsRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/dashboard': {
-      id: '/{-$locale}/_protected/_boilerplate/dashboard'
+    '/{-$locale}/_protected/_system/dashboard': {
+      id: '/{-$locale}/_protected/_system/dashboard'
       path: '/dashboard'
       fullPath: '/{-$locale}/dashboard'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateDashboardRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemDashboardRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/ai-testing': {
-      id: '/{-$locale}/_protected/_boilerplate/ai-testing'
+    '/{-$locale}/_protected/_system/ai-testing': {
+      id: '/{-$locale}/_protected/_system/ai-testing'
       path: '/ai-testing'
       fullPath: '/{-$locale}/ai-testing'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiTestingRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiTestingRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/api/payments/stripe/webhooks': {
@@ -1719,46 +1719,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiGenerateEmbeddingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/{-$locale}/_protected/_boilerplate/projects/': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/'
+    '/{-$locale}/_protected/_system/projects/': {
+      id: '/{-$locale}/_protected/_system/projects/'
       path: '/projects'
       fullPath: '/{-$locale}/projects'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/notifications/': {
-      id: '/{-$locale}/_protected/_boilerplate/notifications/'
+    '/{-$locale}/_protected/_system/notifications/': {
+      id: '/{-$locale}/_protected/_system/notifications/'
       path: '/notifications'
       fullPath: '/{-$locale}/notifications'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/games/': {
-      id: '/{-$locale}/_protected/_boilerplate/games/'
+    '/{-$locale}/_protected/_system/games/': {
+      id: '/{-$locale}/_protected/_system/games/'
       path: '/games'
       fullPath: '/{-$locale}/games'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateGamesIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemGamesIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/email/': {
-      id: '/{-$locale}/_protected/_boilerplate/email/'
+    '/{-$locale}/_protected/_system/email/': {
+      id: '/{-$locale}/_protected/_system/email/'
       path: '/email'
       fullPath: '/{-$locale}/email'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemEmailIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/ai-models/': {
-      id: '/{-$locale}/_protected/_boilerplate/ai-models/'
+    '/{-$locale}/_protected/_system/ai-models/': {
+      id: '/{-$locale}/_protected/_system/ai-models/'
       path: '/ai-models'
       fullPath: '/{-$locale}/ai-models'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/ai-logs/': {
-      id: '/{-$locale}/_protected/_boilerplate/ai-logs/'
+    '/{-$locale}/_protected/_system/ai-logs/': {
+      id: '/{-$locale}/_protected/_system/ai-logs/'
       path: '/ai-logs'
       fullPath: '/{-$locale}/ai-logs'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/': {
@@ -1775,74 +1775,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiTestTestIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/{-$locale}/_protected/_boilerplate/settings/notifications': {
-      id: '/{-$locale}/_protected/_boilerplate/settings/notifications'
+    '/{-$locale}/_protected/_system/settings/notifications': {
+      id: '/{-$locale}/_protected/_system/settings/notifications'
       path: '/notifications'
       fullPath: '/{-$locale}/settings/notifications'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedBoilerplateSettingsRoute
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRoute
     }
-    '/{-$locale}/_protected/_boilerplate/projects/timeline': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/timeline'
+    '/{-$locale}/_protected/_system/projects/timeline': {
+      id: '/{-$locale}/_protected/_system/projects/timeline'
       path: '/projects/timeline'
       fullPath: '/{-$locale}/projects/timeline'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/projects/team': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/team'
+    '/{-$locale}/_protected/_system/projects/team': {
+      id: '/{-$locale}/_protected/_system/projects/team'
       path: '/projects/team'
       fullPath: '/{-$locale}/projects/team'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTeamRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/projects/tasks': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/tasks'
+    '/{-$locale}/_protected/_system/projects/tasks': {
+      id: '/{-$locale}/_protected/_system/projects/tasks'
       path: '/projects/tasks'
       fullPath: '/{-$locale}/projects/tasks'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTasksRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/projects/new': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/new'
+    '/{-$locale}/_protected/_system/projects/new': {
+      id: '/{-$locale}/_protected/_system/projects/new'
       path: '/projects/new'
       fullPath: '/{-$locale}/projects/new'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsNewRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsNewRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/games/$gameId': {
-      id: '/{-$locale}/_protected/_boilerplate/games/$gameId'
+    '/{-$locale}/_protected/_system/games/$gameId': {
+      id: '/{-$locale}/_protected/_system/games/$gameId'
       path: '/games/$gameId'
       fullPath: '/{-$locale}/games/$gameId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateGamesGameIdRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/email/templates': {
-      id: '/{-$locale}/_protected/_boilerplate/email/templates'
+    '/{-$locale}/_protected/_system/email/templates': {
+      id: '/{-$locale}/_protected/_system/email/templates'
       path: '/email/templates'
       fullPath: '/{-$locale}/email/templates'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/email/logs': {
-      id: '/{-$locale}/_protected/_boilerplate/email/logs'
+    '/{-$locale}/_protected/_system/email/logs': {
+      id: '/{-$locale}/_protected/_system/email/logs'
       path: '/email/logs'
       fullPath: '/{-$locale}/email/logs'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailLogsRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemEmailLogsRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/ai-models/$modelId': {
-      id: '/{-$locale}/_protected/_boilerplate/ai-models/$modelId'
+    '/{-$locale}/_protected/_system/ai-models/$modelId': {
+      id: '/{-$locale}/_protected/_system/ai-models/$modelId'
       path: '/ai-models/$modelId'
       fullPath: '/{-$locale}/ai-models/$modelId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_boilerplate/ai-logs/$logId': {
-      id: '/{-$locale}/_protected/_boilerplate/ai-logs/$logId'
+    '/{-$locale}/_protected/_system/ai-logs/$logId': {
+      id: '/{-$locale}/_protected/_system/ai-logs/$logId'
       path: '/ai-logs/$logId'
       fullPath: '/{-$locale}/ai-logs/$logId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/users': {
@@ -1880,11 +1880,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiTestTestIdResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/{-$locale}/_protected/_boilerplate/projects/$projectId/': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/$projectId/'
+    '/{-$locale}/_protected/_system/projects/$projectId/': {
+      id: '/{-$locale}/_protected/_system/projects/$projectId/'
       path: '/projects/$projectId'
       fullPath: '/{-$locale}/projects/$projectId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/blog/': {
@@ -1901,11 +1901,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
     }
-    '/{-$locale}/_protected/_boilerplate/projects/$projectId/edit': {
-      id: '/{-$locale}/_protected/_boilerplate/projects/$projectId/edit'
+    '/{-$locale}/_protected/_system/projects/$projectId/edit': {
+      id: '/{-$locale}/_protected/_system/projects/$projectId/edit'
       path: '/projects/$projectId/edit'
       fullPath: '/{-$locale}/projects/$projectId/edit'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRouteImport
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId': {
@@ -2004,89 +2004,89 @@ const Char123LocaleChar125ProtectedAdminRouteWithChildren =
     Char123LocaleChar125ProtectedAdminRouteChildren,
   )
 
-interface Char123LocaleChar125ProtectedBoilerplateSettingsRouteChildren {
-  Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute: typeof Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute
+interface Char123LocaleChar125ProtectedSystemSettingsRouteChildren {
+  Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute: typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
 }
 
-const Char123LocaleChar125ProtectedBoilerplateSettingsRouteChildren: Char123LocaleChar125ProtectedBoilerplateSettingsRouteChildren =
+const Char123LocaleChar125ProtectedSystemSettingsRouteChildren: Char123LocaleChar125ProtectedSystemSettingsRouteChildren =
   {
-    Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute:
-      Char123LocaleChar125ProtectedBoilerplateSettingsNotificationsRoute,
+    Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute:
+      Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute,
   }
 
-const Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren =
-  Char123LocaleChar125ProtectedBoilerplateSettingsRoute._addFileChildren(
-    Char123LocaleChar125ProtectedBoilerplateSettingsRouteChildren,
+const Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren =
+  Char123LocaleChar125ProtectedSystemSettingsRoute._addFileChildren(
+    Char123LocaleChar125ProtectedSystemSettingsRouteChildren,
   )
 
 interface Char123LocaleChar125ProtectedRouteChildren {
   Char123LocaleChar125ProtectedAdminRoute: typeof Char123LocaleChar125ProtectedAdminRouteWithChildren
-  Char123LocaleChar125ProtectedBoilerplateAiTestingRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiTestingRoute
-  Char123LocaleChar125ProtectedBoilerplateDashboardRoute: typeof Char123LocaleChar125ProtectedBoilerplateDashboardRoute
-  Char123LocaleChar125ProtectedBoilerplateSettingsRoute: typeof Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren
-  Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute
-  Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute
-  Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute
-  Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute
-  Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute: typeof Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute
-  Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute
-  Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute: typeof Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute
+  Char123LocaleChar125ProtectedSystemAiTestingRoute: typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
+  Char123LocaleChar125ProtectedSystemDashboardRoute: typeof Char123LocaleChar125ProtectedSystemDashboardRoute
+  Char123LocaleChar125ProtectedSystemSettingsRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
+  Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
+  Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
+  Char123LocaleChar125ProtectedSystemEmailLogsRoute: typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
+  Char123LocaleChar125ProtectedSystemEmailTemplatesRoute: typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
+  Char123LocaleChar125ProtectedSystemGamesGameIdRoute: typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
+  Char123LocaleChar125ProtectedSystemProjectsNewRoute: typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
+  Char123LocaleChar125ProtectedSystemProjectsTasksRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
+  Char123LocaleChar125ProtectedSystemProjectsTeamRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
+  Char123LocaleChar125ProtectedSystemProjectsTimelineRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
+  Char123LocaleChar125ProtectedSystemAiLogsIndexRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
+  Char123LocaleChar125ProtectedSystemAiModelsIndexRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
+  Char123LocaleChar125ProtectedSystemEmailIndexRoute: typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
+  Char123LocaleChar125ProtectedSystemGamesIndexRoute: typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
+  Char123LocaleChar125ProtectedSystemNotificationsIndexRoute: typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  Char123LocaleChar125ProtectedSystemProjectsIndexRoute: typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
+  Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
+  Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
 }
 
 const Char123LocaleChar125ProtectedRouteChildren: Char123LocaleChar125ProtectedRouteChildren =
   {
     Char123LocaleChar125ProtectedAdminRoute:
       Char123LocaleChar125ProtectedAdminRouteWithChildren,
-    Char123LocaleChar125ProtectedBoilerplateAiTestingRoute:
-      Char123LocaleChar125ProtectedBoilerplateAiTestingRoute,
-    Char123LocaleChar125ProtectedBoilerplateDashboardRoute:
-      Char123LocaleChar125ProtectedBoilerplateDashboardRoute,
-    Char123LocaleChar125ProtectedBoilerplateSettingsRoute:
-      Char123LocaleChar125ProtectedBoilerplateSettingsRouteWithChildren,
-    Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute:
-      Char123LocaleChar125ProtectedBoilerplateAiLogsLogIdRoute,
-    Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute:
-      Char123LocaleChar125ProtectedBoilerplateAiModelsModelIdRoute,
-    Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute:
-      Char123LocaleChar125ProtectedBoilerplateEmailLogsRoute,
-    Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute:
-      Char123LocaleChar125ProtectedBoilerplateEmailTemplatesRoute,
-    Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute:
-      Char123LocaleChar125ProtectedBoilerplateGamesGameIdRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsNewRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsTasksRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsTeamRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsTimelineRoute,
-    Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateAiLogsIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateAiModelsIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateEmailIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateGamesIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateNotificationsIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsIndexRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdEditRoute,
-    Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute:
-      Char123LocaleChar125ProtectedBoilerplateProjectsProjectIdIndexRoute,
+    Char123LocaleChar125ProtectedSystemAiTestingRoute:
+      Char123LocaleChar125ProtectedSystemAiTestingRoute,
+    Char123LocaleChar125ProtectedSystemDashboardRoute:
+      Char123LocaleChar125ProtectedSystemDashboardRoute,
+    Char123LocaleChar125ProtectedSystemSettingsRoute:
+      Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren,
+    Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute:
+      Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute,
+    Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute:
+      Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute,
+    Char123LocaleChar125ProtectedSystemEmailLogsRoute:
+      Char123LocaleChar125ProtectedSystemEmailLogsRoute,
+    Char123LocaleChar125ProtectedSystemEmailTemplatesRoute:
+      Char123LocaleChar125ProtectedSystemEmailTemplatesRoute,
+    Char123LocaleChar125ProtectedSystemGamesGameIdRoute:
+      Char123LocaleChar125ProtectedSystemGamesGameIdRoute,
+    Char123LocaleChar125ProtectedSystemProjectsNewRoute:
+      Char123LocaleChar125ProtectedSystemProjectsNewRoute,
+    Char123LocaleChar125ProtectedSystemProjectsTasksRoute:
+      Char123LocaleChar125ProtectedSystemProjectsTasksRoute,
+    Char123LocaleChar125ProtectedSystemProjectsTeamRoute:
+      Char123LocaleChar125ProtectedSystemProjectsTeamRoute,
+    Char123LocaleChar125ProtectedSystemProjectsTimelineRoute:
+      Char123LocaleChar125ProtectedSystemProjectsTimelineRoute,
+    Char123LocaleChar125ProtectedSystemAiLogsIndexRoute:
+      Char123LocaleChar125ProtectedSystemAiLogsIndexRoute,
+    Char123LocaleChar125ProtectedSystemAiModelsIndexRoute:
+      Char123LocaleChar125ProtectedSystemAiModelsIndexRoute,
+    Char123LocaleChar125ProtectedSystemEmailIndexRoute:
+      Char123LocaleChar125ProtectedSystemEmailIndexRoute,
+    Char123LocaleChar125ProtectedSystemGamesIndexRoute:
+      Char123LocaleChar125ProtectedSystemGamesIndexRoute,
+    Char123LocaleChar125ProtectedSystemNotificationsIndexRoute:
+      Char123LocaleChar125ProtectedSystemNotificationsIndexRoute,
+    Char123LocaleChar125ProtectedSystemProjectsIndexRoute:
+      Char123LocaleChar125ProtectedSystemProjectsIndexRoute,
+    Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute:
+      Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute,
+    Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute:
+      Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute,
   }
 
 const Char123LocaleChar125ProtectedRouteWithChildren =

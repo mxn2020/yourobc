@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/FeatureGate.tsx
+// src/features/system/payments/shared/components/FeatureGate.tsx
 /**
  * Generic Feature Gate Component
  * 

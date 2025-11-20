@@ -1,8 +1,8 @@
-// src/features/boilerplate/ai-logging/components/LogGrid.tsx
+// src/features/system/ai-logging/components/LogGrid.tsx
 import { Card, CardContent } from '@/components/ui'
 import { Activity } from 'lucide-react'
 import { LogCard } from './LogCard'
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types'
+import type { AIUsageLog } from '@/features/system/ai-core/types'
 
 interface LogGridProps {
   logs: AIUsageLog[]

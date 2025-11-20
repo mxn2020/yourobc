@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/pages/PostDetailPage.tsx
+// src/features/system/blog/pages/PostDetailPage.tsx
 /**
  * Post Detail Page
  *
@@ -30,7 +30,7 @@ import { formatDate, formatReadTime, calculateReadTime } from '../utils/content'
 import { generateShareUrls } from '../utils/seo';
 import { BLOG_CONFIG } from '../config';
 import { CommentsSection } from '../../supporting/comments/components/CommentsSection';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function PostDetailPage() {
   const { t } = useTranslation('blog');

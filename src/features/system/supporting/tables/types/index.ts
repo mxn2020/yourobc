@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/types/index.ts
+// src/features/system/supporting/tables/types/index.ts
 
 import type {
   ColumnDef,

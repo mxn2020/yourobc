@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/hooks/useStripeCustomer.ts
+// src/features/system/payments/providers/stripe/hooks/useStripeCustomer.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -10,7 +10,7 @@ import { Id } from "@/convex/_generated/dataModel";
 
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth/hooks/useAuth';
+import { useAuth } from '@/features/system/auth/hooks/useAuth';
 
 /**
  * Hook for managing Stripe customer data
@@ -44,7 +44,7 @@ export function useStripeCustomer() {
 
   // Query customer data from Convex
   const customer = useQuery(
-    api.lib.boilerplate.payments.stripe.queries.getCustomerByUserId,
+    api.lib.system.payments.stripe.queries.getCustomerByUserId,
     {}
   );
 

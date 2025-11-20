@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/wiki/index.ts
+// src/features/system/supporting/wiki/index.ts
 
 export * from './types';
 export * from './hooks';

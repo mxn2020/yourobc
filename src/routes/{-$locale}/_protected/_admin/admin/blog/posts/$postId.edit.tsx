@@ -5,11 +5,11 @@
 
 import { createFileRoute } from '@tanstack/react-router';
 import { api } from '@/convex/_generated/api';
-import { PostEditorPage } from '@/features/boilerplate/blog/pages/PostEditorPage';
-import { usePost } from '@/features/boilerplate/blog/hooks/usePost';
-import { getPostQueryOptions, getCategoriesQueryOptions } from '@/features/boilerplate/blog/services/blogQueryOptions';
+import { PostEditorPage } from '@/features/system/blog/pages/PostEditorPage';
+import { usePost } from '@/features/system/blog/hooks/usePost';
+import { getPostQueryOptions, getCategoriesQueryOptions } from '@/features/system/blog/services/blogQueryOptions';
 import { Loading } from '@/components/ui';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { defaultLocale } from '@/features/system/i18n';
 import { createI18nSeo } from '@/utils/seo';
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -35,8 +35,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/p
         if (convexClient) {
           // Fetch post and categories in parallel
           const [post, categories] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.blog.queries.getPost, { postId }),
-            convexClient.query(api.lib.boilerplate.blog.queries.getCategories, {}),
+            convexClient.query(api.lib.system.blog.queries.getPost, { postId }),
+            convexClient.query(api.lib.system.blog.queries.getCategories, {}),
           ]);
 
           // Cache data using query options

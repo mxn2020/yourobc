@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/queries.ts
+// convex/lib/system/supporting/comments/queries.ts
 
 /**
  * Comments Module Queries

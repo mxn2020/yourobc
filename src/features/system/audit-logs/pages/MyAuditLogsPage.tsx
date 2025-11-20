@@ -1,4 +1,4 @@
-// src/features/boilerplate/audit-logs/pages/MyAuditLogsPage.tsx
+// src/features/system/audit-logs/pages/MyAuditLogsPage.tsx
 import { useState } from 'react'
 import {
   Download,
@@ -15,7 +15,7 @@ import { AuditLogFiltersComponent } from '../components/AuditLogFilters'
 import { AuditLogStatsComponent } from '../components/AuditLogStats'
 import { useMyAuditLogs } from '../hooks/useAuditLogs'
 import type { AuditLogEntry } from '../types/audit-logs.types'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 
 /**
  * My Audit Logs Page - For regular users to view their own activity

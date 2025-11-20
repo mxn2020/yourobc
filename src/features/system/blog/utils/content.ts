@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/utils/content.ts
+// src/features/system/blog/utils/content.ts
 /**
  * Content Utilities
  *

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/pages/BillingPage.tsx
+// src/features/system/payments/pages/BillingPage.tsx
 /**
  * Provider-Agnostic Billing Page
  */

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/constants.ts
+// convex/lib/system/app_theme_settings/constants.ts
 // Constants for appThemeSettings module
 
 export const APP_THEME_SETTINGS_CONSTANTS = {

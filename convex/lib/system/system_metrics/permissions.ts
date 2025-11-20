@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/permissions.ts
+// convex/lib/system/system_metrics/permissions.ts
 // Access control and authorization logic for systemMetrics module
 
 import type { Doc } from '@/generated/dataModel';

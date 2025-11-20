@@ -2,14 +2,14 @@
 import React, { useState, useCallback } from 'react';
 import { MessageSquare, Play, Settings } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, Input } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
 import { TestResults } from '../TestRunner/TestResults';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { TextGenerationConfig } from '../../services/TestExecutor';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 export function TextGenerationTest() {
   const toast = useToast();

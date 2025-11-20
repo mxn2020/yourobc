@@ -1,5 +1,5 @@
 // src/features/ai-logging/utils/log-filters.ts
-import type { AIUsageFilter, AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter, AIUsageLog } from '@/features/system/ai-core/types';
 import type { LogDateRange } from '../types/log.types';
 import { getDateRangeForPreset } from '@/utils/common/date-utils';
 

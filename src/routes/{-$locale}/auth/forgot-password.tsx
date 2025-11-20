@@ -1,8 +1,8 @@
 // src/routes/$locale/auth/forgot-password.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { ForgotPasswordPage, requireGuestBeforeLoad } from '@/features/boilerplate/auth'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { ForgotPasswordPage, requireGuestBeforeLoad } from '@/features/system/auth'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/auth/forgot-password')({
   validateSearch: (search: Record<string, unknown>) => {

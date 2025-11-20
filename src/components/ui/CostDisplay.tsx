@@ -1,7 +1,7 @@
 // src/components/ui/CostDisplay.tsx
 import React, { useState } from 'react';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 interface CostDisplayProps {
   cost: number;

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/index.ts
+// src/features/system/blog/index.ts
 /**
  * Blog Feature - Main Export
  *

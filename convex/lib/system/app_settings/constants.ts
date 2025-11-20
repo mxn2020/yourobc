@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_settings/constants.ts
+// convex/lib/system/app_settings/constants.ts
 // convex/appSettings/constants.ts
 
 export const APP_SETTINGS_CONSTANTS = {

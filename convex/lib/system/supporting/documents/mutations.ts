@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/mutations.ts
+// convex/lib/system/supporting/documents/mutations.ts
 
 /**
  * Documents Module Mutations

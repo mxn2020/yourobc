@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/user_profiles/user_profiles/types.ts
+// convex/schema/system/user_profiles/user_profiles/types.ts
 // Type extractions from validators for user_profiles module
 
 import { Infer } from 'convex/values';

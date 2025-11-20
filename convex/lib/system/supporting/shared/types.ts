@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/shared/types.ts
+// convex/lib/system/supporting/shared/types.ts
 
 /**
  * Shared Module Types

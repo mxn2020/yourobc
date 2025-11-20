@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/permissionRequests/types.ts
+// convex/schema/system/system/permissionRequests/types.ts
 // Type extractions from validators for permissionRequests module
 
 import { Infer } from 'convex/values';

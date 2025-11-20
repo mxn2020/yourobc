@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/analytics/analytics/constants.ts
+// convex/lib/system/analytics/analytics/constants.ts
 // Business constants, permissions, and limits for analytics module
 
 export const ANALYTICS_CONSTANTS = {

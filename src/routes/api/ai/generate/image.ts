@@ -8,10 +8,10 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { aiService } from '@/features/boilerplate/ai-core';
-import type { AIImageRequest } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
-import { validateAIRequest } from '@/features/boilerplate/ai-core/utils';
+import { aiService } from '@/features/system/ai-core';
+import type { AIImageRequest } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
+import { validateAIRequest } from '@/features/system/ai-core/utils';
 
 interface ImageGenerateRequest extends Omit<AIImageRequest, 'metadata'> {
   user_id?: string;

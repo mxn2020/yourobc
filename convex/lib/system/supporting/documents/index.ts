@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/index.ts
+// convex/lib/system/supporting/documents/index.ts
 
 /**
  * Documents Module
@@ -11,7 +11,7 @@
  * - Processing status tracking
  * - Soft delete support
  *
- * @module convex/lib/boilerplate/supporting/documents
+ * @module convex/lib/system/supporting/documents
  */
 
 // Export constants

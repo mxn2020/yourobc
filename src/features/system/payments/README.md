@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/README.md
+// src/features/system/payments/README.md
 # 💳 Payments Module
 
 A modular, provider-agnostic payment and subscription management system for your SaaS application.
@@ -32,9 +32,9 @@ AUTUMN_SECRET_KEY=am_sk_xxxxxxxxxxxxx
 
 **Better Auth Config:**
 ```typescript
-// src/features/boilerplate/auth/lib/auth-config.ts
+// src/features/system/auth/lib/auth-config.ts
 import { betterAuth } from 'better-auth';
-import { autumnBetterAuthConfig } from '@/features/boilerplate/payments';
+import { autumnBetterAuthConfig } from '@/features/system/payments';
 
 export const auth = betterAuth({
   // ... your auth config
@@ -64,7 +64,7 @@ function RootComponent() {
 
 Plans are already configured in `config/plans-config.ts`. Customize them:
 ```typescript
-// src/features/boilerplate/payments/config/plans-config.ts
+// src/features/system/payments/config/plans-config.ts
 export const DEFAULT_PLANS: PricingPlan[] = [
   {
     id: 'free',
@@ -84,7 +84,7 @@ import {
   usePaymentProvider,
   useFeatureAccess,
   useUsageTracking,
-} from '@/features/boilerplate/payments';
+} from '@/features/system/payments';
 
 // Show pricing page
 <Route path="/pricing" component={PricingPage} />
@@ -119,7 +119,7 @@ These work with ANY payment provider:
 
 #### PricingPlans
 ```typescript
-import { PricingPlans } from '@/features/boilerplate/payments';
+import { PricingPlans } from '@/features/system/payments';
 
 <PricingPlans 
   currentPlanId={subscription?.planId}
@@ -129,7 +129,7 @@ import { PricingPlans } from '@/features/boilerplate/payments';
 
 #### FeatureGate
 ```typescript
-import { FeatureGate, useFeatureAccess } from '@/features/boilerplate/payments';
+import { FeatureGate, useFeatureAccess } from '@/features/system/payments';
 
 function ProtectedFeature() {
   const featureAccess = useFeatureAccess('advanced_analytics');
@@ -144,7 +144,7 @@ function ProtectedFeature() {
 
 #### UsageIndicator
 ```typescript
-import { UsageIndicator, useUsageTracking } from '@/features/boilerplate/payments';
+import { UsageIndicator, useUsageTracking } from '@/features/system/payments';
 
 function UsageDisplay() {
   const { getUsageStats } = useUsageTracking();
@@ -169,7 +169,7 @@ import {
   BillingPortalButton,
   SubscriptionStatus,
   UsageDisplay,
-} from '@/features/boilerplate/payments/providers/autumn-betterauth';
+} from '@/features/system/payments/providers/autumn-betterauth';
 
 // Upgrade button
 <PurchaseButton planId="pro" trialDays={14}>
@@ -196,7 +196,7 @@ import {
 
 Main hook for provider-agnostic payment operations:
 ```typescript
-import { usePaymentProvider } from '@/features/boilerplate/payments';
+import { usePaymentProvider } from '@/features/system/payments';
 
 function MyComponent() {
   const {
@@ -224,7 +224,7 @@ function MyComponent() {
 
 Check if user has access to a feature:
 ```typescript
-import { useFeatureAccess } from '@/features/boilerplate/payments';
+import { useFeatureAccess } from '@/features/system/payments';
 
 function MyFeature() {
   const {
@@ -248,7 +248,7 @@ function MyFeature() {
 
 Track and view usage:
 ```typescript
-import { useUsageTracking } from '@/features/boilerplate/payments';
+import { useUsageTracking } from '@/features/system/payments';
 
 function AIChat() {
   const { trackUsage, getUsageStats } = useUsageTracking();
@@ -272,7 +272,7 @@ function AIChat() {
 
 Detect which provider is active:
 ```typescript
-import { useActiveProvider, useEnabledProviders } from '@/features/boilerplate/payments';
+import { useActiveProvider, useEnabledProviders } from '@/features/system/payments';
 
 function PaymentSettings() {
   const activeProvider = useActiveProvider();
@@ -289,7 +289,7 @@ function PaymentSettings() {
 
 ## 📁 File Structure
 ```
-src/features/boilerplate/payments/
+src/features/system/payments/
 ├── types/                              # Shared types
 │   ├── payment.types.ts               # Common payment interfaces
 │   ├── provider.types.ts              # Provider interface
@@ -346,7 +346,7 @@ PRIMARY_PAYMENT_PROVIDER=autumn-betterauth
 
 ### Payment Config
 ```typescript
-import { PAYMENT_CONFIG } from '@/features/boilerplate/payments';
+import { PAYMENT_CONFIG } from '@/features/system/payments';
 
 console.log(PAYMENT_CONFIG.primaryProvider);
 // → 'autumn-betterauth'
@@ -359,7 +359,7 @@ console.log(PAYMENT_CONFIG.enabledProviders);
 
 ### Example 1: Feature Gating
 ```typescript
-import { useFeatureAccess, FeatureGate } from '@/features/boilerplate/payments';
+import { useFeatureAccess, FeatureGate } from '@/features/system/payments';
 
 function AdvancedFeature() {
   const featureAccess = useFeatureAccess('advanced_analytics');
@@ -377,7 +377,7 @@ function AdvancedFeature() {
 
 ### Example 2: Usage Tracking
 ```typescript
-import { useUsageTracking, useFeatureAccess } from '@/features/boilerplate/payments';
+import { useUsageTracking, useFeatureAccess } from '@/features/system/payments';
 
 function AIChat() {
   const { hasAccess, remaining } = useFeatureAccess('ai_requests');
@@ -410,8 +410,8 @@ function AIChat() {
 
 ### Example 3: Upgrade Flow
 ```typescript
-import { usePaymentProvider } from '@/features/boilerplate/payments';
-import { useToast } from '@/features/boilerplate/notifications';
+import { usePaymentProvider } from '@/features/system/payments';
+import { useToast } from '@/features/system/notifications';
 
 function UpgradeButton() {
   const { createCheckout } = usePaymentProvider();
@@ -450,8 +450,8 @@ function UpgradeButton() {
 
 ### Example 4: Custom Pricing Page
 ```typescript
-import { PricingCard, usePaymentProvider } from '@/features/boilerplate/payments';
-import { DEFAULT_PLANS } from '@/features/boilerplate/payments/config/plans-config';
+import { PricingCard, usePaymentProvider } from '@/features/system/payments';
+import { DEFAULT_PLANS } from '@/features/system/payments/config/plans-config';
 
 function CustomPricingPage() {
   const { subscription, createCheckout } = usePaymentProvider();

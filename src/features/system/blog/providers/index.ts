@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/providers/index.ts
+// src/features/system/blog/providers/index.ts
 /**
  * Blog Providers - Barrel Export
  *

@@ -1,4 +1,4 @@
-// convex/config/boilerplate/entities/index.ts
+// convex/config/system/entities/index.ts
 // ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
 
 // Import all domain-specific entity types
@@ -16,7 +16,7 @@ import { PROJECTS_ENTITY_TYPES } from './projects.entities';
 import { SUPPORTING_ENTITY_TYPES } from './supporting.entities';
 
 /**
- * Boilerplate entity types - Built-in boilerplate features
+ * System entity types - Built-in system features
  * These support features like projects, tasks, teams, etc.
  */
 export const BOILERPLATE_ENTITY_TYPES = [
@@ -26,37 +26,37 @@ export const BOILERPLATE_ENTITY_TYPES = [
 ] as const;
 
 /**
- * Boilerplate commentable entities
+ * System commentable entities
  * Entities that support the comments feature
  */
 export const BOILERPLATE_COMMENTABLE_ENTITY_TYPES = [
-  'boilerplate_project',
-  'boilerplate_task',
-  'boilerplate_user',
+  'system_project',
+  'system_task',
+  'system_user',
 ] as const;
 
 /**
- * Boilerplate documentable entities
+ * System documentable entities
  * Entities that support the documents feature
  */
 export const BOILERPLATE_DOCUMENTABLE_ENTITY_TYPES = [
-  'boilerplate_project',
-  'boilerplate_task',
-  'boilerplate_user',
+  'system_project',
+  'system_task',
+  'system_user',
 ] as const;
 
 /**
- * Boilerplate notifiable entities
+ * System notifiable entities
  * Entities that can receive notifications
  */
 export const BOILERPLATE_NOTIFIABLE_ENTITY_TYPES = [
   'system_user',
-  'boilerplate_user',
-  'boilerplate_team',
+  'system_user',
+  'system_team',
 ] as const;
 
 /**
- * All boilerplate entities combined
+ * All system entities combined
  */
 export const ALL_BOILERPLATE_ENTITY_TYPES = [
   ...SYSTEM_ENTITY_TYPES,
@@ -65,6 +65,6 @@ export const ALL_BOILERPLATE_ENTITY_TYPES = [
 ] as const;
 
 /**
- * Boilerplate entity type
+ * System entity type
  */
-export type BoilerplateEntityType = typeof ALL_BOILERPLATE_ENTITY_TYPES[number];
+export type SystemEntityType = typeof ALL_BOILERPLATE_ENTITY_TYPES[number];

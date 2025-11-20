@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/index.ts
+// convex/lib/system/supporting/wiki/index.ts
 
 /**
  * Wiki Module
@@ -14,7 +14,7 @@
  * - Public/private access control
  * - Soft delete support
  *
- * @module convex/lib/boilerplate/supporting/wiki
+ * @module convex/lib/system/supporting/wiki
  */
 
 // Export constants

@@ -8,8 +8,8 @@ import {
   AlertTriangle
 } from 'lucide-react'
 import { Badge, Button, Card, CardContent, CardHeader, Label, Modal, ModalBody, ModalFooter, ModalHeader, ViewSwitcher, type ViewMode } from '@/components/ui'
-import { AdminGuard } from '@/features/boilerplate/admin/components/AdminGuard'
-import { AdminLayout } from '@/features/boilerplate/admin/components/AdminLayout'
+import { AdminGuard } from '@/features/system/admin/components/AdminGuard'
+import { AdminLayout } from '@/features/system/admin/components/AdminLayout'
 import { AuditLogTableComponent } from '../components/AuditLogTable'
 import { AuditLogList } from '../components/AuditLogList'
 import { AuditLogGrid } from '../components/AuditLogGrid'
@@ -17,7 +17,7 @@ import { AuditLogFiltersComponent } from '../components/AuditLogFilters'
 import { AuditLogStatsComponent } from '../components/AuditLogStats'
 import { useAuditLogManagement } from '../hooks/useAdminAuditLogs'
 import type { AuditLogEntry } from '../types/audit-logs.types'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 
 export function AuditLogsPage() {
   const toast = useToast();

@@ -1,7 +1,7 @@
 // src/features/projects/hooks/useProjectAudit.ts
 
 import { useCallback } from "react";
-import { useMyAuditLogs } from "@/features/boilerplate/audit-logs";
+import { useMyAuditLogs } from "@/features/system/audit-logs";
 
 /**
  * Internal hook for project audit logging
@@ -35,7 +35,7 @@ export function useProjectAudit() {
       const logData = {
         action: "project.created" as const,
         description: `Created project "${projectTitle}".`,
-        entityType: "boilerplate_project" as const,
+        entityType: "system_project" as const,
         entityId: publicId, // ✅ Using publicId for user-facing audit logs
         entityTitle: projectTitle,
         metadata: {
@@ -62,7 +62,7 @@ export function useProjectAudit() {
       const logData = {
         action: "project.updated" as const,
         description: `Updated project "${projectTitle}": ${changedFields.join(", ")}.`,
-        entityType: "boilerplate_project" as const,
+        entityType: "system_project" as const,
         entityId: publicId, // ✅ Using publicId
         entityTitle: projectTitle,
         metadata: {
@@ -83,7 +83,7 @@ export function useProjectAudit() {
       const logData = {
         action,
         description: `${hardDelete ? "Permanently deleted" : "Deleted"} project "${projectTitle}".`,
-        entityType: "boilerplate_project" as const,
+        entityType: "system_project" as const,
         entityId: publicId, // ✅ Using publicId
         entityTitle: projectTitle,
         metadata: {
@@ -103,7 +103,7 @@ export function useProjectAudit() {
       const logData = {
         action: "project.progress.updated" as const,
         description: `Updated progress for project "${projectTitle}" from ${oldProgress.percentage}% to ${newProgress.percentage}%.`,
-        entityType: "boilerplate_project" as const,
+        entityType: "system_project" as const,
         entityId: publicId, // ✅ Using publicId
         entityTitle: projectTitle,
         metadata: {
@@ -121,7 +121,7 @@ export function useProjectAudit() {
       const logData = {
         action: "project.viewed" as const,
         description: `Viewed project "${projectTitle}".`,
-        entityType: "boilerplate_project" as const,
+        entityType: "system_project" as const,
         entityId: publicId, // ✅ Using publicId
         entityTitle: projectTitle,
         metadata: {

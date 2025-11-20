@@ -8,8 +8,8 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { stripeService } from '@/features/boilerplate/payments/providers/stripe/services/StripeService';
-import { auth } from '@/features/boilerplate/auth/lib/auth-config';
+import { stripeService } from '@/features/system/payments/providers/stripe/services/StripeService';
+import { auth } from '@/features/system/auth/lib/auth-config';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
@@ -44,7 +44,7 @@ async function handleResumeSubscription({ request }: { request: Request }) {
     const subscription = await stripeService.resumeSubscription(subscriptionId)
 
     // Update subscription in Convex
-    await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.updateSubscriptionStatus, {
+    await convex.mutation(api.lib.system.payments.stripe.mutations.updateSubscriptionStatus, {
       stripeSubscriptionId: subscriptionId,
       status: subscription.status as any,
       cancelAtPeriodEnd: false,

@@ -2,9 +2,9 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui';
 import { DollarSign, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { formatNumber } from '@/features/boilerplate/ai-core/utils';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
-import type { AIUsageStats } from '@/features/boilerplate/ai-core/types';
+import { formatNumber } from '@/features/system/ai-core/utils';
+import { getProviderColor } from '@/features/system/ai-core/utils';
+import type { AIUsageStats } from '@/features/system/ai-core/types';
 
 interface CostAnalyticsProps {
   stats: AIUsageStats | undefined;

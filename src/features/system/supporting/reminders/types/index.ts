@@ -1,7 +1,7 @@
-// src/features/boilerplate/supporting/reminders/types/index.ts
+// src/features/system/supporting/reminders/types/index.ts
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
-import { RecurrencePattern } from '@/convex/lib/boilerplate/supporting/shared/types';
+import { RecurrencePattern } from '@/convex/lib/system/supporting/shared/types';
 
 export type Reminder = Doc<'reminders'>
 export type ReminderId = Id<'reminders'>

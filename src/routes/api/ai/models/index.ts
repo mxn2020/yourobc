@@ -8,10 +8,10 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { aiService } from '@/features/boilerplate/ai-core';
-import type { ModelFilter, ModelSort } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
-import { parseModelFilters, parseModelSort } from '@/features/boilerplate/ai-core/utils';
+import { aiService } from '@/features/system/ai-core';
+import type { ModelFilter, ModelSort } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
+import { parseModelFilters, parseModelSort } from '@/features/system/ai-core/utils';
 
 export const Route = createFileRoute('/api/ai/models/')({
   server: {

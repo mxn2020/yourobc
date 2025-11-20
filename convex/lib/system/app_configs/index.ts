@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_configs/index.ts
+// convex/lib/system/app_configs/index.ts
 // Barrel exports for appConfigs module
 
 // Export constants and types

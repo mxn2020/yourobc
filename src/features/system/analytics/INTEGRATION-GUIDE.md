@@ -7,7 +7,7 @@
 In your app root (usually `src/routes/__root.tsx` or `src/App.tsx`):
 
 ```tsx
-import { AnalyticsProvider, EventTracker } from "@/features/boilerplate/analytics";
+import { AnalyticsProvider, EventTracker } from "@/features/system/analytics";
 
 export function App() {
   return (
@@ -27,7 +27,7 @@ export function App() {
 ### 2. Track Custom Events in Your Components
 
 ```tsx
-import { useAnalytics } from "@/features/boilerplate/analytics";
+import { useAnalytics } from "@/features/system/analytics";
 
 function MyFeature() {
   const { trackEvent } = useAnalytics();
@@ -53,7 +53,7 @@ function MyFeature() {
 ### 3. Display Analytics on Dashboard
 
 ```tsx
-import { MetricCard } from "@/features/boilerplate/analytics";
+import { MetricCard } from "@/features/system/analytics";
 
 function Dashboard() {
   return (
@@ -87,7 +87,7 @@ function Dashboard() {
 ### 4. Track AI Usage (If Using AI Features)
 
 ```tsx
-import { analyticsService } from "@/features/boilerplate/analytics";
+import { analyticsService } from "@/features/system/analytics";
 
 async function callAI(prompt: string) {
   const startTime = Date.now();
@@ -117,7 +117,7 @@ async function callAI(prompt: string) {
 ### 5. Track Payments (If Using Payment Features)
 
 ```tsx
-import { analyticsService } from "@/features/boilerplate/analytics";
+import { analyticsService } from "@/features/system/analytics";
 
 async function handlePaymentSuccess(payment: Payment) {
   // Track payment
@@ -136,7 +136,7 @@ async function handlePaymentSuccess(payment: Payment) {
 ### 6. Identify Users on Login
 
 ```tsx
-import { useUserIdentification } from "@/features/boilerplate/analytics";
+import { useUserIdentification } from "@/features/system/analytics";
 
 function MyApp() {
   const { user } = useAuth();
@@ -156,7 +156,7 @@ function MyApp() {
 ### 7. Create a Dedicated Analytics Page
 
 ```tsx
-import { AnalyticsOverview } from "@/features/boilerplate/analytics/pages";
+import { AnalyticsOverview } from "@/features/system/analytics/pages";
 
 // In your routes file
 export const Route = createFileRoute("/_protected/analytics")({

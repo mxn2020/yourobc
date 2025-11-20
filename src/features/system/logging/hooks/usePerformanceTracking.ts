@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/hooks/usePerformanceTracking.ts
+// src/features/system/logging/hooks/usePerformanceTracking.ts
 
 import { useEffect, useRef, useCallback } from 'react'
 import { logger } from '../services/LoggingService'

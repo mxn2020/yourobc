@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/entityTypes.ts
+// convex/lib/system/audit_logs/entityTypes.ts
 // Entity type validators - Auto-generated from configuration
 //
 // TO CUSTOMIZE ENTITY TYPES:
@@ -31,11 +31,11 @@ function createEntityUnion(types: readonly string[]) {
 }
 
 export const entityTypes = {
-  // Core system entities (from boilerplate config)
+  // Core system entities (from system config)
   coreSystem: createEntityUnion(SYSTEM_ENTITY_TYPES),
 
-  // Boilerplate entities (from boilerplate config)
-  boilerplate: createEntityUnion(BOILERPLATE_ENTITY_TYPES),
+  // System entities (from system config)
+  system: createEntityUnion(BOILERPLATE_ENTITY_TYPES),
 
   // App/addon entities (from app config)
   app: createEntityUnion(ALL_APP_ENTITY_TYPES),

@@ -36,7 +36,7 @@ The blog feature includes a complete scheduling system that allows users to sche
 ### 1. Scheduling a Post
 
 ```typescript
-import { useScheduling } from '@/features/boilerplate/blog';
+import { useScheduling } from '@/features/system/blog';
 
 function MyComponent() {
   const { schedulePost, isScheduling } = useScheduling();
@@ -172,7 +172,7 @@ In the blog dashboard, scheduled posts show:
 crons.interval(
   'publish-scheduled-posts',
   { minutes: 1 },  // Check every minute
-  internal.lib.boilerplate.blog.scheduled_tasks.checkAndPublishScheduledPosts
+  internal.lib.system.blog.scheduled_tasks.checkAndPublishScheduledPosts
 );
 ```
 
@@ -199,7 +199,7 @@ To change the interval (not recommended):
 ```typescript
 // In Convex dashboard, run:
 await ctx.runMutation(
-  internal.lib.boilerplate.blog.scheduled_tasks.checkAndPublishScheduledPosts,
+  internal.lib.system.blog.scheduled_tasks.checkAndPublishScheduledPosts,
   {}
 );
 ```
@@ -292,33 +292,33 @@ interface UseSchedulingReturn {
 
 ```typescript
 // Find posts ready to publish
-internal.lib.boilerplate.blog.scheduled_tasks.findPostsToPublish()
+internal.lib.system.blog.scheduled_tasks.findPostsToPublish()
 
 // Publish a single post
-internal.lib.boilerplate.blog.scheduled_tasks.publishScheduledPost({ postId })
+internal.lib.system.blog.scheduled_tasks.publishScheduledPost({ postId })
 
 // Main scheduler (called by cron)
-internal.lib.boilerplate.blog.scheduled_tasks.checkAndPublishScheduledPosts()
+internal.lib.system.blog.scheduled_tasks.checkAndPublishScheduledPosts()
 
 // Cancel scheduling
-internal.lib.boilerplate.blog.scheduled_tasks.cancelScheduledPublishing({ postId })
+internal.lib.system.blog.scheduled_tasks.cancelScheduledPublishing({ postId })
 
 // Reschedule
-internal.lib.boilerplate.blog.scheduled_tasks.reschedulePost({ postId, newScheduledFor })
+internal.lib.system.blog.scheduled_tasks.reschedulePost({ postId, newScheduledFor })
 ```
 
 ## Files Modified/Created
 
 ### Created
-- `/convex/lib/boilerplate/blog/scheduled_tasks.ts` - Background task logic
-- `/src/features/boilerplate/blog/hooks/useScheduling.ts` - React hook
+- `/convex/lib/system/blog/scheduled_tasks.ts` - Background task logic
+- `/src/features/system/blog/hooks/useScheduling.ts` - React hook
 
 ### Modified
 - `/convex/crons.ts` - Added cron job registration
-- `/src/features/boilerplate/blog/pages/PostEditorPage.tsx` - Added scheduling UI
-- `/src/features/boilerplate/blog/hooks/index.ts` - Export useScheduling
-- `/src/features/boilerplate/blog/index.ts` - Export useScheduling
-- `/src/features/boilerplate/blog/README.md` - Added scheduling docs
+- `/src/features/system/blog/pages/PostEditorPage.tsx` - Added scheduling UI
+- `/src/features/system/blog/hooks/index.ts` - Export useScheduling
+- `/src/features/system/blog/index.ts` - Export useScheduling
+- `/src/features/system/blog/README.md` - Added scheduling docs
 
 ## Summary
 

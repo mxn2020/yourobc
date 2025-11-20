@@ -1,7 +1,7 @@
-// src/features/boilerplate/payments/hooks/useUsageTracking.ts
+// src/features/system/payments/hooks/useUsageTracking.ts
 import { useCallback } from 'react'
 import { paymentsService } from '../services/PaymentsService'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import type { UsageStats } from '../types'
 
 /**

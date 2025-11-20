@@ -1,9 +1,9 @@
-// filepath: src/features/boilerplate/admin/hooks/useAppSettingsManagement.ts
+// filepath: src/features/system/admin/hooks/useAppSettingsManagement.ts
 import { useCallback, useMemo } from 'react'
 import { appSettingsService } from '../services/AppSettingsService'
 import type { AISettings, SystemSettings, AppSetting } from '../types/admin.types'
-import type { SettingCategory } from '@/convex/lib/boilerplate/app_settings/types'
-import { AuthUserId } from '@/features/boilerplate/auth'
+import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
+import { AuthUserId } from '@/features/system/auth'
 
 /**
  * App settings management hook - handles system-wide settings for admins

@@ -1,9 +1,9 @@
-// src/features/boilerplate/components/Auth/AuthLayout.tsx
+// src/features/system/components/Auth/AuthLayout.tsx
 
 import React from 'react';
 import { Brain, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 interface Props {
   children: React.ReactNode;

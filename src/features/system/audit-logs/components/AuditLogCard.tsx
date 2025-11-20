@@ -1,4 +1,4 @@
-// src/features/boilerplate/audit-logs/components/AuditLogCard.tsx
+// src/features/system/audit-logs/components/AuditLogCard.tsx
 import { Badge, Button, Card, CardContent } from '@/components/ui'
 import { Activity, User, Eye, MoreHorizontal } from 'lucide-react'
 import type { AuditEntityType, AuditLogEntry } from '../types/audit-logs.types'

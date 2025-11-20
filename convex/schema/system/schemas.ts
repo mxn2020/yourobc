@@ -1,74 +1,74 @@
-// convex/schema/boilerplate/schemas.ts
+// convex/schema/system/schemas.ts
 
 // Core system table imports
 import { userProfilesTable } from './user_profiles/user_profiles/user_profiles'
-import { boilerplateProjectsProjectsSchemas } from './projects/projects/schemas'
-import { boilerplateTasksSchemas } from './tasks/tasks/schemas'
-import { projectMilestonesTable } from './tables/tasks'
-import { boilerplateSystemAuditLogsSchemas } from './system/auditLogs/schemas'
-import { boilerplateSystemNotificationsSchemas } from './system/notifications/schemas'
-import { boilerplateSystemAppSettingsSchemas } from './system/appSettings/schemas'
-import { boilerplateSystemSystemMetricsSchemas } from './system/systemMetrics/schemas'
-import { boilerplateSystemAppThemeSettingsSchemas } from './system/appThemeSettings/schemas'
-import { boilerplateSystemAppConfigsSchemas } from './system/appConfigs/schemas'
-import { boilerplateSystemPermissionRequestsSchemas } from './system/permissionRequests/schemas'
+import { systemProjectsProjectsSchemas } from './projects/projects/schemas'
+import { systemTasksSchemas } from './projects/tasks/tasks/schemas'
+import { projectMilestonesTable } from './projects/milestones/milestones'
+import { systemSystemAuditLogsSchemas } from './system/auditLogs/schemas'
+import { systemSystemNotificationsSchemas } from './system/notifications/schemas'
+import { systemSystemAppSettingsSchemas } from './system/appSettings/schemas'
+import { systemSystemSystemMetricsSchemas } from './system/systemMetrics/schemas'
+import { systemSystemAppThemeSettingsSchemas } from './system/appThemeSettings/schemas'
+import { systemSystemAppConfigsSchemas } from './system/appConfigs/schemas'
+import { systemSystemPermissionRequestsSchemas } from './system/permissionRequests/schemas'
 import { aiLogsTable } from './ai/ai_logs/schemas'
 import { aiTestsTable } from './ai/ai_tests/schemas'
 import { userSettingsTable } from './user_settings/user_settings/user_settings'
 import { userModelPreferencesTable } from './user_settings/user_model_preferences/user_model_preferences'
-import { boilerplateDashboardsSchemas } from './dashboards/dashboards/schemas'
-import { boilerplateSupportingSupportingSchemas } from './supporting/supporting/schemas'
+import { systemDashboardsSchemas } from './dashboards/dashboards/schemas'
+import { systemSupportingSupportingSchemas } from './supporting/supporting/schemas'
 import { blogSchemas } from './blog/blog/schemas'
-import { boilerplateWebsitesWebsitesSchemas } from './websites/websites/schemas'
+import { systemWebsitesWebsitesSchemas } from './websites/websites/schemas'
 // TODO: Add imports for other website-related tables (pages, sections, themes, templates, collaborators) when refactored
-import { websitePagesTable, websiteSectionsTable, websiteThemesTable, websiteTemplatesTable, websiteCollaboratorsTable } from './tables/websites'
-import { boilerplateAnalyticsAnalyticsSchemas } from './analytics/analytics/schemas'
-import { boilerplateIntegrationsIntegrationsSchemas } from './integrations/integrations/schemas'
-import { boilerplateEmailConfigsSchemas } from './email/configs/schemas'
-import { boilerplateEmailLogsSchemas } from './email/logs/schemas'
-import { boilerplateEmailTemplatesSchemas } from './email/templates/schemas'
-import { boilerplatePaymentsPaymentsSchemas } from './payments/payments/schemas'
-import { boilerplateAutumnCustomersSchemas } from './autumn/autumn_customers/schemas'
-import { boilerplateAutumnUsageLogsSchemas } from './autumn/autumn_usage_logs/schemas'
-import { boilerplateStripeConnectSchemas } from './stripe_connect/stripe_connect/schemas'
+import { websitePagesTable, websiteSectionsTable, websiteThemesTable, websiteTemplatesTable, websiteCollaboratorsTable } from './projects/milestones/websites'
+import { systemAnalyticsAnalyticsSchemas } from './analytics/analytics/schemas'
+import { systemIntegrationsIntegrationsSchemas } from './integrations/integrations/schemas'
+import { systemEmailConfigsSchemas } from './email/configs/schemas'
+import { systemEmailLogsSchemas } from './email/logs/schemas'
+import { systemEmailTemplatesSchemas } from './email/templates/schemas'
+import { systemPaymentsPaymentsSchemas } from './payments/payments/schemas'
+import { systemAutumnCustomersSchemas } from './autumn/autumn_customers/schemas'
+import { systemAutumnUsageLogsSchemas } from './autumn/autumn_usage_logs/schemas'
+import { systemStripeConnectSchemas } from './stripe_connect/stripe_connect/schemas'
 import { stripeSchemas } from './stripe/stripe/schemas'
-import { boilerplateGameScoresSchemas } from './game_scores/game_scores/schemas'
+import { systemGameScoresSchemas } from './game_scores/game_scores/schemas'
 
-export const boilerplateSchemas = {
+export const systemSchemas = {
   // User & Profile
   userProfiles: userProfilesTable,
   userSettings: userSettingsTable,
   userModelPreferences: userModelPreferencesTable,
   
   // Projects
-  ...boilerplateProjectsProjectsSchemas,
-  ...boilerplateTasksSchemas,
+  ...systemProjectsProjectsSchemas,
+  ...systemTasksSchemas,
   projectMilestones: projectMilestonesTable,
   
   // System
-  ...boilerplateSystemAuditLogsSchemas,
-  ...boilerplateSystemNotificationsSchemas,
-  ...boilerplateSystemAppSettingsSchemas,
-  ...boilerplateSystemSystemMetricsSchemas,
-  ...boilerplateSystemAppThemeSettingsSchemas,
-  ...boilerplateSystemAppConfigsSchemas,
-  ...boilerplateSystemPermissionRequestsSchemas,
+  ...systemSystemAuditLogsSchemas,
+  ...systemSystemNotificationsSchemas,
+  ...systemSystemAppSettingsSchemas,
+  ...systemSystemSystemMetricsSchemas,
+  ...systemSystemAppThemeSettingsSchemas,
+  ...systemSystemAppConfigsSchemas,
+  ...systemSystemPermissionRequestsSchemas,
   
   // AI
   aiLogs: aiLogsTable,
   aiTests: aiTestsTable,
 
   // Dashboards
-  ...boilerplateDashboardsSchemas,
+  ...systemDashboardsSchemas,
 
   // Supporting
-  ...boilerplateSupportingSupportingSchemas,
+  ...systemSupportingSupportingSchemas,
 
   // Blog
   ...blogSchemas,
   
   // Websites
-  ...boilerplateWebsitesWebsitesSchemas,
+  ...systemWebsitesWebsitesSchemas,
   websitePages: websitePagesTable,
   websiteSections: websiteSectionsTable,
   websiteThemes: websiteThemesTable,
@@ -76,31 +76,31 @@ export const boilerplateSchemas = {
   websiteCollaborators: websiteCollaboratorsTable,
   
   // Analytics
-  ...boilerplateAnalyticsAnalyticsSchemas,
+  ...systemAnalyticsAnalyticsSchemas,
   
   // Integrations
-  ...boilerplateIntegrationsIntegrationsSchemas,
+  ...systemIntegrationsIntegrationsSchemas,
   
   // Email
-  ...boilerplateEmailConfigsSchemas,
-  ...boilerplateEmailLogsSchemas,
-  ...boilerplateEmailTemplatesSchemas,
+  ...systemEmailConfigsSchemas,
+  ...systemEmailLogsSchemas,
+  ...systemEmailTemplatesSchemas,
   
   // Payments
-  ...boilerplatePaymentsPaymentsSchemas,
+  ...systemPaymentsPaymentsSchemas,
 
   // Autumn
-  ...boilerplateAutumnCustomersSchemas,
-  ...boilerplateAutumnUsageLogsSchemas,
+  ...systemAutumnCustomersSchemas,
+  ...systemAutumnUsageLogsSchemas,
 
   // Stripe Connect
-  ...boilerplateStripeConnectSchemas,
+  ...systemStripeConnectSchemas,
 
   // Stripe Standard
   ...stripeSchemas,
 
   // Game Scores
-  ...boilerplateGameScoresSchemas,
+  ...systemGameScoresSchemas,
 
 }
 

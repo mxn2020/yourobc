@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/mutations.ts
+// convex/lib/system/blog/blog/mutations.ts
 /**
  * Blog Mutation Functions
  *

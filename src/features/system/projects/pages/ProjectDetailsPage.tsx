@@ -1,4 +1,4 @@
-// features/boilerplate/projects/pages/ProjectDetailsPage.tsx
+// features/system/projects/pages/ProjectDetailsPage.tsx
 
 import { FC, useState, useCallback, useEffect, useRef } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -6,7 +6,7 @@ import { useProjectSuspense, useProjectMembersSuspense } from '../hooks/useProje
 import { useUpdateProject, useDeleteProject } from '../hooks/useProjects'
 import { useProjectAudit } from '../hooks/useProjectAudit'
 import { useProjectPermissions } from '../hooks/useProjectPermissions'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError, ParsedError } from '@/utils/errorHandling'
 import type { ProjectId, UpdateProjectData } from '../types'
 import * as projectHelpers from '../utils/projectHelpers'
@@ -55,9 +55,9 @@ import { useProjectMilestones } from '../hooks/useMilestones'
 import { tasksService } from '../services/TasksService'
 import { milestonesService } from '../services/MilestonesService'
 import { teamService } from '../services/TeamService'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 import type { Id } from '@/convex/_generated/dataModel'
-import { useAuth } from '@/features/boilerplate/auth/hooks/useAuth'
+import { useAuth } from '@/features/system/auth/hooks/useAuth'
 
 interface ProjectDetailsPageProps {
   projectId: ProjectId

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/hooks/useTableState.ts
+// src/features/system/supporting/tables/hooks/useTableState.ts
 
 import { useState, useCallback } from 'react'
 import type {

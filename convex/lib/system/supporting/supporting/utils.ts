@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/utils.ts
+// convex/lib/system/supporting/supporting/utils.ts
 // Utility functions for supporting module
 
 import { SUPPORTING_CONSTANTS } from './constants';

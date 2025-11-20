@@ -2,15 +2,15 @@
 import React, { useState } from 'react'
 import { useQuery } from 'convex/react'
 import { useRouter, useParams } from '@tanstack/react-router'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import { api } from '@/convex/_generated/api';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { defaultLocale } from '@/features/system/i18n';
 import { StatsCard } from './StatsCard'
 import { ProjectChart } from './ProjectChart'
 import { QuickActions } from './QuickActions'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '../ui/Modal'
 import { Button } from '../ui/Button'
-import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/boilerplate/projects'
+import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/system/projects'
 import { Card, CardHeader, CardContent } from '../ui/Card'
 import { Progress } from '../ui/Progress'
 import { FolderOpen, CheckCircle, Clock, AlertTriangle, DollarSign, TrendingUp, Calendar, Target } from 'lucide-react'
@@ -19,7 +19,7 @@ import { Id } from '@/convex/_generated/dataModel'
 import { parseConvexError, ParsedError } from '@/utils/errorHandling'
 import { PermissionDeniedModal } from '../Permission/PermissionDeniedModal'
 import { RequestAccessModal } from '@/components/Permission/RequestAccessModal'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 
 export function Dashboard() {
   const { auth, profile, isReady, isAuthenticated } = useAuth()
@@ -36,12 +36,12 @@ export function Dashboard() {
 
   // TanStack Query will use prefetched data automatically if available
   const dashboardStats = useQuery(
-    api.lib.boilerplate.projects.queries.getDashboardStats,
+    api.lib.system.projects.queries.getDashboardStats,
     isReady && isAuthenticated ? {} : "skip"
   )
 
   const projectsList = useQuery(
-    api.lib.boilerplate.projects.queries.getProjects,
+    api.lib.system.projects.queries.getProjects,
     isReady && isAuthenticated ? { options: { limit: 10 } } : "skip"
   )
 

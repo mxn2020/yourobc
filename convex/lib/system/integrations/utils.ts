@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/utils.ts
+// convex/lib/system/integrations/utils.ts
 
 declare const process: { env: Record<string, string | undefined> }
 

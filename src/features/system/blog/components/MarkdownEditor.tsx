@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/components/MarkdownEditor.tsx
+// src/features/system/blog/components/MarkdownEditor.tsx
 /**
  * Markdown Editor Component
  *
@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
 import { Tabs } from '../../../../components/ui/Tabs';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 import type { MarkdownEditorProps, EditorToolbarAction } from '../types';
 
 export function MarkdownEditor({

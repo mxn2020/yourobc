@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/useWebhooks.ts
+// src/features/system/integrations/hooks/useWebhooks.ts
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -50,14 +50,14 @@ import {
  */
 export function useWebhooks() {
   const webhooks = useQuery(
-    api.lib.boilerplate.integrations.queries.getWebhooks,
+    api.lib.system.integrations.queries.getWebhooks,
     {}
   );
 
-  const createWebhookMutation = useMutation(api.lib.boilerplate.integrations.mutations.createWebhook);
-  const updateWebhookMutation = useMutation(api.lib.boilerplate.integrations.mutations.updateWebhook);
-  const deleteWebhookMutation = useMutation(api.lib.boilerplate.integrations.mutations.deleteWebhook);
-  const testWebhookMutation = useMutation(api.lib.boilerplate.integrations.mutations.testWebhook);
+  const createWebhookMutation = useMutation(api.lib.system.integrations.mutations.createWebhook);
+  const updateWebhookMutation = useMutation(api.lib.system.integrations.mutations.updateWebhook);
+  const deleteWebhookMutation = useMutation(api.lib.system.integrations.mutations.deleteWebhook);
+  const testWebhookMutation = useMutation(api.lib.system.integrations.mutations.testWebhook);
 
   return useMemo(
     () => ({
@@ -130,7 +130,7 @@ export function useWebhooks() {
  */
 export function useWebhook(webhookId: Id<"webhooks"> | undefined) {
   const webhook = useQuery(
-    api.lib.boilerplate.integrations.queries.getWebhook,
+    api.lib.system.integrations.queries.getWebhook,
     webhookId ? { webhookId } : "skip"
   );
 
@@ -151,7 +151,7 @@ export function useWebhookDeliveries(
   limit?: number
 ) {
   const deliveries = useQuery(
-    api.lib.boilerplate.integrations.queries.getWebhookDeliveries,
+    api.lib.system.integrations.queries.getWebhookDeliveries,
     webhookId ? { webhookId, limit } : "skip"
   );
 
@@ -186,7 +186,7 @@ export function useActiveWebhooks() {
  */
 export function useWebhookStats(webhookId: Id<"webhooks"> | undefined) {
   const stats = useQuery(
-    api.lib.boilerplate.integrations.queries.getWebhookStats,
+    api.lib.system.integrations.queries.getWebhookStats,
     webhookId ? { webhookId } : "skip"
   );
 
@@ -203,7 +203,7 @@ export function useWebhookStats(webhookId: Id<"webhooks"> | undefined) {
  * Hook to retry a failed webhook delivery
  */
 export function useRetryWebhookDelivery() {
-  const retryMutation = useMutation(api.lib.boilerplate.integrations.mutations.retryWebhookDelivery);
+  const retryMutation = useMutation(api.lib.system.integrations.mutations.retryWebhookDelivery);
 
   return useMemo(
     () => ({

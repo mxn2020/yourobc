@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/index.ts
+// src/features/system/payments/shared/components/index.ts
 export * from './PricingCard';
 export * from './PricingPlans';
 export * from './FeatureGate';

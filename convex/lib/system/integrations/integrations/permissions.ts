@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/permissions.ts
+// convex/lib/system/integrations/integrations/permissions.ts
 // Permission and access control functions for integrations module
 
 import { QueryCtx, MutationCtx } from '@/generated/server';

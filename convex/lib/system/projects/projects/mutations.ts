@@ -1,11 +1,11 @@
-// convex/lib/boilerplate/projects/projects/mutations.ts
+// convex/lib/system/projects/projects/mutations.ts
 // Write operations for projects module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { projectsValidators } from '@/schema/boilerplate/projects/projects/validators';
+import { projectsValidators } from '@/schema/system/projects/projects/validators';
 import { PROJECTS_CONSTANTS } from './constants';
 import { validateProjectData } from './utils';
 import {

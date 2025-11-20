@@ -1,11 +1,11 @@
-// src/features/boilerplate/i18n/components/LanguageSwitcherDropdown.tsx
+// src/features/system/i18n/components/LanguageSwitcherDropdown.tsx
 
-import { useI18n } from '@/features/boilerplate/i18n/context'
+import { useI18n } from '@/features/system/i18n/context'
 import { useNavigate, useLocation } from '@tanstack/react-router'
-import { localeMetadata } from '@/features/boilerplate/i18n/config'
-import { I18N_CONFIG, getEnabledLocales } from '@/features/boilerplate/i18n'
-import { stripLocaleFromPath } from '@/features/boilerplate/i18n/utils/path'
-import type { Locale } from '@/features/boilerplate/i18n/config'
+import { localeMetadata } from '@/features/system/i18n/config'
+import { I18N_CONFIG, getEnabledLocales } from '@/features/system/i18n'
+import { stripLocaleFromPath } from '@/features/system/i18n/utils/path'
+import type { Locale } from '@/features/system/i18n/config'
 import { Check } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 

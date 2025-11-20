@@ -9,7 +9,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router';
-import { auth } from '@/features/boilerplate/auth/lib/auth-config';
+import { auth } from '@/features/system/auth/lib/auth-config';
 import { detectActiveProvider } from './_utils/provider-detector';
 
 export const Route = createFileRoute('/api/payments/usage')({

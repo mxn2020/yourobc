@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/patterns/VirtualWindowList.tsx
+// src/features/system/supporting/virtual-lists/components/patterns/VirtualWindowList.tsx
 
 import React, { useRef } from 'react'
 import { useWindowVirtualizer } from '@tanstack/react-virtual'

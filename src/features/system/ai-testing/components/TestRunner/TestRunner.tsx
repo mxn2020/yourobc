@@ -6,8 +6,8 @@ import { Button } from '@/components/ui';
 import { TestForm } from './TestForm';
 import { TestResults } from './TestResults';
 import type { TestFormData } from '../../types/test.types';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
-import { useToast } from '@/features/boilerplate/notifications';
+import type { TestResult } from '@/features/system/ai-core/types';
+import { useToast } from '@/features/system/notifications';
 import { useModelTesting } from '../../hooks/useModelTesting';
 
 export function TestRunner() {

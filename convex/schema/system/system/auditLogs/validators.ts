@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/auditLogs/validators.ts
+// convex/schema/system/system/auditLogs/validators.ts
 // Grouped validators for auditLogs module
 
 import { v } from 'convex/values';

@@ -22,10 +22,10 @@ import { AutumnProvider } from 'autumn-js/react'
 import { ErrorProvider, useErrorContext } from '@/contexts/ErrorContext'
 import { PermissionDeniedModal } from '@/components/Permission/PermissionDeniedModal'
 import { RequestAccessModal } from '@/components/Permission/RequestAccessModal'
-import { useToast } from '@/features/boilerplate/notifications'
-import { BlogProvider, isBlogEnabled } from '@/features/boilerplate/blog'
-import { PAYMENT_CONFIG } from '@/features/boilerplate/payments'
-import { authService } from '@/features/boilerplate/auth'
+import { useToast } from '@/features/system/notifications'
+import { BlogProvider, isBlogEnabled } from '@/features/system/blog'
+import { PAYMENT_CONFIG } from '@/features/system/payments'
+import { authService } from '@/features/system/auth'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import appCss from '@/styles/app.css?url'
 import { seo } from '@/utils/seo'
@@ -34,9 +34,9 @@ import {
   I18N_CONFIG,
   getEnabledLocales,
   defaultLocale
-} from '@/features/boilerplate/i18n'
-import { getLocaleFromPath, stripLocaleFromPath } from '@/features/boilerplate/i18n/utils/path'
-import type { Locale } from '@/features/boilerplate/i18n'
+} from '@/features/system/i18n'
+import { getLocaleFromPath, stripLocaleFromPath } from '@/features/system/i18n/utils/path'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -60,7 +60,7 @@ export const Route = createRootRouteWithContext<{
     // Load ALL translations at root level (for React components, NOT metadata)
     // Metadata is loaded separately in each route's head function
     const translations = typeof window === 'undefined'
-      ? await import('@/features/boilerplate/i18n/server.server').then(mod =>
+      ? await import('@/features/system/i18n/server.server').then(mod =>
           mod.loadTranslationsServer(locale, ['common', 'ui', 'auth', 'projects', 'blog', 'websites', 'admin'])
         )
       : (window as any).__TRANSLATIONS__ || {}
@@ -382,7 +382,7 @@ function GlobalErrorHandlers() {
   const { permissionError, closePermissionModal } = useErrorContext()
   const [requestAccessOpen, setRequestAccessOpen] = React.useState(false)
   const [savedPermissionData, setSavedPermissionData] = React.useState<{ permission: string; module: string } | null>(null)
-  const requestPermission = useMutation(api.lib.boilerplate.permission_requests.mutations.requestPermission)
+  const requestPermission = useMutation(api.lib.system.permission_requests.mutations.requestPermission)
   const toast = useToast()
 
   const handleRequestAccess = () => {

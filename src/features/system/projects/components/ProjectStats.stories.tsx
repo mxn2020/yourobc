@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { ProjectStats } from './ProjectStats'
-import type { ProjectStats as ProjectStatsType } from '@/convex/lib/boilerplate/projects'
+import type { ProjectStats as ProjectStatsType } from '@/convex/lib/system/projects'
 
 const meta = {
   title: 'Projects/Components/ProjectStats',

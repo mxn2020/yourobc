@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/hooks/useProjects.ts
+// src/features/system/projects/hooks/useProjects.ts
 
 import { useCallback, useMemo, useEffect, useRef } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";

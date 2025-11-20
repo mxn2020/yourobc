@@ -60,19 +60,19 @@ export class EmailService {
   // ==========================================
 
   public getAllConfigsQueryOptions() {
-    return convexQuery(api.lib.boilerplate.email.queries.getAllConfigs, {});
+    return convexQuery(api.lib.system.email.queries.getAllConfigs, {});
   }
 
   public getEmailStatsQueryOptions(days: number = 30) {
-    return convexQuery(api.lib.boilerplate.email.queries.getEmailStats, { days });
+    return convexQuery(api.lib.system.email.queries.getEmailStats, { days });
   }
 
   public getAllTemplatesQueryOptions() {
-    return convexQuery(api.lib.boilerplate.email.queries.getAllTemplates, {});
+    return convexQuery(api.lib.system.email.queries.getAllTemplates, {});
   }
 
   public getEmailLogsQueryOptions(limit: number = 50) {
-    return convexQuery(api.lib.boilerplate.email.queries.getEmailLogs, { limit });
+    return convexQuery(api.lib.system.email.queries.getEmailLogs, { limit });
   }
 
   // ==========================================

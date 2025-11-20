@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/components/FeatureConfigSection.tsx
+// src/features/system/admin/components/FeatureConfigSection.tsx
 /**
  * FeatureConfigSection Component
  *

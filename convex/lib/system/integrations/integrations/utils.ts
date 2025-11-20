@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/utils.ts
+// convex/lib/system/integrations/integrations/utils.ts
 // Utility functions for integrations module
 
 declare const process: { env: Record<string, string | undefined> }

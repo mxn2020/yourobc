@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_theme_settings/index.ts
+// convex/lib/system/app_theme_settings/index.ts
 // Barrel exports for appThemeSettings module
 
 // Export constants and types

@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/config/integrations-config.ts
+// src/features/system/integrations/config/integrations-config.ts
 
 import { IntegrationProviderType } from "../types";
 import { getEnv, getEnvWithDefault } from '../../_shared/env-utils';

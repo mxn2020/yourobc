@@ -4,8 +4,8 @@ import type {
   TestConfiguration, 
   TestParameters, 
   ExpectedResults 
-} from '@/features/boilerplate/ai-core/types';
-import type { ModelProvider } from '@/features/boilerplate/ai-core/types';
+} from '@/features/system/ai-core/types';
+import type { ModelProvider } from '@/features/system/ai-core/types';
 import { Id } from "@/convex/_generated/dataModel";
 
 export interface TestFormData {

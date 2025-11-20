@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/pages/index.ts
+// src/features/system/payments/pages/index.ts
 export * from './PricingPage';
 export * from './BillingPage';
 

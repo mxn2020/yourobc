@@ -1,7 +1,7 @@
-// src/features/boilerplate/projects/hooks/useProjectPermissions.ts
+// src/features/system/projects/hooks/useProjectPermissions.ts
 
 import { useMemo } from "react";
-import { useCurrentUser } from "@/features/boilerplate/auth";
+import { useCurrentUser } from "@/features/system/auth";
 import { PROJECT_CONSTANTS } from "../constants";
 import type { Project } from "../types";
 

@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/components/index.ts
+// src/features/system/integrations/components/index.ts
 
 export * from "./ApiKeyCard";
 export * from "./ApiKeyForm";

@@ -38,7 +38,7 @@ TanStack Form provides a powerful and flexible approach to form management with 
 
 ## Installation
 
-The package is already installed as part of the boilerplate:
+The package is already installed as part of the system:
 
 ```bash
 pnpm install @tanstack/react-form
@@ -50,7 +50,7 @@ pnpm install @tanstack/react-form
 
 ```tsx
 import { useForm } from '@tanstack/react-form'
-import { FieldInfo } from '@/features/boilerplate/supporting/forms'
+import { FieldInfo } from '@/features/system/supporting/forms'
 
 function MyForm() {
   const form = useForm({
@@ -103,7 +103,7 @@ import {
   DefaultFormContext,
   DefaultFieldContext,
   validators,
-} from '@/features/boilerplate/supporting/forms'
+} from '@/features/system/supporting/forms'
 
 function MyForm() {
   const form = useForm({
@@ -159,7 +159,7 @@ function MyForm() {
 
 ```tsx
 import { useForm } from '@tanstack/react-form'
-import { getPreset, extendPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset, extendPreset } from '@/features/system/supporting/forms'
 
 // Use a preset directly
 const preset = getPreset('userProfile')
@@ -372,7 +372,7 @@ Group related fields with title and description.
 ### Built-in Validators
 
 ```tsx
-import { validators } from '@/features/boilerplate/supporting/forms'
+import { validators } from '@/features/system/supporting/forms'
 
 // Required field
 validators.required('This field is required')
@@ -406,7 +406,7 @@ validators.custom((value) => value.length > 0, 'Cannot be empty')
 Combine multiple validators into one:
 
 ```tsx
-import { composeValidators, validators } from '@/features/boilerplate/supporting/forms'
+import { composeValidators, validators } from '@/features/system/supporting/forms'
 
 const validateEmail = composeValidators(
   validators.required('Email is required'),
@@ -478,7 +478,7 @@ Pre-configured form setups for common use cases.
 ### Available Presets
 
 ```tsx
-import { formPresets, getPreset } from '@/features/boilerplate/supporting/forms'
+import { formPresets, getPreset } from '@/features/system/supporting/forms'
 
 // User profile form
 const userProfile = getPreset('userProfile')
@@ -508,7 +508,7 @@ const settingsForm = getPreset('settingsForm')
 ### Extending Presets
 
 ```tsx
-import { extendPreset } from '@/features/boilerplate/supporting/forms'
+import { extendPreset } from '@/features/system/supporting/forms'
 
 const customPreset = extendPreset('userProfile', {
   defaultValues: {
@@ -532,7 +532,7 @@ const form = useForm(customPreset)
 Get automatic preset recommendations:
 
 ```tsx
-import { presetRecommendations } from '@/features/boilerplate/supporting/forms'
+import { presetRecommendations } from '@/features/system/supporting/forms'
 
 const recommended = presetRecommendations.getRecommendation({
   hasAuthentication: true,
@@ -547,7 +547,7 @@ const recommended = presetRecommendations.getRecommendation({
 Hook for declarative field validation:
 
 ```tsx
-import { useFieldValidation } from '@/features/boilerplate/supporting/forms'
+import { useFieldValidation } from '@/features/system/supporting/forms'
 
 function MyField() {
   const { validate } = useFieldValidation({
@@ -575,7 +575,7 @@ function MyField() {
 Create custom form contexts for your own component library:
 
 ```tsx
-import { createFormContexts } from '@/features/boilerplate/supporting/forms'
+import { createFormContexts } from '@/features/system/supporting/forms'
 
 const { FormContext, FieldContext, useFormContext, useFieldContext } =
   createFormContexts()
@@ -602,7 +602,7 @@ import {
   DefaultFormContext,
   DefaultFieldContext,
   validators,
-} from '@/features/boilerplate/supporting/forms'
+} from '@/features/system/supporting/forms'
 
 function UserProfileForm() {
   const form = useForm({
@@ -659,7 +659,7 @@ function UserProfileForm() {
 
 ```tsx
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 function ContactForm() {
   const preset = getPreset('contactForm')
@@ -710,7 +710,7 @@ const { register, handleSubmit, formState: { errors } } = useForm()
 **After (TanStack Form):**
 ```tsx
 import { useForm } from '@tanstack/react-form'
-import { FieldInfo } from '@/features/boilerplate/supporting/forms'
+import { FieldInfo } from '@/features/system/supporting/forms'
 
 const form = useForm({ defaultValues: { email: '' } })
 

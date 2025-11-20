@@ -1,4 +1,4 @@
-// features/boilerplate/projects/pages/ProjectTasksPage.tsx
+// features/system/projects/pages/ProjectTasksPage.tsx
 
 import { FC, useState, useMemo } from 'react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
@@ -7,7 +7,7 @@ import { ListTodo, Plus, CheckSquare, Circle, Clock, AlertCircle } from 'lucide-
 import { useTasks } from '../hooks/useTasks'
 import { useCanCreateProjects } from '../hooks/useProjectPermissions'
 import { PermissionButton } from '../../../../components/Permission/PermissionButton'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 
 export const ProjectTasksPage: FC = () => {
   const navigate = useNavigate()

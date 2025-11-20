@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/systemMetrics/systemMetrics.ts
+// convex/schema/system/system/systemMetrics/systemMetrics.ts
 // Table definitions for systemMetrics module
 
 import { defineTable } from 'convex/server';

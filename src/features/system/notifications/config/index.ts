@@ -1,4 +1,4 @@
-// src/features/boilerplate/notifications/config/index.ts
+// src/features/system/notifications/config/index.ts
 /**
  * Notifications Configuration
  *

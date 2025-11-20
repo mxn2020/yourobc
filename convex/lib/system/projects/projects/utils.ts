@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/projects/utils.ts
+// convex/lib/system/projects/projects/utils.ts
 // Validation functions and utility helpers for projects module
 
 import { PROJECTS_CONSTANTS, PRIORITY_WEIGHTS } from './constants';

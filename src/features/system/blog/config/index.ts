@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/config/index.ts
+// src/features/system/blog/config/index.ts
 /**
  * Blog Feature Configuration
  *

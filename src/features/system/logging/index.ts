@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/index.ts
+// src/features/system/logging/index.ts
 // Logging Feature - Public API
 
 // Export singleton logger and helper

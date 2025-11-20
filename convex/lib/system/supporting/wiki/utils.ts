@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/utils.ts
+// convex/lib/system/supporting/wiki/utils.ts
 
 /**
  * Wiki Module Utilities

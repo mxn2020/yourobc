@@ -1,6 +1,6 @@
 // src/utils/ai/test-utils.ts
 
-import type { TestParameters } from '@/features/boilerplate/ai-core/types';
+import type { TestParameters } from '@/features/system/ai-core/types';
 
 /**
  * Clean test parameters by removing internal fields that shouldn't be stored in database

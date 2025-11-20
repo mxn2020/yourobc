@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/components/PricingCard.tsx
+// src/features/system/payments/providers/stripe/components/PricingCard.tsx
 /**
  * Pricing Card Component
  *

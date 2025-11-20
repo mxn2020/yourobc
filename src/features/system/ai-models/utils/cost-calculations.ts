@@ -5,5 +5,5 @@ export {
   formatCost,
   getCostTier,
   projectCosts
-} from '@/features/boilerplate/ai-core/utils';
+} from '@/features/system/ai-core/utils';
 

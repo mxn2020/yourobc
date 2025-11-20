@@ -1,10 +1,10 @@
-// src/features/boilerplate/integrations/hooks/useApiKeys.ts
+// src/features/system/integrations/hooks/useApiKeys.ts
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMemo } from "react";
-import { useAuth } from "@/features/boilerplate/auth/hooks/useAuth";
+import { useAuth } from "@/features/system/auth/hooks/useAuth";
 import { CreateApiKeyParams, ApiKey } from "../types";
 
 /**
@@ -45,12 +45,12 @@ import { CreateApiKeyParams, ApiKey } from "../types";
  */
 export function useApiKeys() {
   const apiKeys = useQuery(
-    api.lib.boilerplate.integrations.queries.getApiKeys,
+    api.lib.system.integrations.queries.getApiKeys,
     {}
   );
 
-  const createApiKeyMutation = useMutation(api.lib.boilerplate.integrations.mutations.createApiKey);
-  const revokeApiKeyMutation = useMutation(api.lib.boilerplate.integrations.mutations.revokeApiKey);
+  const createApiKeyMutation = useMutation(api.lib.system.integrations.mutations.createApiKey);
+  const revokeApiKeyMutation = useMutation(api.lib.system.integrations.mutations.revokeApiKey);
 
   return useMemo(
     () => ({
@@ -91,7 +91,7 @@ export function useApiKeys() {
  */
 export function useApiKey(keyId: Id<"apiKeys"> | undefined) {
   const apiKey = useQuery(
-    api.lib.boilerplate.integrations.queries.getApiKey,
+    api.lib.system.integrations.queries.getApiKey,
     keyId ? { keyId } : "skip"
   );
 
@@ -108,7 +108,7 @@ export function useApiKey(keyId: Id<"apiKeys"> | undefined) {
  * Hook to validate an API key
  */
 export function useValidateApiKey() {
-  const validateMutation = useMutation(api.lib.boilerplate.integrations.mutations.validateApiKeyWithIncrement);
+  const validateMutation = useMutation(api.lib.system.integrations.mutations.validateApiKeyWithIncrement);
 
   return useMemo(
     () => ({
@@ -147,7 +147,7 @@ export function useActiveApiKeys() {
  */
 export function useApiKeyStats(keyId: Id<"apiKeys"> | undefined) {
   const stats = useQuery(
-    api.lib.boilerplate.integrations.queries.getApiKeyStats,
+    api.lib.system.integrations.queries.getApiKeyStats,
     keyId ? { keyId } : "skip"
   );
 

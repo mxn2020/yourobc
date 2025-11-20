@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/CheckboxField.tsx
+// src/features/system/supporting/forms/components/CheckboxField.tsx
 
 import { useDefaultFieldContext } from '../hooks/useFormContext'
 import { FieldInfo } from './FieldInfo'

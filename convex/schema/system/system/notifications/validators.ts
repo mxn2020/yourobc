@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/notifications/validators.ts
+// convex/schema/system/system/notifications/validators.ts
 // Grouped validators for notifications module
 
 import { v } from 'convex/values';

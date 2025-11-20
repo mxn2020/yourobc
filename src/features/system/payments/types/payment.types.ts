@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/types/payment.types.ts
+// src/features/system/payments/types/payment.types.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 

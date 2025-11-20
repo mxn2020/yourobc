@@ -7,11 +7,11 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { AITestService } from '@/features/boilerplate/ai-core';
-import { auth } from '@/features/boilerplate/auth/server';
-import type { TestConfiguration, TestResult } from '@/features/boilerplate/ai-core/types';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
-import { validateTestConfiguration } from '@/features/boilerplate/ai-core/utils';
+import { AITestService } from '@/features/system/ai-core';
+import { auth } from '@/features/system/auth/server';
+import type { TestConfiguration, TestResult } from '@/features/system/ai-core/types';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
+import { validateTestConfiguration } from '@/features/system/ai-core/utils';
 import { Id } from '@/convex/_generated/dataModel';
 
 interface CompareTestRequest {

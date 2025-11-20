@@ -1,8 +1,8 @@
-// convex/schema/boilerplate/system/systemMetrics/schemas.ts
+// convex/schema/system/system/systemMetrics/schemas.ts
 // Schema exports for systemMetrics module
 
 import { systemMetricsTable } from './systemMetrics';
 
-export const boilerplateSystemSystemMetricsSchemas = {
+export const systemSystemSystemMetricsSchemas = {
   systemMetrics: systemMetricsTable,
 };

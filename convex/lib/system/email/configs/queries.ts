@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/email/configs/queries.ts
+// convex/lib/system/email/configs/queries.ts
 // Read operations for email configs module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { emailConfigsValidators } from '@/schema/boilerplate/email/configs/validators';
+import { emailConfigsValidators } from '@/schema/system/email/configs/validators';
 import { filterEmailConfigsByAccess, requireViewEmailConfigAccess } from './permissions';
 import type { EmailConfigListResponse } from './types';
 

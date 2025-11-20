@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/FormSection.tsx
+// src/features/system/supporting/forms/components/FormSection.tsx
 
 import type { FormSectionProps } from '../types'
 

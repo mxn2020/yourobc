@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/utils.ts
+// convex/lib/system/blog/blog/utils.ts
 /**
  * Blog Utility Functions
  *

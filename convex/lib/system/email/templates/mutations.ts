@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/email/templates/mutations.ts
+// convex/lib/system/email/templates/mutations.ts
 // Write operations for email templates module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, generateUniquePublicId } from '@/shared/auth.helper';
-import { emailTemplatesValidators } from '@/schema/boilerplate/email/templates/validators';
+import { emailTemplatesValidators } from '@/schema/system/email/templates/validators';
 import { EMAIL_TEMPLATES_CONSTANTS } from './constants';
 import { validateEmailTemplateData } from './utils';
 import {

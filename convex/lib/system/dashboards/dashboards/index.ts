@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/dashboards/dashboards/index.ts
+// convex/lib/system/dashboards/dashboards/index.ts
 // Public API exports for dashboards module
 
 // Constants

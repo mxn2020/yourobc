@@ -1,8 +1,8 @@
-// convex/schema/boilerplate/email/templates/schemas.ts
+// convex/schema/system/email/templates/schemas.ts
 // Schema exports for email templates module
 
 import { emailTemplatesTable } from './templates';
 
-export const boilerplateEmailTemplatesSchemas = {
+export const systemEmailTemplatesSchemas = {
   emailTemplates: emailTemplatesTable,
 };

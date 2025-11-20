@@ -1,7 +1,7 @@
 // convex/config/app/navigation.config.ts
 // ✅ APP CUSTOMIZATION FILE - SAFE TO MODIFY
 // This file is where you configure your app's addons and their navigation.
-// Changes to this file will NOT conflict with boilerplate updates.
+// Changes to this file will NOT conflict with system updates.
 
 import { Bot, Lightbulb, GitBranch, Network, Files, GraduationCap, Swords, Sparkles, BookOpenText, BarChart3, MessageCircle, Layers, Activity, Settings, FileText, BookOpen, Users, ClipboardList, TrendingUp, CalendarDays, Briefcase, Building, DollarSign, Plus, Folder, Gamepad2, Trophy } from 'lucide-react';
 import type { AddonConfig, NavigationItem } from '../types';

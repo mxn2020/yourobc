@@ -1,4 +1,4 @@
-// convex/config/boilerplate/entities/auth.entities.ts
+// convex/config/system/entities/auth.entities.ts
 // ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
 
 /**
@@ -6,8 +6,8 @@
  * These entities support user and team management
  */
 export const AUTH_ENTITY_TYPES = [
-  'boilerplate_user',
-  'boilerplate_team',
+  'system_user',
+  'system_team',
 ] as const;
 
 export type AuthEntityType = typeof AUTH_ENTITY_TYPES[number];

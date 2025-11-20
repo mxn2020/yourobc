@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/usePermissions.ts
+// src/features/system/auth/hooks/usePermissions.ts
 
 import { useMemo, useCallback } from 'react'
 import { permissionService } from '../services/PermissionService'

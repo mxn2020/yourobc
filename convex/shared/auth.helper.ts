@@ -1,7 +1,7 @@
 // convex/lib/shared/auth.helper.ts
 
 import { QueryCtx, MutationCtx } from '@/generated/server'
-import { UserProfile } from '@/schema/boilerplate'
+import { UserProfile } from '@/schema/system'
 import {
   throwAuthRequiredError,
   throwPermissionError,

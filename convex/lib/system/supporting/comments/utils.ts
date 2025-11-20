@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/utils.ts
+// convex/lib/system/supporting/comments/utils.ts
 
 /**
  * Comments Module Utilities

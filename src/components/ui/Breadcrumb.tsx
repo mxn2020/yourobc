@@ -3,7 +3,7 @@
 import { FC, Fragment } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronRight, Home } from 'lucide-react'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 
 export interface BreadcrumbItem {
   label: string

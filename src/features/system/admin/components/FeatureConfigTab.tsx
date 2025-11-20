@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/components/FeatureConfigTab.tsx
+// src/features/system/admin/components/FeatureConfigTab.tsx
 /**
  * FeatureConfigTab Component
  *

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/shared/components/PostList.tsx
+// src/features/system/blog/shared/components/PostList.tsx
 /**
  * PostList Component
  *
@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '../../../../../components/ui/Button';
 import { PostCard } from './PostCard';
 import type { PostListProps } from '../../types';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function PostList({
   posts,

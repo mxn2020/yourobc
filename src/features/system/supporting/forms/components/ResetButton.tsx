@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/ResetButton.tsx
+// src/features/system/supporting/forms/components/ResetButton.tsx
 
 import { useDefaultFormContext } from '../hooks/useFormContext'
 import type { ResetButtonProps } from '../types'

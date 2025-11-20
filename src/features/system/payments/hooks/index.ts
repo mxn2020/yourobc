@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/hooks/index.ts
+// src/features/system/payments/hooks/index.ts
 export * from './usePayments'
 export * from './useSubscription'
 export * from './useFeatureAccess'

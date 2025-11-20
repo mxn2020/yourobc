@@ -23,7 +23,7 @@ export const vUserRole = () =>
 
 /**
  * Setting Category Validator
- * Matches SettingCategory type from convex/lib/boilerplate/app_settings/types.ts
+ * Matches SettingCategory type from convex/lib/system/app_settings/types.ts
  */
 export const vSettingCategory = () =>
   v.union(
@@ -66,7 +66,7 @@ export const vTheme = () =>
 
 /**
  * Preferred View Validator
- * Matches schema definition in convex/schema/boilerplate/user_settings.ts
+ * Matches schema definition in convex/schema/system/user_settings.ts
  */
 export const vPreferredView = () =>
   v.union(
@@ -76,7 +76,7 @@ export const vPreferredView = () =>
 
 /**
  * Stripe Connect Event Type Validator
- * Matches eventType union in convex/schema/boilerplate/stripe_connect.ts
+ * Matches eventType union in convex/schema/system/stripe_connect.ts
  */
 export const vStripeEventType = () =>
   v.union(

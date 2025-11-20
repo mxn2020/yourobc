@@ -1,6 +1,6 @@
 // src/features/ai-logging/components/Export/ExportService.tsx
 import { useCallback } from 'react';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 import type { ExportOptions, FormattedExportLog } from '../../types/log.types';
 import { formatLogForExport } from '../../utils/log-formatters';
 

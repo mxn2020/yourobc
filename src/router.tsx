@@ -6,7 +6,7 @@ import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
 import { NotFound } from './components/NotFound'
 import { QueryClient, notifyManager } from '@tanstack/react-query'
 import { ConvexQueryClient } from '@convex-dev/react-query'
-import type { Locale } from '@/features/boilerplate/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 if (typeof document !== 'undefined') {
   notifyManager.setScheduler(window.requestAnimationFrame)

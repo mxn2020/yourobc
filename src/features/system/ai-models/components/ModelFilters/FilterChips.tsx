@@ -1,7 +1,7 @@
 // src/features/ai-models/components/ModelFilters/FilterChips.tsx
 import React from 'react';
 import { Chip } from '@/components/ui';
-import type { ModelFilter } from '@/features/boilerplate/ai-core/types';
+import type { ModelFilter } from '@/features/system/ai-core/types';
 
 interface FilterChipsProps {
   filters: ModelFilter;

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/scheduling/components/EventCard.tsx
+// src/features/system/supporting/scheduling/components/EventCard.tsx
 
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';

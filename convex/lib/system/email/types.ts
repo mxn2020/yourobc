@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/types.ts
+// convex/lib/system/email/types.ts
 // convex/lib/email/types.ts
 
 import type { Doc, Id } from '@/generated/dataModel'

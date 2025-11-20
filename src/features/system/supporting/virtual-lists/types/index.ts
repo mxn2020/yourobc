@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/types/index.ts
+// src/features/system/supporting/virtual-lists/types/index.ts
 
 import type { VirtualizerOptions } from '@tanstack/react-virtual'
 

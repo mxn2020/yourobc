@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Badge, Button, Card, CardContent, CardHeader } from '@/components/ui';
 import { Copy, Check, Settings } from 'lucide-react';
 import { formatLogMetrics } from '../../utils/log-formatters';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 
 interface ResponseDetailsProps {
   log: AIUsageLog;

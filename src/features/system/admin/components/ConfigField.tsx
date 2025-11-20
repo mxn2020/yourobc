@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/components/ConfigField.tsx
+// src/features/system/admin/components/ConfigField.tsx
 /**
  * ConfigField Component
  *

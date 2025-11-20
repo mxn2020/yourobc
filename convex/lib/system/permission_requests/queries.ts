@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/permission_requests/queries.ts
+// convex/lib/system/permission_requests/queries.ts
 
 import { v } from 'convex/values'
 import { query } from '@/generated/server'

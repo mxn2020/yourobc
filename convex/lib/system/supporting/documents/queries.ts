@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/queries.ts
+// convex/lib/system/supporting/documents/queries.ts
 
 /**
  * Documents Module Queries

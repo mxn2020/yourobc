@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/components/TetrisBoard.tsx
+// src/features/system/tetris/components/TetrisBoard.tsx
 
 import { useMemo } from 'react';
 import { TETROMINOS, PIECE_COLORS, getGhostPiece, BOARD_HEIGHT, PREVIEW_HEIGHT } from '../utils/tetrisEngine';

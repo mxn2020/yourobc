@@ -9,7 +9,7 @@
  *   tsx scripts/validate-translations.ts
  */
 
-import { runValidation } from '../src/features/boilerplate/i18n/utils/validateTranslations'
+import { runValidation } from '../src/features/system/i18n/utils/validateTranslations'
 
 runValidation().catch(error => {
   console.error('Validation failed with error:', error)

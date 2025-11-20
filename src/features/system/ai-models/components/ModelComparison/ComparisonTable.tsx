@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { DataTable } from '@/components/ui';
 import { formatModelDisplay } from '../../utils/model-formatters';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { TableColumn } from '@/types';
 
 interface ComparisonTableProps {

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/constants.ts
+// convex/lib/system/supporting/comments/constants.ts
 
 /**
  * Comments Module Constants
@@ -20,9 +20,9 @@ export const COMMENT_CONSTANTS = {
    * Entity types that can have comments (must match entityTypes.commentable)
    */
   ENTITY_TYPE: {
-    PROJECT: 'boilerplate_project',
-    TASK: 'boilerplate_task',
-    USER: 'boilerplate_user',
+    PROJECT: 'system_project',
+    TASK: 'system_task',
+    USER: 'system_user',
   },
 
   /**

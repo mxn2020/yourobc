@@ -1,7 +1,7 @@
 // src/utils/ai/format-utils.ts
-import type { ModelInfo, ModelProvider } from '@/features/boilerplate/ai-core/types';
-import type { TokenUsage } from '@/features/boilerplate/ai-core/types';
-import { PROVIDER_COLORS, COST_TIERS } from '@/features/boilerplate/ai-core/constants';
+import type { ModelInfo, ModelProvider } from '@/features/system/ai-core/types';
+import type { TokenUsage } from '@/features/system/ai-core/types';
+import { PROVIDER_COLORS, COST_TIERS } from '@/features/system/ai-core/constants';
 
 /**
  * Format latency for display

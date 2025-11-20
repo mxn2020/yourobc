@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/utils/index.ts
+// src/features/system/supporting/tables/utils/index.ts
 
 import type { ColumnDef } from '@tanstack/react-table'
 

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/notifications/permissions.ts
+// convex/lib/system/notifications/permissions.ts
 // Access control and authorization logic for notifications module
 
 import type { Doc } from '@/generated/dataModel';

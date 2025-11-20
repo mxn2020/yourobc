@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/admin-queries.ts
+// convex/lib/system/audit_logs/admin-queries.ts
 // Admin-only queries for audit logs
 
 import { query } from '@/generated/server';

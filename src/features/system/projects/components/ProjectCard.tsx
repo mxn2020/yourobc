@@ -11,8 +11,8 @@ import {
 } from "@/components/ui";
 import { useProjectActions } from "../hooks/useProjects";
 import type { Project } from "../types";
-import { useTranslation } from "@/features/boilerplate/i18n";
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { useTranslation } from "@/features/system/i18n";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 import * as projectHelpers from "../utils/projectHelpers";
 
 interface ProjectCardProps {

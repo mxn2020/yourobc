@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/comments/components/CommentForm.tsx
+// src/features/system/supporting/comments/components/CommentForm.tsx
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';

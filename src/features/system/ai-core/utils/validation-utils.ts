@@ -1,9 +1,9 @@
 // src/utils/ai/validation-utils.ts
-import type { ModelInfo, ModelProvider } from '@/features/boilerplate/ai-core/types';
-import type { AIOperationType, AIParameters, ValidationResult } from '@/features/boilerplate/ai-core/types';
-import { PROVIDER_CONFIGS } from '@/features/boilerplate/ai-core/constants';
-import { TestConfiguration } from '@/features/boilerplate/ai-core/types';
-import { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelProvider } from '@/features/system/ai-core/types';
+import type { AIOperationType, AIParameters, ValidationResult } from '@/features/system/ai-core/types';
+import { PROVIDER_CONFIGS } from '@/features/system/ai-core/constants';
+import { TestConfiguration } from '@/features/system/ai-core/types';
+import { AIUsageFilter } from '@/features/system/ai-core/types';
 import { LanguageModelV2FinishReason } from '@ai-sdk/provider';
 import { getProviderFromModelId } from './model-utils';
 import { Id } from '@/convex/_generated/dataModel'

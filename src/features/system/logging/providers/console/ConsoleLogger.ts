@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/providers/console/ConsoleLogger.ts
+// src/features/system/logging/providers/console/ConsoleLogger.ts
 
 import {
   LoggerProvider,

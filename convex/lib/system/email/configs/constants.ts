@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/configs/constants.ts
+// convex/lib/system/email/configs/constants.ts
 // Business constants, permissions, and limits for email configs module
 
 export const EMAIL_CONFIGS_CONSTANTS = {

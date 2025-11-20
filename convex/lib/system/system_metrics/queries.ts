@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/queries.ts
+// convex/lib/system/system_metrics/queries.ts
 
 import { query } from '@/generated/server'
 import { v } from 'convex/values'

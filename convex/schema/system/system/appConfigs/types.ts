@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/appConfigs/types.ts
+// convex/schema/system/system/appConfigs/types.ts
 // Type extractions from validators for appConfigs module
 
 import { Infer } from 'convex/values';

@@ -1,9 +1,9 @@
-// filepath: src/features/boilerplate/admin/types/admin.types.ts
+// filepath: src/features/system/admin/types/admin.types.ts
 import type { Id } from '@/convex/_generated/dataModel'
 import { EntityType } from '@/convex/types'
-import { UserProfile, UserRole, AuthUserId, UserProfileId } from '@/features/boilerplate/auth/types/auth.types'
+import { UserProfile, UserRole, AuthUserId, UserProfileId } from '@/features/system/auth/types/auth.types'
 import { LucideIcon } from 'lucide-react'
-import type { SettingCategory } from '@/convex/lib/boilerplate/app_settings/types'
+import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
 
 // === Admin Component Types ===
 export interface AdminLayoutProps {

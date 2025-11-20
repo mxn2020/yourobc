@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/mutations.ts
+// convex/lib/system/supporting/scheduling/mutations.ts
 
 import { v } from 'convex/values';
 import { mutation, internalMutation } from '@/generated/server';

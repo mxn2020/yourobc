@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/permission_requests/permissions.ts
+// convex/lib/system/permission_requests/permissions.ts
 // Access control and authorization logic for permissionRequests module
 
 import type { Doc } from '@/generated/dataModel';

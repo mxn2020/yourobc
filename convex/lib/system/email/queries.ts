@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/queries.ts
+// convex/lib/system/email/queries.ts
 
 import { v } from 'convex/values';
 import { query } from '@/generated/server';

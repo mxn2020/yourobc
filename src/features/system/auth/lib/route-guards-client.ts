@@ -1,7 +1,7 @@
-// src/features/boilerplate/lib/route-guards-client.ts
+// src/features/system/lib/route-guards-client.ts
 import { redirect } from '@tanstack/react-router'
 import { authService } from '../services/AuthService'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 
 // === Client-side Guards ===
 

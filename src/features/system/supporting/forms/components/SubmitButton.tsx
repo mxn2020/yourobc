@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/SubmitButton.tsx
+// src/features/system/supporting/forms/components/SubmitButton.tsx
 
 import { useDefaultFormContext } from '../hooks/useFormContext'
 import type { SubmitButtonProps } from '../types'

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/FieldInfo.tsx
+// src/features/system/supporting/forms/components/FieldInfo.tsx
 
 import type { FieldApi } from '@tanstack/react-form'
 

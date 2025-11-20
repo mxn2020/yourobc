@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/components/SentryErrorBoundary.tsx
+// src/features/system/logging/components/SentryErrorBoundary.tsx
 
 import React, { Component, ReactNode, ErrorInfo } from 'react'
 import * as Sentry from '@sentry/react'

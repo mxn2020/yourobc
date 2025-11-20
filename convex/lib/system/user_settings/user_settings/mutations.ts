@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/user_settings/user_settings/mutations.ts
+// convex/lib/system/user_settings/user_settings/mutations.ts
 // Write operations for user settings module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { userSettingsValidators } from '@/schema/boilerplate/user_settings/user_settings/validators';
+import { userSettingsValidators } from '@/schema/system/user_settings/user_settings/validators';
 import {
   getDefaultUserSettings,
   validateUserSettings,

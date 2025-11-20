@@ -34,7 +34,7 @@ This module provides a complete set of table components and utilities for displa
 
 ## Installation
 
-The package is already installed as part of the boilerplate:
+The package is already installed as part of the system:
 
 ```bash
 pnpm install @tanstack/react-table
@@ -47,7 +47,7 @@ pnpm install @tanstack/react-table
 Simple table for displaying data:
 
 ```tsx
-import { BasicTable } from '@/features/boilerplate/supporting'
+import { BasicTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name' },
@@ -72,7 +72,7 @@ function UserList() {
 Table with all features:
 
 ```tsx
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 import type { ColumnDef } from '@tanstack/react-table'
 
 interface User {
@@ -188,7 +188,7 @@ Full-featured table with all capabilities enabled through props.
 Pre-configured table with sorting enabled.
 
 ```tsx
-import { SortableTable } from '@/features/boilerplate/supporting'
+import { SortableTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name', enableSorting: true },
@@ -215,7 +215,7 @@ const columns = [
 Pre-configured table with filtering and search.
 
 ```tsx
-import { FilterableTable } from '@/features/boilerplate/supporting'
+import { FilterableTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name', enableColumnFilter: true },
@@ -242,7 +242,7 @@ const columns = [
 Pre-configured table with pagination controls.
 
 ```tsx
-import { PaginatedTable } from '@/features/boilerplate/supporting'
+import { PaginatedTable } from '@/features/system/supporting'
 
 const columns = [
   { accessorKey: 'name', header: 'Name' },
@@ -272,7 +272,7 @@ const columns = [
 Manages all table state in one place.
 
 ```tsx
-import { useTableState } from '@/features/boilerplate/supporting'
+import { useTableState } from '@/features/system/supporting'
 
 function MyTable() {
   const tableState = useTableState({
@@ -311,7 +311,7 @@ function MyTable() {
 Automatically generate columns from data:
 
 ```tsx
-import { generateColumnsFromData } from '@/features/boilerplate/supporting'
+import { generateColumnsFromData } from '@/features/system/supporting'
 
 const data = [
   { id: 1, name: 'John', email: 'john@example.com' },
@@ -332,7 +332,7 @@ const columns = generateColumnsFromData(data, {
 Better type inference for columns:
 
 ```tsx
-import { createColumnHelper } from '@/features/boilerplate/supporting'
+import { createColumnHelper } from '@/features/system/supporting'
 
 const columnHelper = createColumnHelper<User>()
 
@@ -353,7 +353,7 @@ const columns = [
 Export table data to CSV:
 
 ```tsx
-import { exportToCSV } from '@/features/boilerplate/supporting'
+import { exportToCSV } from '@/features/system/supporting'
 
 function ExportButton({ data }) {
   return (
@@ -372,7 +372,7 @@ import {
   getOptimalPageSize,
   shouldUsePagination,
   getPageSizeOptions,
-} from '@/features/boilerplate/supporting'
+} from '@/features/system/supporting'
 
 // Check if pagination is needed
 if (shouldUsePagination(data.length)) {
@@ -397,7 +397,7 @@ Pre-configured settings for common use cases.
 ### Available Presets
 
 ```tsx
-import { tablePresets, getPreset, extendPreset } from '@/features/boilerplate/supporting'
+import { tablePresets, getPreset, extendPreset } from '@/features/system/supporting'
 
 // Use a preset directly
 const config = tablePresets.auditLog
@@ -430,7 +430,7 @@ const customConfig = extendPreset('auditLog', {
 Get automatic recommendations:
 
 ```tsx
-import { presetRecommendations } from '@/features/boilerplate/supporting'
+import { presetRecommendations } from '@/features/system/supporting'
 
 const recommended = presetRecommendations.getRecommendation({
   rowCount: 1000,
@@ -446,7 +446,7 @@ const recommended = presetRecommendations.getRecommendation({
 Each preset includes example code:
 
 ```tsx
-import { presetExamples } from '@/features/boilerplate/supporting'
+import { presetExamples } from '@/features/system/supporting'
 
 console.log(presetExamples.dataGrid)
 // Outputs complete component code
@@ -457,7 +457,7 @@ console.log(presetExamples.dataGrid)
 ### Server-Side Pagination
 
 ```tsx
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
@@ -522,7 +522,7 @@ const columns: ColumnDef<User>[] = [
 ### Row Selection
 
 ```tsx
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 import { useState } from 'react'
 
 function SelectableTable() {
@@ -589,7 +589,7 @@ function SelectableTable() {
 Full type safety with TypeScript:
 
 ```tsx
-import { DataTable, type ColumnDef } from '@/features/boilerplate/supporting'
+import { DataTable, type ColumnDef } from '@/features/system/supporting'
 
 interface Product {
   id: number
@@ -645,7 +645,7 @@ function ProductTable() {
 ### Audit Log Table
 
 ```tsx
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 
 const columns: ColumnDef<AuditLog>[] = [
   { accessorKey: 'timestamp', header: 'Timestamp', enableSorting: true },
@@ -669,7 +669,7 @@ const columns: ColumnDef<AuditLog>[] = [
 ### User Management Table
 
 ```tsx
-import { DataTable } from '@/features/boilerplate/supporting'
+import { DataTable } from '@/features/system/supporting'
 
 const columns: ColumnDef<User>[] = [
   { id: 'select', /* checkbox column */ },

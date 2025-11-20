@@ -1,8 +1,8 @@
 // src/features/ai-testing/services/TestValidator.ts
-import type { ValidationResult } from '@/features/boilerplate/ai-core/types';
-import type { TestConfiguration } from '@/features/boilerplate/ai-core/types';
+import type { ValidationResult } from '@/features/system/ai-core/types';
+import type { TestConfiguration } from '@/features/system/ai-core/types';
 import type { TestFormData } from '../types/test.types';
-import { validateTestConfiguration } from '@/features/boilerplate/ai-core/utils';
+import { validateTestConfiguration } from '@/features/system/ai-core/utils';
 import { validateTestForm } from '../utils/test-validators';
 
 export class TestValidator {

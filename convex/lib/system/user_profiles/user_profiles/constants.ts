@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/constants.ts
+// convex/lib/system/user_profiles/user_profiles/constants.ts
 // Business constants, permissions, and limits for user_profiles module
 
 export const USER_PROFILES_CONSTANTS = {

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/handlers/types.ts
+// convex/lib/system/supporting/scheduling/handlers/types.ts
 
 import type { MutationCtx, QueryCtx } from '@/generated/server';
 import type { Id } from '@/generated/dataModel';

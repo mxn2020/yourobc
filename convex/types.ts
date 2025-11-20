@@ -45,7 +45,7 @@ export type NotificationType = 'assignment' | 'completion' | 'invite' | 'achieve
  * - Add your app/addon entities there to avoid merge conflicts
  *
  * The configuration system merges:
- * - Boilerplate entities (from convex/config/boilerplate/entities.config.ts)
+ * - System entities (from convex/config/system/entities.config.ts)
  * - Your app entities (from convex/config/app/entities.config.ts)
  */
 export {

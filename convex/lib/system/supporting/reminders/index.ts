@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/index.ts
+// convex/lib/system/supporting/reminders/index.ts
 
 /**
  * Reminders Module
@@ -13,7 +13,7 @@
  * - Completion tracking with notes
  * - Soft delete support
  *
- * @module convex/lib/boilerplate/supporting/reminders
+ * @module convex/lib/system/supporting/reminders
  */
 
 // Export constants

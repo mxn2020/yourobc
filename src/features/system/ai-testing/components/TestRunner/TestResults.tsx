@@ -4,9 +4,9 @@ import { CheckCircle, XCircle, Clock, Zap, DollarSign, Copy, Check } from 'lucid
 import { Card, CardHeader, CardContent } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
 import { formatTestResult, formatValidationScore } from '../../utils/test-formatters';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 interface TestResultsProps {
   result: TestResult;

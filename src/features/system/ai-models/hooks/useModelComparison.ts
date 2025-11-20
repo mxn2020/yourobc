@@ -1,7 +1,7 @@
 // src/features/ai-models/hooks/useModelComparison.ts
 import { useState, useCallback, useMemo } from 'react';
-import { compareModels } from '@/features/boilerplate/ai-core/utils';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import { compareModels } from '@/features/system/ai-core/utils';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 export function useModelComparison() {
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);

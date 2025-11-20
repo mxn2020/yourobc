@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/handlers/index.ts
+// convex/lib/system/supporting/scheduling/handlers/index.ts
 
 /**
  * Scheduling Handlers

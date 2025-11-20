@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/README.md
+// src/features/system/i18n/README.md
 
 # Internationalization (i18n) System
 
@@ -19,7 +19,7 @@ Comprehensive internationalization system with configurable locale support, auto
 
 ### As Shipped (Localized URLs)
 
-The boilerplate comes with i18n enabled by default:
+The system comes with i18n enabled by default:
 
 - Routes are in `src/routes/$locale/`
 - URLs include locale: `/en/dashboard`, `/de/projects`, `/es/blog`
@@ -403,7 +403,7 @@ The configuration doesn't change file-based routing. You need to physically move
 
 ### Can I have both /dashboard and /en/dashboard?
 
-No, with TanStack Router's file-based routing, you must choose one structure. This boilerplate uses `/$locale/dashboard` by default.
+No, with TanStack Router's file-based routing, you must choose one structure. This system uses `/$locale/dashboard` by default.
 
 ### What if I only want one language but keep the architecture?
 
@@ -411,4 +411,4 @@ Set `VITE_I18N_ENABLED_LOCALES=en` and `VITE_I18N_SHOW_LANGUAGE_SWITCHER=false`.
 
 ## License
 
-Part of Geenius Boilerplate - see root LICENSE file.
+Part of Geenius System - see root LICENSE file.

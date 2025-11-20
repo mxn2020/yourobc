@@ -1,7 +1,7 @@
 // convex/config/app/email.config.ts
 // ✅ APP CUSTOMIZATION FILE - SAFE TO MODIFY
 // This file is where you configure your app's email settings.
-// Changes to this file will NOT conflict with boilerplate updates.
+// Changes to this file will NOT conflict with system updates.
 
 import type { EmailConfig } from '../types';
 
@@ -61,7 +61,7 @@ export const EMAIL_CONFIG: EmailConfig = {
  *
  * TESTING
  * Test your email configuration using the admin panel:
- * /admin/email-test (if available in your boilerplate)
+ * /admin/email-test (if available in your system)
  */
 
 /**

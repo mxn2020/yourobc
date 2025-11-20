@@ -1,8 +1,8 @@
 // src/routes/_protected/audit-logs/$logId.tsx
 import { createFileRoute } from '@tanstack/react-router';
-import { AuditLogDetailPage } from '@/features/boilerplate/audit-logs/pages/AuditLogDetailPage';
+import { AuditLogDetailPage } from '@/features/system/audit-logs/pages/AuditLogDetailPage';
 import { Loading } from '@/components/ui';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { defaultLocale } from '@/features/system/i18n';
 import { createI18nSeo } from '@/utils/seo';
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId')({

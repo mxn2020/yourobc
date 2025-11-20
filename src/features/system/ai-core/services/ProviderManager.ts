@@ -17,8 +17,8 @@ import type {
 } from '../types/ai-core.types';
 import type { ModelProvider } from '../types/ai-models.types';
 import { PROVIDER_CONFIGS } from '../constants/ai-providers';
-import { extractProvider } from '@/features/boilerplate/ai-core/utils';
-import { formatErrorMessage } from '@/features/boilerplate/ai-core/utils';
+import { extractProvider } from '@/features/system/ai-core/utils';
+import { formatErrorMessage } from '@/features/system/ai-core/utils';
 import { ResponseFormatter } from '../utils/response-formatter';
 import { ErrorHandler } from '../utils/error-handler';
 

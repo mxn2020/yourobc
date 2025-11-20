@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/mutations.ts
+// convex/lib/system/supporting/reminders/mutations.ts
 
 /**
  * Reminders Module Mutations

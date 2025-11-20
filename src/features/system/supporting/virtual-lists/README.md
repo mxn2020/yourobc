@@ -45,7 +45,7 @@ Virtual lists only render the items currently visible in the viewport, dramatica
 
 ## Installation
 
-The package is already installed as part of the boilerplate:
+The package is already installed as part of the system:
 
 ```bash
 pnpm install @tanstack/react-virtual
@@ -58,7 +58,7 @@ pnpm install @tanstack/react-virtual
 A virtualized list component with fixed item heights.
 
 ```tsx
-import { VirtualList } from '@/features/boilerplate/supporting'
+import { VirtualList } from '@/features/system/supporting'
 
 function MyList() {
   const items = Array.from({ length: 10000 }, (_, i) => ({ id: i, name: `Item ${i}` }))
@@ -95,7 +95,7 @@ function MyList() {
 A virtualized list with dynamic item heights (uses ResizeObserver).
 
 ```tsx
-import { VirtualListDynamic } from '@/features/boilerplate/supporting'
+import { VirtualListDynamic } from '@/features/system/supporting'
 
 function MyDynamicList() {
   const items = Array.from({ length: 1000 }, (_, i) => ({
@@ -123,7 +123,7 @@ function MyDynamicList() {
 A virtualized table component for rendering large datasets.
 
 ```tsx
-import { VirtualTable } from '@/features/boilerplate/supporting'
+import { VirtualTable } from '@/features/system/supporting'
 
 function MyTable() {
   const data = Array.from({ length: 10000 }, (_, i) => ({
@@ -184,7 +184,7 @@ function MyTable() {
 A custom hook for creating virtualizers with common configurations.
 
 ```tsx
-import { useVirtualScroll } from '@/features/boilerplate/supporting'
+import { useVirtualScroll } from '@/features/system/supporting'
 
 function MyComponent() {
   const items = Array.from({ length: 1000 }, (_, i) => ({ id: i }))
@@ -237,7 +237,7 @@ function MyComponent() {
 Hook for implementing infinite scroll on window or element.
 
 ```tsx
-import { useInfiniteScroll } from '@/features/boilerplate/supporting'
+import { useInfiniteScroll } from '@/features/system/supporting'
 
 function MyInfiniteList() {
   const [items, setItems] = useState(initialItems)
@@ -274,7 +274,7 @@ import {
   getEstimatedSize,
   getOptimalOverscan,
   shouldUseVirtualization
-} from '@/features/boilerplate/supporting'
+} from '@/features/system/supporting'
 
 // Check if virtualization is needed
 if (shouldUseVirtualization(items.length, 50)) {
@@ -306,7 +306,7 @@ console.log(`Performance: ${metrics.performanceRatio}x faster`)
 ### Example 1: Audit Logs Table
 
 ```tsx
-import { VirtualTable } from '@/features/boilerplate/supporting'
+import { VirtualTable } from '@/features/system/supporting'
 
 function AuditLogsPage() {
   const { data: logs } = useQuery({ queryKey: ['audit-logs'] })
@@ -350,7 +350,7 @@ function AuditLogsPage() {
 ### Example 2: AI Logs List
 
 ```tsx
-import { VirtualList } from '@/features/boilerplate/supporting'
+import { VirtualList } from '@/features/system/supporting'
 
 function AILogsPage() {
   const { data: logs } = useQuery({ queryKey: ['ai-logs'] })
@@ -380,7 +380,7 @@ function AILogsPage() {
 ### Example 3: Notifications with Infinite Scroll
 
 ```tsx
-import { VirtualList } from '@/features/boilerplate/supporting'
+import { VirtualList } from '@/features/system/supporting'
 
 function NotificationsList() {
   const [page, setPage] = useState(1)
@@ -498,7 +498,7 @@ const renderItem = useCallback((item) => {
 Grid layout with rows and columns for uniform content.
 
 ```tsx
-import { VirtualGrid } from '@/features/boilerplate/supporting'
+import { VirtualGrid } from '@/features/system/supporting'
 
 <VirtualGrid
   items={products}
@@ -517,7 +517,7 @@ import { VirtualGrid } from '@/features/boilerplate/supporting'
 Pinterest-style masonry layout with multiple lanes.
 
 ```tsx
-import { VirtualMasonry } from '@/features/boilerplate/supporting'
+import { VirtualMasonry } from '@/features/system/supporting'
 
 <VirtualMasonry
   items={images}
@@ -537,7 +537,7 @@ import { VirtualMasonry } from '@/features/boilerplate/supporting'
 Lists with sticky headers that remain visible while scrolling.
 
 ```tsx
-import { VirtualListSticky } from '@/features/boilerplate/supporting'
+import { VirtualListSticky } from '@/features/system/supporting'
 
 <VirtualListSticky
   items={contacts}
@@ -559,7 +559,7 @@ import { VirtualListSticky } from '@/features/boilerplate/supporting'
 Uses browser window for scrolling (full-page virtualization).
 
 ```tsx
-import { VirtualWindowList } from '@/features/boilerplate/supporting'
+import { VirtualWindowList } from '@/features/system/supporting'
 
 <VirtualWindowList
   items={posts}
@@ -576,7 +576,7 @@ import { VirtualWindowList } from '@/features/boilerplate/supporting'
 Table with built-in sorting functionality.
 
 ```tsx
-import { VirtualTableSortable } from '@/features/boilerplate/supporting'
+import { VirtualTableSortable } from '@/features/system/supporting'
 
 <VirtualTableSortable
   data={users}
@@ -603,7 +603,7 @@ import { VirtualTableSortable } from '@/features/boilerplate/supporting'
 Hook for implementing sticky items in virtualized lists.
 
 ```tsx
-import { useVirtualSticky } from '@/features/boilerplate/supporting'
+import { useVirtualSticky } from '@/features/system/supporting'
 
 const { virtualizer, isSticky, isActiveSticky } = useVirtualSticky({
   count: items.length,
@@ -618,7 +618,7 @@ const { virtualizer, isSticky, isActiveSticky } = useVirtualSticky({
 Hook for masonry layout virtualization.
 
 ```tsx
-import { useVirtualMasonry } from '@/features/boilerplate/supporting'
+import { useVirtualMasonry } from '@/features/system/supporting'
 
 const virtualizer = useVirtualMasonry({
   count: items.length,
@@ -633,7 +633,7 @@ const virtualizer = useVirtualMasonry({
 Hook for grid layout virtualization.
 
 ```tsx
-import { useVirtualGrid } from '@/features/boilerplate/supporting'
+import { useVirtualGrid } from '@/features/system/supporting'
 
 const { virtualizer, getItemsForRow } = useVirtualGrid({
   count: items.length,
@@ -648,7 +648,7 @@ const { virtualizer, getItemsForRow } = useVirtualGrid({
 Hook for smooth scroll animations.
 
 ```tsx
-import { useVirtualSmoothScroll, easingFunctions } from '@/features/boilerplate/supporting'
+import { useVirtualSmoothScroll, easingFunctions } from '@/features/system/supporting'
 
 const scrollToFn = useVirtualSmoothScroll({
   duration: 1000,
@@ -676,7 +676,7 @@ Pre-configured settings for common use cases.
 ### Available Presets
 
 ```tsx
-import { virtualPresets, getPreset, extendPreset } from '@/features/boilerplate/supporting'
+import { virtualPresets, getPreset, extendPreset } from '@/features/system/supporting'
 
 // Use a preset directly
 const config = virtualPresets.auditLogs
@@ -709,7 +709,7 @@ const customConfig = extendPreset('auditLogs', {
 Get automatic recommendations based on data characteristics:
 
 ```tsx
-import { presetRecommendations } from '@/features/boilerplate/supporting'
+import { presetRecommendations } from '@/features/system/supporting'
 
 const recommended = presetRecommendations.getRecommendation({
   hasVariableHeight: true,
@@ -725,7 +725,7 @@ const recommended = presetRecommendations.getRecommendation({
 Each preset includes ready-to-use code examples:
 
 ```tsx
-import { presetExamples } from '@/features/boilerplate/supporting'
+import { presetExamples } from '@/features/system/supporting'
 
 console.log(presetExamples.imageGallery)
 // Outputs complete component code
@@ -738,7 +738,7 @@ console.log(presetExamples.imageGallery)
 Interactive demo of all patterns:
 
 ```tsx
-import { PatternShowcase } from '@/features/boilerplate/supporting'
+import { PatternShowcase } from '@/features/system/supporting'
 
 function DemoPage() {
   return <PatternShowcase />
@@ -753,17 +753,17 @@ function DemoPage() {
 
 **Simple:** Use pattern components
 ```tsx
-import { VirtualGrid } from '@/features/boilerplate/supporting'
+import { VirtualGrid } from '@/features/system/supporting'
 ```
 
 **Flexible:** Use composable hooks
 ```tsx
-import { useVirtualGrid } from '@/features/boilerplate/supporting'
+import { useVirtualGrid } from '@/features/system/supporting'
 ```
 
 **Quick:** Use presets
 ```tsx
-import { virtualPresets } from '@/features/boilerplate/supporting'
+import { virtualPresets } from '@/features/system/supporting'
 ```
 
 ### 2. Pick a Pattern

@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/server.ts - Server-side exports only
+// src/features/system/auth/server.ts - Server-side exports only
 
 // === Core Auth Server ===
 export { auth } from './lib/auth-config'

@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/dashboards/dashboards/types.ts
+// convex/schema/system/dashboards/dashboards/types.ts
 // Type extractions from validators for dashboards module
 
 import { Infer } from 'convex/values';

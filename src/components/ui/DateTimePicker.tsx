@@ -43,7 +43,7 @@ import { Calendar as CalendarIcon, X, Clock } from 'lucide-react'
 import { Calendar } from './Calendar'
 import { Popover, PopoverTrigger, PopoverContent } from './Popover'
 import type { InputSize, FormComponentProps } from './types'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 // Date/Time formatting utilities
 const formatDateTime = (date: Date, format24Hour: boolean = false): string => {

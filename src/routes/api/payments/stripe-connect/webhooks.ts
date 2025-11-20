@@ -9,7 +9,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { json } from '@tanstack/react-start'
-import { stripeConnectService } from '@/features/boilerplate/payments/providers/stripe-connect/services/StripeConnectService'
+import { stripeConnectService } from '@/features/system/payments/providers/stripe-connect/services/StripeConnectService'
 import { ConvexHttpClient } from 'convex/browser'
 import { api } from '@/convex/_generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
@@ -46,7 +46,7 @@ async function handleStripeConnectWebhook({ request }: { request: Request }) {
 
     // Log webhook event
     const eventId = await convex.mutation(
-      api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent,
+      api.lib.system.payments.stripe_connect.mutations.logConnectEvent,
       {
         eventType: 'webhook_received',
         stripeEventId: event.id,
@@ -122,7 +122,7 @@ async function handleStripeConnectWebhook({ request }: { request: Request }) {
       default: {
         console.log(`Unhandled event type: ${event.type}`)
         await convex.mutation(
-          api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed,
+          api.lib.system.payments.stripe_connect.mutations.markEventProcessed,
           {
             eventId,
           }
@@ -152,7 +152,7 @@ async function handleAccountUpdated(account: Stripe.Account, eventId: Id<'connec
   try {
     // Find connected account
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: account.id,
       }
@@ -160,18 +160,18 @@ async function handleAccountUpdated(account: Stripe.Account, eventId: Id<'connec
 
     if (connectedAccount) {
       // Sync account status
-      await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.syncAccountFromStripe, {
+      await convex.mutation(api.lib.system.payments.stripe_connect.mutations.syncAccountFromStripe, {
         accountId: connectedAccount._id,
         stripeAccountData: account,
       })
 
-      await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+      await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
         eventId,
       })
     }
   } catch (error) {
     console.error('Error handling account.updated:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -190,7 +190,7 @@ async function handlePaymentIntentSucceeded(
 
     // Find connected account
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -199,25 +199,25 @@ async function handlePaymentIntentSucceeded(
     if (!connectedAccount) return
 
     // Update payment record
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.updatePaymentByStripeId, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.updatePaymentByStripeId, {
       stripePaymentIntentId: paymentIntent.id,
       status: 'succeeded',
     })
 
     // Log success event
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.logConnectEvent, {
       connectedAccountId: connectedAccount._id,
       eventType: 'payment_succeeded',
       source: 'stripe_webhook',
       processed: true,
     })
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling payment_intent.succeeded:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -235,7 +235,7 @@ async function handlePaymentIntentFailed(
     if (!accountId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -243,24 +243,24 @@ async function handlePaymentIntentFailed(
 
     if (!connectedAccount) return
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.updatePaymentByStripeId, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.updatePaymentByStripeId, {
       stripePaymentIntentId: paymentIntent.id,
       status: 'failed',
     })
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.logConnectEvent, {
       connectedAccountId: connectedAccount._id,
       eventType: 'payment_failed',
       source: 'stripe_webhook',
       processed: true,
     })
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling payment_intent.payment_failed:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -278,7 +278,7 @@ async function handleChargeSucceeded(
     if (!accountId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -288,18 +288,18 @@ async function handleChargeSucceeded(
 
     // Try to find payment by payment intent
     if (charge.payment_intent && typeof charge.payment_intent === 'string') {
-      await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.updatePaymentByStripeId, {
+      await convex.mutation(api.lib.system.payments.stripe_connect.mutations.updatePaymentByStripeId, {
         stripePaymentIntentId: charge.payment_intent,
         stripeChargeId: charge.id,
       })
     }
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling charge.succeeded:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -317,7 +317,7 @@ async function handleChargeRefunded(
     if (!accountId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -327,19 +327,19 @@ async function handleChargeRefunded(
 
     if (charge.payment_intent && typeof charge.payment_intent === 'string') {
       const payment = await convex.query(
-        api.lib.boilerplate.payments.stripe_connect.queries.getPaymentByStripeId,
+        api.lib.system.payments.stripe_connect.queries.getPaymentByStripeId,
         {
           stripePaymentIntentId: charge.payment_intent,
         }
       )
 
       if (payment) {
-        await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markPaymentRefunded, {
+        await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markPaymentRefunded, {
           paymentId: payment._id,
           refund_amount: charge.amount_refunded,
         })
 
-        await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent, {
+        await convex.mutation(api.lib.system.payments.stripe_connect.mutations.logConnectEvent, {
           connectedAccountId: connectedAccount._id,
           paymentId: payment._id,
           eventType: 'refund_created',
@@ -349,12 +349,12 @@ async function handleChargeRefunded(
       }
     }
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling charge.refunded:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -378,7 +378,7 @@ async function handleInvoicePaymentSucceeded(
     if (!subscriptionId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -390,12 +390,12 @@ async function handleInvoicePaymentSucceeded(
     // You might want to create a new payment record for each invoice
     // Or update the subscription payment record
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling invoice.payment_succeeded:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -444,7 +444,7 @@ async function handleSubscriptionUpdated(
     if (!accountId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -453,7 +453,7 @@ async function handleSubscriptionUpdated(
     if (!connectedAccount) return
 
     const payments = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getPaymentsByAccount,
+      api.lib.system.payments.stripe_connect.queries.getPaymentsByAccount,
       {
         connectedAccountId: connectedAccount._id,
       }
@@ -476,7 +476,7 @@ async function handleSubscriptionUpdated(
       }
 
       await convex.mutation(
-        api.lib.boilerplate.payments.stripe_connect.mutations.updateSubscriptionStatus,
+        api.lib.system.payments.stripe_connect.mutations.updateSubscriptionStatus,
         {
           paymentId: payment._id,
           subscription_status: mapStripeSubscriptionStatus(subscription.status),
@@ -485,12 +485,12 @@ async function handleSubscriptionUpdated(
       )
     }
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling subscription updated:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })
@@ -508,7 +508,7 @@ async function handleSubscriptionDeleted(
     if (!accountId) return
 
     const connectedAccount = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByStripeId,
+      api.lib.system.payments.stripe_connect.queries.getConnectedAccountByStripeId,
       {
         stripeAccountId: accountId,
       }
@@ -517,7 +517,7 @@ async function handleSubscriptionDeleted(
     if (!connectedAccount) return
 
     const payments = await convex.query(
-      api.lib.boilerplate.payments.stripe_connect.queries.getPaymentsByAccount,
+      api.lib.system.payments.stripe_connect.queries.getPaymentsByAccount,
       {
         connectedAccountId: connectedAccount._id,
       }
@@ -526,12 +526,12 @@ async function handleSubscriptionDeleted(
     const payment = payments.find((p) => p.stripeSubscriptionId === subscription.id)
 
     if (payment) {
-      await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.updateSubscriptionStatus, {
+      await convex.mutation(api.lib.system.payments.stripe_connect.mutations.updateSubscriptionStatus, {
         paymentId: payment._id,
         subscription_status: 'cancelled',
       })
 
-      await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent, {
+      await convex.mutation(api.lib.system.payments.stripe_connect.mutations.logConnectEvent, {
         connectedAccountId: connectedAccount._id,
         paymentId: payment._id,
         eventType: 'subscription_cancelled',
@@ -540,12 +540,12 @@ async function handleSubscriptionDeleted(
       })
     }
 
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
     })
   } catch (error) {
     console.error('Error handling subscription.deleted:', error)
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.markEventProcessed, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.markEventProcessed, {
       eventId,
       error: (error as Error).message,
     })

@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/types/index.ts
+// src/features/system/analytics/types/index.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 import type {

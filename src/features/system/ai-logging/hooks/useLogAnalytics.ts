@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { AnalyticsService } from '../services/AnalyticsService';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
 import type { AnalyticsTimeRange } from '../types/analytics.types';
 
 const ANALYTICS_QUERY_KEY = ['ai-logs-analytics'] as const;

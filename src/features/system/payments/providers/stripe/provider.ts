@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/provider.ts
+// src/features/system/payments/providers/stripe/provider.ts
 /**
  * Stripe Standard Provider
  *

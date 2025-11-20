@@ -5,7 +5,7 @@ import { AlertCircle, RefreshCw, WifiOff, AlertTriangle, ShieldAlert } from 'luc
 import { Button } from './Button'
 import { Card, CardContent } from './Card'
 import { Alert, AlertDescription, AlertTitle } from './Alert'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export type ErrorType = 'auth' | 'permission' | 'network' | 'validation' | 'not_found' | 'unknown'
 

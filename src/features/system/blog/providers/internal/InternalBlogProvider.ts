@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/providers/internal/InternalBlogProvider.ts
+// src/features/system/blog/providers/internal/InternalBlogProvider.ts
 /**
  * Internal Blog Provider (Convex)
  *
@@ -43,7 +43,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getPosts(filters?: PostFilters): Promise<BlogPost[]> {
     const result = await this.convex.query(
-      'lib/boilerplate/blog/queries:getPosts' as unknown as FunctionReference<
+      'lib/system/blog/queries:getPosts' as unknown as FunctionReference<
         'query',
         'public',
         { status?: string; authorId?: string; categoryId?: string; tag?: string; featured?: boolean },
@@ -62,7 +62,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getPost(id: string): Promise<BlogPost | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getPost' as unknown as FunctionReference<
+      'lib/system/blog/queries:getPost' as unknown as FunctionReference<
         'query',
         'public',
         { postId: Id<'blogPosts'> },
@@ -74,7 +74,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getPostBySlug' as unknown as FunctionReference<
+      'lib/system/blog/queries:getPostBySlug' as unknown as FunctionReference<
         'query',
         'public',
         { slug: string },
@@ -86,7 +86,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async createPost(data: PostFormData, userId: Id<"userProfiles">): Promise<Id<'blogPosts'>> {
     return await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:createPost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:createPost' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -118,7 +118,7 @@ export class InternalBlogProvider implements BlogProvider {
     userId: Id<"userProfiles">
   ): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:updatePost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:updatePost' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -134,7 +134,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async deletePost(id: Id<'blogPosts'>, userId: Id<"userProfiles">): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:deletePost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:deletePost' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; postId: Id<'blogPosts'> },
@@ -149,7 +149,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async publishPost(id: Id<'blogPosts'>, userId: Id<"userProfiles">): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:publishPost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:publishPost' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; postId: Id<'blogPosts'> },
@@ -168,7 +168,7 @@ export class InternalBlogProvider implements BlogProvider {
     userId: Id<"userProfiles">
   ): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:schedulePost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:schedulePost' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; postId: Id<'blogPosts'>; scheduledFor: number },
@@ -184,7 +184,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async unpublishPost(id: Id<'blogPosts'>, userId: Id<"userProfiles">): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:unpublishPost' as unknown as FunctionReference<
+      'lib/system/blog/mutations:unpublishPost' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; postId: Id<'blogPosts'> },
@@ -205,7 +205,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getCategories(): Promise<BlogCategory[]> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getCategories' as unknown as FunctionReference<
+      'lib/system/blog/queries:getCategories' as unknown as FunctionReference<
         'query',
         'public',
         {},
@@ -217,7 +217,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getCategory(id: Id<'blogCategories'>): Promise<BlogCategory | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getCategory' as unknown as FunctionReference<
+      'lib/system/blog/queries:getCategory' as unknown as FunctionReference<
         'query',
         'public',
         { categoryId: Id<'blogCategories'> },
@@ -229,7 +229,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async createCategory(data: CategoryFormData, userId: Id<"userProfiles">): Promise<Id<'blogCategories'>> {
     return await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:createCategory' as unknown as FunctionReference<
+      'lib/system/blog/mutations:createCategory' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -257,7 +257,7 @@ export class InternalBlogProvider implements BlogProvider {
     userId: Id<"userProfiles">
   ): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:updateCategory' as unknown as FunctionReference<
+      'lib/system/blog/mutations:updateCategory' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -273,7 +273,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async deleteCategory(id: Id<'blogCategories'>, userId: Id<"userProfiles">): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:deleteCategory' as unknown as FunctionReference<
+      'lib/system/blog/mutations:deleteCategory' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; categoryId: Id<'blogCategories'> },
@@ -294,7 +294,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getTags(): Promise<BlogTag[]> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getTags' as unknown as FunctionReference<
+      'lib/system/blog/queries:getTags' as unknown as FunctionReference<
         'query',
         'public',
         {},
@@ -306,7 +306,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getTag(id: Id<'blogTags'>): Promise<BlogTag | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getTag' as unknown as FunctionReference<
+      'lib/system/blog/queries:getTag' as unknown as FunctionReference<
         'query',
         'public',
         { tagId: Id<'blogTags'> },
@@ -318,7 +318,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async createTag(data: TagFormData, userId: Id<"userProfiles">): Promise<Id<'blogTags'>> {
     return await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:createTag' as unknown as FunctionReference<
+      'lib/system/blog/mutations:createTag' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -342,7 +342,7 @@ export class InternalBlogProvider implements BlogProvider {
     userId: Id<"userProfiles">
   ): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:updateTag' as unknown as FunctionReference<
+      'lib/system/blog/mutations:updateTag' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -358,7 +358,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async deleteTag(id: Id<'blogTags'>, userId: Id<"userProfiles">): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:deleteTag' as unknown as FunctionReference<
+      'lib/system/blog/mutations:deleteTag' as unknown as FunctionReference<
         'mutation',
         'public',
         { authUserId: string; tagId: Id<'blogTags'> },
@@ -379,7 +379,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getAuthors(): Promise<BlogAuthor[]> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getAuthors' as unknown as FunctionReference<
+      'lib/system/blog/queries:getAuthors' as unknown as FunctionReference<
         'query',
         'public',
         {},
@@ -391,7 +391,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getAuthor(id: Id<'blogAuthors'>): Promise<BlogAuthor | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getAuthor' as unknown as FunctionReference<
+      'lib/system/blog/queries:getAuthor' as unknown as FunctionReference<
         'query',
         'public',
         { authorId: Id<'blogAuthors'> },
@@ -403,7 +403,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getAuthorByUserId(userId: Id<"userProfiles">): Promise<BlogAuthor | null> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getAuthorByUserId' as unknown as FunctionReference<
+      'lib/system/blog/queries:getAuthorByUserId' as unknown as FunctionReference<
         'query',
         'public',
         { userId: Id<"userProfiles"> },
@@ -415,7 +415,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async createAuthor(data: AuthorFormData, userId: Id<"userProfiles">): Promise<Id<'blogAuthors'>> {
     return await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:createAuthor' as unknown as FunctionReference<
+      'lib/system/blog/mutations:createAuthor' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -442,7 +442,7 @@ export class InternalBlogProvider implements BlogProvider {
     userId: Id<"userProfiles">
   ): Promise<void> {
     await this.convex.mutation(
-      'lib/boilerplate/blog/mutations:updateAuthor' as unknown as FunctionReference<
+      'lib/system/blog/mutations:updateAuthor' as unknown as FunctionReference<
         'mutation',
         'public',
         any,
@@ -464,7 +464,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async searchPosts(query: string, filters?: PostFilters): Promise<BlogPost[]> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:searchPosts' as unknown as FunctionReference<
+      'lib/system/blog/queries:searchPosts' as unknown as FunctionReference<
         'query',
         'public',
         { query: string; status?: string },
@@ -479,7 +479,7 @@ export class InternalBlogProvider implements BlogProvider {
 
   async getPostStatistics(authorId?: string): Promise<BlogStatistics> {
     return await this.convex.query(
-      'lib/boilerplate/blog/queries:getPostStatistics' as unknown as FunctionReference<
+      'lib/system/blog/queries:getPostStatistics' as unknown as FunctionReference<
         'query',
         'public',
         { authorId?: string },

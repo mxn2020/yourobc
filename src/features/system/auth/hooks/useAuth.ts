@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useAuth.ts
+// src/features/system/auth/hooks/useAuth.ts
 
 import { useMemo } from 'react'
 import { useAuthentication } from './useAuthentication'

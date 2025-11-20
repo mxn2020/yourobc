@@ -1,4 +1,4 @@
-// filepath: src/features/boilerplate/admin/hooks/useUserManagement.ts
+// filepath: src/features/system/admin/hooks/useUserManagement.ts
 import { useState, useCallback, useMemo } from 'react'
 import { userManagementService } from '../services/UserManagementService'
 import type {
@@ -10,7 +10,7 @@ import type {
   SetPasswordRequest,
   ListUsersOptions
 } from '../types/admin.types'
-import { useAuth, UserRole, AuthUserId, UserProfileId } from '@/features/boilerplate/auth'
+import { useAuth, UserRole, AuthUserId, UserProfileId } from '@/features/system/auth'
 
 /**
  * User management hook - handles admin operations on users

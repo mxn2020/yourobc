@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/useBlog.tsx
+// src/features/system/blog/hooks/useBlog.tsx
 /**
  * Blog Context and Hook
  *

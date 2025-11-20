@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/mutations.ts
+// convex/lib/system/supporting/comments/mutations.ts
 
 /**
  * Comments Module Mutations

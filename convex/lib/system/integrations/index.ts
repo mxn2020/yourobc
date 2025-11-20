@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/index.ts
+// convex/lib/system/integrations/index.ts
 // Central export file for integrations backend
 
 export * from './types';

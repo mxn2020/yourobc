@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/UsageIndicator.tsx
+// src/features/system/payments/shared/components/UsageIndicator.tsx
 /**
  * Generic Usage Indicator Component
  */

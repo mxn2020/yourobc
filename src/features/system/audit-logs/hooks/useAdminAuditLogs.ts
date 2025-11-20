@@ -1,6 +1,6 @@
-// src/features/boilerplate/audit-logs/hooks/useAdminAuditLogs.ts
+// src/features/system/audit-logs/hooks/useAdminAuditLogs.ts
 import { useState, useCallback, useMemo } from 'react'
-import { useAuthenticatedUser } from '@/features/boilerplate/auth'
+import { useAuthenticatedUser } from '@/features/system/auth'
 import { auditLogsAdminService } from '../services/AuditLogsAdminService'
 import { auditLogsService } from '../services/AuditLogsService'
 import type {

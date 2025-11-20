@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/utils/validateTranslations.ts
+// src/features/system/i18n/utils/validateTranslations.ts
 
 /**
  * Translation Validation Utility

@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/utils/constants.ts
+// src/features/system/tetris/utils/constants.ts
 
 export const TETRIS_CONSTANTS = {
   // Game Configuration

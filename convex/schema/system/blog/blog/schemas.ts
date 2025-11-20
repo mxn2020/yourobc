@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/blog/blog/schemas.ts
+// convex/schema/system/blog/blog/schemas.ts
 // Schema exports for blog module
 
 import {

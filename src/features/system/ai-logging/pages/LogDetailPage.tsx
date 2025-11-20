@@ -13,13 +13,13 @@ import { MetricsDetails } from '../components/LogDetails/MetricsDetails';
 import { useAILog, useDeleteLog } from '../hooks/useAILogs';
 import { useLogExport } from '../hooks/useLogExport';
 import { formatLogForDisplay } from '../utils/log-formatters';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
-import { useToast } from '@/features/boilerplate/notifications';
+import { getProviderColor } from '@/features/system/ai-core/utils';
+import { useToast } from '@/features/system/notifications';
 import { parseConvexError } from '@/utils/errorHandling';
 
 export function LogDetailPage() {
   const toast = useToast();
-  const { logId } = useParams({ from: '/{-$locale}/_protected/_boilerplate/ai-logs/$logId' });
+  const { logId } = useParams({ from: '/{-$locale}/_protected/_system/ai-logs/$logId' });
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedField, setCopiedField] = useState<string | null>(null);

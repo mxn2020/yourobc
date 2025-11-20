@@ -10,7 +10,7 @@ import type { AuditLogEntry, AuditLogFilters, AdminAction } from '../types/admin
 import { TableColumn } from '@/types'
 import { EntityType } from '@/convex/types'
 import type { BadgeVariant } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 // Helper function for type-safe property access
 function getAuditLogProperty(log: AuditLogEntry, key: string): string | number | AdminAction | EntityType | Record<string, string | number | boolean> | undefined {

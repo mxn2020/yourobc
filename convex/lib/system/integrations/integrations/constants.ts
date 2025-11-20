@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/constants.ts
+// convex/lib/system/integrations/integrations/constants.ts
 // Business constants, permissions, and limits for integrations module
 
 /**

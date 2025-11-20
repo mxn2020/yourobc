@@ -13,14 +13,14 @@ A comprehensive performance monitoring solution for tracking SSR cache hit rates
 
 ## Installation
 
-The performance monitoring addon is already integrated into the boilerplate. No additional installation required.
+The performance monitoring addon is already integrated into the system. No additional installation required.
 
 ## Quick Start
 
 ### 1. Basic Usage
 
 ```typescript
-import { PerformanceMonitor } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceMonitor } from '@/features/system/performance-monitoring'
 
 // Track a cache hit
 PerformanceMonitor.trackCacheHit({
@@ -49,7 +49,7 @@ try {
 ### 2. React Hook
 
 ```typescript
-import { usePerformanceMetrics } from '@/features/boilerplate/performance-monitoring'
+import { usePerformanceMetrics } from '@/features/system/performance-monitoring'
 
 function MyComponent() {
   const { metrics, isLoading, refresh } = usePerformanceMetrics({
@@ -72,7 +72,7 @@ function MyComponent() {
 ### 3. Dashboard Component
 
 ```typescript
-import { PerformanceDashboard } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceDashboard } from '@/features/system/performance-monitoring'
 
 function PerformancePage() {
   return (
@@ -89,7 +89,7 @@ function PerformancePage() {
 ### 4. Error Boundary
 
 ```typescript
-import { ErrorBoundary } from '@/features/boilerplate/performance-monitoring/components/ErrorBoundary'
+import { ErrorBoundary } from '@/features/system/performance-monitoring/components/ErrorBoundary'
 
 function App() {
   return (
@@ -107,7 +107,7 @@ function App() {
 Use `useMonitoredQuery` instead of `useQuery` to automatically track performance:
 
 ```typescript
-import { useMonitoredQuery } from '@/features/boilerplate/performance-monitoring/integrations/useMonitoredQuery'
+import { useMonitoredQuery } from '@/features/system/performance-monitoring/integrations/useMonitoredQuery'
 
 function useProjects() {
   return useMonitoredQuery({
@@ -123,7 +123,7 @@ function useProjects() {
 In your app initialization:
 
 ```typescript
-import { setupPerformanceMonitoring } from '@/features/boilerplate/projects/integrations/performance-monitoring'
+import { setupPerformanceMonitoring } from '@/features/system/projects/integrations/performance-monitoring'
 import { queryClient } from '@/lib/queryClient'
 
 setupPerformanceMonitoring(queryClient)
@@ -134,7 +134,7 @@ setupPerformanceMonitoring(queryClient)
 ### Track SSR Prefetch
 
 ```typescript
-import { trackSSRPrefetch } from '@/features/boilerplate/projects/integrations/performance-monitoring'
+import { trackSSRPrefetch } from '@/features/system/projects/integrations/performance-monitoring'
 
 // In your route loader
 export const loader = async (context) => {
@@ -149,7 +149,7 @@ export const loader = async (context) => {
 ### Manual Cache Tracking
 
 ```typescript
-import { trackProjectQueryCache } from '@/features/boilerplate/projects/integrations/performance-monitoring'
+import { trackProjectQueryCache } from '@/features/system/projects/integrations/performance-monitoring'
 
 // Track a cache hit
 trackProjectQueryCache('projects:list', true, 25)
@@ -163,7 +163,7 @@ trackProjectQueryCache('projects:list', false, 150)
 Configure the performance monitor globally:
 
 ```typescript
-import { PerformanceMonitor } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceMonitor } from '@/features/system/performance-monitoring'
 
 PerformanceMonitor.configure({
   enableCacheTracking: true,
@@ -287,7 +287,7 @@ The projects feature demonstrates full integration:
 3. Error boundary for component errors
 4. Global React Query integration for automatic tracking
 
-See `src/features/boilerplate/projects/integrations/performance-monitoring.ts` for implementation details.
+See `src/features/system/projects/integrations/performance-monitoring.ts` for implementation details.
 
 ## Troubleshooting
 

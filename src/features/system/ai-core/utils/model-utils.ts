@@ -7,8 +7,8 @@ import type {
   ModelSort,
   ModelCapabilities, 
   ModelAvailability
-} from '@/features/boilerplate/ai-core/types';
-import { PROVIDER_COLORS, MODEL_TYPE_LABELS, CAPABILITY_ICONS } from '@/features/boilerplate/ai-core/constants';
+} from '@/features/system/ai-core/types';
+import { PROVIDER_COLORS, MODEL_TYPE_LABELS, CAPABILITY_ICONS } from '@/features/system/ai-core/constants';
 
 /**
  * Extract provider from model ID

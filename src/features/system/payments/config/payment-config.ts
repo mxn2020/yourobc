@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/config/payment-config.ts
+// src/features/system/payments/config/payment-config.ts
 /**
  * Payment Configuration
  *

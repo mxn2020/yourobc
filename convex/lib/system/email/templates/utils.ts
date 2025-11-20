@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/templates/utils.ts
+// convex/lib/system/email/templates/utils.ts
 // Validation functions and utility helpers for email templates module
 
 import { EMAIL_TEMPLATES_CONSTANTS } from './constants';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/useVirtualScroll.ts
+// src/features/system/supporting/virtual-lists/hooks/useVirtualScroll.ts
 
 import { useRef, useCallback } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'

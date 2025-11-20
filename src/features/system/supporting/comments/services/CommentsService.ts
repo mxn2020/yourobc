@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/comments/services/CommentsService.ts
+// src/features/system/supporting/comments/services/CommentsService.ts
 
 import type { Id } from '@/convex/_generated/dataModel';
 import type { Comment, CreateCommentData, UpdateCommentData, CommentThread } from '../types';

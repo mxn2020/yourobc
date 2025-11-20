@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/components/LanguageSwitcher.tsx
+// src/features/system/i18n/components/LanguageSwitcher.tsx
 
 /**
  * Language Switcher Component
@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
-import { locales, localeNames, localeFlags, type Locale } from '@/features/boilerplate/i18n/config';
+import { locales, localeNames, localeFlags, type Locale } from '@/features/system/i18n/config';
 
 interface LanguageSwitcherProps {
   /**

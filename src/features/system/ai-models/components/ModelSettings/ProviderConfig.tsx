@@ -5,7 +5,7 @@ import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { SimpleSelect as Select } from '@/components/ui';
 import { Badge } from '@/components/ui';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 interface ProviderConfigProps {
   onClose: () => void;

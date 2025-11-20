@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'
 import { Alert, AlertDescription } from '../ui/Alert'
 import { Shield, Mail, Info } from 'lucide-react'
 import { ParsedError } from '../../utils/errorHandling'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface PermissionDeniedModalProps {
   /**

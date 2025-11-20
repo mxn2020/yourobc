@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/services/blogQueryOptions.ts
+// src/features/system/blog/services/blogQueryOptions.ts
 /**
  * Blog Query Options
  *
@@ -17,14 +17,14 @@ import type { PostFilters, PostListOptions } from '../types';
  * Query options factory for fetching all categories
  */
 export function getCategoriesQueryOptions() {
-  return convexQuery(api.lib.boilerplate.blog.queries.getCategories, {});
+  return convexQuery(api.lib.system.blog.queries.getCategories, {});
 }
 
 /**
  * Query options factory for fetching a single category
  */
 export function getCategoryQueryOptions(categoryId: Id<'blogCategories'>) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getCategory, {
+  return convexQuery(api.lib.system.blog.queries.getCategory, {
     categoryId,
   });
 }
@@ -33,14 +33,14 @@ export function getCategoryQueryOptions(categoryId: Id<'blogCategories'>) {
  * Query options factory for fetching all tags
  */
 export function getTagsQueryOptions() {
-  return convexQuery(api.lib.boilerplate.blog.queries.getTags, {});
+  return convexQuery(api.lib.system.blog.queries.getTags, {});
 }
 
 /**
  * Query options factory for fetching a single tag
  */
 export function getTagQueryOptions(tagId: Id<'blogTags'>) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getTag, {
+  return convexQuery(api.lib.system.blog.queries.getTag, {
     tagId,
   });
 }
@@ -49,7 +49,7 @@ export function getTagQueryOptions(tagId: Id<'blogTags'>) {
  * Query options factory for fetching all posts (with optional filters)
  */
 export function getPostsQueryOptions(options?: PostListOptions) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getPosts, {
+  return convexQuery(api.lib.system.blog.queries.getPosts, {
     status: options?.filters?.status,
     authorId: options?.filters?.authorId,
     categoryId: options?.filters?.categoryId,
@@ -64,7 +64,7 @@ export function getPostsQueryOptions(options?: PostListOptions) {
  * Query options factory for fetching a single post by ID
  */
 export function getPostQueryOptions(postId: Id<'blogPosts'>) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getPost, {
+  return convexQuery(api.lib.system.blog.queries.getPost, {
     postId,
   });
 }
@@ -73,7 +73,7 @@ export function getPostQueryOptions(postId: Id<'blogPosts'>) {
  * Query options factory for fetching a post by slug
  */
 export function getPostBySlugQueryOptions(slug: string) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getPostBySlug, {
+  return convexQuery(api.lib.system.blog.queries.getPostBySlug, {
     slug,
   });
 }
@@ -82,7 +82,7 @@ export function getPostBySlugQueryOptions(slug: string) {
  * Query options factory for fetching blog statistics
  */
 export function getBlogStatsQueryOptions(authorId?: Id<'blogAuthors'>) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getPostStatistics, {
+  return convexQuery(api.lib.system.blog.queries.getPostStatistics, {
     authorId,
   });
 }
@@ -91,14 +91,14 @@ export function getBlogStatsQueryOptions(authorId?: Id<'blogAuthors'>) {
  * Query options factory for fetching all authors
  */
 export function getAuthorsQueryOptions() {
-  return convexQuery(api.lib.boilerplate.blog.queries.getAuthors, {});
+  return convexQuery(api.lib.system.blog.queries.getAuthors, {});
 }
 
 /**
  * Query options factory for fetching a single author
  */
 export function getAuthorQueryOptions(authorId: Id<'blogAuthors'>) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getAuthor, {
+  return convexQuery(api.lib.system.blog.queries.getAuthor, {
     authorId,
   });
 }
@@ -112,7 +112,7 @@ export function getPublishedPostsQueryOptions(options?: {
   limit?: number;
   offset?: number;
 }) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getPublishedPosts, {
+  return convexQuery(api.lib.system.blog.queries.getPublishedPosts, {
     categoryId: options?.categoryId,
     tag: options?.tag,
     limit: options?.limit,
@@ -124,7 +124,7 @@ export function getPublishedPostsQueryOptions(options?: {
  * Query options factory for fetching featured posts
  */
 export function getFeaturedPostsQueryOptions(limit?: number) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getFeaturedPosts, {
+  return convexQuery(api.lib.system.blog.queries.getFeaturedPosts, {
     limit,
   });
 }
@@ -133,7 +133,7 @@ export function getFeaturedPostsQueryOptions(limit?: number) {
  * Query options factory for fetching category by slug
  */
 export function getCategoryBySlugQueryOptions(slug: string) {
-  return convexQuery(api.lib.boilerplate.blog.queries.getCategoryBySlug, {
+  return convexQuery(api.lib.system.blog.queries.getCategoryBySlug, {
     slug,
   });
 }

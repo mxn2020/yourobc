@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/blog/blog/types.ts
+// convex/schema/system/blog/blog/types.ts
 // Type extractions from validators for blog module
 
 import { Infer } from 'convex/values';

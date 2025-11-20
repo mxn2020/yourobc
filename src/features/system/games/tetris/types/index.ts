@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/types/index.ts
+// src/features/system/tetris/types/index.ts
 
 import type { Id } from '@/convex/_generated/dataModel';
 

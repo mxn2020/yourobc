@@ -17,8 +17,8 @@ import { useLogAnalytics } from '../hooks/useLogAnalytics';
 import { useLogFiltering, useLogPagination } from '../hooks/useLogFiltering';
 import { createEmptyLogFilter } from '../utils/log-filters';
 import { calculateUsageByDay, calculatePerformanceMetrics } from '../utils/analytics-helpers';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
+import { getProviderColor } from '@/features/system/ai-core/utils';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
 import type { LogTableView } from '../types/log.types';
 
 export function AILogsPage() {

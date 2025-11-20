@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/email/templates/templates.ts
+// convex/schema/system/email/templates/templates.ts
 // Table definitions for email templates module
 
 import { defineTable } from 'convex/server';

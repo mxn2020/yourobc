@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/mutations.ts
+// convex/lib/system/email/mutations.ts
 
 import { v } from 'convex/values';
 import { mutation } from '@/generated/server';

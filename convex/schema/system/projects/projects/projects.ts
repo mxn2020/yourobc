@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/projects/projects/projects.ts
+// convex/schema/system/projects/projects/projects.ts
 // Table definitions for projects module
 
 import { defineTable } from 'convex/server';

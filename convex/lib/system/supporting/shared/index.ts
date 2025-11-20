@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/shared/index.ts
+// convex/lib/system/supporting/shared/index.ts
 
 /**
  * Shared Supporting Module Exports

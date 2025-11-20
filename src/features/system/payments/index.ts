@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/index.ts
+// src/features/system/payments/index.ts
 /**
  * Payments Feature - Main Exports
  * 

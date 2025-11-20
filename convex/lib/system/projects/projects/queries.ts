@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/projects/projects/queries.ts
+// convex/lib/system/projects/projects/queries.ts
 // Read operations for projects module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, getCurrentUser } from '@/shared/auth.helper';
-import { projectsValidators } from '@/schema/boilerplate/projects/projects/validators';
+import { projectsValidators } from '@/schema/system/projects/projects/validators';
 import { PROJECTS_CONSTANTS } from './constants';
 import { requireViewProjectAccess, filterProjectsByAccess } from './permissions';
 import { isProjectOverdue } from './utils';

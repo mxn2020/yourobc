@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/hooks/index.ts
+// src/features/system/payments/providers/stripe/hooks/index.ts
 export * from './useStripeCustomer';
 export * from './useStripeCheckout';
 export * from './useStripeSubscription';

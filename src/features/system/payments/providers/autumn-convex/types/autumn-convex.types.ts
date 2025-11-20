@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/types/autumn-convex.types.ts
+// src/features/system/payments/providers/autumn-convex/types/autumn-convex.types.ts
 /**
  * Autumn Convex Types
  */

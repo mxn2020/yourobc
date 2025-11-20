@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/milestones/MilestoneFormModal.tsx
+// features/system/projects/components/milestones/MilestoneFormModal.tsx
 
 import { FC, useState, useEffect } from 'react'
 import {
@@ -18,7 +18,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { AlertCircle, Loader2, Plus, X } from 'lucide-react'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import type { Id } from '@/convex/_generated/dataModel'
 
 export interface Deliverable {

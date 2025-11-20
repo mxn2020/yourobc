@@ -1,13 +1,13 @@
 // src/utils/ai/cost-utils.ts
 import { useMemo } from 'react';
-import type { ModelInfo, ModelPricing } from '@/features/boilerplate/ai-core/types';
-import type { TokenUsage } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelPricing } from '@/features/system/ai-core/types';
+import type { TokenUsage } from '@/features/system/ai-core/types';
 import { 
   COST_TIERS, 
   DEFAULT_COST_CONFIG,
   COST_FORMATTING_OPTIONS,
   PROVIDER_COST_MULTIPLIERS
-} from '@/features/boilerplate/ai-core/constants';
+} from '@/features/system/ai-core/constants';
 
 /**
  * Calculate cost for a request based on token usage and model pricing

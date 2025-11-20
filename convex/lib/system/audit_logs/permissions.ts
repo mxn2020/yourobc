@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/permissions.ts
+// convex/lib/system/audit_logs/permissions.ts
 // Access control and authorization logic for auditLogs module
 
 import type { Doc } from '@/generated/dataModel';

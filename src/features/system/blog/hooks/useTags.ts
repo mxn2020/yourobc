@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/useTags.ts
+// src/features/system/blog/hooks/useTags.ts
 /**
  * Hook for fetching and managing blog tags
  */

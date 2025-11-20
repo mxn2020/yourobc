@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/constants.ts
+// convex/lib/system/audit_logs/constants.ts
 // convex/auditLogs/constants.ts
 
 export const AUDIT_LOG_CONSTANTS = {

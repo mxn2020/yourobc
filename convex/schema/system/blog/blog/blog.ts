@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/blog/blog/blog.ts
+// convex/schema/system/blog/blog/blog.ts
 // Table definitions for blog module
 
 import { defineTable } from 'convex/server';

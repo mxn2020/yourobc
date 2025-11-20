@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/components/PurchaseButton.tsx
+// src/features/system/payments/providers/autumn-convex/components/PurchaseButton.tsx
 /**
  * Autumn Convex Purchase Button
  */

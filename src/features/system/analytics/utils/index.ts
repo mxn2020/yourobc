@@ -1,3 +1,3 @@
-// src/features/boilerplate/analytics/utils/index.ts
+// src/features/system/analytics/utils/index.ts
 
 export * from "./date-utils";

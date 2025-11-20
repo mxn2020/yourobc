@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/services/PermissionService.ts
+// src/features/system/auth/services/PermissionService.ts
 
 import { authClient } from '../lib/auth-client'
 import { UserProfile, UserRole } from '../types/auth.types'

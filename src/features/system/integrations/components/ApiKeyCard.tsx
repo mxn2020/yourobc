@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/components/ApiKeyCard.tsx
+// src/features/system/integrations/components/ApiKeyCard.tsx
 
 import { useState } from "react";
 import { Id } from "@/convex/_generated/dataModel";

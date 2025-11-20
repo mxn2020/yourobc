@@ -1,6 +1,6 @@
 // src/lib/convex-server.ts
 import { ConvexHttpClient } from 'convex/browser'
-import { auth } from '@/features/boilerplate/auth/lib/auth-config'
+import { auth } from '@/features/system/auth/lib/auth-config'
 import { getRequest } from '@tanstack/react-start/server'
 
 /**

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/types.ts
+// convex/lib/system/supporting/scheduling/types.ts
 
 import type { Doc, Id } from '@/generated/dataModel';
 

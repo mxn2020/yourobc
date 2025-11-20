@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useUserSettings.ts
+// src/features/system/auth/hooks/useUserSettings.ts
 
 import { useCallback, useMemo } from 'react'
 import { userSettingsManagementService, UserSettingsUpdate } from '../services/UserSettingsManagementService'

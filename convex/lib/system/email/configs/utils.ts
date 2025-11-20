@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/configs/utils.ts
+// convex/lib/system/email/configs/utils.ts
 // Validation functions and utility helpers for email configs module
 
 import { EMAIL_CONFIGS_CONSTANTS, EMAIL_PROVIDER_NAMES } from './constants';

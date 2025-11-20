@@ -1,9 +1,9 @@
 // src/routes/{-$locale}/_protected.tsx
 
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { getSessionServer } from '@/features/boilerplate/auth/lib/server-functions'
-import { locales, defaultLocale } from '@/features/boilerplate/i18n'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { getSessionServer } from '@/features/system/auth/lib/server-functions'
+import { locales, defaultLocale } from '@/features/system/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/_protected')({
   beforeLoad: async ({ location, params }) => {

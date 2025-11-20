@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/components/OnboardingButton.tsx
+// src/features/system/payments/providers/stripe-connect/components/OnboardingButton.tsx
 /**
  * Stripe Connect Onboarding Button
  *

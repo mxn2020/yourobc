@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/utils.ts
+// convex/lib/system/email/utils.ts
 // convex/lib/email/utils.ts
 
 import { EMAIL_CONSTANTS } from './constants'

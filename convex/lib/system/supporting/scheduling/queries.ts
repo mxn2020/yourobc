@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/queries.ts
+// convex/lib/system/supporting/scheduling/queries.ts
 
 import { v } from 'convex/values';
 import { query } from '@/generated/server';

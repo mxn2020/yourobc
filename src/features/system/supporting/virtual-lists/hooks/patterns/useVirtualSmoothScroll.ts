@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/patterns/useVirtualSmoothScroll.ts
+// src/features/system/supporting/virtual-lists/hooks/patterns/useVirtualSmoothScroll.ts
 
 import { useRef, useCallback } from 'react'
 import { elementScroll } from '@tanstack/react-virtual'

@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/providers/MakeProvider.ts
+// src/features/system/integrations/providers/MakeProvider.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 import {

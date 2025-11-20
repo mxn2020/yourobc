@@ -1,8 +1,8 @@
-// src/features/boilerplate/pages/ResetPasswordPage.tsx
+// src/features/system/pages/ResetPasswordPage.tsx
 import React from 'react'
 import { ResetPasswordForm } from '../components/ResetPasswordForm'
 import { AuthLayout } from '../components/AuthLayout'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function ResetPasswordPage() {
   const { t } = useTranslation('auth')

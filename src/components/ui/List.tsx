@@ -1,7 +1,7 @@
 // src/components/ui/List.tsx
 import { forwardRef, ReactNode, memo } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { VirtualList } from '@/features/boilerplate/supporting';
+import { VirtualList } from '@/features/system/supporting';
 import type { TableColumn } from '@/types';
 
 // List Item component

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/README.md
+// src/features/system/payments/providers/autumn-convex/README.md
 # Autumn + Convex Provider
 
 Use Autumn's Convex component for server-side subscription management with full type safety.
@@ -67,7 +67,7 @@ USE_CONVEX_AUTUMN=true
 
 ### PurchaseButton
 ```typescript
-import { PurchaseButton } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { PurchaseButton } from '@/features/system/payments/providers/autumn-convex';
 
 <PurchaseButton planId="pro" trialDays={14}>
   Upgrade to Pro
@@ -76,7 +76,7 @@ import { PurchaseButton } from '@/features/boilerplate/payments/providers/autumn
 
 ### BillingPortalButton
 ```typescript
-import { BillingPortalButton } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { BillingPortalButton } from '@/features/system/payments/providers/autumn-convex';
 
 <BillingPortalButton>
   Manage Subscription
@@ -85,14 +85,14 @@ import { BillingPortalButton } from '@/features/boilerplate/payments/providers/a
 
 ### SubscriptionStatus
 ```typescript
-import { SubscriptionStatus } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { SubscriptionStatus } from '@/features/system/payments/providers/autumn-convex';
 
 <SubscriptionStatus />
 ```
 
 ### UsageDisplay
 ```typescript
-import { UsageDisplay } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { UsageDisplay } from '@/features/system/payments/providers/autumn-convex';
 
 <UsageDisplay 
   featureKey="ai_requests"
@@ -105,7 +105,7 @@ import { UsageDisplay } from '@/features/boilerplate/payments/providers/autumn-c
 
 ### useAutumnConvexCustomer
 ```typescript
-import { useAutumnConvexCustomer } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { useAutumnConvexCustomer } from '@/features/system/payments/providers/autumn-convex';
 
 function MyComponent() {
   const { customer, subscription, features, isLoading } = useAutumnConvexCustomer();
@@ -116,7 +116,7 @@ function MyComponent() {
 
 ### useAutumnConvexCheckout
 ```typescript
-import { useAutumnConvexCheckout } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { useAutumnConvexCheckout } from '@/features/system/payments/providers/autumn-convex';
 
 function UpgradeButton() {
   const { createCheckout } = useAutumnConvexCheckout();
@@ -134,7 +134,7 @@ function UpgradeButton() {
 
 ### useAutumnConvexFeatureAccess
 ```typescript
-import { useAutumnConvexFeatureAccess } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { useAutumnConvexFeatureAccess } from '@/features/system/payments/providers/autumn-convex';
 
 function MyFeature() {
   const { hasAccess, reason, remaining, isLoading } = useAutumnConvexFeatureAccess('ai_requests');
@@ -149,7 +149,7 @@ function MyFeature() {
 
 ### useAutumnConvexUsage
 ```typescript
-import { useAutumnConvexUsage } from '@/features/boilerplate/payments/providers/autumn-convex';
+import { useAutumnConvexUsage } from '@/features/system/payments/providers/autumn-convex';
 
 function AIChat() {
   const { trackUsage, getUsageStats } = useAutumnConvexUsage();

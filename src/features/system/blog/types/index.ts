@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/types/index.ts
+// src/features/system/blog/types/index.ts
 /**
  * Blog Feature - Frontend Types
  *

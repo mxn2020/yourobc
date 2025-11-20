@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/pages/PostEditorPage.tsx
+// src/features/system/blog/pages/PostEditorPage.tsx
 /**
  * Post Editor Page
  *
@@ -21,7 +21,7 @@ import { useBlog } from '../hooks/useBlog';
 import { useCategories } from '../hooks/useCategories';
 import { useScheduling } from '../hooks/useScheduling';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 import { generateSlug } from '../utils/slug';
 import { calculateSEOScore } from '../utils/seo';
 import { validateContent } from '../utils/content';

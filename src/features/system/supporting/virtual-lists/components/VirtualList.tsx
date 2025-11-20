@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/VirtualList.tsx
+// src/features/system/supporting/virtual-lists/components/VirtualList.tsx
 
 import React, { useRef, useEffect } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'

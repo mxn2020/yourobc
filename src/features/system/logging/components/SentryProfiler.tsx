@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/components/SentryProfiler.tsx
+// src/features/system/logging/components/SentryProfiler.tsx
 
 import React, { ReactNode, Profiler as ReactProfiler, ProfilerOnRenderCallback } from 'react'
 import * as Sentry from '@sentry/react'

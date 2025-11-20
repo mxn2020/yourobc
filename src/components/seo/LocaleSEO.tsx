@@ -1,7 +1,7 @@
-import { useI18n } from '@/features/boilerplate/i18n/context'
+import { useI18n } from '@/features/system/i18n/context'
 import { useLocation } from '@tanstack/react-router'
-import { locales } from '@/features/boilerplate/i18n/config'
-import { stripLocaleFromPath } from '@/features/boilerplate/i18n/utils/path'
+import { locales } from '@/features/system/i18n/config'
+import { stripLocaleFromPath } from '@/features/system/i18n/utils/path'
 
 export function LocaleSEO() {
   const { locale } = useI18n()

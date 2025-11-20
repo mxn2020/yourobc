@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/permissionRequests/permissionRequests.ts
+// convex/schema/system/system/permissionRequests/permissionRequests.ts
 // Table definitions for permissionRequests module
 
 import { defineTable } from 'convex/server';

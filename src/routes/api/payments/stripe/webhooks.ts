@@ -8,7 +8,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { stripeService } from '@/features/boilerplate/payments/providers/stripe/services/StripeService'
+import { stripeService } from '@/features/system/payments/providers/stripe/services/StripeService'
 import { ConvexHttpClient } from 'convex/browser'
 import { api } from '@/convex/_generated/api'
 import type Stripe from 'stripe'
@@ -121,7 +121,7 @@ async function handleCustomerUpdated(customer: Stripe.Customer, convex: ConvexHt
     return
   }
 
-  await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.upsertCustomer, {
+  await convex.mutation(api.lib.system.payments.stripe.mutations.upsertCustomer, {
     stripeCustomerId: customer.id,
     email: customer.email || '',
     name: customer.name || undefined,
@@ -206,7 +206,7 @@ async function handleSubscriptionUpdated(
     ? subscriptionItem.current_period_end * 1000
     : Date.now()
 
-  await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.upsertSubscription, {
+  await convex.mutation(api.lib.system.payments.stripe.mutations.upsertSubscription, {
     stripeCustomerId: subscription.customer as string,
     stripeSubscriptionId: subscription.id,
     stripePriceId: subscriptionItem?.price.id || '',
@@ -231,7 +231,7 @@ async function handleSubscriptionDeleted(
 ) {
   console.log(`[Stripe Webhook] Processing subscription deletion: ${subscription.id}`)
 
-  await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.updateSubscriptionStatus, {
+  await convex.mutation(api.lib.system.payments.stripe.mutations.updateSubscriptionStatus, {
     stripeSubscriptionId: subscription.id,
     status: 'canceled',
     cancelAtPeriodEnd: false,
@@ -250,7 +250,7 @@ async function handlePaymentIntentSucceeded(
 
   const authUserId = paymentIntent.metadata?.userId || paymentIntent.metadata?.authUserId
 
-  await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.upsertPayment, {
+  await convex.mutation(api.lib.system.payments.stripe.mutations.upsertPayment, {
     stripeCustomerId: paymentIntent.customer as string | undefined,
     stripePaymentIntentId: paymentIntent.id,
     stripeChargeId: paymentIntent.latest_charge as string | undefined,
@@ -273,7 +273,7 @@ async function handlePaymentIntentFailed(
 
   const authUserId = paymentIntent.metadata?.userId || paymentIntent.metadata?.authUserId
 
-  await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.upsertPayment, {
+  await convex.mutation(api.lib.system.payments.stripe.mutations.upsertPayment, {
     stripeCustomerId: paymentIntent.customer as string | undefined,
     stripePaymentIntentId: paymentIntent.id,
     amount: paymentIntent.amount,
@@ -298,7 +298,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, convex: Co
       : invoicePayment.payment.payment_intent?.id
 
     if (paymentIntentId) {
-      await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.updatePaymentStatus, {
+      await convex.mutation(api.lib.system.payments.stripe.mutations.updatePaymentStatus, {
         stripePaymentIntentId: paymentIntentId,
         status: 'succeeded',
       })
@@ -320,7 +320,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice, convex: Conve
       : invoicePayment.payment.payment_intent?.id
 
     if (paymentIntentId) {
-      await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.updatePaymentStatus, {
+      await convex.mutation(api.lib.system.payments.stripe.mutations.updatePaymentStatus, {
         stripePaymentIntentId: paymentIntentId,
         status: 'failed',
       })
@@ -336,7 +336,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice, convex: Conve
     : undefined
 
   if (subscriptionId) {
-    await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.updateSubscriptionStatus, {
+    await convex.mutation(api.lib.system.payments.stripe.mutations.updateSubscriptionStatus, {
       stripeSubscriptionId: subscriptionId,
       status: 'past_due',
     })
@@ -350,7 +350,7 @@ async function handleChargeRefunded(charge: Stripe.Charge, convex: ConvexHttpCli
   console.log(`[Stripe Webhook] Processing charge refunded: ${charge.id}`)
 
   if (charge.payment_intent) {
-    await convex.mutation(api.lib.boilerplate.payments.stripe.mutations.markPaymentRefunded, {
+    await convex.mutation(api.lib.system.payments.stripe.mutations.markPaymentRefunded, {
       stripePaymentIntentId: charge.payment_intent as string,
       refundAmount: charge.amount_refunded,
     })

@@ -1,7 +1,7 @@
 // convex/config/app/entities.config.ts
 // ✅ APP CUSTOMIZATION FILE - SAFE TO MODIFY
 // This file is where you define your app-specific and addon entity types.
-// Changes to this file will NOT conflict with boilerplate updates.
+// Changes to this file will NOT conflict with system updates.
 
 /**
  * App-specific entity types

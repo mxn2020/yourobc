@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/components/SubscriptionStatus.tsx
+// src/features/system/payments/providers/stripe/components/SubscriptionStatus.tsx
 /**
  * Subscription Status Component
  *

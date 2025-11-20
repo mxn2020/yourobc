@@ -8,7 +8,7 @@
  * This endpoint is not needed for Autumn integration.
  *
  * Autumn automatically syncs subscription and payment data through its Convex integration.
- * See: /convex/lib/boilerplate/autumn.ts for the Autumn setup.
+ * See: /convex/lib/system/autumn.ts for the Autumn setup.
  *
  * How Autumn Works:
  * - Autumn integrates directly with Convex as a component

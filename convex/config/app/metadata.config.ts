@@ -1,7 +1,7 @@
 // convex/config/app/metadata.config.ts
 // ✅ APP CUSTOMIZATION FILE - SAFE TO MODIFY
 // This file is where you configure your app's metadata and branding.
-// Changes to this file will NOT conflict with boilerplate updates.
+// Changes to this file will NOT conflict with system updates.
 
 import type { AppMetadataConfig, FeatureFlagsConfig } from '../types';
 

@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/services/AuthService.ts
+// src/features/system/auth/services/AuthService.ts
 
 import { authClient } from '../lib/auth-client'
 import {

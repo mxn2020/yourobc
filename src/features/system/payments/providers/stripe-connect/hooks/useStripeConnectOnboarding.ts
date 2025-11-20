@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/hooks/useStripeConnectOnboarding.ts
+// src/features/system/payments/providers/stripe-connect/hooks/useStripeConnectOnboarding.ts
 /**
  * Stripe Connect Onboarding Hook
  *
@@ -7,7 +7,7 @@
 
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { useState } from 'react';
 import { useStripeConnectAccount } from './useStripeConnectAccount';
 
@@ -48,8 +48,8 @@ export function useStripeConnectOnboarding() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const upsertAccount = useMutation(api.lib.boilerplate.payments.stripe_connect.mutations.upsertConnectedAccount);
-  const updateOnboardingLink = useMutation(api.lib.boilerplate.payments.stripe_connect.mutations.updateOnboardingLink);
+  const upsertAccount = useMutation(api.lib.system.payments.stripe_connect.mutations.upsertConnectedAccount);
+  const updateOnboardingLink = useMutation(api.lib.system.payments.stripe_connect.mutations.updateOnboardingLink);
 
   /**
    * Create a new connected account

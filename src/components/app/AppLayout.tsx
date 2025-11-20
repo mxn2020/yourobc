@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLocation } from '@tanstack/react-router';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 

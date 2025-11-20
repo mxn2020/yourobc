@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/patterns/VirtualMasonry.tsx
+// src/features/system/supporting/virtual-lists/components/patterns/VirtualMasonry.tsx
 
 import React, { useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'

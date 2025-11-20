@@ -1,7 +1,7 @@
 // src/features/ai-models/hooks/useModelFiltering.ts
 import { useMemo } from 'react';
-import { filterModels, sortModels } from '@/features/boilerplate/ai-core/utils';
-import type { ModelInfo, ModelFilter, ModelSort } from '@/features/boilerplate/ai-core/types';
+import { filterModels, sortModels } from '@/features/system/ai-core/utils';
+import type { ModelInfo, ModelFilter, ModelSort } from '@/features/system/ai-core/types';
 
 export function useModelFiltering(
   models: ModelInfo[],

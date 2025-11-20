@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/hooks/useAnalytics.tsx
+// src/features/system/analytics/hooks/useAnalytics.tsx
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { analyticsService } from "../services/AnalyticsService";

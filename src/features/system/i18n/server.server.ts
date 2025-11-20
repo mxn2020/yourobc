@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/server.ts
+// src/features/system/i18n/server.ts
 
 import { readFileSync } from 'fs'
 import { join } from 'path'
@@ -24,8 +24,8 @@ export function loadTranslations(locale: Locale, namespaces: Namespace[]): Recor
 
   for (const namespace of namespaces) {
     try {
-      // ✅ Fixed path - translations are in src/features/boilerplate/i18n/locales
-      const path = join(process.cwd(), 'src', 'features', 'boilerplate', 'i18n', 'locales', locale, `${namespace}.json`)
+      // ✅ Fixed path - translations are in src/features/system/i18n/locales
+      const path = join(process.cwd(), 'src', 'features', 'system', 'i18n', 'locales', locale, `${namespace}.json`)
       const content = JSON.parse(readFileSync(path, 'utf-8'))
 
       // Flatten nested object

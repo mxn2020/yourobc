@@ -19,7 +19,7 @@ Unit tests for the Projects feature are written using Vitest and focus on pure u
 ### Location
 
 ```
-src/features/boilerplate/projects/utils/projectHelpers.test.ts
+src/features/system/projects/utils/projectHelpers.test.ts
 ```
 
 ### What's Tested
@@ -78,7 +78,7 @@ it('should return excellent health for a project with high progress and no issue
 npm test
 
 # Run only projects tests
-npm test -- src/features/boilerplate/projects
+npm test -- src/features/system/projects
 
 # Run with coverage
 npm run test:coverage
@@ -232,7 +232,7 @@ Storybook provides interactive documentation and visual testing for UI component
 ### Location
 
 ```
-src/features/boilerplate/projects/components/
+src/features/system/projects/components/
   ├── ProjectRoleBadge.stories.tsx
   └── ProjectStats.stories.tsx
 ```
@@ -310,7 +310,7 @@ Performance monitoring tracks SSR cache hit rates, query performance, and errors
 The performance monitoring addon is integrated into the Projects feature via:
 
 ```
-src/features/boilerplate/projects/integrations/performance-monitoring.ts
+src/features/system/projects/integrations/performance-monitoring.ts
 ```
 
 ### Key Metrics Tracked
@@ -356,7 +356,7 @@ export const loader = async (context) => {
 #### Use Monitored Queries
 
 ```typescript
-import { useMonitoredQuery } from '@/features/boilerplate/performance-monitoring/integrations/useMonitoredQuery'
+import { useMonitoredQuery } from '@/features/system/performance-monitoring/integrations/useMonitoredQuery'
 
 function useProjects() {
   return useMonitoredQuery({
@@ -371,7 +371,7 @@ function useProjects() {
 Add the performance dashboard to your app:
 
 ```typescript
-import { PerformanceDashboard } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceDashboard } from '@/features/system/performance-monitoring'
 
 function PerformancePage() {
   return <PerformanceDashboard timeRange={24 * 60 * 60 * 1000} />

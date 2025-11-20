@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/services/WebsitesService.ts
+// src/features/system/websites/services/WebsitesService.ts
 
 import { queryOptions } from '@tanstack/react-query'
 import { api } from '@/convex/_generated/api'
@@ -30,42 +30,42 @@ class WebsitesService {
 
   // Hooks for data fetching
   useWebsites(options?: WebsitesListOptions) {
-    return useQuery(api.lib.boilerplate.websites.queries.getWebsites, { options })
+    return useQuery(api.lib.system.websites.queries.getWebsites, { options })
   }
 
   useWebsite(websiteId: WebsiteId) {
-    return useQuery(api.lib.boilerplate.websites.queries.getWebsite, { websiteId })
+    return useQuery(api.lib.system.websites.queries.getWebsite, { websiteId })
   }
 
   useWebsitePages(websiteId: WebsiteId, options?: PagesListOptions) {
-    return useQuery(api.lib.boilerplate.websites.queries.getWebsitePages, {
+    return useQuery(api.lib.system.websites.queries.getWebsitePages, {
       websiteId,
       options,
     })
   }
 
   usePageWithSections(pageId: string) {
-    return useQuery(api.lib.boilerplate.websites.queries.getPageWithSections, {
+    return useQuery(api.lib.system.websites.queries.getPageWithSections, {
       pageId: pageId as any,
     })
   }
 
   useWebsiteSections(websiteId: WebsiteId, type?: string) {
-    return useQuery(api.lib.boilerplate.websites.queries.getWebsiteSections, {
+    return useQuery(api.lib.system.websites.queries.getWebsiteSections, {
       websiteId,
       type,
     })
   }
 
   useThemes(includeSystem = true, includePublic = true) {
-    return useQuery(api.lib.boilerplate.websites.queries.getThemes, {
+    return useQuery(api.lib.system.websites.queries.getThemes, {
       includeSystem,
       includePublic,
     })
   }
 
   useTemplates(category?: string, includeSystem = true, includePublic = true) {
-    return useQuery(api.lib.boilerplate.websites.queries.getTemplates, {
+    return useQuery(api.lib.system.websites.queries.getTemplates, {
       category,
       includeSystem,
       includePublic,
@@ -73,62 +73,62 @@ class WebsitesService {
   }
 
   useWebsiteStats(targetUserId?: string) {
-    return useQuery(api.lib.boilerplate.websites.queries.getWebsiteStats, {
+    return useQuery(api.lib.system.websites.queries.getWebsiteStats, {
       targetUserId: targetUserId as any,
     })
   }
 
   // Hooks for mutations
   useCreateWebsite() {
-    return useMutation(api.lib.boilerplate.websites.mutations.createWebsite)
+    return useMutation(api.lib.system.websites.mutations.createWebsite)
   }
 
   useUpdateWebsite() {
-    return useMutation(api.lib.boilerplate.websites.mutations.updateWebsite)
+    return useMutation(api.lib.system.websites.mutations.updateWebsite)
   }
 
   usePublishWebsite() {
-    return useMutation(api.lib.boilerplate.websites.mutations.publishWebsite)
+    return useMutation(api.lib.system.websites.mutations.publishWebsite)
   }
 
   useDeleteWebsite() {
-    return useMutation(api.lib.boilerplate.websites.mutations.deleteWebsite)
+    return useMutation(api.lib.system.websites.mutations.deleteWebsite)
   }
 
   useCreatePage() {
-    return useMutation(api.lib.boilerplate.websites.mutations.createPage)
+    return useMutation(api.lib.system.websites.mutations.createPage)
   }
 
   useUpdatePage() {
-    return useMutation(api.lib.boilerplate.websites.mutations.updatePage)
+    return useMutation(api.lib.system.websites.mutations.updatePage)
   }
 
   usePublishPage() {
-    return useMutation(api.lib.boilerplate.websites.mutations.publishPage)
+    return useMutation(api.lib.system.websites.mutations.publishPage)
   }
 
   useDeletePage() {
-    return useMutation(api.lib.boilerplate.websites.mutations.deletePage)
+    return useMutation(api.lib.system.websites.mutations.deletePage)
   }
 
   useCreateSection() {
-    return useMutation(api.lib.boilerplate.websites.mutations.createSection)
+    return useMutation(api.lib.system.websites.mutations.createSection)
   }
 
   useUpdateSection() {
-    return useMutation(api.lib.boilerplate.websites.mutations.updateSection)
+    return useMutation(api.lib.system.websites.mutations.updateSection)
   }
 
   useDeleteSection() {
-    return useMutation(api.lib.boilerplate.websites.mutations.deleteSection)
+    return useMutation(api.lib.system.websites.mutations.deleteSection)
   }
 
   useAddCollaborator() {
-    return useMutation(api.lib.boilerplate.websites.mutations.addCollaborator)
+    return useMutation(api.lib.system.websites.mutations.addCollaborator)
   }
 
   useRemoveCollaborator() {
-    return useMutation(api.lib.boilerplate.websites.mutations.removeCollaborator)
+    return useMutation(api.lib.system.websites.mutations.removeCollaborator)
   }
 }
 

@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/appConfigs/appConfigs.ts
+// convex/schema/system/system/appConfigs/appConfigs.ts
 // Table definitions for appConfigs module
 
 import { defineTable } from 'convex/server';

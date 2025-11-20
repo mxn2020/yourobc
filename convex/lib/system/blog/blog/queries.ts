@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/queries.ts
+// convex/lib/system/blog/blog/queries.ts
 /**
  * Blog Query Functions
  *

@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/dashboards/dashboards/queries.ts
+// convex/lib/system/dashboards/dashboards/queries.ts
 // Read operations for dashboards module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { dashboardsValidators } from '@/schema/boilerplate/dashboards/dashboards/validators';
+import { dashboardsValidators } from '@/schema/system/dashboards/dashboards/validators';
 import {
   filterDashboardsByAccess,
   requireViewDashboardAccess,

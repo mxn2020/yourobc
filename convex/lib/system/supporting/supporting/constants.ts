@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/constants.ts
+// convex/lib/system/supporting/supporting/constants.ts
 // Business constants, permissions, and limits for supporting module
 
 /**

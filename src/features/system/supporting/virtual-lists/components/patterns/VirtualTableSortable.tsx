@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/patterns/VirtualTableSortable.tsx
+// src/features/system/supporting/virtual-lists/components/patterns/VirtualTableSortable.tsx
 
 import React, { useRef, useState, useMemo } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'

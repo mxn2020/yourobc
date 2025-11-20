@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { LogService } from '../services/LogService';
-import type { AIUsageFilter, AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter, AIUsageLog } from '@/features/system/ai-core/types';
 import { Id } from "@/convex/_generated/dataModel";
 
 const LOGS_QUERY_KEY = ['ai-logs'] as const;

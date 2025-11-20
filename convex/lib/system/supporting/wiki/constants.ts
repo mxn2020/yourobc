@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/constants.ts
+// convex/lib/system/supporting/wiki/constants.ts
 
 /**
  * Wiki Module Constants

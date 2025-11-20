@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_settings/queries.ts
+// convex/lib/system/user_settings/user_settings/queries.ts
 // Read operations for user settings module
 
 import { query } from '@/generated/server';

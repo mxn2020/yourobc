@@ -13,7 +13,7 @@ const crons = cronJobs()
 crons.interval(
   'process-scheduled-events',
   { minutes: 1 },
-  internal.lib.boilerplate.supporting.scheduling.mutations.processScheduledEvents
+  internal.lib.system.supporting.scheduling.mutations.processScheduledEvents
 )
 
 /**
@@ -23,7 +23,7 @@ crons.interval(
 crons.hourly(
   'aggregate-hourly-analytics',
   { minuteUTC: 5 }, // Run at 5 minutes past each hour
-  internal.lib.boilerplate.analytics.aggregations.aggregateHourlyMetrics
+  internal.lib.system.analytics.aggregations.aggregateHourlyMetrics
 )
 
 /**
@@ -33,7 +33,7 @@ crons.hourly(
 crons.daily(
   'aggregate-daily-analytics',
   { hourUTC: 1, minuteUTC: 0 }, // Run at 1:00 AM UTC
-  internal.lib.boilerplate.analytics.aggregations.aggregateDailyMetrics
+  internal.lib.system.analytics.aggregations.aggregateDailyMetrics
 )
 
 export default crons

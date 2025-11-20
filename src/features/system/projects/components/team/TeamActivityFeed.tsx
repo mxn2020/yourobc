@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/team/TeamActivityFeed.tsx
+// features/system/projects/components/team/TeamActivityFeed.tsx
 
 import { FC, useState } from 'react'
 import type { Id } from '@/convex/_generated/dataModel'

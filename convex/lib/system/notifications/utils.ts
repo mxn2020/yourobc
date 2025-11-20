@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/notifications/utils.ts
+// convex/lib/system/notifications/utils.ts
 
 /**
  * Notification Utilities

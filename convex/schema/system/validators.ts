@@ -1,87 +1,87 @@
-// convex/schema/boilerplate/validators.ts
+// convex/schema/system/validators.ts
 
-import { boilerplateSchemas } from './schemas'
+import { systemSchemas } from './schemas'
 
 // User & Profile validators
-export const userProfile = boilerplateSchemas.userProfiles.validator
-export const userSettings = boilerplateSchemas.userSettings.validator
-export const userModelPreference = boilerplateSchemas.userModelPreferences.validator
+export const userProfile = systemSchemas.userProfiles.validator
+export const userSettings = systemSchemas.userSettings.validator
+export const userModelPreference = systemSchemas.userModelPreferences.validator
 
 // Project validators
-export const project = boilerplateSchemas.projects.validator
-export const projectCollaborator = boilerplateSchemas.projectCollaborators.validator
-export const projectTask = boilerplateSchemas.projectTasks.validator
-export const projectMember = boilerplateSchemas.projectMembers.validator
-export const projectMilestone = boilerplateSchemas.projectMilestones.validator
+export const project = systemSchemas.projects.validator
+export const projectCollaborator = systemSchemas.projectCollaborators.validator
+export const projectTask = systemSchemas.projectTasks.validator
+export const projectMember = systemSchemas.projectMembers.validator
+export const projectMilestone = systemSchemas.projectMilestones.validator
 
 // System validators
-export const auditLog = boilerplateSchemas.auditLogs.validator
-export const notification = boilerplateSchemas.notifications.validator
-export const appSetting = boilerplateSchemas.appSettings.validator
-export const systemMetric = boilerplateSchemas.systemMetrics.validator
-export const appThemeSetting = boilerplateSchemas.appThemeSettings.validator
-export const appConfig = boilerplateSchemas.appConfigs.validator
+export const auditLog = systemSchemas.auditLogs.validator
+export const notification = systemSchemas.notifications.validator
+export const appSetting = systemSchemas.appSettings.validator
+export const systemMetric = systemSchemas.systemMetrics.validator
+export const appThemeSetting = systemSchemas.appThemeSettings.validator
+export const appConfig = systemSchemas.appConfigs.validator
 
 // AI validators
-export const aiLog = boilerplateSchemas.aiLogs.validator
-export const aiTest = boilerplateSchemas.aiTests.validator
+export const aiLog = systemSchemas.aiLogs.validator
+export const aiTest = systemSchemas.aiTests.validator
 
 // Dashboard validators
-export const dashboard = boilerplateSchemas.dashboards.validator
+export const dashboard = systemSchemas.dashboards.validator
 
 // Supporting validators
-export const wikiEntry = boilerplateSchemas.wikiEntries.validator
-export const comment = boilerplateSchemas.comments.validator
-export const reminder = boilerplateSchemas.reminders.validator
-export const document = boilerplateSchemas.documents.validator
-export const scheduledEvent = boilerplateSchemas.scheduledEvents.validator
-export const availabilityPreference = boilerplateSchemas.availabilityPreferences.validator
+export const wikiEntry = systemSchemas.wikiEntries.validator
+export const comment = systemSchemas.comments.validator
+export const reminder = systemSchemas.reminders.validator
+export const document = systemSchemas.documents.validator
+export const scheduledEvent = systemSchemas.scheduledEvents.validator
+export const availabilityPreference = systemSchemas.availabilityPreferences.validator
 
 // Blog validators
-export const blogPost = boilerplateSchemas.blogPosts.validator
-export const blogCategory = boilerplateSchemas.blogCategories.validator
-export const blogTag = boilerplateSchemas.blogTags.validator
-export const blogAuthor = boilerplateSchemas.blogAuthors.validator
-export const blogProviderSync = boilerplateSchemas.blogProviderSync.validator
-export const blogMedia = boilerplateSchemas.blogMedia.validator
+export const blogPost = systemSchemas.blogPosts.validator
+export const blogCategory = systemSchemas.blogCategories.validator
+export const blogTag = systemSchemas.blogTags.validator
+export const blogAuthor = systemSchemas.blogAuthors.validator
+export const blogProviderSync = systemSchemas.blogProviderSync.validator
+export const blogMedia = systemSchemas.blogMedia.validator
 
 // Website validators
-export const website = boilerplateSchemas.websites.validator
-export const websitePage = boilerplateSchemas.websitePages.validator
-export const websiteSection = boilerplateSchemas.websiteSections.validator
-export const websiteTheme = boilerplateSchemas.websiteThemes.validator
-export const websiteTemplate = boilerplateSchemas.websiteTemplates.validator
-export const websiteCollaborator = boilerplateSchemas.websiteCollaborators.validator
+export const website = systemSchemas.websites.validator
+export const websitePage = systemSchemas.websitePages.validator
+export const websiteSection = systemSchemas.websiteSections.validator
+export const websiteTheme = systemSchemas.websiteThemes.validator
+export const websiteTemplate = systemSchemas.websiteTemplates.validator
+export const websiteCollaborator = systemSchemas.websiteCollaborators.validator
 
 // Analytics validators
-export const analyticsEvent = boilerplateSchemas.analyticsEvents.validator
-export const analyticsMetric = boilerplateSchemas.analyticsMetrics.validator
-export const analyticsDashboard = boilerplateSchemas.analyticsDashboards.validator
-export const analyticsReport = boilerplateSchemas.analyticsReports.validator
-export const analyticsProviderSync = boilerplateSchemas.analyticsProviderSync.validator
+export const analyticsEvent = systemSchemas.analyticsEvents.validator
+export const analyticsMetric = systemSchemas.analyticsMetrics.validator
+export const analyticsDashboard = systemSchemas.analyticsDashboards.validator
+export const analyticsReport = systemSchemas.analyticsReports.validator
+export const analyticsProviderSync = systemSchemas.analyticsProviderSync.validator
 
 // Integrations validators
-export const apiKey = boilerplateSchemas.apiKeys.validator
-export const apiRequestLog = boilerplateSchemas.apiRequestLogs.validator
-export const webhook = boilerplateSchemas.webhooks.validator
-export const webhookDelivery = boilerplateSchemas.webhookDeliveries.validator
-export const oauthApp = boilerplateSchemas.oauthApps.validator
-export const oauthToken = boilerplateSchemas.oauthTokens.validator
-export const externalIntegration = boilerplateSchemas.externalIntegrations.validator
-export const integrationEvent = boilerplateSchemas.integrationEvents.validator
+export const apiKey = systemSchemas.apiKeys.validator
+export const apiRequestLog = systemSchemas.apiRequestLogs.validator
+export const webhook = systemSchemas.webhooks.validator
+export const webhookDelivery = systemSchemas.webhookDeliveries.validator
+export const oauthApp = systemSchemas.oauthApps.validator
+export const oauthToken = systemSchemas.oauthTokens.validator
+export const externalIntegration = systemSchemas.externalIntegrations.validator
+export const integrationEvent = systemSchemas.integrationEvents.validator
 
 // Email validators
-export const emailConfig = boilerplateSchemas.emailConfigs.validator
-export const emailLog = boilerplateSchemas.emailLogs.validator
-export const emailTemplate = boilerplateSchemas.emailTemplates.validator
+export const emailConfig = systemSchemas.emailConfigs.validator
+export const emailLog = systemSchemas.emailLogs.validator
+export const emailTemplate = systemSchemas.emailTemplates.validator
 
 // Payment validators
-export const subscription = boilerplateSchemas.subscriptions.validator
-export const usageLog = boilerplateSchemas.usageLogs.validator
-export const paymentEvent = boilerplateSchemas.paymentEvents.validator
+export const subscription = systemSchemas.subscriptions.validator
+export const usageLog = systemSchemas.usageLogs.validator
+export const paymentEvent = systemSchemas.paymentEvents.validator
 
 // Stripe Connect validators
-export const connectedAccount = boilerplateSchemas.connectedAccounts.validator
-export const clientProduct = boilerplateSchemas.clientProducts.validator
-export const clientPayment = boilerplateSchemas.clientPayments.validator
-export const connectEvent = boilerplateSchemas.connectEvents.validator
+export const connectedAccount = systemSchemas.connectedAccounts.validator
+export const clientProduct = systemSchemas.clientProducts.validator
+export const clientPayment = systemSchemas.clientPayments.validator
+export const connectEvent = systemSchemas.connectEvents.validator

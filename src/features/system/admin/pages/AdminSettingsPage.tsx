@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Button, Card, CardContent, CardHeader, Input, SimpleSelect, Slider, Switch } from '@/components/ui'
 import { useAppSettingsManagement } from '../hooks/useAppSettingsManagement'
 import { useAdminPermissions } from '../hooks/useAdmin'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 import {
   Settings,
@@ -21,7 +21,7 @@ import { AdminLayout } from '../components/AdminLayout'
 import { AdminGuard } from '../components/AdminGuard'
 import { FeatureConfigTab } from '../components/FeatureConfigTab'
 import type { AISettings } from '../types/admin.types'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface AIConfigState {
   defaultModel: string

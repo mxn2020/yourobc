@@ -41,7 +41,7 @@ export const createI18nSeo = async (
   fallback: { title: string; description: string; keywords?: string }
 ) => {
   const metadata = typeof window === 'undefined'
-    ? await import('@/features/boilerplate/i18n/server.server').then(mod =>
+    ? await import('@/features/system/i18n/server.server').then(mod =>
         mod.loadTranslationsServer(locale as any, ['metadata'])
       )
     : {}

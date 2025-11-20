@@ -1,11 +1,11 @@
-// features/boilerplate/projects/pages/ProjectTeamPage.tsx
+// features/system/projects/pages/ProjectTeamPage.tsx
 import { FC, useState, useMemo } from 'react'
 import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import { Card, Loading, Badge, Button } from '@/components/ui'
 import { Users, Briefcase, Calendar, ArrowRight } from 'lucide-react'
 import { useUserMemberships } from '../hooks/useTeam'
-import { useCurrentUser } from '@/features/boilerplate/auth'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { useCurrentUser } from '@/features/system/auth'
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 
 export const ProjectTeamPage: FC = () => {
   const navigate = useNavigate()

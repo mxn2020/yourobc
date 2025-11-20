@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/utils.ts
+// convex/lib/system/system_metrics/utils.ts
 // Utility functions for systemMetrics module
 
 import { SYSTEM_METRICS_CONSTANTS } from './constants';

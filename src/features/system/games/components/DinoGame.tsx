@@ -37,12 +37,12 @@ export const DinoGame = () => {
   const [isNewHighScore, setIsNewHighScore] = useState(false);
 
   // Convex mutations and queries
-  const saveScore = useMutation(api.lib.boilerplate.games.mutations.saveScore);
+  const saveScore = useMutation(api.lib.system.games.mutations.saveScore);
   const userBestScore = useQuery(
-    api.lib.boilerplate.games.queries.getUserBestScore,
+    api.lib.system.games.queries.getUserBestScore,
     { gameName: GAME_NAME }
   );
-  const userRank = useQuery(api.lib.boilerplate.games.queries.getUserRank, {
+  const userRank = useQuery(api.lib.system.games.queries.getUserRank, {
     gameName: GAME_NAME,
   });
 

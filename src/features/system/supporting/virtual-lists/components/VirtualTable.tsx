@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/VirtualTable.tsx
+// src/features/system/supporting/virtual-lists/components/VirtualTable.tsx
 
 import React, { useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'

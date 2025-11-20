@@ -1,6 +1,6 @@
 // src/types/index.ts
 
-import { UserRole } from '@/features/boilerplate/auth';
+import { UserRole } from '@/features/system/auth';
 import type { Id } from '../../convex/_generated/dataModel'
 import { EntityType, NotificationType } from '@/convex/types';
 

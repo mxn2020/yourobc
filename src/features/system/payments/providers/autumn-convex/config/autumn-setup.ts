@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/config/autumn-setup.ts
+// src/features/system/payments/providers/autumn-convex/config/autumn-setup.ts
 /**
  * Autumn Convex Setup
  * 

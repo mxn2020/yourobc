@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/handlers/blog.ts
+// convex/lib/system/supporting/scheduling/handlers/blog.ts
 
 import type { SchedulingHandler } from './types';
 import type { MutationCtx } from '@/generated/server';

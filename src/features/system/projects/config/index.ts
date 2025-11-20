@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/config/index.ts
+// src/features/system/projects/config/index.ts
 /**
  * Projects Feature Configuration
  *

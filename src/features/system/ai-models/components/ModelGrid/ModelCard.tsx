@@ -1,5 +1,5 @@
 import React from 'react';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 import { Link } from '@tanstack/react-router';
 import { 
   ExternalLink, 
@@ -13,10 +13,10 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { Badge, Button, Card, Chip, Tooltip } from '@/components/ui';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { useModelPreferences, useSetDefaultModel, useClearDefaultModel } from '../../hooks/useModelPreferences';
 import type { ModelCardProps } from '../../types/model.types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { UserPreferences } from '../../types/preferences.types';
 import { Id } from "@/convex/_generated/dataModel";
 

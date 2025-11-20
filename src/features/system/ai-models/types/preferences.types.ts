@@ -1,4 +1,4 @@
-import { ModelSort } from '@/features/boilerplate/ai-core/types';
+import { ModelSort } from '@/features/system/ai-core/types';
 
 // src/features/ai-models/types/preferences.types.ts
 export interface UserPreferences {

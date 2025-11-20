@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/providers/sentry/SentryLogger.ts
+// src/features/system/logging/providers/sentry/SentryLogger.ts
 
 import * as Sentry from '@sentry/react'
 import {

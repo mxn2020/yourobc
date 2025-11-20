@@ -3,7 +3,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LinkShortenerPage, linkShortenerService } from '@/features/marketing/link-shortener'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute(

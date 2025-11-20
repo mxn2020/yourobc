@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/services/ProfileManagementService.ts
+// src/features/system/auth/services/ProfileManagementService.ts
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
@@ -21,7 +21,7 @@ class ProfileManagementService {
   // === Profile Queries ===
   useCurrentUserProfile(enabled = true) {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.user_profiles.queries.getProfileByAuthId, {}),
+      ...convexQuery(api.lib.system.user_profiles.queries.getProfileByAuthId, {}),
       enabled, // Only run when enabled
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
@@ -31,13 +31,13 @@ class ProfileManagementService {
   // === Profile Mutations ===
   useUpdateProfile() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_profiles.mutations.updateProfile),
+      mutationFn: useConvexMutation(api.lib.system.user_profiles.mutations.updateProfile),
     })
   }
 
   useUpdateActivity() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_profiles.mutations.updateActivity),
+      mutationFn: useConvexMutation(api.lib.system.user_profiles.mutations.updateActivity),
     })
   }
 

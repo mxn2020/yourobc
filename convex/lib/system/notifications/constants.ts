@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/notifications/constants.ts
+// convex/lib/system/notifications/constants.ts
 
 export const NOTIFICATION_CONSTANTS = {
   // Permissions

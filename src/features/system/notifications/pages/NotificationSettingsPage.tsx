@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui'
 import { Button } from '@/components/ui'
 import { Bell, Mail, Globe, Save } from 'lucide-react'
 import { useNotificationSettings } from '../hooks/useNotificationSettings'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 
 export function NotificationSettingsPage() {

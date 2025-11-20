@@ -1,6 +1,6 @@
-// src/features/boilerplate/payments/hooks/useSubscription.ts
+// src/features/system/payments/hooks/useSubscription.ts
 import { paymentsService } from '../services/PaymentsService'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 
 /**
  * Hook to get subscription data

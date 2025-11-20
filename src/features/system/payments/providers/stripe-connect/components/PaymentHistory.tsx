@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/components/PaymentHistory.tsx
+// src/features/system/payments/providers/stripe-connect/components/PaymentHistory.tsx
 /**
  * Payment History Component
  *

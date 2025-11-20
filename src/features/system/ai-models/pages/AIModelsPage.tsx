@@ -11,7 +11,7 @@ import { ProviderConfig } from '../components/ModelSettings/ProviderConfig';
 import { CostCalculator } from '../components/CostCalculator/CostCalculator';
 import { Badge, Button, Card, CardContent, Input } from '@/components/ui';
 import { createEmptyFilter } from '../utils/model-filters';
-import type { ModelFilter, ModelSort, ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelFilter, ModelSort, ModelInfo } from '@/features/system/ai-core/types';
 
 export function AIModelsPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_model_preferences/index.ts
+// convex/lib/system/user_settings/user_model_preferences/index.ts
 // Barrel exports for user model preferences module
 
 // Export constants

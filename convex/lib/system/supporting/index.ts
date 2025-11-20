@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/index.ts
+// convex/lib/system/supporting/index.ts
 
 /**
  * Supporting Modules
@@ -11,9 +11,9 @@
  * - Wiki: Knowledge base articles and guides
  *
  * Note: Notifications is a main feature, not a supporting feature.
- * It is located at convex/lib/boilerplate/notifications/
+ * It is located at convex/lib/system/notifications/
  *
- * @module convex/lib/boilerplate/supporting
+ * @module convex/lib/system/supporting
  */
 
 // ============================================================================

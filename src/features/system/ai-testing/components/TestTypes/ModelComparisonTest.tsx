@@ -3,16 +3,16 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { BarChart3, Play, Plus, X } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui';
 import { Button } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import { Badge } from '@/components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
 import { useTestComparison } from '../../hooks/useTestComparison';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { TestComparisonConfig } from '../../types/test.types';
-import { formatCost } from '@/features/boilerplate/ai-core/utils';
-import { useToast } from '@/features/boilerplate/notifications';
+import { formatCost } from '@/features/system/ai-core/utils';
+import { useToast } from '@/features/system/notifications';
 
 export function ModelComparisonTest() {
   const toast = useToast();

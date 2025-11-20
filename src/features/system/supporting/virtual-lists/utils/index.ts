@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/utils/index.ts
+// src/features/system/supporting/virtual-lists/utils/index.ts
 
 import type { VirtualListMetrics } from '../types'
 

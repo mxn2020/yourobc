@@ -1,7 +1,7 @@
-// src/features/boilerplate/supporting/documents/components/DocumentsSection.tsx
+// src/features/system/supporting/documents/components/DocumentsSection.tsx
 
 import { useState } from 'react';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import {
   useEntityDocuments,
   useCreateDocument,

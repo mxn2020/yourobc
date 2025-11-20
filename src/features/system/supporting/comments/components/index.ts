@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/comments/components/index.ts
+// src/features/system/supporting/comments/components/index.ts
 
 export * from './CommentCard';
 export * from './CommentForm';

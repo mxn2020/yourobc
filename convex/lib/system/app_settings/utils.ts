@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_settings/utils.ts
+// convex/lib/system/app_settings/utils.ts
 
 import { APP_SETTINGS_CONSTANTS, DEFAULT_APP_SETTING_VALUES } from './constants';
 import type { 

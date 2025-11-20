@@ -109,7 +109,7 @@ Comments are enabled by default. Users can comment on published posts!
 ## 🎨 Customize
 
 ### Change Posts Per Page
-Edit `/src/features/boilerplate/blog/config/index.ts`:
+Edit `/src/features/system/blog/config/index.ts`:
 ```typescript
 export const BLOG_CONFIG = {
   postsPerPage: 12, // Change this

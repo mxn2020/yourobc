@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/configs/index.ts
+// convex/lib/system/email/configs/index.ts
 // Public API exports for email configs module
 
 // Constants

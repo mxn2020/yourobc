@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/services/AnalyticsService.ts
+// src/features/system/analytics/services/AnalyticsService.ts
 
 import { AnalyticsProvider, AnalyticsProviderType } from "../types";
 import { getAnalyticsProvider, shouldTrackEvent } from "../config/analytics-config";

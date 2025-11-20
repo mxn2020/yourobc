@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/components/BasicTable.tsx
+// src/features/system/supporting/tables/components/BasicTable.tsx
 
 import React from 'react'
 import {

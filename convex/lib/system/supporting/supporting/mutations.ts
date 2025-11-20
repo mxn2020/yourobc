@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/mutations.ts
+// convex/lib/system/supporting/supporting/mutations.ts
 // Write operations for supporting module
 
 import { v } from 'convex/values';

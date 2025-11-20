@@ -56,7 +56,7 @@ function getDefaultSettings(): NotificationSettings {
 
 export function useNotificationSettingsCore() {
   return useQuery({
-    ...convexQuery(api.lib.boilerplate.user_settings.queries.getUserSettings, {
+    ...convexQuery(api.lib.system.user_settings.queries.getUserSettings, {
       key: 'notificationPreferences'
     }),
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -71,7 +71,7 @@ export function useNotificationSettingsCore() {
 
 export function useNotificationSetting(key: keyof NotificationSettings) {
   return useQuery({
-    ...convexQuery(api.lib.boilerplate.user_settings.queries.getUserSetting, {
+    ...convexQuery(api.lib.system.user_settings.queries.getUserSetting, {
       key: `notificationPreferences.${key}`
     }),
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -88,7 +88,7 @@ export function useNotificationSetting(key: keyof NotificationSettings) {
 
 export function useUpdateNotificationSettings() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.updateUserSettings),
+    mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.updateUserSettings),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -97,7 +97,7 @@ export function useUpdateNotificationSettings() {
 
 export function useUpdateNotificationSetting() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.updateUserSetting),
+    mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.updateUserSetting),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -106,7 +106,7 @@ export function useUpdateNotificationSetting() {
 
 export function useResetNotificationSettings() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.deleteUserSetting),
+    mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.deleteUserSetting),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }

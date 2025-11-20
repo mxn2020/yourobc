@@ -7,10 +7,10 @@ import { Input } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { BatchTestConfig } from '../../types/test.types';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 interface TestCase {
   name: string;

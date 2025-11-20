@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/components/GameStats.tsx
+// src/features/system/tetris/components/GameStats.tsx
 
 import type { GameState } from '../types';
 

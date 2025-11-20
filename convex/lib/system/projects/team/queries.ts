@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/team/queries.ts
+// convex/lib/system/projects/team/queries.ts
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';

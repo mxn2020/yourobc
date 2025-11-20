@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/index.ts
+// src/features/system/integrations/hooks/index.ts
 
 // Context and main hook
 export * from "./useIntegrations";

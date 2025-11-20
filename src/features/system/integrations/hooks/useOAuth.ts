@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/useOAuth.ts
+// src/features/system/integrations/hooks/useOAuth.ts
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -47,13 +47,13 @@ import {
  */
 export function useOAuthApps() {
   const oauthApps = useQuery(
-    api.lib.boilerplate.integrations.queries.getOAuthApps,
+    api.lib.system.integrations.queries.getOAuthApps,
     {}
   );
 
-  const createOAuthAppMutation = useMutation(api.lib.boilerplate.integrations.mutations.createOAuthApp);
-  const updateOAuthAppMutation = useMutation(api.lib.boilerplate.integrations.mutations.updateOAuthApp);
-  const deleteOAuthAppMutation = useMutation(api.lib.boilerplate.integrations.mutations.deleteOAuthApp);
+  const createOAuthAppMutation = useMutation(api.lib.system.integrations.mutations.createOAuthApp);
+  const updateOAuthAppMutation = useMutation(api.lib.system.integrations.mutations.updateOAuthApp);
+  const deleteOAuthAppMutation = useMutation(api.lib.system.integrations.mutations.deleteOAuthApp);
 
   return useMemo(
     () => ({
@@ -114,7 +114,7 @@ export function useOAuthApps() {
  */
 export function useOAuthApp(appId: Id<"oauthApps"> | undefined) {
   const oauthApp = useQuery(
-    api.lib.boilerplate.integrations.queries.getOAuthApp,
+    api.lib.system.integrations.queries.getOAuthApp,
     appId ? { appId } : "skip"
   );
 
@@ -132,7 +132,7 @@ export function useOAuthApp(appId: Id<"oauthApps"> | undefined) {
  */
 export function useOAuthAppByClientId(clientId: string | undefined) {
   const oauthApp = useQuery(
-    api.lib.boilerplate.integrations.queries.getOAuthAppByClientId,
+    api.lib.system.integrations.queries.getOAuthAppByClientId,
     clientId ? { clientId } : "skip"
   );
 
@@ -150,7 +150,7 @@ export function useOAuthAppByClientId(clientId: string | undefined) {
  */
 export function useOAuthTokens(appId: Id<"oauthApps"> | undefined) {
   const tokens = useQuery(
-    api.lib.boilerplate.integrations.queries.getOAuthTokens,
+    api.lib.system.integrations.queries.getOAuthTokens,
     appId ? { appId } : "skip"
   );
 
@@ -184,7 +184,7 @@ export function useActiveOAuthTokens(appId: Id<"oauthApps"> | undefined) {
  * Hook to revoke an OAuth token
  */
 export function useRevokeOAuthToken() {
-  const revokeTokenMutation = useMutation(api.lib.boilerplate.integrations.mutations.revokeOAuthToken);
+  const revokeTokenMutation = useMutation(api.lib.system.integrations.mutations.revokeOAuthToken);
 
   return useMemo(
     () => ({
@@ -203,7 +203,7 @@ export function useRevokeOAuthToken() {
  * Hook to rotate OAuth app client secret
  */
 export function useRotateClientSecret() {
-  const rotateMutation = useMutation(api.lib.boilerplate.integrations.mutations.rotateClientSecret);
+  const rotateMutation = useMutation(api.lib.system.integrations.mutations.rotateClientSecret);
 
   return useMemo(
     () => ({
@@ -223,7 +223,7 @@ export function useRotateClientSecret() {
  */
 export function useOAuthAppStats(appId: Id<"oauthApps"> | undefined) {
   const stats = useQuery(
-    api.lib.boilerplate.integrations.queries.getOAuthAppStats,
+    api.lib.system.integrations.queries.getOAuthAppStats,
     appId ? { appId } : "skip"
   );
 
@@ -241,9 +241,9 @@ export function useOAuthAppStats(appId: Id<"oauthApps"> | undefined) {
  */
 export function useOAuthAuthorization() {
   const createAuthorizationMutation = useMutation(
-    api.lib.boilerplate.integrations.mutations.createOAuthAuthorization
+    api.lib.system.integrations.mutations.createOAuthAuthorization
   );
-  const exchangeCodeMutation = useMutation(api.lib.boilerplate.integrations.mutations.exchangeAuthorizationCode);
+  const exchangeCodeMutation = useMutation(api.lib.system.integrations.mutations.exchangeAuthorizationCode);
 
   return useMemo(
     () => ({

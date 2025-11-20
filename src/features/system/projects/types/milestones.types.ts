@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/types/milestones.types.ts
+// src/features/system/projects/types/milestones.types.ts
 
 import type { Id } from '@/convex/_generated/dataModel'
 

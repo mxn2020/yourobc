@@ -1,11 +1,11 @@
-// convex/schema/boilerplate/index.ts
+// convex/schema/system/index.ts
 
 /**
- * Boilerplate Schema Module
+ * System Schema Module
  *
- * Central entry point for all boilerplate/boilerplate schemas, validators, and types
+ * Central entry point for all system/system schemas, validators, and types
  */
 
-export { boilerplateSchemas } from './schemas'
-export * as boilerplateValidators from './validators'
+export { systemSchemas } from './schemas'
+export * as systemValidators from './validators'
 export * from './types'

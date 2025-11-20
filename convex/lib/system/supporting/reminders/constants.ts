@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/constants.ts
+// convex/lib/system/supporting/reminders/constants.ts
 
 /**
  * Reminders Module Constants

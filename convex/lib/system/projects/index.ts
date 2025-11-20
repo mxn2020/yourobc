@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/index.ts
+// convex/lib/system/projects/index.ts
 // Re-export from new GUIDE-compliant structure for backward compatibility
 
 // Re-export everything from the new projects module

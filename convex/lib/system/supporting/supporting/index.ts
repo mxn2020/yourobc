@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/index.ts
+// convex/lib/system/supporting/supporting/index.ts
 // Public API exports for supporting module
 
 // Constants

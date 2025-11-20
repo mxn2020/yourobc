@@ -1,13 +1,13 @@
-// src/features/boilerplate/auth/components/LoginForm.tsx
+// src/features/system/auth/components/LoginForm.tsx
 
 import React, { useEffect } from 'react'
 import { useSearch, useNavigate, Link } from '@tanstack/react-router'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react'
 import { authService } from '../services/AuthService'
 import type { LoginFormData, AuthFormProps } from '../types/auth.types'
-import { useToast } from '@/features/boilerplate/notifications/hooks/use-toast'
+import { useToast } from '@/features/system/notifications/hooks/use-toast'
 import { Button, Checkbox, Input, Alert, AlertDescription, Label } from '@/components/ui'
-import { useTranslation, defaultLocale } from '@/features/boilerplate/i18n'
+import { useTranslation, defaultLocale } from '@/features/system/i18n'
 import { useAuthForm } from '../hooks/useAuthForm'
 
 interface LoginFormProps extends Omit<AuthFormProps, 'onSubmit'> {

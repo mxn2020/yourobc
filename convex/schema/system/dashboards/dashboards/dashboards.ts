@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/dashboards/dashboards/dashboards.ts
+// convex/schema/system/dashboards/dashboards/dashboards.ts
 // Table definitions for dashboards module
 
 import { defineTable } from 'convex/server';

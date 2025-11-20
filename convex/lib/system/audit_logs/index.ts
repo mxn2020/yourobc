@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/index.ts
+// convex/lib/system/audit_logs/index.ts
 
 // Export constants and types
 export { AUDIT_LOG_CONSTANTS } from './constants'

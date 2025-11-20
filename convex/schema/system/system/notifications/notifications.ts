@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/notifications/notifications.ts
+// convex/schema/system/system/notifications/notifications.ts
 // Table definitions for notifications module
 
 import { defineTable } from 'convex/server';

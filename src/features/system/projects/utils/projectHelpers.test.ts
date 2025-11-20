@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/utils/projectHelpers.test.ts
+// src/features/system/projects/utils/projectHelpers.test.ts
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {

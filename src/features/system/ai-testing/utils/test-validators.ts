@@ -1,7 +1,7 @@
 // src/features/ai-testing/utils/test-validators.ts
-import type { ValidationResult } from '@/features/boilerplate/ai-core/types';
+import type { ValidationResult } from '@/features/system/ai-core/types';
 import type { TestFormData, TestComparisonConfig, ParameterTuningConfig, BatchTestConfig } from '../types/test.types';
-import { validateModelId, validatePrompt, validateParameters } from '@/features/boilerplate/ai-core/utils';
+import { validateModelId, validatePrompt, validateParameters } from '@/features/system/ai-core/utils';
 
 export function validateTestForm(data: TestFormData): ValidationResult {
   const errors: string[] = [];

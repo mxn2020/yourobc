@@ -1,9 +1,9 @@
 // src/features/ai-testing/utils/test-formatters.ts
-import type { TestResult, TestStatus } from '@/features/boilerplate/ai-core/types';
+import type { TestResult, TestStatus } from '@/features/system/ai-core/types';
 import type { TestResultSummary, TestHistoryItem } from '../types/test-results.types';
-import { formatDuration, formatDate } from '@/features/boilerplate/ai-core/utils';
-import { formatCost } from '@/features/boilerplate/ai-core/utils';
-import { formatTokenCount } from '@/features/boilerplate/ai-core/utils';
+import { formatDuration, formatDate } from '@/features/system/ai-core/utils';
+import { formatCost } from '@/features/system/ai-core/utils';
+import { formatTokenCount } from '@/features/system/ai-core/utils';
 
 export function formatTestStatus(status: TestStatus): {
   label: string;

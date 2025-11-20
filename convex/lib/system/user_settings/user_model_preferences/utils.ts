@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_model_preferences/utils.ts
+// convex/lib/system/user_settings/user_model_preferences/utils.ts
 // Utility functions for user model preferences module
 
 import { Id } from '@/generated/dataModel';

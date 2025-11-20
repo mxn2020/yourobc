@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/config/index.ts
+// src/features/system/auth/config/index.ts
 /**
  * Authentication Configuration
  *

@@ -4,8 +4,8 @@ import { Button, Card, CardContent, Input, SimpleSelect as Select } from '@/comp
 import { Search, X, Filter } from 'lucide-react';
 import { DateRangePicker } from './DateRangePicker';
 import { AdvancedFilters } from './AdvancedFilters';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
-import type { ModelProvider } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
+import type { ModelProvider } from '@/features/system/ai-core/types';
 import type { LogDateRange } from '../../types/log.types';
 import { getActiveFilterCount } from '../../utils/log-filters';
 

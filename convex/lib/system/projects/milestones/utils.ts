@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/milestones/utils.ts
+// convex/lib/system/milestones/utils.ts
 
 import { MILESTONE_CONSTANTS, PRIORITY_WEIGHTS } from './constants';
 import type { Milestone } from './types';

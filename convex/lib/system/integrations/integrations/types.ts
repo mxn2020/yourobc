@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/types.ts
+// convex/lib/system/integrations/integrations/types.ts
 // Type definitions for integrations module
 
 import { Id } from '@/generated/dataModel';

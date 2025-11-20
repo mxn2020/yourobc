@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/providers/n8nProvider.ts
+// src/features/system/integrations/providers/n8nProvider.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 import {

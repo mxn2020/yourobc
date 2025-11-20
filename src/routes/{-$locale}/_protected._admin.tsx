@@ -1,11 +1,11 @@
 // src/routes/{-$locale}/_protected._admin.tsx  ✅ Correct path
 
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { requireAdminServer } from '@/features/boilerplate/auth/lib/server-functions'
+import { requireAdminServer } from '@/features/system/auth/lib/server-functions'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '@/convex/_generated/api'
-import { locales, defaultLocale } from '@/features/boilerplate/i18n'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { locales, defaultLocale } from '@/features/system/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin')({
   beforeLoad: async ({ context, location, params }) => {
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin')({
 
     // Check user profile and admin role
     const userProfile = await context.queryClient.ensureQueryData(
-      convexQuery(api.lib.boilerplate.user_profiles.queries.getProfileByAuthId, {})
+      convexQuery(api.lib.system.user_profiles.queries.getProfileByAuthId, {})
     )
 
     // Verify admin role and active status

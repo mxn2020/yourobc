@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/index.ts - Updated with clean separation
+// src/features/system/auth/index.ts - Updated with clean separation
 // CLIENT-SAFE EXPORTS ONLY - For client-side imports use this file
 
 // === Core Auth Client ===

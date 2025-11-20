@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/projects/projects/validators.ts
+// convex/schema/system/projects/projects/validators.ts
 // Grouped validators for projects module
 
 import { v } from 'convex/values';

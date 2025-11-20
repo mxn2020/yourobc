@@ -1,4 +1,4 @@
-// src/features/boilerplate/_shared/env-utils.ts
+// src/features/system/_shared/env-utils.ts
 /**
  * Environment Utilities
  *

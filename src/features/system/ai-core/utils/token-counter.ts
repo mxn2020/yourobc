@@ -1,11 +1,11 @@
 // src/core/ai/utils/token-counter.ts
-import type { TokenUsage } from '@/features/boilerplate/ai-core/types';
+import type { TokenUsage } from '@/features/system/ai-core/types';
 import { 
   estimateTokenCount, 
   estimatePromptTokens,
   calculateTokensPerSecond,
   calculateWordsPerMinute 
-} from '@/features/boilerplate/ai-core/utils';
+} from '@/features/system/ai-core/utils';
 
 export interface TokenCountResult {
   estimatedTokens: number;

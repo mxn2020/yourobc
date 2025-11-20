@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/index.ts
+// src/features/system/analytics/index.ts
 // Main export file for the Analytics feature
 
 // Types (export types explicitly to avoid conflicts with component names)

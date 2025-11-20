@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/email/configs/validators.ts
+// convex/schema/system/email/configs/validators.ts
 // Grouped validators for email configs module
 
 import { v } from 'convex/values';

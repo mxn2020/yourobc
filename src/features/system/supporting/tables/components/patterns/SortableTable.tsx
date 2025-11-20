@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/components/patterns/SortableTable.tsx
+// src/features/system/supporting/tables/components/patterns/SortableTable.tsx
 
 import React, { useState } from 'react'
 import type { SortableTableProps } from '../../types'

@@ -1,6 +1,6 @@
-// filepath: src/features/boilerplate/_shared/types.ts
+// filepath: src/features/system/_shared/types.ts
 /**
- * Shared type definitions used across all boilerplate features
+ * Shared type definitions used across all system features
  *
  * This file provides core type aliases that ensure consistency
  * throughout the application, particularly around user identification.

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/scheduling/hooks/useScheduling.ts
+// src/features/system/supporting/scheduling/hooks/useScheduling.ts
 
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -9,7 +9,7 @@ import type { Id } from '@/convex/_generated/dataModel';
  */
 export function useEntityEvents(entityType: string, entityId: string) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getEventsByEntity,
+    api.lib.system.supporting.scheduling.queries.getEventsByEntity,
     { entityType, entityId }
   );
 }
@@ -19,7 +19,7 @@ export function useEntityEvents(entityType: string, entityId: string) {
  */
 export function useScheduledEvent(eventId?: Id<'scheduledEvents'>) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getEvent,
+    api.lib.system.supporting.scheduling.queries.getEvent,
     eventId ? { eventId } : 'skip'
   );
 }
@@ -29,7 +29,7 @@ export function useScheduledEvent(eventId?: Id<'scheduledEvents'>) {
  */
 export function useUserEvents(includeAttending?: boolean) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getUserEvents,
+    api.lib.system.supporting.scheduling.queries.getUserEvents,
     { includeAttending }
   );
 }
@@ -43,7 +43,7 @@ export function useEventsInRange(
   handlerType?: string
 ) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getEventsByDateRange,
+    api.lib.system.supporting.scheduling.queries.getEventsByDateRange,
     { startDate, endDate, handlerType }
   );
 }
@@ -53,7 +53,7 @@ export function useEventsInRange(
  */
 export function useUpcomingEvents(handlerType?: string) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getUpcomingEvents,
+    api.lib.system.supporting.scheduling.queries.getUpcomingEvents,
     { handlerType }
   );
 }
@@ -63,7 +63,7 @@ export function useUpcomingEvents(handlerType?: string) {
  */
 export function useTodayEvents() {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getTodayEvents,
+    api.lib.system.supporting.scheduling.queries.getTodayEvents,
     {}
   );
 }
@@ -76,7 +76,7 @@ export function useCheckAvailability(
   endTime: number
 ) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.checkAvailability,
+    api.lib.system.supporting.scheduling.queries.checkAvailability,
     { startTime, endTime }
   );
 }
@@ -86,7 +86,7 @@ export function useCheckAvailability(
  */
 export function useAvailabilityPreferences() {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.getAvailabilityPreferences,
+    api.lib.system.supporting.scheduling.queries.getAvailabilityPreferences,
     {}
   );
 }
@@ -100,7 +100,7 @@ export function useFindAvailableSlots(
   duration: number
 ) {
   return useQuery(
-    api.lib.boilerplate.supporting.scheduling.queries.findAvailableSlots,
+    api.lib.system.supporting.scheduling.queries.findAvailableSlots,
     { startDate, endDate, duration }
   );
 }
@@ -109,54 +109,54 @@ export function useFindAvailableSlots(
  * Create a new scheduled event
  */
 export function useCreateEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.createEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.createEvent);
 }
 
 /**
  * Update an existing event
  */
 export function useUpdateEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.updateEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.updateEvent);
 }
 
 /**
  * Cancel an event
  */
 export function useCancelEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.cancelEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.cancelEvent);
 }
 
 /**
  * Delete an event
  */
 export function useDeleteEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.deleteEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.deleteEvent);
 }
 
 /**
  * RSVP to an event
  */
 export function useRespondToEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.respondToEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.respondToEvent);
 }
 
 /**
  * Reschedule an event
  */
 export function useRescheduleEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.rescheduleEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.rescheduleEvent);
 }
 
 /**
  * Mark event as completed
  */
 export function useCompleteEvent() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.completeEvent);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.completeEvent);
 }
 
 /**
  * Update availability preferences
  */
 export function useUpdateAvailabilityPreferences() {
-  return useMutation(api.lib.boilerplate.supporting.scheduling.mutations.updateAvailabilityPreferences);
+  return useMutation(api.lib.system.supporting.scheduling.mutations.updateAvailabilityPreferences);
 }

@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/user_settings/user_settings/validators.ts
+// convex/schema/system/user_settings/user_settings/validators.ts
 // Grouped validators for user settings module
 
 import { v } from 'convex/values';

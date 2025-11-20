@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/hooks/useStripeSubscription.ts
+// src/features/system/payments/providers/stripe/hooks/useStripeSubscription.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -11,7 +11,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth/hooks/useAuth';
+import { useAuth } from '@/features/system/auth/hooks/useAuth';
 import type { SubscriptionData } from '../types';
 
 interface CancelResult {
@@ -91,13 +91,13 @@ export function useStripeSubscription() {
 
   // Query active subscription for user
   const subscription = useQuery(
-    api.lib.boilerplate.payments.stripe.queries.getActiveSubscription,
+    api.lib.system.payments.stripe.queries.getActiveSubscription,
     {}
   ) as SubscriptionData | undefined | null;
 
   // Query all subscriptions for user
   const allSubscriptions = useQuery(
-    api.lib.boilerplate.payments.stripe.queries.getSubscriptionsByUserId,
+    api.lib.system.payments.stripe.queries.getSubscriptionsByUserId,
     {}
   );
 

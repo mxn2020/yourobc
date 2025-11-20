@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/handlers/registry.ts
+// convex/lib/system/supporting/scheduling/handlers/registry.ts
 
 import type { SchedulingHandler, HandlerRegistration } from './types';
 import type { SchedulingHandlerConfig } from '@/shared/types';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/hooks/useAutumnConvex.ts
+// src/features/system/payments/providers/autumn-convex/hooks/useAutumnConvex.ts
 /**
  * Autumn Convex Hooks
  * 
@@ -7,7 +7,7 @@
 
 import { useAction, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { useEffect, useState } from 'react';
 import type { FeatureAccess, UsageStats, CheckoutOptions, CheckoutResult } from '../../../types';
 

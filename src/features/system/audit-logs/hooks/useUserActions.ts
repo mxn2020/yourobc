@@ -1,7 +1,7 @@
-// src/features/boilerplate/audit-logs/hooks/useUserActions.ts
+// src/features/system/audit-logs/hooks/useUserActions.ts
 
-import { useAuth } from '@/features/boilerplate/auth'
-import { AuditLogHelpers, useMyAuditLogs } from '@/features/boilerplate/audit-logs'
+import { useAuth } from '@/features/system/auth'
+import { AuditLogHelpers, useMyAuditLogs } from '@/features/system/audit-logs'
 
 export function useUserActions() {
     const { createAuditLog } = useMyAuditLogs()

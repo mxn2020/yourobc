@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/components/DocumentCard.tsx
+// src/features/system/supporting/documents/components/DocumentCard.tsx
 
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';

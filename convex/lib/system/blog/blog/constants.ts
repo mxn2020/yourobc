@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/constants.ts
+// convex/lib/system/blog/blog/constants.ts
 // Business constants, permissions, and limits for blog module
 
 export const BLOG_CONSTANTS = {

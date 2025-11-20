@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/services/PaymentsService.ts
+// src/features/system/payments/services/PaymentsService.ts
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useActiveProvider } from '../hooks/useActiveProvider'
 import { 

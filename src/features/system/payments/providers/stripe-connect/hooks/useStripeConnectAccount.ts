@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/hooks/useStripeConnectAccount.ts
+// src/features/system/payments/providers/stripe-connect/hooks/useStripeConnectAccount.ts
 /**
  * Stripe Connect Account Hook
  *
@@ -7,7 +7,7 @@
 
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 
 /**
  * Hook to get and manage the connected Stripe account for the current user
@@ -33,7 +33,7 @@ export function useStripeConnectAccount() {
 
   // Query connected account by user email
   const account = useQuery(
-    api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccountByEmail,
+    api.lib.system.payments.stripe_connect.queries.getConnectedAccountByEmail,
     user?.email ? { email: user.email } : 'skip'
   );
 

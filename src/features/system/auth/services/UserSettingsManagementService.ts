@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/services/UserSettingsManagementService.ts
+// src/features/system/auth/services/UserSettingsManagementService.ts
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
@@ -34,7 +34,7 @@ class UserSettingsManagementService {
   // === Settings Queries ===
   useUserSettings(enabled = true) {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.user_settings.queries.getUserSettings, {}),
+      ...convexQuery(api.lib.system.user_settings.queries.getUserSettings, {}),
       enabled, // Only run when enabled
       staleTime: 10 * 60 * 1000, // 10 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes
@@ -43,7 +43,7 @@ class UserSettingsManagementService {
 
   useUserModelPreferences(enabled = true) {
     return useQuery({
-      ...convexQuery(api.lib.boilerplate.user_settings.queries.getUserModelPreferences, {}),
+      ...convexQuery(api.lib.system.user_settings.queries.getUserModelPreferences, {}),
       enabled, // Only run when enabled
       staleTime: 10 * 60 * 1000, // 10 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes
@@ -53,37 +53,37 @@ class UserSettingsManagementService {
   // === Settings Mutations ===
   useUpdateUserSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.updateUserSettings),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.updateUserSettings),
     })
   }
 
   useResetUserSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.resetUserSettings),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.resetUserSettings),
     })
   }
 
   useUpdateModelPreferences() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.updateUserModelPreferences),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.updateUserModelPreferences),
     })
   }
 
   useSetDefaultModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.setDefaultModel),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.setDefaultModel),
     })
   }
 
   useToggleFavoriteModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.toggleFavoriteModel),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.toggleFavoriteModel),
     })
   }
 
   useClearDefaultModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.boilerplate.user_settings.mutations.clearDefaultModel),
+      mutationFn: useConvexMutation(api.lib.system.user_settings.mutations.clearDefaultModel),
     })
   }
 

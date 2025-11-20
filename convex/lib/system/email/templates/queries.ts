@@ -1,10 +1,10 @@
-// convex/lib/boilerplate/email/templates/queries.ts
+// convex/lib/system/email/templates/queries.ts
 // Read operations for email templates module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { emailTemplatesValidators } from '@/schema/boilerplate/email/templates/validators';
+import { emailTemplatesValidators } from '@/schema/system/email/templates/validators';
 import { filterEmailTemplatesByAccess, requireViewEmailTemplateAccess } from './permissions';
 import type { EmailTemplateListResponse, TemplateStats } from './types';
 

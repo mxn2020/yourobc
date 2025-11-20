@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/permission_requests/index.ts
+// convex/lib/system/permission_requests/index.ts
 // Barrel exports for permissionRequests module
 
 // Export constants and types

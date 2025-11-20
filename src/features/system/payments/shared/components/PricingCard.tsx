@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/PricingCard.tsx
+// src/features/system/payments/shared/components/PricingCard.tsx
 /**
  * Generic Pricing Card Component
  * 

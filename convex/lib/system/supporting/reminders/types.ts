@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/types.ts
+// convex/lib/system/supporting/reminders/types.ts
 
 /**
  * Reminders Module Types

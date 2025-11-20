@@ -1,10 +1,10 @@
-// src/features/boilerplate/integrations/EXAMPLES.tsx
+// src/features/system/integrations/EXAMPLES.tsx
 
 /**
  * Integrations Feature - Usage Examples
  *
  * This file contains practical examples of how to use the Integrations feature
- * in your TanStack Start + Convex boilerplate.
+ * in your TanStack Start + Convex system.
  */
 
 import { Id } from "@/convex/_generated/dataModel";
@@ -22,7 +22,7 @@ import {
   ApiKeyList,
   WebhookForm,
   WebhookList,
-} from "@/features/boilerplate/integrations";
+} from "@/features/system/integrations";
 
 // ============================================================================
 // Example 1: Basic API Key Management
@@ -405,7 +405,7 @@ export function Example11_IntegrationHealthMonitoring() {
 // ============================================================================
 
 export async function Example12_UsingServiceDirectly() {
-  const { integrationsService } = await import("@/features/boilerplate/integrations");
+  const { integrationsService } = await import("@/features/system/integrations");
 
   // Create a read-only API key (convenience method)
   const result = await integrationsService.createReadOnlyApiKey("Read-Only Key");

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/components/RevenueAnalytics.tsx
+// src/features/system/payments/providers/stripe-connect/components/RevenueAnalytics.tsx
 /**
  * Revenue Analytics Component
  *

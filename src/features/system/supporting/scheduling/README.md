@@ -86,7 +86,7 @@ You need to create the Convex backend for this module:
 
 #### A. Create Schema
 
-**File:** `convex/schema/boilerplate/supporting.ts`
+**File:** `convex/schema/system/supporting.ts`
 
 Add the scheduledEvents table:
 
@@ -193,7 +193,7 @@ scheduledEvents: defineTable({
 
 #### B. Create Backend Module
 
-Create the following files in `convex/lib/boilerplate/supporting/scheduling/`:
+Create the following files in `convex/lib/system/supporting/scheduling/`:
 
 **types.ts:**
 ```typescript
@@ -240,7 +240,7 @@ export type ScheduledEventId = Id<'scheduledEvents'>
 ### Basic Event Scheduling
 
 ```typescript
-import { SchedulingSection } from '@/features/boilerplate/supporting';
+import { SchedulingSection } from '@/features/system/supporting';
 
 function ProjectPage({ projectId }) {
   return (
@@ -265,7 +265,7 @@ import {
   useCreateEvent,
   useCancelEvent,
   useCheckAvailability,
-} from '@/features/boilerplate/supporting';
+} from '@/features/system/supporting';
 
 function MyComponent() {
   const { user } = useAuth();
@@ -306,7 +306,7 @@ function MyComponent() {
 ### Using Service Methods
 
 ```typescript
-import { SchedulingService } from '@/features/boilerplate/supporting';
+import { SchedulingService } from '@/features/system/supporting';
 
 // Validate event data
 const errors = SchedulingService.validateEventData(eventData);
@@ -333,7 +333,7 @@ const stats = SchedulingService.getEventsStats(events);
 ### Individual Components
 
 ```typescript
-import { EventCard, EventList } from '@/features/boilerplate/supporting';
+import { EventCard, EventList } from '@/features/system/supporting';
 
 function Calendar() {
   const events = useUserEvents(user?.id);
@@ -453,7 +453,7 @@ await respondToEvent({
 Enable/disable scheduling in your application:
 
 ```typescript
-import { isFeatureEnabled } from '@/features/boilerplate/supporting';
+import { isFeatureEnabled } from '@/features/system/supporting';
 
 const schedulingEnabled = isFeatureEnabled('scheduling');
 ```
@@ -493,7 +493,7 @@ VITE_SUPPORTING_FEATURE_SCHEDULING=true
 
 ### Backend not found errors
 
-If you see TypeScript errors about `api.lib.boilerplate.supporting.scheduling`, you need to implement the Convex backend first (see Setup section above).
+If you see TypeScript errors about `api.lib.system.supporting.scheduling`, you need to implement the Convex backend first (see Setup section above).
 
 ### Timezone issues
 

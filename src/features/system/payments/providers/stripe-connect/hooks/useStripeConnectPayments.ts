@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe-connect/hooks/useStripeConnectPayments.ts
+// src/features/system/payments/providers/stripe-connect/hooks/useStripeConnectPayments.ts
 /**
  * Stripe Connect Payments Hook
  *
@@ -37,13 +37,13 @@ export function useStripeConnectPayments() {
 
   // Query payments for this connected account
   const payments = useQuery(
-    api.lib.boilerplate.payments.stripe_connect.queries.getPaymentsByAccount,
+    api.lib.system.payments.stripe_connect.queries.getPaymentsByAccount,
     account?._id ? { connectedAccountId: account._id } : 'skip'
   );
 
   // Query payment analytics
   const analytics = useQuery(
-    api.lib.boilerplate.payments.stripe_connect.queries.getAccountAnalytics,
+    api.lib.system.payments.stripe_connect.queries.getAccountAnalytics,
     account?._id ? { accountId: account._id } : 'skip'
   );
 
@@ -103,7 +103,7 @@ export function useStripeConnectPayments() {
  */
 export function usePlatformPaymentAnalytics() {
   // Query platform-wide analytics
-  const analytics = useQuery(api.lib.boilerplate.payments.stripe_connect.queries.getPlatformAnalytics);
+  const analytics = useQuery(api.lib.system.payments.stripe_connect.queries.getPlatformAnalytics);
 
   return {
     analytics,

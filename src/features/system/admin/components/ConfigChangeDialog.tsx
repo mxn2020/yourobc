@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/components/ConfigChangeDialog.tsx
+// src/features/system/admin/components/ConfigChangeDialog.tsx
 /**
  * ConfigChangeDialog Component
  *
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui';
 import { AlertTriangle, RefreshCw, Link } from 'lucide-react';
 import type { ConfigChangeDialogProps } from '../types/config.types';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function ConfigChangeDialog({
   open,

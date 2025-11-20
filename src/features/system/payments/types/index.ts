@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/types/index.ts
+// src/features/system/payments/types/index.ts
 /**
  * Payment Types - Main Exports
  */

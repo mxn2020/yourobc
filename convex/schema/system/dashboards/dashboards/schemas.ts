@@ -1,8 +1,8 @@
-// convex/schema/boilerplate/dashboards/dashboards/schemas.ts
+// convex/schema/system/dashboards/dashboards/schemas.ts
 // Schema exports for dashboards module
 
 import { dashboardsTable } from './dashboards';
 
-export const boilerplateDashboardsSchemas = {
+export const systemDashboardsSchemas = {
   dashboards: dashboardsTable,
 };

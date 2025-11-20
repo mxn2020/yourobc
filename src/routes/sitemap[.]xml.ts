@@ -1,7 +1,7 @@
 // src/routes/sitemap[.].xml.ts
 
 import { createFileRoute } from '@tanstack/react-router'
-import { I18N_CONFIG, getEnabledLocales } from '@/features/boilerplate/i18n'
+import { I18N_CONFIG, getEnabledLocales } from '@/features/system/i18n'
 
 const routes = [
   '/',

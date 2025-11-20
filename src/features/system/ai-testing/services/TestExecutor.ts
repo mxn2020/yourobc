@@ -1,5 +1,5 @@
 // src/features/ai-testing/services/TestExecutor.ts
-import type { TestConfiguration, TestResult, TestStatus } from '@/features/boilerplate/ai-core/types';
+import type { TestConfiguration, TestResult, TestStatus } from '@/features/system/ai-core/types';
 import type { 
   TestExecutionRequest, 
   TestComparisonConfig, 
@@ -7,7 +7,7 @@ import type {
   BatchTestConfig 
 } from '../types/test.types';
 import type { TestExecutionResult } from '../types/test-results.types';
-import { addInternalFields } from '@/features/boilerplate/ai-core/utils';
+import { addInternalFields } from '@/features/system/ai-core/utils';
 
 // Individual test type configurations
 export interface TextGenerationConfig {

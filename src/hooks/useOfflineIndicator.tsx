@@ -1,6 +1,6 @@
 import { onlineManager } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 
 export function useOfflineIndicator() {
   const toast = useToast()

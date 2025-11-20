@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/reminders/services/RemindersService.ts
+// src/features/system/supporting/reminders/services/RemindersService.ts
 
 import type { Reminder, CreateReminderData, UpdateReminderData } from '../types';
 import { MAX_CONTENT_LENGTH } from '../../shared/constants';

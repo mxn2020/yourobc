@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/notifications/types.ts
+// convex/lib/system/notifications/types.ts
 // convex/notifications/types.ts
 
 import type { Doc, Id } from '@/generated/dataModel';

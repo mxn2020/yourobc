@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/utils/presets.ts
+// src/features/system/supporting/forms/utils/presets.ts
 
 import type { FormPreset, FormPresetName } from '../types'
 import { validators } from '../hooks/useFieldValidation'
@@ -208,42 +208,42 @@ export const presetRecommendations = {
 export const presetExamples = {
   userProfile: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('userProfile')
 const form = useForm(preset)
 `,
   contactForm: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('contactForm')
 const form = useForm(preset)
 `,
   loginForm: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('loginForm')
 const form = useForm(preset)
 `,
   registrationForm: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('registrationForm')
 const form = useForm(preset)
 `,
   searchForm: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('searchForm')
 const form = useForm(preset)
 `,
   settingsForm: `
 import { useForm } from '@tanstack/react-form'
-import { getPreset } from '@/features/boilerplate/supporting/forms'
+import { getPreset } from '@/features/system/supporting/forms'
 
 const preset = getPreset('settingsForm')
 const form = useForm(preset)

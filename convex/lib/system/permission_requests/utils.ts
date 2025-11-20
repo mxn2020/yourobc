@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/permission_requests/utils.ts
+// convex/lib/system/permission_requests/utils.ts
 // Utility functions for permissionRequests module
 
 /**

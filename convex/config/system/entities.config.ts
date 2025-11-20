@@ -1,11 +1,11 @@
-// convex/config/boilerplate/entities.config.ts
+// convex/config/system/entities.config.ts
 // ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
-// This file is part of the boilerplate and will be updated with new releases.
+// This file is part of the system and will be updated with new releases.
 // To add your own entity types, use convex/config/app/entities.config.ts instead.
 
 /**
  * Entity types are now organized into domain-specific files for better maintainability.
- * See: convex/config/boilerplate/entities/
+ * See: convex/config/system/entities/
  *
  * Structure:
  * - system.entities.ts - Core system functionality

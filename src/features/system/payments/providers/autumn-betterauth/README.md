@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/README.md
+// src/features/system/payments/providers/autumn-betterauth/README.md
 # Autumn + Better Auth Provider
 
 The easiest payment provider - just a Better Auth plugin!
@@ -24,9 +24,9 @@ AUTUMN_SECRET_KEY=am_sk_xxxxxxxxxxxxx
 
 ### 4. Add to Better Auth
 ```typescript
-// src/features/boilerplate/auth/lib/auth-config.ts
+// src/features/system/auth/lib/auth-config.ts
 import { betterAuth } from 'better-auth';
-import { autumnBetterAuthConfig } from '@/features/boilerplate/payments';
+import { autumnBetterAuthConfig } from '@/features/system/payments';
 
 export const auth = betterAuth({
   database: /* ... */,
@@ -55,7 +55,7 @@ function RootComponent() {
 
 ### PurchaseButton
 ```typescript
-import { PurchaseButton } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { PurchaseButton } from '@/features/system/payments/providers/autumn-betterauth';
 
 <PurchaseButton 
   planId="pro" 
@@ -68,7 +68,7 @@ import { PurchaseButton } from '@/features/boilerplate/payments/providers/autumn
 
 ### BillingPortalButton
 ```typescript
-import { BillingPortalButton } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { BillingPortalButton } from '@/features/system/payments/providers/autumn-betterauth';
 
 <BillingPortalButton>
   Manage Subscription
@@ -77,14 +77,14 @@ import { BillingPortalButton } from '@/features/boilerplate/payments/providers/a
 
 ### SubscriptionStatus
 ```typescript
-import { SubscriptionStatus } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { SubscriptionStatus } from '@/features/system/payments/providers/autumn-betterauth';
 
 <SubscriptionStatus />
 ```
 
 ### UsageDisplay
 ```typescript
-import { UsageDisplay } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { UsageDisplay } from '@/features/system/payments/providers/autumn-betterauth';
 
 <UsageDisplay 
   featureKey="ai_requests"
@@ -99,7 +99,7 @@ import { UsageDisplay } from '@/features/boilerplate/payments/providers/autumn-b
 
 Direct access to Autumn's customer data:
 ```typescript
-import { useAutumnCustomer } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { useAutumnCustomer } from '@/features/system/payments/providers/autumn-betterauth';
 
 function MyComponent() {
   const {
@@ -120,7 +120,7 @@ function MyComponent() {
 
 Simplified checkout:
 ```typescript
-import { useAutumnCheckout } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { useAutumnCheckout } from '@/features/system/payments/providers/autumn-betterauth';
 
 function UpgradeButton() {
   const { createCheckout } = useAutumnCheckout();
@@ -140,7 +140,7 @@ function UpgradeButton() {
 
 Check feature access:
 ```typescript
-import { useAutumnFeatureAccess } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { useAutumnFeatureAccess } from '@/features/system/payments/providers/autumn-betterauth';
 
 function MyFeature() {
   const {
@@ -163,7 +163,7 @@ function MyFeature() {
 
 Track and view usage:
 ```typescript
-import { useAutumnUsage } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+import { useAutumnUsage } from '@/features/system/payments/providers/autumn-betterauth';
 
 function AIChat() {
   const { trackUsage, getUsageStats } = useAutumnUsage();
@@ -185,7 +185,7 @@ function AIChat() {
 
 By default, each user is a customer. For organization billing:
 ```typescript
-import { autumnOrganizationConfig } from '@/features/boilerplate/payments';
+import { autumnOrganizationConfig } from '@/features/system/payments';
 
 export const auth = betterAuth({
   plugins: [
@@ -197,7 +197,7 @@ export const auth = betterAuth({
 
 For both user and organization:
 ```typescript
-import { autumnDualConfig } from '@/features/boilerplate/payments';
+import { autumnDualConfig } from '@/features/system/payments';
 
 export const auth = betterAuth({
   plugins: [

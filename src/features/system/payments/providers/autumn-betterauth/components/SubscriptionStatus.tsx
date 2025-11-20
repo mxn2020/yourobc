@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/components/SubscriptionStatus.tsx
+// src/features/system/payments/providers/autumn-betterauth/components/SubscriptionStatus.tsx
 /**
  * Subscription Status Display
  */

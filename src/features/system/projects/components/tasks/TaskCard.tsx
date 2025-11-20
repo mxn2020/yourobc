@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/tasks/TaskCard.tsx
+// features/system/projects/components/tasks/TaskCard.tsx
 
 import { FC } from 'react'
 import { Card } from '@/components/ui/Card'

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/queries.ts
+// convex/lib/system/supporting/reminders/queries.ts
 
 /**
  * Reminders Module Queries

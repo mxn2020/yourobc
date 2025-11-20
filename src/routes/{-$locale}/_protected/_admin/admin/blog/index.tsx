@@ -7,8 +7,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { BlogDashboard } from '@/features/boilerplate/blog/pages/BlogDashboard'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { BlogDashboard } from '@/features/system/blog/pages/BlogDashboard'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/')({
@@ -39,12 +39,12 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/'
 
         if (convexClient) {
           const [stats, draftPosts, allPosts] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.blog.queries.getPostStatistics, {}),
-            convexClient.query(api.lib.boilerplate.blog.queries.getPosts, {
+            convexClient.query(api.lib.system.blog.queries.getPostStatistics, {}),
+            convexClient.query(api.lib.system.blog.queries.getPosts, {
               status: 'draft',
               limit: 5,
             }),
-            convexClient.query(api.lib.boilerplate.blog.queries.getPosts, {
+            convexClient.query(api.lib.system.blog.queries.getPosts, {
               limit: 1,
             })
           ])

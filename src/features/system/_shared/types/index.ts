@@ -1,6 +1,6 @@
-// filepath: src/features/boilerplate/_shared/types/index.ts
+// filepath: src/features/system/_shared/types/index.ts
 /**
- * Shared types used across boilerplate features
+ * Shared types used across system features
  */
 
 export type {

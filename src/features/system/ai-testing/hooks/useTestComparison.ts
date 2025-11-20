@@ -1,9 +1,9 @@
 // src/features/ai-testing/hooks/useTestComparison.ts
 import { useMemo, useCallback } from 'react';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
 import type { TestComparisonResult, ParameterTuningResult } from '../types/test-results.types';
 import { groupBy, sortBy } from '@/utils/common/array-utils';
-import { getProviderFromModelId } from '@/features/boilerplate/ai-core/utils';
+import { getProviderFromModelId } from '@/features/system/ai-core/utils';
 
 export function useTestComparison() {
   const compareModelResults = useCallback((results: TestResult[]): TestComparisonResult[] => {

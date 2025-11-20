@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/services/DocumentsService.ts
+// src/features/system/supporting/documents/services/DocumentsService.ts
 
 import { Id } from '@/convex/_generated/dataModel'
 import type { Document, CreateDocumentData, UpdateDocumentData } from '../types';

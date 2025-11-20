@@ -2,7 +2,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery as useConvexQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { authService } from '@/features/boilerplate/auth'
+import { authService } from '@/features/system/auth'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/{-$locale}/test/auth')({

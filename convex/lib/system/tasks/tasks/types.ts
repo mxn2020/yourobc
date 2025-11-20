@@ -1,8 +1,8 @@
-// convex/lib/boilerplate/tasks/tasks/types.ts
+// convex/lib/system/tasks/tasks/types.ts
 // TypeScript type definitions for tasks module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { TaskStatus, TaskPriority } from '@/schema/boilerplate/tasks/tasks/types';
+import type { TaskStatus, TaskPriority } from '@/schema/system/tasks/tasks/types';
 
 // Entity types
 export type Task = Doc<'projectTasks'>;

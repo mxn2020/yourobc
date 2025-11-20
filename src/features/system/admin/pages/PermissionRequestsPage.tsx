@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/pages/PermissionRequestsPage.tsx
+// src/features/system/admin/pages/PermissionRequestsPage.tsx
 
 import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from '@/components/ui/Textarea'
 import { Label } from '@/components/ui/Label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { CheckCircle, XCircle, Clock, User, Calendar, MessageSquare } from 'lucide-react'
 import { format } from 'date-fns'
 import { Id } from '@/convex/_generated/dataModel'
@@ -40,14 +40,14 @@ export function PermissionRequestsPage() {
   const [reviewAction, setReviewAction] = useState<'approve' | 'deny' | null>(null)
 
   // Queries
-  const stats = useQuery(api.lib.boilerplate.permission_requests.queries.getPermissionRequestsStats)
-  const allRequests = useQuery(api.lib.boilerplate.permission_requests.queries.getAllPermissionRequests, {
+  const stats = useQuery(api.lib.system.permission_requests.queries.getPermissionRequestsStats)
+  const allRequests = useQuery(api.lib.system.permission_requests.queries.getAllPermissionRequests, {
     status: activeTab === 'all' ? undefined : activeTab,
   })
 
   // Mutations
-  const approveRequest = useMutation(api.lib.boilerplate.permission_requests.mutations.approvePermissionRequest)
-  const denyRequest = useMutation(api.lib.boilerplate.permission_requests.mutations.denyPermissionRequest)
+  const approveRequest = useMutation(api.lib.system.permission_requests.mutations.approvePermissionRequest)
+  const denyRequest = useMutation(api.lib.system.permission_requests.mutations.denyPermissionRequest)
 
   const handleReview = async () => {
     if (!selectedRequest || !reviewAction) return

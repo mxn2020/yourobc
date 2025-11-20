@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/config/autumn-plugin.ts
+// src/features/system/payments/providers/autumn-betterauth/config/autumn-plugin.ts
 /**
  * Autumn Better Auth Plugin Configuration
  * 
@@ -12,7 +12,7 @@ import { autumn } from 'autumn-js/better-auth';
  * 
  * @example
  * import { betterAuth } from 'better-auth';
- * import { autumnBetterAuthConfig } from '@/features/boilerplate/payments/providers/autumn-betterauth';
+ * import { autumnBetterAuthConfig } from '@/features/system/payments/providers/autumn-betterauth';
  * 
  * export const auth = betterAuth({
  *   plugins: [autumnBetterAuthConfig],

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/scheduling/services/SchedulingService.ts
+// src/features/system/supporting/scheduling/services/SchedulingService.ts
 
 import type {
   ScheduledEvent,

@@ -1,7 +1,7 @@
-// src/features/boilerplate/supporting/scheduling/components/SchedulingSection.tsx
+// src/features/system/supporting/scheduling/components/SchedulingSection.tsx
 
 import { useState } from 'react';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import {
   useEntityEvents,
   useCancelEvent,

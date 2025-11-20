@@ -3,12 +3,12 @@
 import { useState, useMemo } from 'react';
 import { User, Search, Plus, LogOut, Shield, ChevronDown, Building, ListTodo, Users, CalendarDays, BarChart3, Globe } from 'lucide-react';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
-import { useAuth } from '@/features/boilerplate/auth';
-import { AuthenticatedNotifications } from '@/features/boilerplate/notifications';
+import { useAuth } from '@/features/system/auth';
+import { AuthenticatedNotifications } from '@/features/system/notifications';
 import { NotificationBell } from './NotificationBell';
 import { NAVIGATION } from '@/config';
-import { LanguageSwitcherDropdown } from '@/features/boilerplate/i18n/components';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { LanguageSwitcherDropdown } from '@/features/system/i18n/components';
+import { defaultLocale } from '@/features/system/i18n';
 
 export function Header() {
   const location = useLocation();

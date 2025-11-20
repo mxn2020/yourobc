@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/index.ts
+// convex/lib/system/supporting/scheduling/index.ts
 
 /**
  * Scheduling Module
@@ -12,7 +12,7 @@
  * - RSVP functionality
  * - Priority and visibility management
  *
- * @module convex/lib/boilerplate/supporting/scheduling
+ * @module convex/lib/system/supporting/scheduling
  */
 
 // Types

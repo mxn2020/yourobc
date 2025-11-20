@@ -1,8 +1,8 @@
 // src/features/ai-models/hooks/useCostCalculation.ts
 import { useMemo } from 'react';
-import { estimateRequestCost } from '@/features/boilerplate/ai-core/utils';
-import { estimateTokenCount } from '@/features/boilerplate/ai-core/utils';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import { estimateRequestCost } from '@/features/system/ai-core/utils';
+import { estimateTokenCount } from '@/features/system/ai-core/utils';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 export function useCostCalculation(
   model: ModelInfo | null,

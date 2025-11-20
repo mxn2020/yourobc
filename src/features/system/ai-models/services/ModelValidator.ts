@@ -1,6 +1,6 @@
 // src/features/ai-models/services/ModelValidator.ts
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
-import { validateModelId } from '@/features/boilerplate/ai-core/utils';
+import type { ModelInfo } from '@/features/system/ai-core/types';
+import { validateModelId } from '@/features/system/ai-core/utils';
 
 export class ModelValidator {
   static validateModel(model: ModelInfo): { valid: boolean; errors: string[] } {

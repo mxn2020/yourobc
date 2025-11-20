@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/documents/components/DocumentUploadForm.tsx
+// src/features/system/supporting/documents/components/DocumentUploadForm.tsx
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/Button';

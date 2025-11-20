@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/pages/ProjectsPage.tsx
+// src/features/system/projects/pages/ProjectsPage.tsx
 
 import { FC, useState, useMemo, useEffect, useRef } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -11,10 +11,10 @@ import { ProjectQuickFilterBadges } from "../components/ProjectQuickFilterBadges
 import { ProjectsHelpSection } from "../components/ProjectsHelpSection";
 import { useProjectsList, useProjectStats, useUserProjects } from "../hooks/useProjects";
 import { useCanCreateProjects } from "../hooks/useProjectPermissions";
-import { useTranslation } from "@/features/boilerplate/i18n";
+import { useTranslation } from "@/features/system/i18n";
 import { Loading, PermissionDenied, ErrorState, EmptyState } from "@/components/ui";
 import type { Project } from "../types";
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 
 export const ProjectsPage: FC = () => {
   // Track component render performance (dev mode only)

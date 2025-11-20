@@ -9,10 +9,10 @@ import {
   Checkbox,
   Label
 } from '@/components/ui'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api';
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { Settings, User, Bell, Palette, Globe } from 'lucide-react'
 import { Id } from '@/convex/_generated/dataModel';
 
@@ -21,11 +21,11 @@ export function SettingsPage() {
   const { auth, isAuthenticated, isAuthLoading } = useAuth()
 
   const settings = useQuery(
-    api.lib.boilerplate.user_settings.queries.getUserSettings,
+    api.lib.system.user_settings.queries.getUserSettings,
     isAuthenticated ? {} : "skip"
   )
-  const updateSettings = useMutation(api.lib.boilerplate.user_settings.mutations.updateUserSettings)
-  const resetSettings = useMutation(api.lib.boilerplate.user_settings.mutations.resetUserSettings)
+  const updateSettings = useMutation(api.lib.system.user_settings.mutations.updateUserSettings)
+  const resetSettings = useMutation(api.lib.system.user_settings.mutations.resetUserSettings)
 
   const [loading, setLoading] = React.useState(false)
   const [localSettings, setLocalSettings] = React.useState(settings)

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/PricingPlans.tsx
+// src/features/system/payments/shared/components/PricingPlans.tsx
 /**
  * Generic Pricing Plans Grid
  * 

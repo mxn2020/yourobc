@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/permissions.ts
+// convex/lib/system/supporting/supporting/permissions.ts
 // Access control and authorization logic for supporting module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

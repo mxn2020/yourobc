@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/projects/constants.ts
+// convex/lib/system/projects/projects/constants.ts
 // Business constants, permissions, and limits for projects module
 
 export const PROJECTS_CONSTANTS = {

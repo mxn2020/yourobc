@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useAuthForm.ts
+// src/features/system/auth/hooks/useAuthForm.ts
 
 import { useState } from 'react'
 import { AuthResponse } from '../types/auth.types'

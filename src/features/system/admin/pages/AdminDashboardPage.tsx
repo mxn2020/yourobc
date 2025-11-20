@@ -22,7 +22,7 @@ import { AdminStatsCard } from '../components/AdminStatsCard'
 import { AdminLayout } from '../components/AdminLayout'
 import { AdminGuard } from '../components/AdminGuard'
 import { useAdminDashboard } from '../hooks/useAdmin'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function AdminDashboardPage() {
   const { t } = useTranslation('admin')

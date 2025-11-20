@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/wiki/components/WikiEntryCard.tsx
+// src/features/system/supporting/wiki/components/WikiEntryCard.tsx
 
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';

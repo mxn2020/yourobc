@@ -453,4 +453,4 @@ When adding new games:
 
 ## License
 
-Part of the Geenius Boilerplate project.
+Part of the Geenius System project.

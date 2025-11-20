@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/pages/AnalyticsOverview.tsx
+// src/features/system/analytics/pages/AnalyticsOverview.tsx
 
 import { MetricCard } from "../components/MetricCard";
 import { useAnalyticsSummary, useActiveSessions } from "../hooks/useMetrics";

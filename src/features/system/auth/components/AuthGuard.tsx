@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/components/AuthGuard.tsx
+// src/features/system/auth/components/AuthGuard.tsx
 
 
 /**
@@ -16,8 +16,8 @@ import { useLocation, useRouter } from '@tanstack/react-router'
 import { useAuth } from '../hooks/useAuth'
 import { Loading } from '@/components/ui'
 import type { AuthGuardProps } from '../types/auth.types'
-import { useI18n } from '@/features/boilerplate/i18n'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { useI18n } from '@/features/system/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 
 export function AuthGuard({
   children,

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/queries.ts
+// convex/lib/system/supporting/supporting/queries.ts
 // Query operations for supporting module
 
 import type { QueryCtx } from '@/generated/server';

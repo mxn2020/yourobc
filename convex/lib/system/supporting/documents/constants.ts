@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/documents/constants.ts
+// convex/lib/system/supporting/documents/constants.ts
 
 /**
  * Documents Module Constants
@@ -32,9 +32,9 @@ export const DOCUMENT_CONSTANTS = {
    * Entity types that can have documents (must match entityTypes.documentable)
    */
   ENTITY_TYPE: {
-    PROJECT: 'boilerplate_project',
-    TASK: 'boilerplate_task',
-    USER: 'boilerplate_user',
+    PROJECT: 'system_project',
+    TASK: 'system_task',
+    USER: 'system_user',
   },
 
   /**

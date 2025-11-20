@@ -1,8 +1,8 @@
-// src/features/boilerplate/ai-logging/components/LogCard.tsx
+// src/features/system/ai-logging/components/LogCard.tsx
 import { Badge, Button, Card, CardContent } from '@/components/ui'
 import { Activity, Eye, Database, CloudSnow, Minus, AlertCircle } from 'lucide-react'
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils'
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types'
+import { getProviderColor } from '@/features/system/ai-core/utils'
+import type { AIUsageLog } from '@/features/system/ai-core/types'
 
 interface LogCardProps {
   log: AIUsageLog

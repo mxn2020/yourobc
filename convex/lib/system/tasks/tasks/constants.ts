@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/tasks/tasks/constants.ts
+// convex/lib/system/tasks/tasks/constants.ts
 // Business constants, permissions, and limits for tasks module
 
 export const TASKS_CONSTANTS = {

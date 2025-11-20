@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/utils.ts
+// src/features/system/i18n/utils.ts
 
 /**
  * i18n Utility Functions

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/queries.ts
+// convex/lib/system/audit_logs/queries.ts
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/patterns/index.ts
+// src/features/system/supporting/virtual-lists/hooks/patterns/index.ts
 
 export { useVirtualSticky } from './useVirtualSticky'
 export { useVirtualMasonry } from './useVirtualMasonry'

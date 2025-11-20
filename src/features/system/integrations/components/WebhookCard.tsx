@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/components/WebhookCard.tsx
+// src/features/system/integrations/components/WebhookCard.tsx
 
 import { useState } from "react";
 import { Id } from "@/convex/_generated/dataModel";

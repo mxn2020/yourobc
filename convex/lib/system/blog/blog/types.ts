@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/types.ts
+// convex/lib/system/blog/types.ts
 /**
  * Blog Type Definitions
  *

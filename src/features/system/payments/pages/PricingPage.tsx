@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/pages/PricingPage.tsx
+// src/features/system/payments/pages/PricingPage.tsx
 /**
  * Provider-Agnostic Pricing Page
  * 

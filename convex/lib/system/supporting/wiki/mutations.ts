@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/mutations.ts
+// convex/lib/system/supporting/wiki/mutations.ts
 
 /**
  * Wiki Module Mutations

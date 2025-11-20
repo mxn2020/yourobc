@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/queries.ts
+// convex/lib/system/supporting/wiki/queries.ts
 
 /**
  * Wiki Module Queries

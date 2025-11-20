@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/components/patterns/VirtualListSticky.tsx
+// src/features/system/supporting/virtual-lists/components/patterns/VirtualListSticky.tsx
 
 import React, { useRef, useMemo } from 'react'
 import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'

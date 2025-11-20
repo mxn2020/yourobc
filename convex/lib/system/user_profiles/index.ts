@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/index.ts
+// convex/lib/system/user_profiles/user_profiles/index.ts
 // Public API exports for user_profiles module
 
 // Constants

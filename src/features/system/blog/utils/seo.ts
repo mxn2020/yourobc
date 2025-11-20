@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/utils/seo.ts
+// src/features/system/blog/utils/seo.ts
 /**
  * SEO Utilities
  *

@@ -1,11 +1,11 @@
-// convex/lib/boilerplate/dashboards/dashboards/mutations.ts
+// convex/lib/system/dashboards/dashboards/mutations.ts
 // Write operations for dashboards module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { dashboardsValidators } from '@/schema/boilerplate/dashboards/dashboards/validators';
+import { dashboardsValidators } from '@/schema/system/dashboards/dashboards/validators';
 import { DASHBOARDS_CONSTANTS } from './constants';
 import { validateDashboardData } from './utils';
 import { requireEditDashboardAccess, requireDeleteDashboardAccess } from './permissions';

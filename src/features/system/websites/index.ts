@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/index.ts
+// src/features/system/websites/index.ts
 
 export * from './types'
 export * from './constants'

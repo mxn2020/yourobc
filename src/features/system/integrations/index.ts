@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/index.ts
+// src/features/system/integrations/index.ts
 // Main export file for the Integrations feature
 
 // Types (export types explicitly to avoid conflicts)

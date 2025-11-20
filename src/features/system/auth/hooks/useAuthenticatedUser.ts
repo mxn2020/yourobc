@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useAuthenticatedUser.ts
+// src/features/system/auth/hooks/useAuthenticatedUser.ts
 
 import { useAuth } from './useAuth'
 import { Id } from "@/convex/_generated/dataModel"

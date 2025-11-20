@@ -1,5 +1,5 @@
 {
-  "name": "tanstack-start-boilerplate",
+  "name": "tanstack-start-system",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -25,7 +25,7 @@
     "auth:stop": "docker-compose down",
     "auth:logs": "docker-compose logs -f postgres",
     "auth:clean": "docker-compose down -v && docker-compose up -d",
-    "auth:generate": "DATABASE_URL=\"postgresql://geenius_user:geenius_password@localhost:5433/geenius_auth\" npx @better-auth/cli generate --config ./src/features/boilerplate/auth/lib/auth-config.generate.ts",
+    "auth:generate": "DATABASE_URL=\"postgresql://geenius_user:geenius_password@localhost:5433/geenius_auth\" npx @better-auth/cli generate --config ./src/features/system/auth/lib/auth-config.generate.ts",
     "auth:migrate": "DATABASE_URL=\"postgresql://geenius_user:geenius_password@localhost:5433/geenius_auth\" prisma migrate dev",
     "auth:migrate:deploy": "DATABASE_URL=\"postgresql://geenius_user:geenius_password@localhost:5433/geenius_auth\" prisma migrate deploy",
     "auth:push": "DATABASE_URL=\"postgresql://geenius_user:geenius_password@localhost:5433/geenius_auth\" prisma db push",

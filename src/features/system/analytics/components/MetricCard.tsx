@@ -1,4 +1,4 @@
-// src/features/boilerplate/analytics/components/MetricCard.tsx
+// src/features/system/analytics/components/MetricCard.tsx
 
 import { useMetricValue, useMetricTrend } from "../hooks/useMetrics";
 import { MetricPeriod, DateRangePreset } from "../types";

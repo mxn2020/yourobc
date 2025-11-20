@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/reminders/utils.ts
+// convex/lib/system/supporting/reminders/utils.ts
 
 /**
  * Reminders Module Utilities

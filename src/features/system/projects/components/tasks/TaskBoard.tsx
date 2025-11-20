@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/tasks/TaskBoard.tsx
+// features/system/projects/components/tasks/TaskBoard.tsx
 
 import { FC, useState } from 'react'
 import {

@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/components/PurchaseButton.tsx
+// src/features/system/payments/providers/autumn-betterauth/components/PurchaseButton.tsx
 /**
  * Autumn Purchase Button Component
  * 

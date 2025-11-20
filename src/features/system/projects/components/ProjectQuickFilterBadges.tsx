@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 import { Badge } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface ProjectStats {
   totalProjects: number

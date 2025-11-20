@@ -1,5 +1,5 @@
 // src/features/ai-logging/types/log.types.ts
-import type { AIUsageLog, AIUsageFilter, LogQueryResult } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog, AIUsageFilter, LogQueryResult } from '@/features/system/ai-core/types';
 
 export type LogTableView = 'compact' | 'detailed';
 export type LogDateRange = 'today' | 'yesterday' | 'last_7_days' | 'last_30_days' | 'custom';

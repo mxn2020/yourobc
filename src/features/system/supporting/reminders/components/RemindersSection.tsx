@@ -1,6 +1,6 @@
-// src/features/boilerplate/supporting/reminders/components/RemindersSection.tsx
+// src/features/system/supporting/reminders/components/RemindersSection.tsx
 
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { useEntityReminders, useCompleteReminder, useCancelReminder, useDeleteReminder } from '../hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/providers/ghost/GhostBlogProvider.ts
+// src/features/system/blog/providers/ghost/GhostBlogProvider.ts
 /**
  * Ghost CMS Blog Provider
  *

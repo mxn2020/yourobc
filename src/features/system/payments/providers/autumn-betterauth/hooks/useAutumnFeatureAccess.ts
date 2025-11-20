@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-betterauth/hooks/useAutumnFeatureAccess.ts
+// src/features/system/payments/providers/autumn-betterauth/hooks/useAutumnFeatureAccess.ts
 /**
  * Autumn Feature Access Hook
  */

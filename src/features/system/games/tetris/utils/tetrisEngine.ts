@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/utils/tetrisEngine.ts
+// src/features/system/tetris/utils/tetrisEngine.ts
 
 /**
  * Tetris Game Engine

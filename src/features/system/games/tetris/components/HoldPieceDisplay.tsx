@@ -1,4 +1,4 @@
-// src/features/boilerplate/tetris/components/HoldPieceDisplay.tsx
+// src/features/system/tetris/components/HoldPieceDisplay.tsx
 
 import { TETROMINOS, PIECE_COLORS } from '../utils/tetrisEngine';
 

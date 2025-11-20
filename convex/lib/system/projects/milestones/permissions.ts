@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/milestones/permissions.ts
+// convex/lib/system/projects/milestones/permissions.ts
 
 import { QueryCtx, MutationCtx } from '@/generated/server';
 import { Doc } from '@/generated/dataModel';

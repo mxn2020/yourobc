@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/components/SignupForm.tsx
+// src/features/system/auth/components/SignupForm.tsx
 
 import React, { useState } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
@@ -6,7 +6,7 @@ import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react
 import { authService } from '../services/AuthService'
 import type { SignupFormData } from '../types/auth.types'
 import { Button, Checkbox, Input, Alert, AlertDescription, Label } from '@/components/ui'
-import { useTranslation, defaultLocale } from '@/features/boilerplate/i18n'
+import { useTranslation, defaultLocale } from '@/features/system/i18n'
 import { useAuthForm } from '../hooks/useAuthForm'
 
 export function SignupForm() {

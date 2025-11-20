@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/examples/PatternShowcase.tsx
+// src/features/system/supporting/virtual-lists/examples/PatternShowcase.tsx
 
 import React, { useState } from 'react'
 import {
@@ -22,7 +22,7 @@ import type { VirtualTableColumn } from '../types'
  *
  * @example
  * ```tsx
- * import { PatternShowcase } from '@/features/boilerplate/supporting/virtual-lists'
+ * import { PatternShowcase } from '@/features/system/supporting/virtual-lists'
  *
  * function App() {
  *   return <PatternShowcase />

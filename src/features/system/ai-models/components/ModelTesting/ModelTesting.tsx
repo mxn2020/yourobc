@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TestTube, Play, X, DollarSign, Clock, Zap, Copy, Check } from 'lucide-react';
 import { Badge, Button, Card, CardContent, CardHeader, Input, Loading } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
-import { useToast } from '@/features/boilerplate/notifications';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
+import { useToast } from '@/features/system/notifications';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 interface ModelTestingProps {
   models: ModelInfo[];

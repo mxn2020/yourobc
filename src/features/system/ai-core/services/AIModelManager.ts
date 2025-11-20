@@ -8,8 +8,8 @@ import type {
   ModelType 
 } from '../types/ai-models.types';
 import type { AIOperationType } from '../types/ai-core.types';
-import { extractProvider } from '@/features/boilerplate/ai-core/utils';
-import { sortModels, filterModels } from '@/features/boilerplate/ai-core/utils';
+import { extractProvider } from '@/features/system/ai-core/utils';
+import { sortModels, filterModels } from '@/features/system/ai-core/utils';
 
 export interface ModelManagerConfig {
   cacheTimeout?: number;

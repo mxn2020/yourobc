@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/examples/VirtualListExample.tsx
+// src/features/system/supporting/virtual-lists/examples/VirtualListExample.tsx
 
 import React from 'react'
 import { VirtualList, VirtualTable, VirtualListDynamic } from '../components'

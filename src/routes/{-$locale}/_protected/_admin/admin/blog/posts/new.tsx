@@ -5,10 +5,10 @@
 
 import { createFileRoute } from '@tanstack/react-router';
 import { api } from '@/convex/_generated/api';
-import { PostEditorPage } from '@/features/boilerplate/blog/pages/PostEditorPage';
-import { getCategoriesQueryOptions } from '@/features/boilerplate/blog/services/blogQueryOptions';
+import { PostEditorPage } from '@/features/system/blog/pages/PostEditorPage';
+import { getCategoriesQueryOptions } from '@/features/system/blog/services/blogQueryOptions';
 import { Loading } from '@/components/ui';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { defaultLocale } from '@/features/system/i18n';
 import { createI18nSeo } from '@/utils/seo';
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/posts/new')({
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/blog/p
 
         if (convexClient) {
           const categories = await convexClient.query(
-            api.lib.boilerplate.blog.queries.getCategories,
+            api.lib.system.blog.queries.getCategories,
             {}
           );
 

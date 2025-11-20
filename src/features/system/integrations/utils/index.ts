@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/utils/index.ts
+// src/features/system/integrations/utils/index.ts
 
 import { WebhookDeliveryStatus, IntegrationStatus, RateLimitStatus } from "../types";
 

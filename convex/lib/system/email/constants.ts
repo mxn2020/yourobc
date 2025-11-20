@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/email/constants.ts
+// convex/lib/system/email/constants.ts
 // convex/lib/email/constants.ts
 
 export const EMAIL_CONSTANTS = {

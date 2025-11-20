@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/hooks/useFeatureConfigManagement.ts
+// src/features/system/admin/hooks/useFeatureConfigManagement.ts
 /**
  * useFeatureConfigManagement Hook
  *
@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 import { parseConvexError } from '@/utils/errorHandling';
 import FeatureConfigService from '../services/FeatureConfigService';
 import type {

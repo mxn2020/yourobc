@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/index.ts
+// src/features/system/payments/providers/stripe/index.ts
 /**
  * Stripe Standard Provider Exports
  *
@@ -7,7 +7,7 @@
  *
  * @example
  * ```tsx
- * import { Stripe } from '@/features/boilerplate/payments';
+ * import { Stripe } from '@/features/system/payments';
  *
  * // Use components
  * <Stripe.CheckoutButton priceId="price_xxx" />

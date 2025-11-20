@@ -1,5 +1,5 @@
 // src/features/ai-models/utils/model-filters.ts
-import type { ModelFilter, ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelFilter, ModelInfo } from '@/features/system/ai-core/types';
 
 export function createEmptyFilter(): ModelFilter {
   return {};

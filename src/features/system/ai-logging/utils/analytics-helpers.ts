@@ -1,8 +1,8 @@
 // src/features/ai-logging/utils/analytics-helpers.ts
-import type { AIUsageLog, ModelProvider } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog, ModelProvider } from '@/features/system/ai-core/types';
 import type { UsageChartData, CostBreakdownData, PerformanceMetric, AnalyticsDashboardData } from '../types/analytics.types';
 import { groupBy } from '@/utils/common/array-utils';
-import { formatDate } from '@/features/boilerplate/ai-core/utils';
+import { formatDate } from '@/features/system/ai-core/utils';
 
 export function calculateUsageByDay(logs: AIUsageLog[], days = 30): UsageChartData[] {
   const now = new Date();

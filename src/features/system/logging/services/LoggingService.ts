@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/services/LoggingService.ts
+// src/features/system/logging/services/LoggingService.ts
 
 import {
   LoggerProvider,
@@ -23,7 +23,7 @@ import { CustomLogger } from '../providers/custom/CustomLogger'
  *
  * Usage:
  * ```typescript
- * import { logger } from '@/features/boilerplate/logging'
+ * import { logger } from '@/features/system/logging'
  *
  * // Simple logging
  * logger.info('User logged in')

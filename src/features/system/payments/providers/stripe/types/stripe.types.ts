@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/types/stripe.types.ts
+// src/features/system/payments/providers/stripe/types/stripe.types.ts
 /**
  * Stripe Standard Types
  *

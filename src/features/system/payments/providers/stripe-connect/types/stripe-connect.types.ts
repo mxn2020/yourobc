@@ -1,4 +1,4 @@
-// src/features/boilerplate/stripe-connect/types/stripe-connect.types.ts
+// src/features/system/stripe-connect/types/stripe-connect.types.ts
 /**
  * Type Definitions for Stripe Connect
  *

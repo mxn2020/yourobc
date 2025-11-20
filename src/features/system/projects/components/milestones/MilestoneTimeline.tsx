@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/milestones/MilestoneTimeline.tsx
+// features/system/projects/components/milestones/MilestoneTimeline.tsx
 
 import { FC } from 'react'
 import { Badge } from '@/components/ui/Badge'

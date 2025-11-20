@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/systemMetrics/validators.ts
+// convex/schema/system/system/systemMetrics/validators.ts
 // Grouped validators for systemMetrics module
 
 import { v } from 'convex/values';

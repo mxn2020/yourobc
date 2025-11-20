@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/index.ts
+// src/features/system/supporting/index.ts
 
 // Configuration
 export * from './config';
@@ -148,4 +148,4 @@ export type {
 export * from './tables';
 
 // Note: Notifications is a main feature located at:
-// src/features/boilerplate/notifications/
+// src/features/system/notifications/

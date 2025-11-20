@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/hooks.tsx
+// src/features/system/i18n/hooks.tsx
 
 import { useI18n } from './context'
 import type { Namespace } from './config'

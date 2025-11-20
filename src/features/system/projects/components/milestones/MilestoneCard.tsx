@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/milestones/MilestoneCard.tsx
+// features/system/projects/components/milestones/MilestoneCard.tsx
 
 import { FC } from 'react'
 import { Card } from '@/components/ui/Card'

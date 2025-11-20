@@ -1,4 +1,4 @@
-// src/features/boilerplate/auth/hooks/useAuthentication.ts
+// src/features/system/auth/hooks/useAuthentication.ts
 
 import { useCallback } from 'react'
 import { useRouter } from '@tanstack/react-router'
@@ -11,7 +11,7 @@ import {
   ResetPasswordFormData,
   AuthProvider
 } from '../types/auth.types'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 
 /**
  * Core authentication hook - handles login, signup, logout

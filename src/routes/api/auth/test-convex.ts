@@ -1,6 +1,6 @@
 // src/routes/api/auth/test-convex.ts
 import { createFileRoute } from '@tanstack/react-router'
-import { authService } from '@/features/boilerplate/auth'
+import { authService } from '@/features/system/auth'
 import { ConvexHttpClient } from 'convex/browser'
 import { api } from '@/convex/_generated/api'
 

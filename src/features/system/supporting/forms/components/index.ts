@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/index.ts
+// src/features/system/supporting/forms/components/index.ts
 
 // Base field components
 export { TextField } from './TextField'

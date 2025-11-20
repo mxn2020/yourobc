@@ -1,5 +1,5 @@
 // src/features/ai-models/types/model.types.ts - Updated with missing props
-import type { ModelInfo, ModelFilter, ModelSort } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelFilter, ModelSort } from '@/features/system/ai-core/types';
 
 export interface ModelGridProps {
   models: ModelInfo[];

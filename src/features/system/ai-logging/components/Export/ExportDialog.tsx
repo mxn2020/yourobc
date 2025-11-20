@@ -5,7 +5,7 @@ import { DateRangePicker } from '../LogFilters/DateRangePicker';
 import { Download, FileText, FileSpreadsheet, Code } from 'lucide-react';
 import { useLogExport } from '../../hooks/useLogExport';
 import type { ExportOptions, LogDateRange } from '../../types/log.types';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
 
 interface ExportDialogProps {
   isOpen: boolean;

@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/utils/projectHelpers.ts
+// src/features/system/projects/utils/projectHelpers.ts
 
 import type { CreateProjectData, UpdateProjectData } from '../types'
 

@@ -1,4 +1,4 @@
-// src/features/boilerplate/ai-core/config/index.ts
+// src/features/system/ai-core/config/index.ts
 /**
  * AI Features Configuration
  *

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/wiki/services/WikiService.ts
+// src/features/system/supporting/wiki/services/WikiService.ts
 
 import type { WikiEntry, CreateWikiEntryData } from '../types';
 import { MAX_CONTENT_LENGTH } from '../../shared/constants';

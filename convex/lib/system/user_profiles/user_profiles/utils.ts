@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/utils.ts
+// convex/lib/system/user_profiles/user_profiles/utils.ts
 // Validation functions and utilities for user_profiles module
 
 import { USER_PROFILES_CONSTANTS } from './constants';
@@ -12,7 +12,7 @@ import {
   editorRole,
   analystRole,
   guestRole,
-} from '../../../../../../src/features/boilerplate/auth/lib/auth-permissions';
+} from '../../../../../../src/features/system/auth/lib/auth-permissions';
 
 // ============================================================================
 // Better Auth Role Permissions Integration

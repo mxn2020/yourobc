@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { Button } from './Button'
 import { Card, CardContent } from './Card'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export type EmptyStateVariant =
   | 'default'

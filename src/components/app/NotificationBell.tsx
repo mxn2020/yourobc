@@ -1,8 +1,8 @@
 // src/components/app/NotificationBell.tsx
 import { useState } from 'react'
 import { Bell } from 'lucide-react'
-import { useUnreadCount } from '@/features/boilerplate/notifications'
-import { NotificationsDropdown } from '@/features/boilerplate/notifications/components/NotificationsDropdown'
+import { useUnreadCount } from '@/features/system/notifications'
+import { NotificationsDropdown } from '@/features/system/notifications/components/NotificationsDropdown'
 
 /**
  * NotificationBell Component

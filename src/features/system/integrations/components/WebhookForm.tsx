@@ -1,11 +1,11 @@
-// src/features/boilerplate/integrations/components/WebhookForm.tsx
+// src/features/system/integrations/components/WebhookForm.tsx
 
 import { useState } from "react";
 import { Id } from "@/convex/_generated/dataModel";
 import { CreateWebhookParams, Webhook } from "../types";
 import { WEBHOOK_EVENTS } from "../types";
 import { isValidWebhookUrl, generateWebhookSecret } from "../utils";
-import { useAuth } from "@/features/boilerplate/auth";
+import { useAuth } from "@/features/system/auth";
 
 interface WebhookFormProps {
   webhook?: Webhook; // For editing

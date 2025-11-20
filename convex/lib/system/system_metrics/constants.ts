@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/constants.ts
+// convex/lib/system/system_metrics/constants.ts
 // Constants for systemMetrics module
 
 export const SYSTEM_METRICS_CONSTANTS = {

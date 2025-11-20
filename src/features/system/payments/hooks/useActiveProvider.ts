@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/hooks/useActiveProvider.ts
+// src/features/system/payments/shared/hooks/useActiveProvider.ts
 /**
  * Hook to get the active payment provider
  */

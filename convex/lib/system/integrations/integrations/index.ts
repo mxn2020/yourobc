@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/index.ts
+// convex/lib/system/integrations/integrations/index.ts
 // Central export file for integrations module
 
 /**

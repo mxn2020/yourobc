@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/utils/path.ts
+// src/features/system/i18n/utils/path.ts
 // Client-safe path utilities for i18n
 
 import type { Locale } from '../config'

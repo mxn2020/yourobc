@@ -1,11 +1,11 @@
-// src/features/boilerplate/payments/providers/autumn-convex/components/BillingPortalButton.tsx
+// src/features/system/payments/providers/autumn-convex/components/BillingPortalButton.tsx
 /**
  * Billing Portal Button
  */
 
 import { useAction } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import { Button } from '@/components/ui';
 import { useState } from 'react';
 

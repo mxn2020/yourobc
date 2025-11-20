@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/providers/sanity/SanityBlogProvider.ts
+// src/features/system/blog/providers/sanity/SanityBlogProvider.ts
 /**
  * Sanity.io Blog Provider
  *

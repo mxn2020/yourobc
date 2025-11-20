@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/index.ts
+// convex/lib/system/system_metrics/index.ts
 // Barrel exports for systemMetrics module
 
 // Export constants and types

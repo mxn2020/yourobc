@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/scheduling/components/EventList.tsx
+// src/features/system/supporting/scheduling/components/EventList.tsx
 
 import { EventCard } from './EventCard';
 import { SchedulingService } from '../services';

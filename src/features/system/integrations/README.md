@@ -1,6 +1,6 @@
 # Integrations Feature - Complete Guide
 
-The **Integrations** feature provides a comprehensive API management system for your TanStack Start + Convex boilerplate, enabling:
+The **Integrations** feature provides a comprehensive API management system for your TanStack Start + Convex system, enabling:
 
 - **API Key Management** - Generate, validate, and manage API keys with scopes and rate limits
 - **Webhook System** - Create webhooks with automatic delivery, retries, and HMAC signatures
@@ -29,7 +29,7 @@ The **Integrations** feature provides a comprehensive API management system for 
 
 ```tsx
 // src/routes/__root.tsx
-import { IntegrationsProvider } from '@/features/boilerplate/integrations';
+import { IntegrationsProvider } from '@/features/system/integrations';
 
 export const Route = createRootRoute({
   component: () => (
@@ -43,7 +43,7 @@ export const Route = createRootRoute({
 ### 2. Create an API Key
 
 ```tsx
-import { useApiKeys } from '@/features/boilerplate/integrations';
+import { useApiKeys } from '@/features/system/integrations';
 
 function CreateApiKeyButton() {
   const { createApiKey } = useApiKeys(userId);
@@ -70,7 +70,7 @@ function CreateApiKeyButton() {
 ### 3. Create a Webhook
 
 ```tsx
-import { useWebhooks } from '@/features/boilerplate/integrations';
+import { useWebhooks } from '@/features/system/integrations';
 
 function CreateWebhookButton() {
   const { createWebhook } = useWebhooks(userId);
@@ -119,7 +119,7 @@ IntegrationProvider (Interface)
 ### Creating API Keys
 
 ```tsx
-import { useApiKeys, API_SCOPES } from '@/features/boilerplate/integrations';
+import { useApiKeys, API_SCOPES } from '@/features/system/integrations';
 
 const { createApiKey } = useApiKeys(userId);
 
@@ -163,7 +163,7 @@ API_SCOPES.ADMIN           // "admin:*"
 ### Displaying API Keys
 
 ```tsx
-import { ApiKeyCard, ApiKeyList } from '@/features/boilerplate/integrations';
+import { ApiKeyCard, ApiKeyList } from '@/features/system/integrations';
 
 function ApiKeysPage() {
   const { apiKeys, revokeApiKey } = useApiKeys(userId);
@@ -181,7 +181,7 @@ function ApiKeysPage() {
 ### Validating API Keys
 
 ```tsx
-import { useValidateApiKey } from '@/features/boilerplate/integrations';
+import { useValidateApiKey } from '@/features/system/integrations';
 
 const { validateApiKey } = useValidateApiKey();
 
@@ -195,7 +195,7 @@ const isValid = await validateApiKey("sk_12345678_...");
 ### Creating Webhooks
 
 ```tsx
-import { useWebhooks, WEBHOOK_EVENTS } from '@/features/boilerplate/integrations';
+import { useWebhooks, WEBHOOK_EVENTS } from '@/features/system/integrations';
 
 const { createWebhook } = useWebhooks(userId);
 
@@ -259,7 +259,7 @@ console.log("Response:", delivery.response);
 ### Viewing Webhook Deliveries
 
 ```tsx
-import { useWebhookDeliveries } from '@/features/boilerplate/integrations';
+import { useWebhookDeliveries } from '@/features/system/integrations';
 
 const { deliveries, isLoading } = useWebhookDeliveries(webhookId, 100);
 
@@ -271,7 +271,7 @@ deliveries.forEach(delivery => {
 ### Displaying Webhooks
 
 ```tsx
-import { WebhookCard, WebhookList } from '@/features/boilerplate/integrations';
+import { WebhookCard, WebhookList } from '@/features/system/integrations';
 
 function WebhooksPage() {
   const { webhooks, testWebhook, deleteWebhook } = useWebhooks(userId);
@@ -294,7 +294,7 @@ function WebhooksPage() {
 ### Creating OAuth Apps
 
 ```tsx
-import { useOAuthApps, OAUTH_SCOPES } from '@/features/boilerplate/integrations';
+import { useOAuthApps, OAUTH_SCOPES } from '@/features/system/integrations';
 
 const { createOAuthApp } = useOAuthApps(userId);
 
@@ -317,7 +317,7 @@ console.log("Client Secret (save this!):", result.clientSecret);
 ### Authorization Flow
 
 ```tsx
-import { useOAuthAuthorization } from '@/features/boilerplate/integrations';
+import { useOAuthAuthorization } from '@/features/system/integrations';
 
 const { createAuthorization, exchangeCode } = useOAuthAuthorization();
 
@@ -344,7 +344,7 @@ console.log("Refresh Token:", tokens.refreshToken);
 ### Managing OAuth Tokens
 
 ```tsx
-import { useOAuthTokens, useRevokeOAuthToken } from '@/features/boilerplate/integrations';
+import { useOAuthTokens, useRevokeOAuthToken } from '@/features/system/integrations';
 
 const { tokens } = useOAuthTokens(appId);
 const { revokeToken } = useRevokeOAuthToken();
@@ -360,7 +360,7 @@ await revokeToken(tokenId);
 ### Connecting External Platforms
 
 ```tsx
-import { useExternalIntegrations } from '@/features/boilerplate/integrations';
+import { useExternalIntegrations } from '@/features/system/integrations';
 
 const { connectIntegration, disconnectIntegration } = useExternalIntegrations(userId);
 
@@ -398,7 +398,7 @@ await disconnectIntegration(zapierIntegrationId);
 ### Testing External Integrations
 
 ```tsx
-import { useTestExternalIntegration } from '@/features/boilerplate/integrations';
+import { useTestExternalIntegration } from '@/features/system/integrations';
 
 const { testIntegration } = useTestExternalIntegration();
 
@@ -413,7 +413,7 @@ console.log("Test result:", result);
 ### Viewing Request Logs
 
 ```tsx
-import { useRequestLogs, useRecentRequestLogs, useFailedRequests } from '@/features/boilerplate/integrations';
+import { useRequestLogs, useRecentRequestLogs, useFailedRequests } from '@/features/system/integrations';
 
 // Get logs for specific API key
 const { logs } = useRequestLogs({
@@ -433,7 +433,7 @@ const { logs: failedLogs } = useFailedRequests(50);
 ### Usage Statistics
 
 ```tsx
-import { useUsageStats, useRecentUsageStats } from '@/features/boilerplate/integrations';
+import { useUsageStats, useRecentUsageStats } from '@/features/system/integrations';
 
 const { stats, isLoading } = useRecentUsageStats(userId);
 
@@ -452,7 +452,7 @@ if (!isLoading && stats) {
 
 ## ⚙️ Configuration
 
-All configuration is in `/src/features/boilerplate/integrations/config/integrations-config.ts`:
+All configuration is in `/src/features/system/integrations/config/integrations-config.ts`:
 
 ```typescript
 export const INTEGRATIONS_CONFIG = {
@@ -537,7 +537,7 @@ Form to create/edit a webhook.
 Singleton service providing all integration operations.
 
 ```tsx
-import { integrationsService } from '@/features/boilerplate/integrations';
+import { integrationsService } from '@/features/system/integrations';
 
 // Create API key
 await integrationsService.createApiKey(params);
@@ -612,12 +612,12 @@ Before deploying to production:
 
 ## 📖 Additional Resources
 
-- [Backend API Reference](/convex/lib/boilerplate/integrations/)
-- [Database Schema](/convex/schema/boilerplate/integrations.ts)
-- [Configuration Options](/src/features/boilerplate/integrations/config/)
-- [Example Usage](/src/features/boilerplate/integrations/EXAMPLES.tsx)
+- [Backend API Reference](/convex/lib/system/integrations/)
+- [Database Schema](/convex/schema/system/integrations.ts)
+- [Configuration Options](/src/features/system/integrations/config/)
+- [Example Usage](/src/features/system/integrations/EXAMPLES.tsx)
 
 ---
 
-*Integrations Feature - TanStack Start + Convex Boilerplate*
+*Integrations Feature - TanStack Start + Convex System*
 *Version 1.0.0 - Complete Implementation*

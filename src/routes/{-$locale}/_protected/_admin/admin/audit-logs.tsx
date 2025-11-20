@@ -1,10 +1,10 @@
 // src/routes/_protected/_admin/admin/audit-logs.tsx
 import { createFileRoute } from '@tanstack/react-router'
-import { AdminAuditLogsPage } from '@/features/boilerplate/admin'
-import { auditLogsAdminService } from '@/features/boilerplate/audit-logs/services/AuditLogsAdminService'
+import { AdminAuditLogsPage } from '@/features/system/admin'
+import { auditLogsAdminService } from '@/features/system/audit-logs/services/AuditLogsAdminService'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/audit-logs')({
@@ -39,10 +39,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/audit-
           };
 
           const [auditLogs, stats] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.audit_logs.admin_queries.adminGetAuditLogs, {
+            convexClient.query(api.lib.system.audit_logs.admin_queries.adminGetAuditLogs, {
               options: convexOptions,
             }),
-            convexClient.query(api.lib.boilerplate.audit_logs.admin_queries.adminGetAuditLogStats, {
+            convexClient.query(api.lib.system.audit_logs.admin_queries.adminGetAuditLogStats, {
               timeWindow: 'week',
             }),
           ]);

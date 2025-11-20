@@ -1,4 +1,4 @@
-// src/features/boilerplate/utils/ErrorHandling.ts
+// src/features/system/utils/ErrorHandling.ts
 import { AuthenticationError, AuthErrorCode, ProfileError, ProfileErrorCode } from '../types/auth.types'
 
 // === Error Code Constants ===

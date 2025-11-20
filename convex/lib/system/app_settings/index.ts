@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_settings/index.ts
+// convex/lib/system/app_settings/index.ts
 // convex/appSettings/index.ts
 
 // Export constants and types

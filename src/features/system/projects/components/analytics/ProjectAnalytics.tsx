@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/analytics/ProjectAnalytics.tsx
+// features/system/projects/components/analytics/ProjectAnalytics.tsx
 
 import { FC, useMemo } from 'react'
 import { Card } from '@/components/ui/Card'

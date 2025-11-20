@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/queries.ts
+// convex/lib/system/user_profiles/user_profiles/queries.ts
 // Read operations for user_profiles module
 
 import { query } from '@/generated/server';

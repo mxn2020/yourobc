@@ -16,7 +16,7 @@ import {
 import { Badge, Button, Card, CardContent, CardContent, CardHeader, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
 import { useMyAuditLogs } from '../hooks/useAuditLogs';
 import type { AuditLogEntry, AuditSeverity } from '../types/audit-logs.types';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 import { parseConvexError } from '@/utils/errorHandling';
 
 interface AuditLogDetailPageProps {

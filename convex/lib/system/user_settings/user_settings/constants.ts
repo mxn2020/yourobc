@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_settings/constants.ts
+// convex/lib/system/user_settings/user_settings/constants.ts
 // Constants for user settings module
 
 /**

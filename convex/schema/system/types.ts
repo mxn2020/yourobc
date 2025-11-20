@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/types.ts
+// convex/schema/system/types.ts
 
 import { type Infer } from 'convex/values'
 import type { Id } from '@/generated/dataModel'

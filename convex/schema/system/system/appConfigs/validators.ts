@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/appConfigs/validators.ts
+// convex/schema/system/system/appConfigs/validators.ts
 // Grouped validators for appConfigs module
 
 import { v } from 'convex/values';

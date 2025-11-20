@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/shared/components/UpgradePrompt.tsx
+// src/features/system/payments/shared/components/UpgradePrompt.tsx
 /**
  * Generic Upgrade Prompt Component
  */

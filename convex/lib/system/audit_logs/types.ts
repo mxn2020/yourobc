@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/audit_logs/types.ts
+// convex/lib/system/audit_logs/types.ts
 // convex/auditLogs/types.ts
 
 import type { Doc, Id } from '@/generated/dataModel';

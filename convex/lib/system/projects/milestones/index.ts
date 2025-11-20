@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/projects/milestones/index.ts
+// convex/lib/system/projects/milestones/index.ts
 
 export * from './constants';
 export * from './types';

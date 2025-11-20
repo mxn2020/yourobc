@@ -1,4 +1,4 @@
-// src/features/boilerplate/admin/types/config.types.ts
+// src/features/system/admin/types/config.types.ts
 /**
  * TypeScript types for Feature Configuration Management
  */

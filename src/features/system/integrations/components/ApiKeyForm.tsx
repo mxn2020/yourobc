@@ -1,11 +1,11 @@
-// src/features/boilerplate/integrations/components/ApiKeyForm.tsx
+// src/features/system/integrations/components/ApiKeyForm.tsx
 
 import { useState } from "react";
 import { CreateApiKeyParams, CreateApiKeyResult } from "../types";
 import { API_SCOPES } from "../types";
 import { getRateLimitForTier } from "../config/integrations-config";
 import { copyToClipboard } from "../utils";
-import { useAuth } from "@/features/boilerplate/auth";
+import { useAuth } from "@/features/system/auth";
 
 interface ApiKeyFormProps {
   onSubmit: (params: CreateApiKeyParams) => Promise<CreateApiKeyResult>;

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_configs/utils.ts
+// convex/lib/system/app_configs/utils.ts
 // Utility functions for appConfigs module
 
 import { APP_CONFIGS_CONSTANTS } from './constants';

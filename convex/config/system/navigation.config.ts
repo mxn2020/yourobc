@@ -1,6 +1,6 @@
-// convex/config/boilerplate/navigation.config.ts
+// convex/config/system/navigation.config.ts
 // ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
-// This file is part of the boilerplate and will be updated with new releases.
+// This file is part of the system and will be updated with new releases.
 // To customize navigation, use convex/config/app/navigation.config.ts instead.
 
 import { BarChart3, FolderOpen, Brain, TestTube, ClipboardList, Settings, Users, Lock, Activity, Shield, ListTodo } from 'lucide-react';

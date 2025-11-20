@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_settings/queries.ts
+// convex/lib/system/app_settings/queries.ts
 
 import { v } from 'convex/values'
 import { MutationCtx, QueryCtx, query } from '@/generated/server'

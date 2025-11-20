@@ -1,4 +1,4 @@
-// convex/config/boilerplate/entities/email.entities.ts
+// convex/config/system/entities/email.entities.ts
 // ⚠️ BOILERPLATE FILE - DO NOT MODIFY IN YOUR APPS
 
 /**

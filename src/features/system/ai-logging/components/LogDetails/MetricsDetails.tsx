@@ -2,7 +2,7 @@
 import { Badge, Card, CardContent, CardHeader } from '@/components/ui';
 import { Clock, DollarSign, Zap, Activity, Database, CloudSnow } from 'lucide-react';
 import { formatLogMetrics } from '../../utils/log-formatters';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 
 interface MetricsDetailsProps {
   log: AIUsageLog;

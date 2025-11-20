@@ -11,7 +11,7 @@ import { useModelPreferences } from '../hooks/useModelPreferences';
 import { formatModelDisplay } from '../utils/model-formatters';
 
 export function ModelDetailPage() {
-  const { modelId } = useParams({ from: '/{-$locale}/_protected/_boilerplate/ai-models/$modelId' });
+  const { modelId } = useParams({ from: '/{-$locale}/_protected/_system/ai-models/$modelId' });
   const [showCostCalculator, setShowCostCalculator] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTesting, setShowTesting] = useState(false);

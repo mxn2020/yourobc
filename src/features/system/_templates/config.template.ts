@@ -1,16 +1,16 @@
-// src/features/boilerplate/_templates/config.template.ts
+// src/features/system/_templates/config.template.ts
 /**
  * STANDARD CONFIGURATION TEMPLATE
  *
  * This template defines the standard pattern that ALL feature configurations must follow.
  * Copy this file to your feature's config directory and customize for your feature.
  *
- * Location: src/features/boilerplate/{feature}/config/index.ts
+ * Location: src/features/system/{feature}/config/index.ts
  *
  * Example Features Using This Pattern:
- * - Blog: src/features/boilerplate/blog/config/index.ts
- * - Payments: src/features/boilerplate/payments/config/payment-config.ts
- * - Logging: src/features/boilerplate/logging/config/logging-config.ts
+ * - Blog: src/features/system/blog/config/index.ts
+ * - Payments: src/features/system/payments/config/payment-config.ts
+ * - Logging: src/features/system/logging/config/logging-config.ts
  */
 
 // ============================================
@@ -227,7 +227,7 @@ export default FEATURE_CONFIG;
  * Example 1: Check if feature is enabled in component
  *
  * ```tsx
- * import { isFeatureEnabled } from '@/features/boilerplate/feature/config';
+ * import { isFeatureEnabled } from '@/features/system/feature/config';
  *
  * export function MyComponent() {
  *   if (!isFeatureEnabled()) {
@@ -242,7 +242,7 @@ export default FEATURE_CONFIG;
  * Example 2: Conditionally wrap with provider in root
  *
  * ```tsx
- * import { isFeatureEnabled } from '@/features/boilerplate/feature/config';
+ * import { isFeatureEnabled } from '@/features/system/feature/config';
  *
  * const featureEnabled = isFeatureEnabled();
  *
@@ -260,7 +260,7 @@ export default FEATURE_CONFIG;
  * Example 3: Validate configuration on startup
  *
  * ```ts
- * import { validateFeatureConfig } from '@/features/boilerplate/feature/config';
+ * import { validateFeatureConfig } from '@/features/system/feature/config';
  *
  * const validation = validateFeatureConfig();
  * if (!validation.valid) {

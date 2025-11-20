@@ -3,10 +3,10 @@
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { parseConvexError, ParsedError } from '../utils/errorHandling'
-import { logger, createFeatureLogger } from '@/features/boilerplate/logging'
-import { BreadcrumbCategory, BreadcrumbLevel } from '@/features/boilerplate/logging/types/logging.types'
-import { defaultLocale } from '@/features/boilerplate/i18n'
-import { useToast } from '@/features/boilerplate/notifications'
+import { logger, createFeatureLogger } from '@/features/system/logging'
+import { BreadcrumbCategory, BreadcrumbLevel } from '@/features/system/logging/types/logging.types'
+import { defaultLocale } from '@/features/system/i18n'
+import { useToast } from '@/features/system/notifications'
 
 const errorLogger = createFeatureLogger('errors')
 

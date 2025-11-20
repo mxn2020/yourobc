@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/notifications/types.ts
+// convex/schema/system/system/notifications/types.ts
 // Type extractions from validators for notifications module
 
 import { Infer } from 'convex/values';

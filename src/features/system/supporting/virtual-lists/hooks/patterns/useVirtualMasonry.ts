@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/patterns/useVirtualMasonry.ts
+// src/features/system/supporting/virtual-lists/hooks/patterns/useVirtualMasonry.ts
 
 import { useVirtualizer } from '@tanstack/react-virtual'
 import type { UseVirtualMasonryOptions } from '../../types'

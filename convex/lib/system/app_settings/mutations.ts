@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/app_settings/mutations.ts
+// convex/lib/system/app_settings/mutations.ts
 
 import { v } from 'convex/values'
 import { mutation } from '@/generated/server'

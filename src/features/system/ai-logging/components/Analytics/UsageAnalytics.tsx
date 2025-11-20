@@ -2,8 +2,8 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui';
 import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { formatNumber } from '@/features/boilerplate/ai-core/utils';
-import type { AIUsageStats } from '@/features/boilerplate/ai-core/types';
+import { formatNumber } from '@/features/system/ai-core/utils';
+import type { AIUsageStats } from '@/features/system/ai-core/types';
 
 interface UsageAnalyticsProps {
   stats: AIUsageStats | undefined;

@@ -1,9 +1,9 @@
 // src/features/ai-models/utils/model-formatters.ts
-import { formatContextWindow } from '@/features/boilerplate/ai-core/utils';
-import { getCostTier } from '@/features/boilerplate/ai-core/utils';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
-import { formatPrice } from '@/features/boilerplate/ai-core/utils';
+import { formatContextWindow } from '@/features/system/ai-core/utils';
+import { getCostTier } from '@/features/system/ai-core/utils';
+import { getProviderColor } from '@/features/system/ai-core/utils';
+import type { ModelInfo } from '@/features/system/ai-core/types';
+import { formatPrice } from '@/features/system/ai-core/utils';
 
 export function formatModelDisplay(model: ModelInfo) {
   return {

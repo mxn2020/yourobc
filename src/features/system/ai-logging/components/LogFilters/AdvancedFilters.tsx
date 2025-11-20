@@ -1,8 +1,8 @@
 // src/features/ai-logging/components/LogFilters/AdvancedFilters.tsx
 import { useCallback } from 'react';
 import { Input, Label, SimpleSelect as Select } from '@/components/ui';
-import type { AIUsageFilter } from '@/features/boilerplate/ai-core/types';
-import type { AIOperationType } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageFilter } from '@/features/system/ai-core/types';
+import type { AIOperationType } from '@/features/system/ai-core/types';
 import type { LanguageModelV2FinishReason } from '@ai-sdk/provider';
 
 interface AdvancedFiltersProps {

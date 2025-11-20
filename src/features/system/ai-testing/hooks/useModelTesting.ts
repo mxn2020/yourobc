@@ -1,7 +1,7 @@
 // src/features/ai-testing/hooks/useModelTesting.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import type { TestConfiguration, TestResult } from '@/features/boilerplate/ai-core/types';
+import type { TestConfiguration, TestResult } from '@/features/system/ai-core/types';
 import type { 
   TestFormData, 
   TestExecutionRequest, 

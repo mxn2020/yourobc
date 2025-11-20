@@ -7,7 +7,7 @@ import {
   projectCosts,
   calculateBudgetUtilization,
   analyzeSpendingPatterns
-} from '@/features/boilerplate/ai-core/utils';
+} from '@/features/system/ai-core/utils';
 import { 
   DEFAULT_COST_CONFIG, 
   PROVIDER_COST_MULTIPLIERS,

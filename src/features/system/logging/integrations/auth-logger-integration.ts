@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/integrations/auth-logger-integration.ts
+// src/features/system/logging/integrations/auth-logger-integration.ts
 
 import { logger } from '../services/LoggingService'
 import { UserContext, BreadcrumbCategory, BreadcrumbLevel } from '../types/logging.types'

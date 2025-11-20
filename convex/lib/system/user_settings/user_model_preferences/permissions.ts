@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_settings/user_model_preferences/permissions.ts
+// convex/lib/system/user_settings/user_model_preferences/permissions.ts
 // Access control and permissions for user model preferences module
 
 import { Id } from '@/generated/dataModel';

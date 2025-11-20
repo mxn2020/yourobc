@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/utils.ts
+// convex/lib/system/supporting/scheduling/utils.ts
 
 import type { ScheduledEvent, CreateScheduledEventData, UpdateScheduledEventData } from './types';
 import { SCHEDULING_CONSTANTS } from './constants';

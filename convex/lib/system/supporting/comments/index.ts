@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/index.ts
+// convex/lib/system/supporting/comments/index.ts
 
 /**
  * Comments Module
@@ -13,7 +13,7 @@
  * - Internal/external comment types
  * - Soft delete with cascade
  *
- * @module convex/lib/boilerplate/supporting/comments
+ * @module convex/lib/system/supporting/comments
  */
 
 // Export constants

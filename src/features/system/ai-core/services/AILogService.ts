@@ -16,9 +16,9 @@ import type {
   LanguageModelV2ResponseMetadata,
   JSONValue
 } from '@ai-sdk/provider';
-import { getProviderFromModelId } from '@/features/boilerplate/ai-core/utils';
-import { formatErrorMessage } from '@/features/boilerplate/ai-core/utils';
-import { cleanTestParameters } from '@/features/boilerplate/ai-core/utils';
+import { getProviderFromModelId } from '@/features/system/ai-core/utils';
+import { formatErrorMessage } from '@/features/system/ai-core/utils';
+import { cleanTestParameters } from '@/features/system/ai-core/utils';
 import { TestParameters } from '../types/ai-testing.types';
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -282,7 +282,7 @@ export class AILogService {
       }
 
       // Query logs from Convex
-      const result = await this.convexClient.query(api.lib.boilerplate.ai_logs.queries.getAILogs, convexArgs);
+      const result = await this.convexClient.query(api.lib.system.ai_logs.queries.getAILogs, convexArgs);
 
       return {
         logs: result.logs.map((log) => ({
@@ -320,7 +320,7 @@ export class AILogService {
         return null;
       }
 
-      const result = await this.convexClient.query(api.lib.boilerplate.ai_logs.queries.getAILog, { logId });
+      const result = await this.convexClient.query(api.lib.system.ai_logs.queries.getAILog, { logId });
       
       if (!result) {
         return null;
@@ -358,7 +358,7 @@ export class AILogService {
         return null;
       }
 
-      const result = await this.convexClient.query(api.lib.boilerplate.ai_logs.queries.getAILogByPublicId, { publicId });
+      const result = await this.convexClient.query(api.lib.system.ai_logs.queries.getAILogByPublicId, { publicId });
 
       if (!result) {
         return null;
@@ -398,7 +398,7 @@ export class AILogService {
         return false;
       }
 
-      await this.convexClient.mutation(api.lib.boilerplate.ai_logs.mutations.deleteAILog, {
+      await this.convexClient.mutation(api.lib.system.ai_logs.mutations.deleteAILog, {
         logId
       });
 
@@ -421,7 +421,7 @@ export class AILogService {
         return false;
       }
 
-      await this.convexClient.mutation(api.lib.boilerplate.ai_logs.mutations.deleteAILogByPublicId, {
+      await this.convexClient.mutation(api.lib.system.ai_logs.mutations.deleteAILogByPublicId, {
         publicId
       });
 
@@ -443,7 +443,7 @@ export class AILogService {
       }
 
       // Get stats from Convex
-      const rawStats = await this.convexClient.query(api.lib.boilerplate.ai_logs.queries.getAILogStats, {});
+      const rawStats = await this.convexClient.query(api.lib.system.ai_logs.queries.getAILogStats, {});
       
       // Return stats directly - Convex schema should match our expected format
       return {
@@ -603,7 +603,7 @@ export class AILogService {
             ...pendingLog.data,
             requestType: pendingLog.data.requestType === 'streaming' ? 'text_generation' : pendingLog.data.requestType
           };
-          await this.convexClient.mutation(api.lib.boilerplate.ai_logs.mutations.createAILog, logData);
+          await this.convexClient.mutation(api.lib.system.ai_logs.mutations.createAILog, logData);
         }
         
         if (this.config.enableDebugLogging) {
@@ -664,7 +664,7 @@ export class AILogService {
       // Direct logging without batching
       if (this.convexClient) {
         try {
-          await this.convexClient.mutation(api.lib.boilerplate.ai_logs.mutations.createAILog, logData);
+          await this.convexClient.mutation(api.lib.system.ai_logs.mutations.createAILog, logData);
         } catch (error) {
           console.error('Failed to create log directly:', error);
         }

@@ -1,5 +1,5 @@
 // convex/config/index.ts
-// Main configuration export - Merges boilerplate and app configurations
+// Main configuration export - Merges system and app configurations
 // This file automatically combines all configuration sources into unified exports
 
 // ============================================================================
@@ -12,7 +12,7 @@ import {
   BOILERPLATE_COMMENTABLE_ENTITY_TYPES,
   BOILERPLATE_DOCUMENTABLE_ENTITY_TYPES,
   BOILERPLATE_NOTIFIABLE_ENTITY_TYPES,
-  type BoilerplateEntityType,
+  type SystemEntityType,
 } from './system/entities.config';
 
 import {
@@ -51,7 +51,7 @@ import { FEATURES, validateAllFeatures, isFeatureEnabled as checkFeature } from 
 // ============================================================================
 
 /**
- * All entity types (boilerplate + app)
+ * All entity types (system + app)
  * Use this constant throughout your app
  */
 export const ALL_ENTITY_TYPES = [
@@ -65,7 +65,7 @@ export const ALL_ENTITY_TYPES = [
 export type EntityType = typeof ALL_ENTITY_TYPES[number];
 
 /**
- * All commentable entity types (boilerplate + app)
+ * All commentable entity types (system + app)
  */
 export const COMMENTABLE_ENTITY_TYPES = [
   ...BOILERPLATE_COMMENTABLE_ENTITY_TYPES,
@@ -78,7 +78,7 @@ export const COMMENTABLE_ENTITY_TYPES = [
 export type CommentableEntityType = typeof COMMENTABLE_ENTITY_TYPES[number];
 
 /**
- * All documentable entity types (boilerplate + app)
+ * All documentable entity types (system + app)
  */
 export const DOCUMENTABLE_ENTITY_TYPES = [
   ...BOILERPLATE_DOCUMENTABLE_ENTITY_TYPES,
@@ -91,7 +91,7 @@ export const DOCUMENTABLE_ENTITY_TYPES = [
 export type DocumentableEntityType = typeof DOCUMENTABLE_ENTITY_TYPES[number];
 
 /**
- * All notifiable entity types (boilerplate + app)
+ * All notifiable entity types (system + app)
  */
 export const NOTIFIABLE_ENTITY_TYPES = [
   ...BOILERPLATE_NOTIFIABLE_ENTITY_TYPES,
@@ -104,7 +104,7 @@ export const NOTIFIABLE_ENTITY_TYPES = [
 export type NotifiableEntityType = typeof NOTIFIABLE_ENTITY_TYPES[number];
 
 /**
- * Navigation configuration (boilerplate + app)
+ * Navigation configuration (system + app)
  */
 export const NAVIGATION = {
   dashboard: DASHBOARD_NAVIGATION,
@@ -127,7 +127,7 @@ export const APP_CONFIG = {
   entities: {
     all: ALL_ENTITY_TYPES,
     system: SYSTEM_ENTITY_TYPES,
-    boilerplate: BOILERPLATE_ENTITY_TYPES,
+    system: BOILERPLATE_ENTITY_TYPES,
     app: ALL_APP_ENTITY_TYPES,
     commentable: COMMENTABLE_ENTITY_TYPES,
     documentable: DOCUMENTABLE_ENTITY_TYPES,
@@ -175,7 +175,7 @@ export {
 
 // Types
 export * from './types';
-export type { BoilerplateEntityType };
+export type { SystemEntityType };
 
 // ============================================================================
 // HELPER FUNCTIONS

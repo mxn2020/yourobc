@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/members/MemberCard.tsx
+// features/system/projects/components/members/MemberCard.tsx
 
 import { FC } from 'react'
 import { Card } from '@/components/ui/Card'

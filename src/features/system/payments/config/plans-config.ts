@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/config/plans-config.ts
+// src/features/system/payments/config/plans-config.ts
 /**
  * Pricing Plans Configuration
  * 

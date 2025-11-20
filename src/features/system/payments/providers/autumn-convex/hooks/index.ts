@@ -1,2 +1,2 @@
-// src/features/boilerplate/payments/providers/autumn-convex/hooks/index.ts
+// src/features/system/payments/providers/autumn-convex/hooks/index.ts
 export * from './useAutumnConvex';

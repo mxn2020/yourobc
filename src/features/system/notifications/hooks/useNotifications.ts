@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/convex/_generated/api'
-import { useAuth } from '@/features/boilerplate/auth'
+import { useAuth } from '@/features/system/auth'
 import type {
   NotificationFilters,
   CreateNotificationData,
@@ -24,7 +24,7 @@ export function useNotificationsCore() {
 
   // Fetch notifications with current filters
   const { data: notificationsData, isLoading } = useQuery({
-    ...convexQuery(api.lib.boilerplate.notifications.queries.getNotifications, {
+    ...convexQuery(api.lib.system.notifications.queries.getNotifications, {
       options: filters,
     }),
     enabled: isReady && isAuthenticated && !!profile, // Only query when auth is ready AND profile exists
@@ -108,7 +108,7 @@ export function useNotificationsWithFilters(
   }), [filters])
 
   const { data: notificationsData, isLoading, error } = useQuery({
-    ...convexQuery(api.lib.boilerplate.notifications.queries.getNotifications, {
+    ...convexQuery(api.lib.system.notifications.queries.getNotifications, {
       options: queryFilters,
     }),
     enabled: isReady && isAuthenticated && !!profile, // Only query when auth is ready AND profile exists
@@ -133,7 +133,7 @@ export function useUnreadCount() {
   const { isReady, isAuthenticated, profile } = useAuth()
 
   const { data: unreadCount, isLoading } = useQuery({
-    ...convexQuery(api.lib.boilerplate.notifications.queries.getUnreadCount, {}),
+    ...convexQuery(api.lib.system.notifications.queries.getUnreadCount, {}),
     enabled: isReady && isAuthenticated && !!profile, // Only query when auth is ready AND profile exists
     staleTime: 10000, // 10 seconds
   })
@@ -148,7 +148,7 @@ export function useNotification(notificationId: NotificationId) {
   const { isReady, isAuthenticated, profile } = useAuth()
 
   const { data: notification, isLoading } = useQuery({
-    ...convexQuery(api.lib.boilerplate.notifications.queries.getNotification, {
+    ...convexQuery(api.lib.system.notifications.queries.getNotification, {
       notificationId,
     }),
     enabled: isReady && isAuthenticated && !!profile && !!notificationId, // Only query when auth is ready, profile exists, and ID exists
@@ -164,7 +164,7 @@ export function useNotification(notificationId: NotificationId) {
 
 export function useMarkAsRead() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.notifications.mutations.markAsRead),
+    mutationFn: useConvexMutation(api.lib.system.notifications.mutations.markAsRead),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -173,7 +173,7 @@ export function useMarkAsRead() {
 
 export function useMarkAllAsRead() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.notifications.mutations.markAllAsRead),
+    mutationFn: useConvexMutation(api.lib.system.notifications.mutations.markAllAsRead),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -182,7 +182,7 @@ export function useMarkAllAsRead() {
 
 export function useDeleteNotification() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.notifications.mutations.deleteNotification),
+    mutationFn: useConvexMutation(api.lib.system.notifications.mutations.deleteNotification),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -191,7 +191,7 @@ export function useDeleteNotification() {
 
 export function useCreateNotification() {
   return useMutation({
-    mutationFn: useConvexMutation(api.lib.boilerplate.notifications.mutations.createNotification),
+    mutationFn: useConvexMutation(api.lib.system.notifications.mutations.createNotification),
     onError: () => {
       // Intentionally empty - let individual components handle errors
     }
@@ -199,10 +199,10 @@ export function useCreateNotification() {
 }
 
 export function useNotificationActions() {
-  const markAsReadMutation = useConvexMutation(api.lib.boilerplate.notifications.mutations.markAsRead)
-  const markAllAsReadMutation = useConvexMutation(api.lib.boilerplate.notifications.mutations.markAllAsRead)
-  const deleteNotificationMutation = useConvexMutation(api.lib.boilerplate.notifications.mutations.deleteNotification)
-  const createNotificationMutation = useConvexMutation(api.lib.boilerplate.notifications.mutations.createNotification)
+  const markAsReadMutation = useConvexMutation(api.lib.system.notifications.mutations.markAsRead)
+  const markAllAsReadMutation = useConvexMutation(api.lib.system.notifications.mutations.markAllAsRead)
+  const deleteNotificationMutation = useConvexMutation(api.lib.system.notifications.mutations.deleteNotification)
+  const createNotificationMutation = useConvexMutation(api.lib.system.notifications.mutations.createNotification)
 
   const markAsRead = useCallback(async (notificationId: NotificationId) => {
     await markAsReadMutation({

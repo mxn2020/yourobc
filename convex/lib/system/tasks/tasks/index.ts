@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/tasks/tasks/index.ts
+// convex/lib/system/tasks/tasks/index.ts
 // Public API exports for tasks module
 
 // Constants

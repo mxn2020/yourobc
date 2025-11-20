@@ -2,13 +2,13 @@
 import React, { useState, useCallback } from 'react';
 import { Hash, Play, Settings, Copy, RotateCcw, Plus, Trash2 } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, Input } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { EmbeddingConfig } from '../../services/TestExecutor';
-import { supportsOperationType } from '@/features/boilerplate/ai-core/utils';
-import { useToast } from '@/features/boilerplate/notifications';
+import { supportsOperationType } from '@/features/system/ai-core/utils';
+import { useToast } from '@/features/system/notifications';
 
 interface EmbeddingResult {
   embedding?: number[];

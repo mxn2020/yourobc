@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/providers/ZapierProvider.ts
+// src/features/system/integrations/providers/ZapierProvider.ts
 
 import { Id } from "@/convex/_generated/dataModel";
 import {

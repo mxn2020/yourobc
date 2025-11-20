@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@/convex/_generated/api';
 import { Id } from "@/convex/_generated/dataModel";
-import { useAuth } from '@/features/boilerplate/auth';
+import { useAuth } from '@/features/system/auth';
 import type { ProviderConfig, EmailProvider } from '../types';
 import { validateProviderConfig } from '../utils';
 
@@ -12,21 +12,21 @@ import { validateProviderConfig } from '../utils';
  * Hook to get the active email configuration
  */
 export function useActiveEmailConfig() {
-  return useConvexQuery(api.lib.boilerplate.email.queries.getActiveConfig, {});
+  return useConvexQuery(api.lib.system.email.queries.getActiveConfig, {});
 }
 
 /**
  * Hook to get all email configurations
  */
 export function useAllEmailConfigs() {
-  return useConvexQuery(api.lib.boilerplate.email.queries.getAllConfigs, {});
+  return useConvexQuery(api.lib.system.email.queries.getAllConfigs, {});
 }
 
 /**
  * Hook to get configuration by provider
  */
 export function useEmailConfigByProvider(provider: EmailProvider) {
-  return useConvexQuery(api.lib.boilerplate.email.queries.getConfigByProvider, { provider });
+  return useConvexQuery(api.lib.system.email.queries.getConfigByProvider, { provider });
 }
 
 /**
@@ -34,7 +34,7 @@ export function useEmailConfigByProvider(provider: EmailProvider) {
  */
 export function useSaveEmailConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.boilerplate.email.mutations.saveEmailConfig);
+  const mutation = useConvexMutation(api.lib.system.email.mutations.saveEmailConfig);
 
   return useMutation({
     mutationFn: async ({
@@ -74,7 +74,7 @@ export function useSaveEmailConfig() {
  */
 export function useSetActiveConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.boilerplate.email.mutations.setActiveConfig);
+  const mutation = useConvexMutation(api.lib.system.email.mutations.setActiveConfig);
 
   return useMutation({
     mutationFn: async ({ configId }: { configId: Id<"emailConfigs"> }) => {
@@ -92,7 +92,7 @@ export function useSetActiveConfig() {
  */
 export function useDeleteEmailConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.boilerplate.email.mutations.deleteEmailConfig);
+  const mutation = useConvexMutation(api.lib.system.email.mutations.deleteEmailConfig);
 
   return useMutation({
     mutationFn: async ({ configId }: { configId: Id<"emailConfigs"> }) => {
@@ -110,7 +110,7 @@ export function useDeleteEmailConfig() {
  */
 export function useUpdateTestStatus() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.boilerplate.email.mutations.updateTestStatus);
+  const mutation = useConvexMutation(api.lib.system.email.mutations.updateTestStatus);
 
   return useMutation({
     mutationFn: async ({

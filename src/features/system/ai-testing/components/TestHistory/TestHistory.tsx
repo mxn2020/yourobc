@@ -5,7 +5,7 @@ import { Button, Card, CardContent, CardHeader, Input, Loading, SimpleSelect as 
 import { TestCard } from './TestCard';
 import { useTestHistory } from '../../hooks/useTestHistory';
 import type { TestViewMode, TestSortField, TestFilterStatus } from '../../types/test.types';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 export function TestHistory() {
   const toast = useToast();

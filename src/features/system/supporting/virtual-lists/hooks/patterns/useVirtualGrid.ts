@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/patterns/useVirtualGrid.ts
+// src/features/system/supporting/virtual-lists/hooks/patterns/useVirtualGrid.ts
 
 import { useVirtualizer } from '@tanstack/react-virtual'
 import type { UseVirtualGridOptions } from '../../types'

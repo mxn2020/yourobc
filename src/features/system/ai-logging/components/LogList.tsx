@@ -1,8 +1,8 @@
-// src/features/boilerplate/ai-logging/components/LogList.tsx
+// src/features/system/ai-logging/components/LogList.tsx
 import { DataList, Badge } from '@/components/ui'
 import { Activity, Database, CloudSnow, Minus, AlertCircle } from 'lucide-react'
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils'
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types'
+import { getProviderColor } from '@/features/system/ai-core/utils'
+import type { AIUsageLog } from '@/features/system/ai-core/types'
 
 interface LogListProps {
   logs: AIUsageLog[]

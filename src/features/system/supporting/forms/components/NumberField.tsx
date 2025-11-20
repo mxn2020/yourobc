@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/components/NumberField.tsx
+// src/features/system/supporting/forms/components/NumberField.tsx
 
 import { useDefaultFieldContext } from '../hooks/useFormContext'
 import { FieldInfo } from './FieldInfo'

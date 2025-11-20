@@ -2,11 +2,11 @@
 import { useState, useMemo } from 'react';
 import { User, Bell, LogOut, Shield, ChevronLeft, ChevronRight, BarChart3, Building, Globe } from 'lucide-react';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
-import { useAuth } from '@/features/boilerplate/auth';
-import { NotificationsDropdown, useUnreadCount, AuthenticatedNotifications } from '@/features/boilerplate/notifications';
+import { useAuth } from '@/features/system/auth';
+import { NotificationsDropdown, useUnreadCount, AuthenticatedNotifications } from '@/features/system/notifications';
 import { NAVIGATION } from '@/config';
-import { LanguageSwitcherDropdown } from '@/features/boilerplate/i18n/components';
-import { defaultLocale } from '@/features/boilerplate/i18n';
+import { LanguageSwitcherDropdown } from '@/features/system/i18n/components';
+import { defaultLocale } from '@/features/system/i18n';
 
 interface SidebarProps {
   isCollapsed?: boolean;

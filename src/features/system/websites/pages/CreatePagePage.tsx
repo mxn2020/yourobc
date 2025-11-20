@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/pages/CreatePagePage.tsx
+// src/features/system/websites/pages/CreatePagePage.tsx
 
 import { FC, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
@@ -10,10 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { useTranslation } from '@/features/system/i18n'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { WebsiteId } from '../types'
 
 interface CreatePagePageProps {

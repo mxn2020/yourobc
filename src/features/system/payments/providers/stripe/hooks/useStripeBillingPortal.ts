@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/hooks/useStripeBillingPortal.ts
+// src/features/system/payments/providers/stripe/hooks/useStripeBillingPortal.ts
 /**
  * Stripe Billing Portal Hook
  *

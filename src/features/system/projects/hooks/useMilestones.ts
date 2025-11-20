@@ -1,4 +1,4 @@
-// src/features/boilerplate/projects/hooks/useMilestones.ts
+// src/features/system/projects/hooks/useMilestones.ts
 
 import { useCallback, useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';

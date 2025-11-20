@@ -1,8 +1,8 @@
-// src/features/boilerplate/lib/route-guards-server.ts
+// src/features/system/lib/route-guards-server.ts
 import { redirect } from '@tanstack/react-router'
 import { getSessionServer, requireAuthServer, requireAdminServer, getCurrentUserServer } from './server-functions'
-import { defaultLocale } from '@/features/boilerplate/i18n'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 // === Server-side Route Loader Helpers ===
 

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/analytics/analytics/permissions.ts
+// convex/lib/system/analytics/analytics/permissions.ts
 // Access control functions for analytics module
 
 import { QueryCtx, MutationCtx } from '@/generated/server';

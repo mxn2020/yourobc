@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/integrations/integrations/queries.ts
+// convex/lib/system/integrations/integrations/queries.ts
 // Query operations for integrations module
 
 import { v } from 'convex/values';

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/pages/BlogHomePage.tsx
+// src/features/system/blog/pages/BlogHomePage.tsx
 /**
  * Blog Home Page
  *
@@ -15,7 +15,7 @@ import { usePosts } from '../hooks/usePosts';
 import { useCategories } from '../hooks/useCategories';
 import { PostList } from '../shared/components/PostList';
 import { PostCard } from '../shared/components/PostCard';
-import { useTranslation } from '@/features/boilerplate/i18n';
+import { useTranslation } from '@/features/system/i18n';
 
 export function BlogHomePage() {
   const { t } = useTranslation('blog');

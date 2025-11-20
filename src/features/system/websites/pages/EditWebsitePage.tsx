@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/pages/EditWebsitePage.tsx
+// src/features/system/websites/pages/EditWebsitePage.tsx
 
 import { FC } from 'react'
 import { useNavigate } from '@tanstack/react-router'
@@ -6,10 +6,10 @@ import { useWebsite } from '../hooks/useWebsites'
 import { WebsiteForm } from '../components/WebsiteForm'
 import { Card } from '@/components/ui/card'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { useTranslation } from '@/features/system/i18n'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { WebsiteId, UpdateWebsiteData } from '../types'
 
 interface EditWebsitePageProps {

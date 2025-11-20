@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/components/WebsiteForm.tsx
+// src/features/system/websites/components/WebsiteForm.tsx
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { CreateWebsiteData, UpdateWebsiteData } from '../types'
 import { WEBSITE_VISIBILITY } from '../constants'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface WebsiteFormProps {
   initialData?: Partial<UpdateWebsiteData>

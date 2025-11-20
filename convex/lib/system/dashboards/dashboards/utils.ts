@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/dashboards/dashboards/utils.ts
+// convex/lib/system/dashboards/dashboards/utils.ts
 // Validation functions and utility helpers for dashboards module
 
 import { DASHBOARDS_CONSTANTS } from './constants';

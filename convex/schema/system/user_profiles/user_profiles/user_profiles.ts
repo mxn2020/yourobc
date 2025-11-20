@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/user_profiles/user_profiles/user_profiles.ts
+// convex/schema/system/user_profiles/user_profiles/user_profiles.ts
 // User profiles table definition - manages system user profiles with Better Auth integration
 
 import { defineTable } from 'convex/server';

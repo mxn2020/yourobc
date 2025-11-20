@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/config/index.ts
+// src/features/system/websites/config/index.ts
 
 export const WEBSITES_CONFIG = {
   limits: {

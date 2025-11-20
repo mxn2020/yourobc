@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/patterns/useVirtualSticky.ts
+// src/features/system/supporting/virtual-lists/hooks/patterns/useVirtualSticky.ts
 
 import { useRef, useCallback } from 'react'
 import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'

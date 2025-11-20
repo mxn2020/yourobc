@@ -4,14 +4,14 @@ import { Sliders, Play, Plus, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
 import { useTestComparison } from '../../hooks/useTestComparison';
-import type { TestResult } from '@/features/boilerplate/ai-core/types';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { TestResult } from '@/features/system/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { ParameterTuningConfig } from '../../types/test.types';
-import { useToast } from '@/features/boilerplate/notifications';
+import { useToast } from '@/features/system/notifications';
 
 interface ParameterConfig {
   name: keyof TestResult['parameters'];

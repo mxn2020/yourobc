@@ -8,7 +8,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { stripeConnectService } from '@/features/boilerplate/payments/providers/stripe-connect/services/StripeConnectService';
+import { stripeConnectService } from '@/features/system/payments/providers/stripe-connect/services/StripeConnectService';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -48,7 +48,7 @@ async function handleCreateCheckout({ request }: { request: Request }) {
     }
 
     // Get account from Convex
-    const account = await convex.query(api.lib.boilerplate.payments.stripe_connect.queries.getConnectedAccount, {
+    const account = await convex.query(api.lib.system.payments.stripe_connect.queries.getConnectedAccount, {
       accountId: connectedAccountId as Id<'connectedAccounts'>,
     })
 
@@ -67,7 +67,7 @@ async function handleCreateCheckout({ request }: { request: Request }) {
     }
 
     // Get product from Convex
-    const product = await convex.query(api.lib.boilerplate.payments.stripe_connect.queries.getProduct, {
+    const product = await convex.query(api.lib.system.payments.stripe_connect.queries.getProduct, {
       productId: productId as Id<'clientProducts'>,
     })
 
@@ -96,7 +96,7 @@ async function handleCreateCheckout({ request }: { request: Request }) {
     )
 
     // Create payment record in Convex
-    const paymentId = await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.createPayment, {
+    const paymentId = await convex.mutation(api.lib.system.payments.stripe_connect.mutations.createPayment, {
       connectedAccountId: connectedAccountId as Id<'connectedAccounts'>,
       productId: productId as Id<'clientProducts'>,
       customerEmail,
@@ -115,7 +115,7 @@ async function handleCreateCheckout({ request }: { request: Request }) {
     })
 
     // Log event
-    await convex.mutation(api.lib.boilerplate.payments.stripe_connect.mutations.logConnectEvent, {
+    await convex.mutation(api.lib.system.payments.stripe_connect.mutations.logConnectEvent, {
       connectedAccountId: connectedAccountId as Id<'connectedAccounts'>,
       paymentId,
       eventType: 'payment_created',

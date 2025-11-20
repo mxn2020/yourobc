@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/permission_requests/constants.ts
+// convex/lib/system/permission_requests/constants.ts
 
 /**
  * Permission Request Constants and Configuration Values

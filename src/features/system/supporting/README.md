@@ -1,6 +1,6 @@
 # Supporting Features
 
-This directory contains cross-functional supporting features that can be used across all main features in the boilerplate.
+This directory contains cross-functional supporting features that can be used across all main features in the system.
 
 ## Structure
 
@@ -49,7 +49,7 @@ supporting/
 
 ## Important Note
 
-**Notifications is NOT a supporting feature** - it is a main boilerplate feature located at `src/features/boilerplate/notifications/`. It has dedicated routes (`/notifications`), global navigation (header bell icon), and is user-centric rather than entity-attachable.
+**Notifications is NOT a supporting feature** - it is a main system feature located at `src/features/system/notifications/`. It has dedicated routes (`/notifications`), global navigation (header bell icon), and is user-centric rather than entity-attachable.
 
 ## Features
 
@@ -65,7 +65,7 @@ import {
   getSupportingConfig,
   isFeatureEnabled,
   getEnabledFeatures
-} from '@/features/boilerplate/supporting';
+} from '@/features/system/supporting';
 
 // Check if a feature is enabled
 const commentsEnabled = isFeatureEnabled('comments');
@@ -142,7 +142,7 @@ Threaded discussion system with mentions, reactions, and reply support.
 
 **Usage:**
 ```typescript
-import { CommentsSection } from '@/features/boilerplate/supporting';
+import { CommentsSection } from '@/features/system/supporting';
 
 <CommentsSection
   entityType="project"
@@ -194,7 +194,7 @@ Document management and file storage system.
 
 **Usage:**
 ```typescript
-import { DocumentsSection } from '@/features/boilerplate/supporting';
+import { DocumentsSection } from '@/features/system/supporting';
 
 <DocumentsSection
   entityType="project"
@@ -248,7 +248,7 @@ Follow-up reminders and task notifications.
 
 **Usage:**
 ```typescript
-import { RemindersSection } from '@/features/boilerplate/supporting';
+import { RemindersSection } from '@/features/system/supporting';
 
 <RemindersSection
   entityType="project"
@@ -302,7 +302,7 @@ Knowledge base and documentation system.
 
 **Usage:**
 ```typescript
-import { WikiEntryCard, WikiSidebar } from '@/features/boilerplate/supporting';
+import { WikiEntryCard, WikiSidebar } from '@/features/system/supporting';
 
 // Display entry
 <WikiEntryCard entry={entry} onView={handleView} />
@@ -369,7 +369,7 @@ Comprehensive event and appointment scheduling system.
 
 **Usage:**
 ```typescript
-import { SchedulingSection } from '@/features/boilerplate/supporting';
+import { SchedulingSection } from '@/features/system/supporting';
 
 <SchedulingSection
   entityType="project"
@@ -432,7 +432,7 @@ High-performance virtualization system for rendering large lists and tables effi
 
 **Usage:**
 ```typescript
-import { VirtualList, VirtualTable } from '@/features/boilerplate/supporting';
+import { VirtualList, VirtualTable } from '@/features/system/supporting';
 
 // Simple list
 <VirtualList
@@ -503,7 +503,7 @@ import {
   CommentsSection,
   DocumentsSection,
   RemindersSection
-} from '@/features/boilerplate/supporting';
+} from '@/features/system/supporting';
 
 function MyFeaturePage() {
   return (
@@ -526,7 +526,7 @@ import {
   CommentCard,
   CommentForm,
   CommentList
-} from '@/features/boilerplate/supporting';
+} from '@/features/system/supporting';
 
 function CustomComments() {
   const comments = useEntityComments(type, id, userId);
@@ -547,7 +547,7 @@ function CustomComments() {
 ### 3. Check Feature Flags
 
 ```typescript
-import { isFeatureEnabled } from '@/features/boilerplate/supporting';
+import { isFeatureEnabled } from '@/features/system/supporting';
 
 function MyComponent() {
   const showComments = isFeatureEnabled('comments');
@@ -566,7 +566,7 @@ function MyComponent() {
 
 All features integrate with Convex backend at:
 ```
-convex/lib/boilerplate/supporting/
+convex/lib/system/supporting/
 ├── comments/
 ├── documents/
 ├── reminders/

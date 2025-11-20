@@ -1,3 +1,3 @@
-// src/features/boilerplate/analytics/pages/index.ts
+// src/features/system/analytics/pages/index.ts
 
 export { AnalyticsOverview } from "./AnalyticsOverview";

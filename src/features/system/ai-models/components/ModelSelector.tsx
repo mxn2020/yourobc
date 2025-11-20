@@ -4,7 +4,7 @@ import { Search, ChevronDown, X, Check, Filter, Star, Zap, Brain, Image, Layers 
 import { Badge } from '../../../../components/ui/Badge';
 import { Button } from '../../../../components/ui/Button';
 import { useModelPreferences } from '../hooks/useModelPreferences';
-import type { ModelInfo, ModelCapabilities, ModelType } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelCapabilities, ModelType } from '@/features/system/ai-core/types';
 
 // Helper function for type-safe capability access
 function hasCapability(capabilities: ModelCapabilities | undefined, cap: string): boolean {

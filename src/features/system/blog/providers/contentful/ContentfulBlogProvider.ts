@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/providers/contentful/ContentfulBlogProvider.ts
+// src/features/system/blog/providers/contentful/ContentfulBlogProvider.ts
 /**
  * Contentful Blog Provider
  *

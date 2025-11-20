@@ -4,7 +4,7 @@ import { Badge, Button, Card, CardContent, CardHeader } from '@/components/ui';
 import { X } from 'lucide-react';
 import { ComparisonTable } from './ComparisonTable';
 import { formatModelDisplay } from '../../utils/model-formatters';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 interface ModelComparisonProps {
   selectedModelIds: string[];

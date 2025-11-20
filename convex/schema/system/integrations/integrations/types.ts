@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/integrations/integrations/types.ts
+// convex/schema/system/integrations/integrations/types.ts
 // Type extractions from validators for integrations module
 
 import { Infer } from 'convex/values';

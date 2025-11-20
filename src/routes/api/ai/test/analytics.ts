@@ -7,9 +7,9 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { auth } from '@/features/boilerplate/auth/server';
-import { AITestService } from '@/features/boilerplate/ai-core';
-import type { GatewayResponse } from '@/features/boilerplate/ai-core/types';
+import { auth } from '@/features/system/auth/server';
+import { AITestService } from '@/features/system/ai-core';
+import type { GatewayResponse } from '@/features/system/ai-core/types';
 
 export const Route = createFileRoute('/api/ai/test/analytics')({
   server: {

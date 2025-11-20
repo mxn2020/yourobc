@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/scheduling/helpers.ts
+// convex/lib/system/supporting/scheduling/helpers.ts
 
 /**
  * Scheduling Module Helper Functions

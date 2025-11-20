@@ -5,7 +5,7 @@ import { Badge, Button, DataTable } from '@/components/ui';
 import { TestTube, ExternalLink, Star, Eye } from 'lucide-react';
 import { useModelPreferences } from '../../hooks/useModelPreferences';
 import { formatModelDisplay } from '../../utils/model-formatters';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 
 interface ModelListProps {
   models: ModelInfo[];

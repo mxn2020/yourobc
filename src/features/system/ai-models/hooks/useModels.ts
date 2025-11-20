@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { ModelService } from '../services/ModelService';
-import type { ModelInfo, ModelFilter, ModelSort } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo, ModelFilter, ModelSort } from '@/features/system/ai-core/types';
 
 export function useModels(filters?: ModelFilter, sort?: ModelSort) {
   return useQuery({

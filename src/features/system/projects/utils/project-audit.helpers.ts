@@ -1,5 +1,5 @@
 // src/features/projects/utils/project-audit.helpers.ts
-import type { CreateAuditLogData, AuditAction, AuditMetadata } from '@/features/boilerplate/audit-logs'
+import type { CreateAuditLogData, AuditAction, AuditMetadata } from '@/features/system/audit-logs'
 import type { ProjectId } from '../types'
 import { Id } from "@/convex/_generated/dataModel";
 

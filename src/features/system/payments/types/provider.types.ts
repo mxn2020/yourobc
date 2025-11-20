@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/types/provider.types.ts
+// src/features/system/payments/types/provider.types.ts
 /**
  * Payment Provider Interface
  * 

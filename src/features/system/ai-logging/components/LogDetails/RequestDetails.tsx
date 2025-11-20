@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button, Card, CardContent, CardHeader } from '@/components/ui';
 import { Copy, Check } from 'lucide-react';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 
 interface RequestDetailsProps {
   log: AIUsageLog;

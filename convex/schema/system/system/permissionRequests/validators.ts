@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/system/permissionRequests/validators.ts
+// convex/schema/system/system/permissionRequests/validators.ts
 // Grouped validators for permissionRequests module
 
 import { v } from 'convex/values';

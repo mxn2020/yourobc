@@ -1,4 +1,4 @@
-// src/features/boilerplate/lib/auth-permissions.ts
+// src/features/system/lib/auth-permissions.ts
 import { createAccessControl } from "better-auth/plugins/access";
 import { defaultStatements, adminAc, userAc } from "better-auth/plugins/admin/access";
 

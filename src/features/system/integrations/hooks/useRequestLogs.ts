@@ -1,4 +1,4 @@
-// src/features/boilerplate/integrations/hooks/useRequestLogs.ts
+// src/features/system/integrations/hooks/useRequestLogs.ts
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -33,7 +33,7 @@ import { GetRequestLogsParams, ApiRequestLog, UsageStats } from "../types";
  */
 export function useRequestLogs(params: GetRequestLogsParams) {
   const logs = useQuery(
-    api.lib.boilerplate.integrations.queries.getApiRequestLogs,
+    api.lib.system.integrations.queries.getApiRequestLogs,
     params.apiKeyId || params.startDate || params.endDate
       ? {
           apiKeyId: params.apiKeyId,
@@ -138,7 +138,7 @@ export function useUsageStats(
   endDate: number
 ) {
   const stats = useQuery(
-    api.lib.boilerplate.integrations.queries.getApiUsageStats,
+    api.lib.system.integrations.queries.getApiUsageStats,
     startDate && endDate ? { startDate, endDate } : "skip"
   );
 
@@ -172,7 +172,7 @@ export function useIntegrationEvents(params: {
   limit?: number;
 }) {
   const events = useQuery(
-    api.lib.boilerplate.integrations.queries.getIntegrationEvents,
+    api.lib.system.integrations.queries.getIntegrationEvents,
     params.integrationId
       ? {
           integrationId: params.integrationId,

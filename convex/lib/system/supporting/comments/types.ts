@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/comments/types.ts
+// convex/lib/system/supporting/comments/types.ts
 
 /**
  * Comments Module Types

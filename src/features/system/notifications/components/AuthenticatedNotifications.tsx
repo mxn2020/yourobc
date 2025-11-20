@@ -1,5 +1,5 @@
 // src/features/notifications/components/AuthenticatedNotifications.tsx
-import { useAuth } from '@/features/boilerplate/auth/hooks/useAuth'
+import { useAuth } from '@/features/system/auth/hooks/useAuth'
 
 interface AuthenticatedNotificationsProps {
   children: React.ReactNode

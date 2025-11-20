@@ -1,8 +1,8 @@
 // src/routes/{-$locale}/auth.tsx
 
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { locales, defaultLocale } from '@/features/boilerplate/i18n'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { locales, defaultLocale } from '@/features/system/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/auth')({
   beforeLoad: async ({ params }) => {

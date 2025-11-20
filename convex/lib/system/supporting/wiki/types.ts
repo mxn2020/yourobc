@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/wiki/types.ts
+// convex/lib/system/supporting/wiki/types.ts
 
 /**
  * Wiki Module Types

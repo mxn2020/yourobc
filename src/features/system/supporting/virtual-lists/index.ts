@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/index.ts
+// src/features/system/supporting/virtual-lists/index.ts
 
 /**
  * Virtual Lists Module - Hybrid Approach
@@ -11,13 +11,13 @@
  * @example
  * ```tsx
  * // Option 1: Use pattern components
- * import { VirtualGrid, VirtualMasonry } from '@/features/boilerplate/supporting'
+ * import { VirtualGrid, VirtualMasonry } from '@/features/system/supporting'
  *
  * // Option 2: Use hooks
- * import { useVirtualSticky, useVirtualGrid } from '@/features/boilerplate/supporting'
+ * import { useVirtualSticky, useVirtualGrid } from '@/features/system/supporting'
  *
  * // Option 3: Use presets
- * import { virtualPresets } from '@/features/boilerplate/supporting'
+ * import { virtualPresets } from '@/features/system/supporting'
  * const config = virtualPresets.auditLogs
  * ```
  */

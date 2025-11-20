@@ -1,9 +1,9 @@
 // src/routes/{-$locale}/unauthorized.tsx
 
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { locales, defaultLocale } from '@/features/boilerplate/i18n'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
+import { locales, defaultLocale } from '@/features/system/i18n'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/unauthorized')({
   validateSearch: (search: Record<string, unknown>) => {

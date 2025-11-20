@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/wiki/components/WikiSidebar.tsx
+// src/features/system/supporting/wiki/components/WikiSidebar.tsx
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';

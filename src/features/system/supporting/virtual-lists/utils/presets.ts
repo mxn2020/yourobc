@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/utils/presets.ts
+// src/features/system/supporting/virtual-lists/utils/presets.ts
 
 import type { VirtualListPreset, VirtualListPresetName } from '../types'
 
@@ -10,7 +10,7 @@ import type { VirtualListPreset, VirtualListPresetName } from '../types'
  *
  * @example
  * ```tsx
- * import { virtualPresets } from '@/features/boilerplate/supporting/virtual-lists'
+ * import { virtualPresets } from '@/features/system/supporting/virtual-lists'
  *
  * const config = virtualPresets.auditLogs
  * // Use config properties in your VirtualList component

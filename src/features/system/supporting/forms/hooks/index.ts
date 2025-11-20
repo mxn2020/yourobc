@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/forms/hooks/index.ts
+// src/features/system/supporting/forms/hooks/index.ts
 
 // Context hooks
 export {

@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/milestones/constants.ts
+// convex/lib/system/milestones/constants.ts
 
 export const MILESTONE_CONSTANTS = {
   STATUS: {

@@ -4,13 +4,13 @@ import { Database, Play, Settings, Copy, RotateCcw } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
-import { ModelSelector } from '@/features/boilerplate/ai-models/components/ModelSelector';
+import { ModelSelector } from '@/features/system/ai-models/components/ModelSelector';
 import { useQuery } from '@tanstack/react-query';
 import { useModelTesting } from '../../hooks/useModelTesting';
-import type { ModelInfo } from '@/features/boilerplate/ai-core/types';
+import type { ModelInfo } from '@/features/system/ai-core/types';
 import type { ObjectGenerationConfig } from '../../services/TestExecutor';
-import { supportsOperationType } from '@/features/boilerplate/ai-core/utils';
-import { useToast } from '@/features/boilerplate/notifications';
+import { supportsOperationType } from '@/features/system/ai-core/utils';
+import { useToast } from '@/features/system/notifications';
 
 interface ObjectGenerationResult {
   object: any;

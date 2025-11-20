@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/system_metrics/types.ts
+// convex/lib/system/system_metrics/types.ts
 // Type definitions for systemMetrics module
 
 import type { Doc } from '@/generated/dataModel';

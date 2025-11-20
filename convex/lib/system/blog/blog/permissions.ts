@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/blog/blog/permissions.ts
+// convex/lib/system/blog/blog/permissions.ts
 // Permission and access control functions for blog module
 
 import { QueryCtx, MutationCtx } from '@/generated/server';

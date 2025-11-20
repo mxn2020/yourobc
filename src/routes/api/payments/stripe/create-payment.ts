@@ -8,8 +8,8 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { stripeService } from '@/features/boilerplate/payments/providers/stripe/services/StripeService';
-import { auth } from '@/features/boilerplate/auth/lib/auth-config';
+import { stripeService } from '@/features/system/payments/providers/stripe/services/StripeService';
+import { auth } from '@/features/system/auth/lib/auth-config';
 
 export const Route = createFileRoute('/api/payments/stripe/create-payment')({
   server: {

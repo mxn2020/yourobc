@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/notifications/index.ts
+// convex/lib/system/notifications/index.ts
 
 /**
  * Notification Module Exports

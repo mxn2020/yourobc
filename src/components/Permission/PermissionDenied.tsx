@@ -5,7 +5,7 @@ import { ShieldAlert, Mail } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Card, CardContent } from '../ui/Card'
 import { Alert, AlertDescription } from '../ui/Alert'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export interface PermissionDeniedProps {
   /**

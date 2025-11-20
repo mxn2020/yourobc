@@ -1,4 +1,4 @@
-// src/features/boilerplate/i18n/index.ts
+// src/features/system/i18n/index.ts
 
 export * from './config'
 export * from './types'

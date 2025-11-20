@@ -6,8 +6,8 @@ import { ResponseDetails } from './ResponseDetails';
 import { MetricsDetails } from './MetricsDetails';
 import { CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { formatLogForDisplay } from '../../utils/log-formatters';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
-import type { AIUsageLog } from '@/features/boilerplate/ai-core/types';
+import { getProviderColor } from '@/features/system/ai-core/utils';
+import type { AIUsageLog } from '@/features/system/ai-core/types';
 
 interface LogDetailsProps {
   log: AIUsageLog;

@@ -1,4 +1,4 @@
-// features/boilerplate/projects/components/index.ts
+// features/system/projects/components/index.ts
 
 // Core project components
 export { ProjectForm } from './ProjectForm'

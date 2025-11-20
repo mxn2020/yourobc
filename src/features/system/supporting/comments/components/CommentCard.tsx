@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/comments/components/CommentCard.tsx
+// src/features/system/supporting/comments/components/CommentCard.tsx
 
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';

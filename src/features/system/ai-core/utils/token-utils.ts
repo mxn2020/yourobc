@@ -1,7 +1,7 @@
 // src/utils/ai/token-utils.ts
 import { useMemo } from 'react';
-import type { TokenUsage } from '@/features/boilerplate/ai-core/types';
-import { TOKEN_ESTIMATION_RATIOS } from '@/features/boilerplate/ai-core/constants';
+import type { TokenUsage } from '@/features/system/ai-core/types';
+import { TOKEN_ESTIMATION_RATIOS } from '@/features/system/ai-core/constants';
 
 /**
  * Estimate token count from text length

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/virtual-lists/hooks/useInfiniteScroll.ts
+// src/features/system/supporting/virtual-lists/hooks/useInfiniteScroll.ts
 
 import { useEffect } from 'react'
 import type { UseInfiniteScrollOptions } from '../types'

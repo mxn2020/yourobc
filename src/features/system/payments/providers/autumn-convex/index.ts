@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/autumn-convex/index.ts
+// src/features/system/payments/providers/autumn-convex/index.ts
 /**
  * Autumn + Convex Payment Provider
  * 

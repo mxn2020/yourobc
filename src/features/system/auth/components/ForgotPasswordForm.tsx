@@ -1,11 +1,11 @@
-// src/features/boilerplate/auth/components/ForgotPasswordForm.tsx
+// src/features/system/auth/components/ForgotPasswordForm.tsx
 
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Mail, ArrowRight, ArrowLeft, Send, Loader2 } from 'lucide-react'
 import { authService } from '../services/AuthService'
 import { Button, Input, Alert, AlertDescription } from '@/components/ui'
-import { useTranslation, defaultLocale } from '@/features/boilerplate/i18n'
+import { useTranslation, defaultLocale } from '@/features/system/i18n'
 import { useAuthForm } from '../hooks/useAuthForm'
 import type { ForgotPasswordFormData } from '../types/auth.types'
 

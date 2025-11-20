@@ -1,4 +1,4 @@
-// convex/schema/boilerplate/integrations/integrations/integrations.ts
+// convex/schema/system/integrations/integrations/integrations.ts
 // Table definitions for integrations module
 
 import { defineTable } from 'convex/server';

@@ -26,16 +26,16 @@ import {
 import { Badge, Button, Card, CardContent, Checkbox, Input, RadioGroup, RadioGroupItem, SimpleSelect } from '@/components/ui'
 import { AdminLayout } from '../components/AdminLayout'
 import { AdminGuard } from '../components/AdminGuard'
-import { UserRole, AuthUserId, UserProfileId } from '@/features/boilerplate/auth'
+import { UserRole, AuthUserId, UserProfileId } from '@/features/system/auth'
 import { useUserManagement } from '../hooks/useUserManagement'
 import { useAdminPermissions } from '../hooks/useAdmin'
 import { userManagementService } from '../services/UserManagementService'
 import { ROLE_DEFINITIONS } from '../types/admin.types'
 import type { RoleUpdateRequest, BanUserRequest, SetPasswordRequest, UserWithRole } from '../types/admin.types'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 import { Id } from "@/convex/_generated/dataModel";
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function UserManagementPage() {
   const { t } = useTranslation('admin')

@@ -1,8 +1,8 @@
 // src/routes/$locale/auth/signup.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { SignupPage, requireGuestBeforeLoad } from '@/features/boilerplate/auth'
-import type { Locale } from '@/features/boilerplate/i18n'
+import { SignupPage, requireGuestBeforeLoad } from '@/features/system/auth'
+import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/auth/signup')({
   validateSearch: (search: Record<string, unknown>) => {

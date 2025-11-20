@@ -1,6 +1,6 @@
 // src/features/ai-logging/types/analytics.types.ts
-import type { AIUsageStats } from '@/features/boilerplate/ai-core/types';
-import type { ModelProvider } from '@/features/boilerplate/ai-core/types';
+import type { AIUsageStats } from '@/features/system/ai-core/types';
+import type { ModelProvider } from '@/features/system/ai-core/types';
 
 export interface UsageChartData {
   date: string;

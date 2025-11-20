@@ -1,11 +1,11 @@
-// src/features/boilerplate/websites/components/WebsiteCard.tsx
+// src/features/system/websites/components/WebsiteCard.tsx
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Website } from '../types'
 import { WEBSITE_STATUS } from '../constants'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface WebsiteCardProps {
   website: Website

@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/shared/components/index.ts
+// src/features/system/blog/shared/components/index.ts
 /**
  * Shared Blog Components
  */

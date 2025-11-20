@@ -1,10 +1,10 @@
 // routes/{-$locale}/_protected/_admin/admin/users.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { UserManagementPage } from '@/features/boilerplate/admin'
+import { UserManagementPage } from '@/features/system/admin'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
 export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/users')({
@@ -33,7 +33,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/users'
 
         if (convexClient) {
           const users = await convexClient.query(
-            api.lib.boilerplate.user_profiles.queries.getAllProfiles,
+            api.lib.system.user_profiles.queries.getAllProfiles,
             { options: { limit: 25, offset: 0 } }
           )
 

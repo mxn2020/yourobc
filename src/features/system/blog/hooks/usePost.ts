@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/hooks/usePost.ts
+// src/features/system/blog/hooks/usePost.ts
 /**
  * Hook for fetching a single blog post
  */

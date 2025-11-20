@@ -1,4 +1,4 @@
-// src/features/boilerplate/payments/providers/stripe/components/CheckoutButton.tsx
+// src/features/system/payments/providers/stripe/components/CheckoutButton.tsx
 /**
  * Checkout Button Component
  *

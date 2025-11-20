@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/supporting/supporting/types.ts
+// convex/lib/system/supporting/supporting/types.ts
 // Library types for supporting module
 
 import { Doc, Id } from '@/dataModel';
@@ -23,7 +23,7 @@ export type {
   LocationType,
   ReminderType as EventReminderType,
   RecurrenceFrequency,
-} from '@/schema/boilerplate/supporting/supporting/types';
+} from '@/schema/system/supporting/supporting/types';
 
 // Database document types
 export type WikiEntry = Doc<'wikiEntries'>;
@@ -99,15 +99,15 @@ export interface CreateScheduledEventInput {
 }
 
 // Re-export types from schema
-export type WikiEntryType = import('@/schema/boilerplate/supporting/supporting/types').WikiEntryType;
-export type WikiStatus = import('@/schema/boilerplate/supporting/supporting/types').WikiStatus;
-export type WikiVisibility = import('@/schema/boilerplate/supporting/supporting/types').WikiVisibility;
-export type CommentType = import('@/schema/boilerplate/supporting/supporting/types').CommentType;
-export type ReminderType = import('@/schema/boilerplate/supporting/supporting/types').ReminderType;
-export type ReminderStatus = import('@/schema/boilerplate/supporting/supporting/types').ReminderStatus;
-export type ReminderPriority = import('@/schema/boilerplate/supporting/supporting/types').ReminderPriority;
-export type DocumentType = import('@/schema/boilerplate/supporting/supporting/types').DocumentType;
-export type DocumentStatus = import('@/schema/boilerplate/supporting/supporting/types').DocumentStatus;
-export type ScheduledEventType = import('@/schema/boilerplate/supporting/supporting/types').ScheduledEventType;
-export type ScheduledEventStatus = import('@/schema/boilerplate/supporting/supporting/types').ScheduledEventStatus;
-export type RecurrenceFrequency = import('@/schema/boilerplate/supporting/supporting/types').RecurrenceFrequency;
+export type WikiEntryType = import('@/schema/system/supporting/supporting/types').WikiEntryType;
+export type WikiStatus = import('@/schema/system/supporting/supporting/types').WikiStatus;
+export type WikiVisibility = import('@/schema/system/supporting/supporting/types').WikiVisibility;
+export type CommentType = import('@/schema/system/supporting/supporting/types').CommentType;
+export type ReminderType = import('@/schema/system/supporting/supporting/types').ReminderType;
+export type ReminderStatus = import('@/schema/system/supporting/supporting/types').ReminderStatus;
+export type ReminderPriority = import('@/schema/system/supporting/supporting/types').ReminderPriority;
+export type DocumentType = import('@/schema/system/supporting/supporting/types').DocumentType;
+export type DocumentStatus = import('@/schema/system/supporting/supporting/types').DocumentStatus;
+export type ScheduledEventType = import('@/schema/system/supporting/supporting/types').ScheduledEventType;
+export type ScheduledEventStatus = import('@/schema/system/supporting/supporting/types').ScheduledEventStatus;
+export type RecurrenceFrequency = import('@/schema/system/supporting/supporting/types').RecurrenceFrequency;

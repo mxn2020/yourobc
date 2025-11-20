@@ -1,12 +1,12 @@
 // File: src/routes/api/payments/_utils/provider-detector.ts
-import { PAYMENT_CONFIG } from '@/features/boilerplate/payments';
-import type { PaymentProvider, PaymentProviderType } from '@/features/boilerplate/payments/types';
+import { PAYMENT_CONFIG } from '@/features/system/payments';
+import type { PaymentProvider, PaymentProviderType } from '@/features/system/payments/types';
 
 // Import all provider implementations
-import { autumnBetterAuthProvider } from '@/features/boilerplate/payments/providers/autumn-betterauth';
-import { autumnConvexProvider } from '@/features/boilerplate/payments/providers/autumn-convex';
-import { stripeProvider } from '@/features/boilerplate/payments/providers/stripe';
-import { stripeConnectProvider } from '@/features/boilerplate/payments/providers/stripe-connect';
+import { autumnBetterAuthProvider } from '@/features/system/payments/providers/autumn-betterauth';
+import { autumnConvexProvider } from '@/features/system/payments/providers/autumn-convex';
+import { stripeProvider } from '@/features/system/payments/providers/stripe';
+import { stripeConnectProvider } from '@/features/system/payments/providers/stripe-connect';
 
 /**
  * Provider registry mapping provider types to their implementations

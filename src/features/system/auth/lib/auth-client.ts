@@ -1,4 +1,4 @@
-// src/features/boilerplate/lib/auth-client.ts
+// src/features/system/lib/auth-client.ts
 
 import { createAuthClient } from "better-auth/react"
 import { adminClient, jwtClient } from "better-auth/client/plugins"

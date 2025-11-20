@@ -8,9 +8,9 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { aiService } from '@/features/boilerplate/ai-core';
-import type { AIObjectRequest } from '@/features/boilerplate/ai-core/types';
-import { validateAIRequest, validateJsonSchema } from '@/features/boilerplate/ai-core/utils';
+import { aiService } from '@/features/system/ai-core';
+import type { AIObjectRequest } from '@/features/system/ai-core/types';
+import { validateAIRequest, validateJsonSchema } from '@/features/system/ai-core/utils';
 
 interface StreamObjectRequest extends Omit<AIObjectRequest, 'metadata'> {
   user_id?: string;

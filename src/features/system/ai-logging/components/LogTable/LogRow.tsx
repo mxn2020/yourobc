@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Badge, Button, Checkbox } from '@/components/ui';
 import { Eye, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
 import { formatLogForDisplay } from '../../utils/log-formatters';
-import { getProviderColor } from '@/features/boilerplate/ai-core/utils';
+import { getProviderColor } from '@/features/system/ai-core/utils';
 import type { LogRowProps } from '../../types/log.types';
 
 export function LogRow({ log, isSelected, view, onSelect, onView }: LogRowProps) {

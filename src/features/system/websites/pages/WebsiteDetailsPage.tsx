@@ -1,4 +1,4 @@
-// src/features/boilerplate/websites/pages/WebsiteDetailsPage.tsx
+// src/features/system/websites/pages/WebsiteDetailsPage.tsx
 
 import { FC } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
@@ -8,10 +8,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { useTranslation } from '@/features/system/i18n'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { WebsiteId } from '../types'
 
 interface WebsiteDetailsPageProps {

@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/components/patterns/FilterableTable.tsx
+// src/features/system/supporting/tables/components/patterns/FilterableTable.tsx
 
 import React, { useState } from 'react'
 import type { FilterableTableProps } from '../../types'

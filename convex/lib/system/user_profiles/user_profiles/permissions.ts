@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/user_profiles/user_profiles/permissions.ts
+// convex/lib/system/user_profiles/user_profiles/permissions.ts
 // Access control and authorization logic for user_profiles module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

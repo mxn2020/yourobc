@@ -1,8 +1,8 @@
-// src/features/boilerplate/pages/ForgotPasswordPage.tsx
+// src/features/system/pages/ForgotPasswordPage.tsx
 import React from 'react'
 import { ForgotPasswordForm } from '../components/ForgotPasswordForm'
 import { AuthLayout } from '../components/AuthLayout'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation('auth')

@@ -1,4 +1,4 @@
-// src/features/boilerplate/stripe-connect/services/StripeConnectService.ts
+// src/features/system/stripe-connect/services/StripeConnectService.ts
 /**
  * Stripe Connect Service
  *

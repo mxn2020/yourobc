@@ -1,4 +1,4 @@
-// src/features/boilerplate/blog/utils/index.ts
+// src/features/system/blog/utils/index.ts
 /**
  * Blog Utilities - Barrel Export
  */

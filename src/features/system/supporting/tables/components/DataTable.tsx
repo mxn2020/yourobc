@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/components/DataTable.tsx
+// src/features/system/supporting/tables/components/DataTable.tsx
 
 import React, { useState } from 'react'
 import {

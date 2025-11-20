@@ -1,4 +1,4 @@
-// src/features/boilerplate/supporting/tables/components/patterns/PaginatedTable.tsx
+// src/features/system/supporting/tables/components/patterns/PaginatedTable.tsx
 
 import React, { useState } from 'react'
 import type { PaginatedTableProps } from '../../types'
