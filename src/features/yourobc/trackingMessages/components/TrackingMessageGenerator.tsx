@@ -6,7 +6,7 @@ import type { Id } from '@/convex/_generated/dataModel'
 import { useTrackingMessageForServiceAndStatus } from '../hooks/useTrackingMessages'
 import type { TrackingMessageVariables } from '../types'
 import { useToast } from '@/features/system/notifications'
-import type { ShipmentStatus, ScheduledTime } from '@/convex/schema/yourobc/base'
+import type { ShipmentStatus, ScheduledTime } from '@/convex/schema/base'
 import { formatInLocalTime } from '@/lib/timezone-utils'
 
 interface TrackingMessageGeneratorProps {

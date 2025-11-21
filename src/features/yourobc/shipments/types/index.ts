@@ -2,7 +2,7 @@
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 import { Address, Dimensions, Routing, CurrencyAmount, StatusUpdateData, SLA } from '@/convex/lib/yourobc'
-import type { ScheduledTime } from '@/convex/schema/yourobc/base'
+import type { ScheduledTime } from '@/convex/schema/base'
 import type { AssignedTo, CustomsInfo, ShipmentDocumentStatus } from '@/convex/lib/yourobc/shipments'
 
 // Base types from Convex schema

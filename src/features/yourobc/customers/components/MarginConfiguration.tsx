@@ -18,7 +18,7 @@ import {
 } from '@/components/ui'
 import { Plus, Trash2, Save, Calculator } from 'lucide-react'
 import type { Id } from '@/convex/_generated/dataModel'
-import type { MarginServiceType } from '@/convex/schema/yourobc/base'
+import type { MarginServiceType } from '@/convex/schema/base'
 
 interface MarginConfigurationProps {
   customerId: Id<'yourobcCustomers'>

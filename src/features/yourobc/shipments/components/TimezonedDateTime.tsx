@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 import { Badge } from '@/components/ui'
-import type { ScheduledTime } from '@/convex/schema/yourobc/base'
+import type { ScheduledTime } from '@/convex/schema/base'
 import {
   formatDualTimezone,
   formatRelativeTime,

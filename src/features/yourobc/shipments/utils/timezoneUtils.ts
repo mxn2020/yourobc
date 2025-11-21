@@ -1,6 +1,6 @@
 // src/features/yourobc/shipments/utils/timezoneUtils.ts
 
-import type { ScheduledTime } from '@/convex/schema/yourobc/base'
+import type { ScheduledTime } from '@/convex/schema/base'
 
 /**
  * Get timezone offset in minutes from UTC
