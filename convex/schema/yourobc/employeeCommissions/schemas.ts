@@ -3,6 +3,6 @@
 
 import { employeeCommissionsTable } from './employeeCommissions';
 
-export const softwareYourObcEmployeeCommissionsSchemas = {
+export const yourobcEmployeeCommissionsSchemas = {
   yourobcEmployeeCommissions: employeeCommissionsTable,
 };

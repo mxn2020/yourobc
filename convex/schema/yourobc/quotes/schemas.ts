@@ -3,6 +3,6 @@
 
 import { quotesTable } from './quotes';
 
-export const softwareYourObcQuotesSchemas = {
+export const yourobcQuotesSchemas = {
   yourobcQuotes: quotesTable,
 };

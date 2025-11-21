@@ -1,19 +1,6 @@
 // convex/schema/yourobc/dashboard/index.ts
-/**
- * Dashboard Module Barrel Export
- *
- * Central export point for all dashboard-related schema definitions,
- * validators, and types.
- */
+// Public API exports for dashboard schema module
 
-// Table definitions
-export * from './dashboardAlertAcknowledgments';
-
-// Validators
-export * from './validators';
-
-// Types
+export { yourobcDashboardSchemas } from './schemas';
 export * from './types';
-
-// Schema collection
-export * from './schemas';
+export * from './validators';

@@ -1,36 +1,6 @@
 // convex/schema/yourobc/employeeCommissions/index.ts
-/**
- * Employee Commissions Schema Barrel Export
- *
- * Exports all commission-related schemas, validators, and types.
- *
- * @module convex/schema/yourobc/employeeCommissions
- */
+// Public API exports for employeeCommissions schema module
 
-// Table schemas
-export {
-  employeeCommissionsTable,
-  employeeCommissionRulesTable,
-} from './schemas'
-
-// Validators
-export {
-  appliedTierValidator,
-  commissionTierValidator,
-  serviceTypeValidator,
-} from './validators'
-
-// Types
-export type {
-  AppliedTier,
-  CommissionTier,
-  ServiceType,
-  EmployeeCommission,
-  EmployeeCommissionRule,
-  EmployeeCommissionId,
-  EmployeeCommissionRuleId,
-  CreateEmployeeCommissionInput,
-  UpdateEmployeeCommissionInput,
-  CreateEmployeeCommissionRuleInput,
-  UpdateEmployeeCommissionRuleInput,
-} from './types'
+export { yourobcEmployeeCommissionsSchemas } from './schemas';
+export * from './types';
+export * from './validators';

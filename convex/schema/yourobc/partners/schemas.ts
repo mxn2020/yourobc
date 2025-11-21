@@ -3,6 +3,6 @@
 
 import { partnersTable } from './partners';
 
-export const softwareYourObcPartnersSchemas = {
+export const yourobcPartnersSchemas = {
   yourobcPartners: partnersTable,
 };

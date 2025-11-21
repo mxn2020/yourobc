@@ -107,36 +107,3 @@ export const shipmentsTable = defineTable({
   .index('by_partner', ['partnerId'])
   .index('by_serviceType', ['serviceType'])
   .index('by_created', ['createdAt']);
-
-// Shipment Status History Table
-export const shipmentStatusHistoryTable = defineTable({
-  shipmentId: v.id('yourobcShipments'),
-  status: shipmentsValidators.status,
-  timestamp: v.number(),
-  location: v.optional(v.string()),
-  notes: v.optional(v.string()),
-
-  // Event-specific metadata
-  metadata: v.optional(v.object({
-    flightNumber: v.optional(v.string()),
-    estimatedArrival: v.optional(v.number()),
-    delayReason: v.optional(v.string()),
-    podReceived: v.optional(v.boolean()),
-    customerSignature: v.optional(v.string()),
-    courierAssigned: v.optional(v.id('yourobcCouriers')),
-    courierNumber: v.optional(v.string()),
-    oldDeadline: v.optional(v.number()),
-    newDeadline: v.optional(v.number()),
-    reason: v.optional(v.string()),
-    actualCosts: v.optional(currencyAmountSchema),
-    costNotes: v.optional(v.string()),
-    cancellationReason: v.optional(v.string()),
-  })),
-
-  // Audit fields (history entries are immutable, so only creation tracking)
-  createdBy: v.string(),
-  createdAt: v.number(),
-})
-  .index('by_shipment', ['shipmentId'])
-  .index('by_timestamp', ['timestamp'])
-  .index('by_shipment_timestamp', ['shipmentId', 'timestamp']);

@@ -3,6 +3,6 @@
 
 import { trackingMessagesTable } from './trackingMessages';
 
-export const softwareYourObcTrackingMessagesSchemas = {
-  softwareYourObcTrackingMessages: trackingMessagesTable,
+export const yourobcTrackingMessagesSchemas = {
+  yourobcTrackingMessages: trackingMessagesTable,
 };

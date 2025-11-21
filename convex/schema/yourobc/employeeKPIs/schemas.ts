@@ -3,6 +3,6 @@
 
 import { employeeKPIsTable } from './employeeKPIs';
 
-export const softwareYourObcEmployeeKpisSchemas = {
+export const yourobcEmployeeKpisSchemas = {
   yourobcEmployeeKPIs: employeeKPIsTable,
 };

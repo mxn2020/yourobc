@@ -3,6 +3,6 @@
 
 import { tasksTable } from './tasks';
 
-export const softwareYourObcTasksSchemas = {
-  softwareYourObcTasks: tasksTable,
+export const yourobcTasksSchemas = {
+  yourobcTasks: tasksTable,
 };

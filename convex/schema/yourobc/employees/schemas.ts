@@ -3,7 +3,7 @@
 
 import { employeesTable, vacationDaysTable } from './employees';
 
-export const softwareYourObcEmployeesSchemas = {
+export const yourobcEmployeesSchemas = {
   yourobcEmployees: employeesTable,
   yourobcVacationDays: vacationDaysTable,
 };

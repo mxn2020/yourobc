@@ -3,12 +3,12 @@
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
+import { shipmentsValidators } from './validators';
 import {
-  shipmentStatusValidator,
   currencyAmountSchema,
   auditFields,
   softDeleteFields,
-} from './validators';
+} from '@/schema/base';
 
 // ============================================================================
 // Shipment Status History Table
@@ -27,9 +27,9 @@ export const shipmentStatusHistoryTable = defineTable({
   timestamp: v.number(),
 
   // Required: Core fields
-  ownerId: v.id('userProfiles'),
+  ownerId: v.string(), // authUserId - following yourobc pattern
   shipmentId: v.id('yourobcShipments'),
-  status: shipmentStatusValidator,
+  status: shipmentsValidators.status,
 
   // Event details
   location: v.optional(v.string()),
