@@ -1,39 +1,41 @@
 // convex/lib/system/user_settings/user_settings/types.ts
-// Type definitions for user settings module
+// TypeScript type definitions for user_settings module
 
 import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  Theme,
+  LayoutPreferences,
+  NotificationPreferences,
+  DashboardPreferences,
+} from '@/schema/system/user_settings/user_settings/types';
 
-/**
- * User Settings Types
- */
+// Entity types
 export type UserSettings = Doc<'userSettings'>;
 export type UserSettingsId = Id<'userSettings'>;
 
-/**
- * Update data type for user settings
- */
-export interface UpdateUserSettingsData {
-  theme?: UserSettings['theme'];
+// Data interfaces
+export interface CreateUserSettingsData {
+  displayName: string;
+  theme?: Theme;
   language?: string;
   timezone?: string;
   dateFormat?: string;
-  layoutPreferences?: UserSettings['layoutPreferences'];
-  notificationPreferences?: UserSettings['notificationPreferences'];
-  dashboardPreferences?: UserSettings['dashboardPreferences'];
+  layoutPreferences?: LayoutPreferences;
+  notificationPreferences?: NotificationPreferences;
+  dashboardPreferences?: DashboardPreferences;
 }
 
-/**
- * Create data type for user settings
- */
-export interface CreateUserSettingsData {
-  userId: Id<'userProfiles'>;
-  displayName: string;
-  theme: UserSettings['theme'];
-  language: string;
-  timezone: string;
-  dateFormat: string;
-  layoutPreferences: UserSettings['layoutPreferences'];
-  notificationPreferences: UserSettings['notificationPreferences'];
-  dashboardPreferences: UserSettings['dashboardPreferences'];
-  version: number;
+export interface UpdateUserSettingsData {
+  theme?: Theme;
+  language?: string;
+  timezone?: string;
+  dateFormat?: string;
+  layoutPreferences?: LayoutPreferences;
+  notificationPreferences?: NotificationPreferences;
+  dashboardPreferences?: DashboardPreferences;
+}
+
+// Response types
+export interface UserSettingsResponse {
+  settings: UserSettings;
 }

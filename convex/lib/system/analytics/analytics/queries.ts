@@ -3,7 +3,7 @@
 
 import { v } from 'convex/values';
 import { query, QueryCtx } from '@/generated/server';
-import { requireCurrentUser, getCurrentUser } from '@/shared/auth.helper';
+import { requireCurrentUser, getCurrentUser } from '@/lib/auth.helper';
 import { Id, Doc } from '@/generated/dataModel';
 import { canViewDashboard, canViewReport, filterDashboardsByAccess, filterReportsByAccess } from './permissions';
 

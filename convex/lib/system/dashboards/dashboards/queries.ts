@@ -20,6 +20,9 @@ export const getDashboards = query({
     offset: v.optional(v.number()),
     filters: v.optional(
       v.object({
+        status: v.optional(v.array(dashboardsValidators.status)),
+        priority: v.optional(v.array(dashboardsValidators.priority)),
+        visibility: v.optional(v.array(dashboardsValidators.visibility)),
         layout: v.optional(v.array(dashboardsValidators.layout)),
         isDefault: v.optional(v.boolean()),
         isPublic: v.optional(v.boolean()),
@@ -40,6 +43,25 @@ export const getDashboards = query({
 
     // Apply access filtering
     dashboards = await filterDashboardsByAccess(ctx, dashboards, user);
+
+    // Apply status filter
+    if (filters.status?.length) {
+      dashboards = dashboards.filter((item) => filters.status!.includes(item.status));
+    }
+
+    // Apply priority filter
+    if (filters.priority?.length) {
+      dashboards = dashboards.filter((item) =>
+        item.priority && filters.priority!.includes(item.priority)
+      );
+    }
+
+    // Apply visibility filter
+    if (filters.visibility?.length) {
+      dashboards = dashboards.filter((item) =>
+        item.visibility && filters.visibility!.includes(item.visibility)
+      );
+    }
 
     // Apply layout filter
     if (filters.layout?.length) {
@@ -212,6 +234,17 @@ export const getDashboardStats = query({
 
     return {
       total: accessible.length,
+      byStatus: {
+        active: accessible.filter((item) => item.status === 'active').length,
+        archived: accessible.filter((item) => item.status === 'archived').length,
+        draft: accessible.filter((item) => item.status === 'draft').length,
+      },
+      byPriority: {
+        low: accessible.filter((item) => item.priority === 'low').length,
+        medium: accessible.filter((item) => item.priority === 'medium').length,
+        high: accessible.filter((item) => item.priority === 'high').length,
+        urgent: accessible.filter((item) => item.priority === 'urgent').length,
+      },
       byLayout: {
         grid: accessible.filter((item) => item.layout === 'grid').length,
         freeform: accessible.filter((item) => item.layout === 'freeform').length,

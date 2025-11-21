@@ -10,7 +10,30 @@ export const DASHBOARDS_CONSTANTS = {
     UPDATE: 'dashboards:update',
     DELETE: 'dashboards:delete',
     VIEW_ALL: 'dashboards:view_all',
+    BULK_EDIT: 'dashboards:bulk_edit',
   },
+
+  // Standard Status (required by guide)
+  STATUS: {
+    ACTIVE: 'active',
+    ARCHIVED: 'archived',
+    DRAFT: 'draft',
+  } as const,
+
+  // Priority Levels
+  PRIORITY: {
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    URGENT: 'urgent',
+  } as const,
+
+  // Visibility Levels
+  VISIBILITY: {
+    PRIVATE: 'private',
+    TEAM: 'team',
+    PUBLIC: 'public',
+  } as const,
 
   // Layout Types
   LAYOUT: {
@@ -58,9 +81,11 @@ export const DASHBOARDS_CONSTANTS = {
 
   // Default Values
   DEFAULT_VALUES: {
+    STATUS: 'active' as const,
     LAYOUT: 'grid' as const,
     IS_DEFAULT: false,
     IS_PUBLIC: false,
+    VISIBILITY: 'private' as const,
     WIDGETS: [],
   },
 

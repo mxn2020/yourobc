@@ -1,68 +1,119 @@
 // convex/lib/system/user_settings/user_settings/permissions.ts
-// Access control and permissions for user settings module
+// Access control and authorization logic for user_settings module
 
-import { Id } from '@/generated/dataModel';
+import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { UserSettings } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if a user can read settings
- *
- * Users can only read their own settings
- *
- * @param settings - The settings document
- * @param currentUserId - The current user's ID
- * @returns true if the user can read the settings
- */
-export function canReadUserSettings(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// View Access
+// ============================================================================
+
+export async function canViewUserSettings(
+  ctx: QueryCtx | MutationCtx,
   settings: UserSettings,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only read their own settings
-  return settings.userId === currentUserId;
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (settings.ownerId === user._id) return true;
+
+  // User can view their own settings (using userId for backward compatibility)
+  if (settings.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if a user can update settings
- *
- * Users can only update their own settings
- *
- * @param settings - The settings document
- * @param currentUserId - The current user's ID
- * @returns true if the user can update the settings
- */
-export function canUpdateUserSettings(
+export async function requireViewUserSettingsAccess(
+  ctx: QueryCtx | MutationCtx,
   settings: UserSettings,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only update their own settings
-  return settings.userId === currentUserId;
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewUserSettings(ctx, settings, user))) {
+    throw new Error('You do not have permission to view these settings');
+  }
 }
 
-/**
- * Check if a user can delete settings
- *
- * Users can only delete their own settings (soft delete)
- *
- * @param settings - The settings document
- * @param currentUserId - The current user's ID
- * @returns true if the user can delete the settings
- */
-export function canDeleteUserSettings(
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+export async function canEditUserSettings(
+  ctx: QueryCtx | MutationCtx,
   settings: UserSettings,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only delete their own settings
-  return settings.userId === currentUserId;
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (settings.ownerId === user._id) return true;
+
+  // User can edit their own settings (using userId for backward compatibility)
+  if (settings.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Filter settings query by user access
- *
- * Returns settings only for the current user
- *
- * @param currentUserId - The current user's ID
- * @returns Filter predicate for settings query
- */
-export function getUserSettingsAccessFilter(currentUserId: Id<'userProfiles'>) {
-  return (settings: UserSettings) => settings.userId === currentUserId;
+export async function requireEditUserSettingsAccess(
+  ctx: QueryCtx | MutationCtx,
+  settings: UserSettings,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditUserSettings(ctx, settings, user))) {
+    throw new Error('You do not have permission to edit these settings');
+  }
+}
+
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteUserSettings(
+  settings: UserSettings,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (settings.ownerId === user._id) return true;
+  if (settings.userId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteUserSettingsAccess(
+  settings: UserSettings,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteUserSettings(settings, user))) {
+    throw new Error('You do not have permission to delete these settings');
+  }
+}
+
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterUserSettingsByAccess(
+  ctx: QueryCtx | MutationCtx,
+  settingsList: UserSettings[],
+  user: UserProfile
+): Promise<UserSettings[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return settingsList;
+  }
+
+  const accessible: UserSettings[] = [];
+
+  for (const settings of settingsList) {
+    if (await canViewUserSettings(ctx, settings, user)) {
+      accessible.push(settings);
+    }
+  }
+
+  return accessible;
 }

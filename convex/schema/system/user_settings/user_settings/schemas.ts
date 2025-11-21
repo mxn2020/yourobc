@@ -1,8 +1,8 @@
 // convex/schema/system/user_settings/user_settings/schemas.ts
-// Schema exports for user settings module
+// Schema exports for user_settings module
 
 import { userSettingsTable } from './user_settings';
 
-export const userSettingsSchemas = {
+export const systemUserSettingsUserSettingsSchemas = {
   userSettings: userSettingsTable,
 };

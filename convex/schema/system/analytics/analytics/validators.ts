@@ -154,4 +154,37 @@ export const analyticsValidators = {
     v.literal('partial'),
     v.literal('error')
   ),
+
+  // Analytics Events status
+  eventStatus: v.union(
+    v.literal('pending'),
+    v.literal('processed'),
+    v.literal('synced'),
+    v.literal('failed')
+  ),
+
+  // Analytics Metrics status
+  metricStatus: v.union(
+    v.literal('active'),
+    v.literal('archived')
+  ),
+
+  // Dashboard/Report status
+  dashboardStatus: v.union(
+    v.literal('active'),
+    v.literal('archived')
+  ),
+
+  reportStatus: v.union(
+    v.literal('active'),
+    v.literal('archived'),
+    v.literal('scheduled')
+  ),
+
+  // Provider status
+  providerStatus: v.union(
+    v.literal('active'),
+    v.literal('inactive'),
+    v.literal('error')
+  ),
 } as const;

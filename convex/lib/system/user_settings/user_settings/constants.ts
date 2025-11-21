@@ -1,32 +1,36 @@
 // convex/lib/system/user_settings/user_settings/constants.ts
-// Constants for user settings module
+// Business constants, permissions, and limits for user_settings module
 
-/**
- * User Settings Constants
- *
- * Centralized constants for user settings configuration and validation
- */
 export const USER_SETTINGS_CONSTANTS = {
-  // Theme options
+  PERMISSIONS: {
+    VIEW: 'user_settings:view',
+    CREATE: 'user_settings:create',
+    EDIT: 'user_settings:edit',
+    DELETE: 'user_settings:delete',
+    RESET: 'user_settings:reset',
+  },
+
+  STATUS: {
+    ACTIVE: 'active',
+    DELETED: 'deleted',
+  },
+
   THEMES: {
-    LIGHT: 'light' as const,
-    DARK: 'dark' as const,
-    AUTO: 'auto' as const,
+    LIGHT: 'light',
+    DARK: 'dark',
+    AUTO: 'auto',
   },
 
-  // Layout options
   LAYOUTS: {
-    HEADER: 'header' as const,
-    SIDEBAR: 'sidebar' as const,
+    HEADER: 'header',
+    SIDEBAR: 'sidebar',
   },
 
-  // Dashboard view options
   DASHBOARD_VIEWS: {
-    CARDS: 'cards' as const,
-    TABLE: 'table' as const,
+    CARDS: 'cards',
+    TABLE: 'table',
   },
 
-  // Default values
   DEFAULTS: {
     THEME: 'auto' as const,
     LANGUAGE: 'en',
@@ -43,13 +47,16 @@ export const USER_SETTINGS_CONSTANTS = {
     DEADLINES: true,
   },
 
-  // Validation limits
   LIMITS: {
     MIN_ITEMS_PER_PAGE: 5,
     MAX_ITEMS_PER_PAGE: 100,
+    MAX_DISPLAY_NAME_LENGTH: 200,
+    MAX_LANGUAGE_LENGTH: 10,
+    MAX_TIMEZONE_LENGTH: 50,
+    MAX_DATE_FORMAT_LENGTH: 20,
   },
 
-  // Entity configuration
-  ENTITY_TYPE: 'user_settings',
-  DISPLAY_NAME_PREFIX: 'Settings for',
+  VALIDATION: {
+    LANGUAGE_PATTERN: /^[a-z]{2}(-[A-Z]{2})?$/,
+  },
 } as const;

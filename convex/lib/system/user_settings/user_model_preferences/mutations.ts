@@ -1,512 +1,71 @@
 // convex/lib/system/user_settings/user_model_preferences/mutations.ts
-// Write operations for user model preferences module
+// Write operations for user_model_preferences module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { userModelPreferencesValidators } from '@/schema/system/user_settings/user_model_preferences/validators';
-import {
-  getDefaultModelPreferences,
-  validateModelPreferences,
-  trimModelPreferencesData,
-  generateModelPreferencesDisplayName,
-} from './utils';
-import { USER_MODEL_PREFERENCES_CONSTANTS } from './constants';
+import { validateModelPreferences, trimModelPreferencesData, generateModelPreferencesDisplayName, getDefaultModelPreferences } from './utils';
+import { requireEditModelPreferencesAccess, requireDeleteModelPreferencesAccess } from './permissions';
+import type { UserModelPreferencesId } from './types';
 
 /**
- * Update user model preferences
- * Authentication: Required
- * Authorization: Users can only update their own preferences
- * Validation: Applied with trimming and validation rules
- * Audit Log: Created for all updates
+ * Update user model preferences - GUIDE compliant 7-step mutation
  */
 export const updateUserModelPreferences = mutation({
   args: {
-    defaultLanguageModel: v.optional(v.string()),
-    defaultEmbeddingModel: v.optional(v.string()),
-    defaultImageModel: v.optional(v.string()),
-    defaultMultimodalModel: v.optional(v.string()),
-    favoriteModels: v.optional(v.array(v.string())),
-    hiddenProviders: v.optional(v.array(v.string())),
-    preferredView: v.optional(userModelPreferencesValidators.preferredView),
-    sortPreference: v.optional(userModelPreferencesValidators.sortPreference),
-    testingDefaults: v.optional(userModelPreferencesValidators.testingDefaults),
+    data: v.object({
+      defaultLanguageModel: v.optional(v.string()),
+      defaultEmbeddingModel: v.optional(v.string()),
+      defaultImageModel: v.optional(v.string()),
+      defaultMultimodalModel: v.optional(v.string()),
+      favoriteModels: v.optional(v.array(v.string())),
+      hiddenProviders: v.optional(v.array(v.string())),
+      preferredView: v.optional(userModelPreferencesValidators.preferredView),
+      sortPreference: v.optional(userModelPreferencesValidators.sortPreference),
+      testingDefaults: v.optional(userModelPreferencesValidators.testingDefaults),
+    }),
   },
-  handler: async (ctx, args) => {
-    // 1. Authentication
+  handler: async (ctx, { data }): Promise<UserModelPreferencesId> => {
     const user = await requireCurrentUser(ctx);
-
-    // 2. Trim string fields
-    const trimmedArgs = trimModelPreferencesData(args);
-
-    // 3. Validate the updates
-    const errors = validateModelPreferences(trimmedArgs);
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(', ')}`);
-    }
-
-    // 4. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
+    const existing = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique();
+    if (existing) { await requireEditModelPreferencesAccess(ctx, existing, user); }
+    const trimmedData = trimModelPreferencesData(data);
+    const errors = validateModelPreferences(trimmedData);
+    if (errors.length > 0) { throw new Error('Validation failed: ' + errors.join(', ')); }
     const now = Date.now();
-
-    // 5. Prepare update data, excluding undefined values
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
-    if (trimmedArgs.defaultLanguageModel !== undefined) updateData.defaultLanguageModel = trimmedArgs.defaultLanguageModel;
-    if (trimmedArgs.defaultEmbeddingModel !== undefined) updateData.defaultEmbeddingModel = trimmedArgs.defaultEmbeddingModel;
-    if (trimmedArgs.defaultImageModel !== undefined) updateData.defaultImageModel = trimmedArgs.defaultImageModel;
-    if (trimmedArgs.defaultMultimodalModel !== undefined) updateData.defaultMultimodalModel = trimmedArgs.defaultMultimodalModel;
-    if (trimmedArgs.favoriteModels !== undefined) updateData.favoriteModels = trimmedArgs.favoriteModels;
-    if (trimmedArgs.hiddenProviders !== undefined) updateData.hiddenProviders = trimmedArgs.hiddenProviders;
-    if (trimmedArgs.preferredView !== undefined) updateData.preferredView = trimmedArgs.preferredView;
-    if (trimmedArgs.sortPreference !== undefined) updateData.sortPreference = trimmedArgs.sortPreference;
-    if (trimmedArgs.testingDefaults !== undefined) updateData.testingDefaults = trimmedArgs.testingDefaults;
-
-    let preferencesId: any;
-
     if (existing) {
-      // 6. Update existing preferences
-      updateData.version = existing.version + 1;
-      preferencesId = existing._id;
-      await ctx.db.patch(preferencesId, updateData);
-    } else {
-      // 6. Create new preferences with publicId and displayName
-      const defaults = getDefaultModelPreferences();
-      const publicId = crypto.randomUUID();
-      const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User');
-
-      preferencesId = await ctx.db.insert('userModelPreferences', {
-        publicId,
-        userId: user._id,
-        displayName,
-        ...defaults,
-        ...updateData,
-        version: 1,
-        createdAt: now,
-        createdBy: user._id,
-      });
-    }
-
-    // 7. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: 'user.model_preferences_updated',
-      entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: preferencesId,
-      description: 'Updated user model preferences',
-      metadata: {
-        updates: trimmedArgs,
-        operation: existing ? 'update' : 'create',
-      },
-      createdAt: now,
-    });
-
-    // 8. Return preferences ID
-    return preferencesId;
-  },
-});
-
-/**
- * Set default model for a specific type
- * Authentication: Required
- * Authorization: Users can only update their own preferences
- * Audit Log: Created for update
- */
-export const setDefaultModel = mutation({
-  args: {
-    modelId: v.string(),
-    modelType: v.string(),
-  },
-  handler: async (ctx, { modelId, modelType }) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
-
-    // 2. Trim string fields
-    const trimmedModelId = modelId.trim();
-    const trimmedModelType = modelType.trim();
-
-    // 3. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
-    const now = Date.now();
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
-
-    // 4. Set default model based on type
-    switch (trimmedModelType) {
-      case USER_MODEL_PREFERENCES_CONSTANTS.MODEL_TYPES.LANGUAGE:
-        updateData.defaultLanguageModel = trimmedModelId;
-        break;
-      case USER_MODEL_PREFERENCES_CONSTANTS.MODEL_TYPES.EMBEDDING:
-        updateData.defaultEmbeddingModel = trimmedModelId;
-        break;
-      case USER_MODEL_PREFERENCES_CONSTANTS.MODEL_TYPES.IMAGE:
-        updateData.defaultImageModel = trimmedModelId;
-        break;
-      case USER_MODEL_PREFERENCES_CONSTANTS.MODEL_TYPES.MULTIMODAL:
-        updateData.defaultMultimodalModel = trimmedModelId;
-        break;
-      default:
-        throw new Error(`Invalid model type: ${trimmedModelType}`);
-    }
-
-    let preferencesId: any;
-
-    if (existing) {
-      // 5. Update existing preferences
-      updateData.version = existing.version + 1;
-      preferencesId = existing._id;
-      await ctx.db.patch(preferencesId, updateData);
-    } else {
-      // 5. Create new preferences
-      const defaults = getDefaultModelPreferences();
-      const publicId = crypto.randomUUID();
-      const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User');
-
-      preferencesId = await ctx.db.insert('userModelPreferences', {
-        publicId,
-        userId: user._id,
-        displayName,
-        ...defaults,
-        ...updateData,
-        version: 1,
-        createdAt: now,
-        createdBy: user._id,
-      });
-    }
-
-    // 6. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: 'user.default_model_set',
-      entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: preferencesId,
-      description: `Set default ${trimmedModelType} model to ${trimmedModelId}`,
-      metadata: {
-        modelId: trimmedModelId,
-        modelType: trimmedModelType,
-        operation: existing ? 'update' : 'create',
-      },
-      createdAt: now,
-    });
-
-    // 7. Return preferences ID
-    return preferencesId;
-  },
-});
-
-/**
- * Toggle a model as favorite
- * Authentication: Required
- * Authorization: Users can only update their own preferences
- * Validation: Applied to ensure limits are respected
- * Audit Log: Created for toggle operation
- */
-export const toggleFavoriteModel = mutation({
-  args: {
-    modelId: v.string(),
-  },
-  handler: async (ctx, { modelId }) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
-
-    // 2. Trim string fields
-    const trimmedModelId = modelId.trim();
-
-    // 3. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
-    // 4. Toggle favorite
-    const currentFavorites = existing?.favoriteModels || [];
-    const isFavorite = currentFavorites.includes(trimmedModelId);
-    const newFavorites = isFavorite
-      ? currentFavorites.filter(id => id !== trimmedModelId)
-      : [...currentFavorites, trimmedModelId];
-
-    // 5. Validate the new favorites list
-    const errors = validateModelPreferences({ favoriteModels: newFavorites });
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(', ')}`);
-    }
-
-    const now = Date.now();
-    let preferencesId: any;
-
-    if (existing) {
-      // 6. Update existing preferences
-      preferencesId = existing._id;
-      await ctx.db.patch(preferencesId, {
-        favoriteModels: newFavorites,
-        version: existing.version + 1,
-        updatedAt: now,
-        updatedBy: user._id,
-      });
-    } else {
-      // 6. Create new preferences
-      const defaults = getDefaultModelPreferences();
-      const publicId = crypto.randomUUID();
-      const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User');
-
-      preferencesId = await ctx.db.insert('userModelPreferences', {
-        publicId,
-        userId: user._id,
-        displayName,
-        ...defaults,
-        favoriteModels: newFavorites,
-        version: 1,
-        createdAt: now,
-        createdBy: user._id,
-        updatedAt: now,
-        updatedBy: user._id,
-      });
-    }
-
-    // 7. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: isFavorite ? 'user.model_unfavorited' : 'user.model_favorited',
-      entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: preferencesId,
-      description: `${isFavorite ? 'Removed' : 'Added'} ${trimmedModelId} ${isFavorite ? 'from' : 'to'} favorites`,
-      metadata: {
-        modelId: trimmedModelId,
-        action: isFavorite ? 'remove' : 'add',
-        operation: existing ? 'update' : 'create',
-      },
-      createdAt: now,
-    });
-
-    // 8. Return preferences ID
-    return preferencesId;
-  },
-});
-
-/**
- * Clear default model for a specific type
- * Authentication: Required
- * Authorization: Users can only update their own preferences
- * Audit Log: Created for clear operation
- */
-export const clearDefaultModel = mutation({
-  args: {
-    modelType: v.union(
-      v.literal('language'),
-      v.literal('embedding'),
-      v.literal('image'),
-      v.literal('multimodal')
-    ),
-  },
-  handler: async (ctx, { modelType }) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
-
-    // 2. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
-    if (!existing) return null;
-
-    const now = Date.now();
-    const updateData: any = {
-      updatedAt: now,
-      updatedBy: user._id,
-      version: existing.version + 1,
-    };
-
-    // 3. Clear the appropriate default model field
-    switch (modelType) {
-      case 'language':
-        updateData.defaultLanguageModel = undefined;
-        break;
-      case 'embedding':
-        updateData.defaultEmbeddingModel = undefined;
-        break;
-      case 'image':
-        updateData.defaultImageModel = undefined;
-        break;
-      case 'multimodal':
-        updateData.defaultMultimodalModel = undefined;
-        break;
-    }
-
-    // 4. Update preferences
-    await ctx.db.patch(existing._id, updateData);
-
-    // 5. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: 'user.default_model_cleared',
-      entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: existing._id,
-      description: `Cleared default ${modelType} model`,
-      metadata: {
-        modelType,
-        operation: 'clear',
-      },
-      createdAt: now,
-    });
-
-    return existing._id;
-  },
-});
-
-/**
- * Reset user model preferences to defaults
- * Authentication: Required
- * Authorization: Users can only reset their own preferences
- * Audit Log: Created for reset operation
- */
-export const resetUserModelPreferences = mutation({
-  args: {},
-  handler: async (ctx) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
-
-    // 2. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
-    const defaults = getDefaultModelPreferences();
-    const now = Date.now();
-
-    if (existing) {
-      // 3. Update to defaults
-      await ctx.db.patch(existing._id, {
-        ...defaults,
-        publicId: existing.publicId,
-        userId: existing.userId,
-        displayName: existing.displayName,
-        version: existing.version + 1,
-        updatedAt: now,
-        updatedBy: user._id,
-      });
-
-      // 4. Create audit log
-      await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
-        userId: user._id,
-        userName: user.name || user.email || 'Unknown User',
-        action: 'user.model_preferences_reset',
-        entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-        entityId: existing._id,
-        description: 'Reset user model preferences to defaults',
-        metadata: {
-          operation: 'reset',
-        },
-        createdAt: now,
-      });
-
+      const updateData: any = { updatedAt: now, updatedBy: user._id, version: existing.version + 1 };
+      if (trimmedData.defaultLanguageModel !== undefined) updateData.defaultLanguageModel = trimmedData.defaultLanguageModel;
+      if (trimmedData.defaultEmbeddingModel !== undefined) updateData.defaultEmbeddingModel = trimmedData.defaultEmbeddingModel;
+      if (trimmedData.defaultImageModel !== undefined) updateData.defaultImageModel = trimmedData.defaultImageModel;
+      if (trimmedData.defaultMultimodalModel !== undefined) updateData.defaultMultimodalModel = trimmedData.defaultMultimodalModel;
+      if (trimmedData.favoriteModels !== undefined) updateData.favoriteModels = trimmedData.favoriteModels;
+      if (trimmedData.hiddenProviders !== undefined) updateData.hiddenProviders = trimmedData.hiddenProviders;
+      if (trimmedData.preferredView !== undefined) updateData.preferredView = trimmedData.preferredView;
+      if (trimmedData.sortPreference !== undefined) updateData.sortPreference = trimmedData.sortPreference;
+      if (trimmedData.testingDefaults !== undefined) updateData.testingDefaults = trimmedData.testingDefaults;
+      await ctx.db.patch(existing._id, updateData);
+      await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.updated', entityType: 'system_user_model_preferences', entityId: existing.publicId, entityTitle: existing.displayName, description: 'Updated model preferences: ' + existing.displayName, metadata: { changes: trimmedData }, createdAt: now, createdBy: user._id, updatedAt: now });
       return existing._id;
     } else {
-      // 3. Create new preferences with defaults
-      const publicId = crypto.randomUUID();
+      const defaults = getDefaultModelPreferences();
+      const publicId = await generateUniquePublicId(ctx, 'userModelPreferences');
       const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User');
-
-      const preferencesId = await ctx.db.insert('userModelPreferences', {
-        publicId,
-        userId: user._id,
-        displayName,
-        ...defaults,
-        version: 1,
-        createdAt: now,
-        createdBy: user._id,
-        updatedAt: now,
-        updatedBy: user._id,
-      });
-
-      // 4. Create audit log
-      await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
-        userId: user._id,
-        userName: user.name || user.email || 'Unknown User',
-        action: 'user.model_preferences_reset',
-        entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-        entityId: preferencesId,
-        description: 'Created default user model preferences',
-        metadata: {
-          operation: 'create',
-        },
-        createdAt: now,
-      });
-
+      const preferencesId = await ctx.db.insert('userModelPreferences', { publicId, displayName, ownerId: user._id, userId: user._id, defaultLanguageModel: trimmedData.defaultLanguageModel || defaults.defaultLanguageModel, defaultEmbeddingModel: trimmedData.defaultEmbeddingModel || defaults.defaultEmbeddingModel, defaultImageModel: trimmedData.defaultImageModel || defaults.defaultImageModel, defaultMultimodalModel: trimmedData.defaultMultimodalModel || defaults.defaultMultimodalModel, favoriteModels: trimmedData.favoriteModels || defaults.favoriteModels, hiddenProviders: trimmedData.hiddenProviders || defaults.hiddenProviders, preferredView: trimmedData.preferredView || defaults.preferredView, sortPreference: trimmedData.sortPreference || defaults.sortPreference, testingDefaults: trimmedData.testingDefaults || defaults.testingDefaults, version: 1, metadata: undefined, createdAt: now, createdBy: user._id, updatedAt: now, updatedBy: user._id });
+      await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.created', entityType: 'system_user_model_preferences', entityId: publicId, entityTitle: displayName, description: 'Created model preferences: ' + displayName, metadata: { data: trimmedData }, createdAt: now, createdBy: user._id, updatedAt: now });
       return preferencesId;
     }
   },
 });
 
-/**
- * Soft delete user model preferences
- * Authentication: Required
- * Authorization: Users can only delete their own preferences
- * Audit Log: Created for deletion
- */
-export const deleteUserModelPreferences = mutation({
-  args: {},
-  handler: async (ctx) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
+export const setDefaultModel = mutation({ args: { modelId: v.string(), modelType: v.string() }, handler: async (ctx, { modelId, modelType }): Promise<UserModelPreferencesId> => { const user = await requireCurrentUser(ctx); const existing = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique(); if (existing) { await requireEditModelPreferencesAccess(ctx, existing, user); } const now = Date.now(); const updateData: any = { updatedAt: now, updatedBy: user._id }; if (modelType === 'language') updateData.defaultLanguageModel = modelId.trim(); else if (modelType === 'embedding') updateData.defaultEmbeddingModel = modelId.trim(); else if (modelType === 'image') updateData.defaultImageModel = modelId.trim(); else if (modelType === 'multimodal') updateData.defaultMultimodalModel = modelId.trim(); else throw new Error('Invalid model type'); if (existing) { await ctx.db.patch(existing._id, { ...updateData, version: existing.version + 1 }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.default_set', entityType: 'system_user_model_preferences', entityId: existing.publicId, entityTitle: existing.displayName, description: 'Set default ' + modelType + ': ' + existing.displayName, metadata: { modelId, modelType }, createdAt: now, createdBy: user._id, updatedAt: now }); return existing._id; } else { const defaults = getDefaultModelPreferences(); const publicId = await generateUniquePublicId(ctx, 'userModelPreferences'); const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User'); const preferencesId = await ctx.db.insert('userModelPreferences', { publicId, displayName, ownerId: user._id, userId: user._id, ...defaults, ...updateData, version: 1, createdAt: now, createdBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.created', entityType: 'system_user_model_preferences', entityId: publicId, entityTitle: displayName, description: 'Created and set default: ' + displayName, metadata: { modelId, modelType }, createdAt: now, createdBy: user._id, updatedAt: now }); return preferencesId; } } });
 
-    // 2. Get existing preferences
-    const existing = await ctx.db
-      .query('userModelPreferences')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
+export const toggleFavoriteModel = mutation({ args: { modelId: v.string() }, handler: async (ctx, { modelId }): Promise<UserModelPreferencesId> => { const user = await requireCurrentUser(ctx); const existing = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique(); if (existing) { await requireEditModelPreferencesAccess(ctx, existing, user); } const trimmedModelId = modelId.trim(); const currentFavorites = existing?.favoriteModels || []; const isFavorite = currentFavorites.includes(trimmedModelId); const newFavorites = isFavorite ? currentFavorites.filter(id => id !== trimmedModelId) : [...currentFavorites, trimmedModelId]; const errors = validateModelPreferences({ favoriteModels: newFavorites }); if (errors.length > 0) { throw new Error('Validation failed: ' + errors.join(', ')); } const now = Date.now(); if (existing) { await ctx.db.patch(existing._id, { favoriteModels: newFavorites, version: existing.version + 1, updatedAt: now, updatedBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: isFavorite ? 'user_model_preferences.unfavorited' : 'user_model_preferences.favorited', entityType: 'system_user_model_preferences', entityId: existing.publicId, entityTitle: existing.displayName, description: (isFavorite ? 'Removed from' : 'Added to') + ' favorites: ' + existing.displayName, metadata: { modelId: trimmedModelId }, createdAt: now, createdBy: user._id, updatedAt: now }); return existing._id; } else { const defaults = getDefaultModelPreferences(); const publicId = await generateUniquePublicId(ctx, 'userModelPreferences'); const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User'); const preferencesId = await ctx.db.insert('userModelPreferences', { publicId, displayName, ownerId: user._id, userId: user._id, ...defaults, favoriteModels: newFavorites, version: 1, createdAt: now, createdBy: user._id, updatedAt: now, updatedBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.created', entityType: 'system_user_model_preferences', entityId: publicId, entityTitle: displayName, description: 'Created and favorited: ' + displayName, metadata: { modelId: trimmedModelId }, createdAt: now, createdBy: user._id, updatedAt: now }); return preferencesId; } } });
 
-    if (!existing) {
-      throw new Error('User model preferences not found');
-    }
+export const clearDefaultModel = mutation({ args: { modelType: v.union(v.literal('language'), v.literal('embedding'), v.literal('image'), v.literal('multimodal')) }, handler: async (ctx, { modelType }): Promise<UserModelPreferencesId | null> => { const user = await requireCurrentUser(ctx); const existing = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique(); if (!existing) return null; await requireEditModelPreferencesAccess(ctx, existing, user); const now = Date.now(); const updateData: any = { updatedAt: now, updatedBy: user._id, version: existing.version + 1 }; if (modelType === 'language') updateData.defaultLanguageModel = undefined; else if (modelType === 'embedding') updateData.defaultEmbeddingModel = undefined; else if (modelType === 'image') updateData.defaultImageModel = undefined; else updateData.defaultMultimodalModel = undefined; await ctx.db.patch(existing._id, updateData); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.default_cleared', entityType: 'system_user_model_preferences', entityId: existing.publicId, entityTitle: existing.displayName, description: 'Cleared default ' + modelType + ': ' + existing.displayName, metadata: { modelType }, createdAt: now, createdBy: user._id, updatedAt: now }); return existing._id; } });
 
-    const now = Date.now();
+export const resetUserModelPreferences = mutation({ args: {}, handler: async (ctx): Promise<UserModelPreferencesId> => { const user = await requireCurrentUser(ctx); const existing = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique(); if (existing) { await requireEditModelPreferencesAccess(ctx, existing, user); } const defaults = getDefaultModelPreferences(); const now = Date.now(); if (existing) { await ctx.db.patch(existing._id, { ...defaults, publicId: existing.publicId, displayName: existing.displayName, ownerId: existing.ownerId, userId: existing.userId, version: existing.version + 1, updatedAt: now, updatedBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.reset', entityType: 'system_user_model_preferences', entityId: existing.publicId, entityTitle: existing.displayName, description: 'Reset: ' + existing.displayName, createdAt: now, createdBy: user._id, updatedAt: now }); return existing._id; } else { const publicId = await generateUniquePublicId(ctx, 'userModelPreferences'); const displayName = generateModelPreferencesDisplayName(user.name || user.email || 'User'); const preferencesId = await ctx.db.insert('userModelPreferences', { publicId, displayName, ownerId: user._id, userId: user._id, ...defaults, version: 1, createdAt: now, createdBy: user._id, updatedAt: now, updatedBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.created', entityType: 'system_user_model_preferences', entityId: publicId, entityTitle: displayName, description: 'Created default: ' + displayName, createdAt: now, createdBy: user._id, updatedAt: now }); return preferencesId; } } });
 
-    // 3. Soft delete (set deletedAt and deletedBy)
-    await ctx.db.patch(existing._id, {
-      deletedAt: now,
-      deletedBy: user._id,
-      updatedAt: now,
-      updatedBy: user._id,
-    });
-
-    // 4. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: 'user.model_preferences_deleted',
-      entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: existing._id,
-      description: 'Deleted user model preferences',
-      metadata: {
-        operation: 'soft_delete',
-      },
-      createdAt: now,
-    });
-
-    return existing._id;
-  },
-});
+export const deleteUserModelPreferences = mutation({ args: {}, handler: async (ctx): Promise<UserModelPreferencesId> => { const user = await requireCurrentUser(ctx); const preferences = await ctx.db.query('userModelPreferences').withIndex('by_user_id', (q) => q.eq('userId', user._id)).filter((q) => q.eq(q.field('deletedAt'), undefined)).unique(); if (!preferences) { throw new Error('Preferences not found'); } await requireDeleteModelPreferencesAccess(preferences, user); const now = Date.now(); await ctx.db.patch(preferences._id, { deletedAt: now, deletedBy: user._id, updatedAt: now, updatedBy: user._id }); await ctx.db.insert('auditLogs', { userId: user._id, userName: user.name || user.email || 'Unknown User', action: 'user_model_preferences.deleted', entityType: 'system_user_model_preferences', entityId: preferences.publicId, entityTitle: preferences.displayName, description: 'Deleted: ' + preferences.displayName, createdAt: now, createdBy: user._id, updatedAt: now }); return preferences._id; } });

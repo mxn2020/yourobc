@@ -2,10 +2,15 @@
 // Table definitions for notifications module
 
 import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
 import { notificationsValidators } from './validators';
 
 export const notificationsTable = defineTable({
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // User receiving the notification
   userId: notificationsValidators.userId,
 
@@ -31,9 +36,12 @@ export const notificationsTable = defineTable({
   ...softDeleteFields,
 })
   // Required indexes
-  .index('by_user', ['userId'])
+  .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
+  .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
+  .index('by_user', ['userId'])
   .index('by_user_read', ['userId', 'isRead'])
   .index('by_created_at', ['createdAt']);

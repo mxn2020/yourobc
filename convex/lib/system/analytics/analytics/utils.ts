@@ -4,6 +4,240 @@
 import { ANALYTICS_CONSTANTS } from './constants';
 import type { DeviceInfo } from './types';
 
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate dashboard data for creation/update
+ */
+export function validateDashboardData(
+  data: Partial<{
+    name?: string;
+    description?: string;
+    widgets?: any[];
+  }>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name (main display field)
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Dashboard name is required');
+    } else if (trimmed.length > ANALYTICS_CONSTANTS.LIMITS.MAX_DASHBOARD_NAME_LENGTH) {
+      errors.push(`Dashboard name cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_DASHBOARD_NAME_LENGTH} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > ANALYTICS_CONSTANTS.LIMITS.MAX_DASHBOARD_DESCRIPTION_LENGTH) {
+      errors.push(`Dashboard description cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_DASHBOARD_DESCRIPTION_LENGTH} characters`);
+    }
+  }
+
+  // Validate widgets
+  if (data.widgets !== undefined) {
+    if (data.widgets.length > ANALYTICS_CONSTANTS.LIMITS.MAX_WIDGETS_PER_DASHBOARD) {
+      errors.push(`Cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_WIDGETS_PER_DASHBOARD} widgets per dashboard`);
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate report data for creation/update
+ */
+export function validateReportData(
+  data: Partial<{
+    name?: string;
+    description?: string;
+    query?: {
+      metrics?: string[];
+    };
+    schedule?: {
+      recipients?: string[];
+    };
+  }>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name (main display field)
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Report name is required');
+    } else if (trimmed.length > ANALYTICS_CONSTANTS.LIMITS.MAX_REPORT_NAME_LENGTH) {
+      errors.push(`Report name cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_REPORT_NAME_LENGTH} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > ANALYTICS_CONSTANTS.LIMITS.MAX_REPORT_DESCRIPTION_LENGTH) {
+      errors.push(`Report description cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_REPORT_DESCRIPTION_LENGTH} characters`);
+    }
+  }
+
+  // Validate metrics count
+  if (data.query?.metrics !== undefined) {
+    if (data.query.metrics.length > ANALYTICS_CONSTANTS.LIMITS.MAX_METRICS_PER_REPORT) {
+      errors.push(`Cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_METRICS_PER_REPORT} metrics per report`);
+    }
+  }
+
+  // Validate recipients count
+  if (data.schedule?.recipients !== undefined) {
+    if (data.schedule.recipients.length > ANALYTICS_CONSTANTS.LIMITS.MAX_RECIPIENTS_PER_REPORT) {
+      errors.push(`Cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_RECIPIENTS_PER_REPORT} recipients per report`);
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate event data for tracking
+ */
+export function validateEventData(
+  data: Partial<{
+    eventName?: string;
+  }>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate event name
+  if (data.eventName !== undefined) {
+    const trimmed = data.eventName.trim();
+
+    if (!trimmed) {
+      errors.push('Event name is required');
+    } else if (trimmed.length > ANALYTICS_CONSTANTS.LIMITS.MAX_EVENT_NAME_LENGTH) {
+      errors.push(`Event name cannot exceed ${ANALYTICS_CONSTANTS.LIMITS.MAX_EVENT_NAME_LENGTH} characters`);
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate metric data for creation/update
+ */
+export function validateMetricData(
+  data: Partial<{
+    name?: string;
+    metricType?: string;
+  }>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name (main display field)
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Metric name is required');
+    }
+  }
+
+  // Validate metric type
+  if (data.metricType !== undefined) {
+    const trimmed = data.metricType.trim();
+
+    if (!trimmed) {
+      errors.push('Metric type is required');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate provider config data for creation/update
+ */
+export function validateProviderConfigData(
+  data: Partial<{
+    name?: string;
+    provider?: string;
+  }>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name (main display field)
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Provider config name is required');
+    }
+  }
+
+  // Validate provider type
+  if (data.provider !== undefined) {
+    const trimmed = data.provider.trim();
+
+    if (!trimmed) {
+      errors.push('Provider type is required');
+    }
+  }
+
+  return errors;
+}
+
+// ============================================================================
+// Display & Formatting Functions
+// ============================================================================
+
+/**
+ * Format dashboard display name
+ */
+export function formatDashboardDisplayName(dashboard: { name: string; status?: string }): string {
+  const statusBadge = dashboard.status ? ` [${dashboard.status}]` : '';
+  return `${dashboard.name}${statusBadge}`;
+}
+
+/**
+ * Format report display name
+ */
+export function formatReportDisplayName(report: { name: string; status?: string }): string {
+  const statusBadge = report.status ? ` [${report.status}]` : '';
+  return `${report.name}${statusBadge}`;
+}
+
+/**
+ * Format event display name
+ */
+export function formatEventDisplayName(event: { eventName: string; eventType?: string }): string {
+  const typeBadge = event.eventType ? ` [${event.eventType}]` : '';
+  return `${event.eventName}${typeBadge}`;
+}
+
+/**
+ * Check if dashboard is editable
+ */
+export function isDashboardEditable(dashboard: { status: string; deletedAt?: number }): boolean {
+  if (dashboard.deletedAt) return false;
+  return dashboard.status !== 'archived';
+}
+
+/**
+ * Check if report is editable
+ */
+export function isReportEditable(report: { status: string; deletedAt?: number }): boolean {
+  if (report.deletedAt) return false;
+  return report.status !== 'archived';
+}
+
+// ============================================================================
+// Utility Helper Functions
+// ============================================================================
+
 /**
  * Generate a unique session ID
  */

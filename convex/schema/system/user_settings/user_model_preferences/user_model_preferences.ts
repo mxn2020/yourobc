@@ -1,27 +1,21 @@
-/**
- * User Model Preferences Schema
- *
- * Database schemas for user AI model preferences and defaults
- */
+// convex/schema/system/user_settings/user_model_preferences/user_model_preferences.ts
+// Table definitions for user_model_preferences module
 
-import { defineTable } from "convex/server";
-import { v } from "convex/values";
-import { auditFields, softDeleteFields, metadataSchema } from "../../../base";
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, softDeleteFields, metadataSchema } from '../../../base';
 import { userModelPreferencesValidators } from './validators';
 
-/**
- * User model preferences table
- * Stores user-specific AI model preferences and defaults
- */
 export const userModelPreferencesTable = defineTable({
-  // Public ID for shareable references
-  publicId: v.string(),
-
-  // User identification (userId serves as ownerId)
-  userId: v.id('userProfiles'),
-
-  // Main display field - user identifier
+  // Required: Main display field
   displayName: v.string(), // e.g., "Model Preferences for [User Name]"
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
+  // User identification (kept for backward compatibility)
+  userId: v.id('userProfiles'),
 
   // Default model selections
   defaultLanguageModel: v.optional(v.string()),
@@ -46,24 +40,17 @@ export const userModelPreferencesTable = defineTable({
   // Standard metadata
   metadata: metadataSchema,
 
-  // Audit fields
+  // Required: Audit fields
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
-  .index("by_public_id", ["publicId"])
-  .index("by_display_name", ["displayName"])
-  .index("by_owner", ["userId"]) // userId serves as ownerId
-  .index("by_deleted_at", ["deletedAt"])
+  .index('by_public_id', ['publicId'])
+  .index('by_display_name', ['displayName'])
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_user_id', ['userId'])
   .index('by_preferred_view', ['preferredView'])
   .index('by_created_at', ['createdAt']);
-
-/**
- * Export the table schema
- */
-export const userModelPreferencesSchemas = {
-  userModelPreferencesTable,
-};

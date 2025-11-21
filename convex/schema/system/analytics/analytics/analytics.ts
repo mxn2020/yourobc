@@ -11,11 +11,18 @@ import { analyticsValidators } from './validators';
  * Stores all tracked events (page views, user actions, AI usage, payments, etc.)
  */
 export const analyticsEventsTable = defineTable({
-  // Event Identity
+  // Required: Main display field
   eventName: v.string(), // 'page_view', 'button_click', 'ai_request', etc.
-  eventType: analyticsValidators.eventType,
 
-  // User Context
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'), // Creator/owner of the event tracking
+
+  // Event Identity
+  eventType: analyticsValidators.eventType,
+  status: analyticsValidators.eventStatus,
+
+  // User Context (subject of the event)
   userId: v.optional(v.id('userProfiles')),
   sessionId: v.string(),
   anonymousId: v.optional(v.string()), // For non-logged-in users
@@ -120,24 +127,38 @@ export const analyticsEventsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_event_name', ['eventName'])
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_event_name', ['eventName']) // Main display field
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
   .index('by_event_type', ['eventType'])
+  .index('by_status', ['status'])
   .index('by_user', ['userId'])
   .index('by_session', ['sessionId'])
   .index('by_timestamp', ['timestamp'])
   .index('by_user_timestamp', ['userId', 'timestamp'])
-  .index('by_sync_status', ['syncStatus'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_sync_status', ['syncStatus']);
 
 /**
  * Analytics Metrics Table
  * Stores pre-aggregated metrics for faster querying
  */
 export const analyticsMetricsTable = defineTable({
+  // Required: Main display field
+  name: v.string(), // Human-readable metric name
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Metric Identity
   metricType: v.string(), // 'daily_active_users', 'ai_requests_count', etc.
   dimension: v.optional(v.string()), // 'country:US', 'feature:chat', etc.
+  status: analyticsValidators.metricStatus,
 
   // Time Bucket
   period: analyticsValidators.metricPeriod,
@@ -159,11 +180,18 @@ export const analyticsMetricsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_name', ['name']) // Main display field
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_status', ['status'])
   .index('by_metric_period', ['metricType', 'period', 'periodStart'])
   .index('by_period_start', ['periodStart'])
   .index('by_metric_dimension', ['metricType', 'dimension'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_owner_and_status', ['ownerId', 'status']);
 
 /**
  * Analytics Dashboards Table
@@ -290,22 +318,25 @@ export const analyticsDashboardsTable = defineTable({
 
   // Access Control
   isPublic: v.boolean(),
-  status: v.union(v.literal('active'), v.literal('archived')),
+  status: analyticsValidators.dashboardStatus,
 
   // Standard metadata and audit fields
   metadata: metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })
+  // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_slug', ['slug'])
-  .index('by_name', ['name'])
-  .index('by_type', ['type'])
+  .index('by_name', ['name']) // Main display field
   .index('by_owner', ['ownerId'])
-  .index('by_public', ['isPublic'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_slug', ['slug'])
+  .index('by_type', ['type'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_public', ['isPublic'])
+  .index('by_owner_and_status', ['ownerId', 'status']);
 
 /**
  * Analytics Reports Table
@@ -318,7 +349,7 @@ export const analyticsReportsTable = defineTable({
   // Required: Core fields
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
-  status: v.union(v.literal('active'), v.literal('archived'), v.literal('scheduled')),
+  status: analyticsValidators.reportStatus,
 
   // Report information
   description: v.optional(v.string()),
@@ -386,13 +417,16 @@ export const analyticsReportsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_name', ['name'])
+  .index('by_name', ['name']) // Main display field
   .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
   .index('by_type', ['reportType'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_owner_and_status', ['ownerId', 'status']);
 
 /**
  * Analytics Provider Sync Table
@@ -400,11 +434,15 @@ export const analyticsReportsTable = defineTable({
  */
 export const analyticsProviderSyncTable = defineTable({
   // Required: Main display field
-  provider: v.string(), // 'google_analytics', 'mixpanel', 'plausible'
+  name: v.string(), // Human-readable provider name
 
   // Required: Core fields
   publicId: v.string(),
-  status: v.union(v.literal('active'), v.literal('inactive'), v.literal('error')),
+  ownerId: v.id('userProfiles'),
+
+  // Provider type
+  provider: v.string(), // 'google_analytics', 'mixpanel', 'plausible'
+  status: analyticsValidators.providerStatus,
 
   // Configuration - Discriminated union by provider
   enabled: v.boolean(),
@@ -476,9 +514,14 @@ export const analyticsProviderSyncTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_name', ['name']) // Main display field
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
   .index('by_provider', ['provider'])
-  .index('by_enabled', ['enabled'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_enabled', ['enabled'])
+  .index('by_owner_and_status', ['ownerId', 'status']);

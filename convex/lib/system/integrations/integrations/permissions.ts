@@ -1,182 +1,452 @@
 // convex/lib/system/integrations/integrations/permissions.ts
-// Permission and access control functions for integrations module
+// Access control and authorization logic for integrations module
 
-import { QueryCtx, MutationCtx } from '@/generated/server';
-import { Doc, Id } from '@/generated/dataModel';
-import { INTEGRATIONS_CONSTANTS } from './constants';
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { ApiKey, Webhook, OAuthApp, ExternalIntegration } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if user can view API keys
- */
-export async function canViewApiKeys(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// API Keys - View Access
+// ============================================================================
+
+export async function canViewApiKey(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
+  apiKey: ApiKey,
+  user: UserProfile
 ): Promise<boolean> {
-  // Users can always view their own API keys
-  return true;
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (apiKey.ownerId === user._id) return true;
+
+  // Creator can view
+  if (apiKey.createdBy === user._id) return true;
+
+  // User who owns the API key can view
+  if (apiKey.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can create API keys
- */
-export async function canCreateApiKey(
+export async function requireViewApiKeyAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
-): Promise<boolean> {
-  // All authenticated users can create API keys
-  return true;
+  apiKey: ApiKey,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewApiKey(ctx, apiKey, user))) {
+    throw new Error('You do not have permission to view this API key');
+  }
 }
 
-/**
- * Check if user can update/revoke API key
- */
-export async function canManageApiKey(
+// ============================================================================
+// API Keys - Edit Access
+// ============================================================================
+
+export async function canEditApiKey(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>,
-  apiKey: Doc<'apiKeys'>
+  apiKey: ApiKey,
+  user: UserProfile
 ): Promise<boolean> {
-  // User must be the owner
-  return apiKey.userId === userId;
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (apiKey.ownerId === user._id) return true;
+
+  // User who owns the API key can edit
+  if (apiKey.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can view webhooks
- */
-export async function canViewWebhooks(
+export async function requireEditApiKeyAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
-): Promise<boolean> {
-  // Users can always view their own webhooks
-  return true;
+  apiKey: ApiKey,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditApiKey(ctx, apiKey, user))) {
+    throw new Error('You do not have permission to edit this API key');
+  }
 }
 
-/**
- * Check if user can create webhooks
- */
-export async function canCreateWebhook(
+// ============================================================================
+// API Keys - Delete Access
+// ============================================================================
+
+export async function canDeleteApiKey(
+  apiKey: ApiKey,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (apiKey.ownerId === user._id) return true;
+  if (apiKey.userId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteApiKeyAccess(
+  apiKey: ApiKey,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteApiKey(apiKey, user))) {
+    throw new Error('You do not have permission to delete this API key');
+  }
+}
+
+// ============================================================================
+// Webhooks - View Access
+// ============================================================================
+
+export async function canViewWebhook(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
+  webhook: Webhook,
+  user: UserProfile
 ): Promise<boolean> {
-  // All authenticated users can create webhooks
-  return true;
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (webhook.ownerId === user._id) return true;
+
+  // Creator can view
+  if (webhook.createdBy === user._id) return true;
+
+  // User who owns the webhook can view
+  if (webhook.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can manage webhook
- */
-export async function canManageWebhook(
+export async function requireViewWebhookAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>,
-  webhook: Doc<'webhooks'>
-): Promise<boolean> {
-  // User must be the owner
-  return webhook.userId === userId;
+  webhook: Webhook,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewWebhook(ctx, webhook, user))) {
+    throw new Error('You do not have permission to view this webhook');
+  }
 }
 
-/**
- * Check if user can view OAuth apps
- */
-export async function canViewOAuthApps(
+// ============================================================================
+// Webhooks - Edit Access
+// ============================================================================
+
+export async function canEditWebhook(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
+  webhook: Webhook,
+  user: UserProfile
 ): Promise<boolean> {
-  // Users can always view their own OAuth apps
-  return true;
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (webhook.ownerId === user._id) return true;
+
+  // User who owns the webhook can edit
+  if (webhook.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can create OAuth apps
- */
-export async function canCreateOAuthApp(
+export async function requireEditWebhookAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
-): Promise<boolean> {
-  // All authenticated users can create OAuth apps
-  return true;
+  webhook: Webhook,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditWebhook(ctx, webhook, user))) {
+    throw new Error('You do not have permission to edit this webhook');
+  }
 }
 
-/**
- * Check if user can manage OAuth app
- */
-export async function canManageOAuthApp(
+// ============================================================================
+// Webhooks - Delete Access
+// ============================================================================
+
+export async function canDeleteWebhook(
+  webhook: Webhook,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (webhook.ownerId === user._id) return true;
+  if (webhook.userId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteWebhookAccess(
+  webhook: Webhook,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteWebhook(webhook, user))) {
+    throw new Error('You do not have permission to delete this webhook');
+  }
+}
+
+// ============================================================================
+// OAuth Apps - View Access
+// ============================================================================
+
+export async function canViewOAuthApp(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>,
-  oauthApp: Doc<'oauthApps'>
+  oauthApp: OAuthApp,
+  user: UserProfile
 ): Promise<boolean> {
-  // User must be the owner
-  return oauthApp.userId === userId;
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (oauthApp.ownerId === user._id) return true;
+
+  // Creator can view
+  if (oauthApp.createdBy === user._id) return true;
+
+  // User who owns the OAuth app can view
+  if (oauthApp.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can view external integrations
- */
-export async function canViewIntegrations(
+export async function requireViewOAuthAppAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
-): Promise<boolean> {
-  // Users can always view their own integrations
-  return true;
+  oauthApp: OAuthApp,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewOAuthApp(ctx, oauthApp, user))) {
+    throw new Error('You do not have permission to view this OAuth app');
+  }
 }
 
-/**
- * Check if user can create external integrations
- */
-export async function canCreateIntegration(
+// ============================================================================
+// OAuth Apps - Edit Access
+// ============================================================================
+
+export async function canEditOAuthApp(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>
+  oauthApp: OAuthApp,
+  user: UserProfile
 ): Promise<boolean> {
-  // All authenticated users can create integrations
-  return true;
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (oauthApp.ownerId === user._id) return true;
+
+  // User who owns the OAuth app can edit
+  if (oauthApp.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can manage external integration
- */
-export async function canManageIntegration(
+export async function requireEditOAuthAppAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: Id<'userProfiles'>,
-  integration: Doc<'externalIntegrations'>
+  oauthApp: OAuthApp,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditOAuthApp(ctx, oauthApp, user))) {
+    throw new Error('You do not have permission to edit this OAuth app');
+  }
+}
+
+// ============================================================================
+// OAuth Apps - Delete Access
+// ============================================================================
+
+export async function canDeleteOAuthApp(
+  oauthApp: OAuthApp,
+  user: UserProfile
 ): Promise<boolean> {
-  // User must be the owner
-  return integration.userId === userId;
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (oauthApp.ownerId === user._id) return true;
+  if (oauthApp.userId === user._id) return true;
+  return false;
 }
 
-/**
- * Filter API keys by access control
- */
-export function filterApiKeysByAccess(
-  apiKeys: Doc<'apiKeys'>[],
-  userId: Id<'userProfiles'>
-): Doc<'apiKeys'>[] {
-  return apiKeys.filter((key) => key.userId === userId);
+export async function requireDeleteOAuthAppAccess(
+  oauthApp: OAuthApp,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteOAuthApp(oauthApp, user))) {
+    throw new Error('You do not have permission to delete this OAuth app');
+  }
 }
 
-/**
- * Filter webhooks by access control
- */
-export function filterWebhooksByAccess(
-  webhooks: Doc<'webhooks'>[],
-  userId: Id<'userProfiles'>
-): Doc<'webhooks'>[] {
-  return webhooks.filter((webhook) => webhook.userId === userId);
+// ============================================================================
+// External Integrations - View Access
+// ============================================================================
+
+export async function canViewExternalIntegration(
+  ctx: QueryCtx | MutationCtx,
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (integration.ownerId === user._id) return true;
+
+  // Creator can view
+  if (integration.createdBy === user._id) return true;
+
+  // User who owns the integration can view
+  if (integration.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Filter OAuth apps by access control
- */
-export function filterOAuthAppsByAccess(
-  oauthApps: Doc<'oauthApps'>[],
-  userId: Id<'userProfiles'>
-): Doc<'oauthApps'>[] {
-  return oauthApps.filter((app) => app.userId === userId);
+export async function requireViewExternalIntegrationAccess(
+  ctx: QueryCtx | MutationCtx,
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewExternalIntegration(ctx, integration, user))) {
+    throw new Error('You do not have permission to view this integration');
+  }
 }
 
-/**
- * Filter integrations by access control
- */
-export function filterIntegrationsByAccess(
-  integrations: Doc<'externalIntegrations'>[],
-  userId: Id<'userProfiles'>
-): Doc<'externalIntegrations'>[] {
-  return integrations.filter((integration) => integration.userId === userId);
+// ============================================================================
+// External Integrations - Edit Access
+// ============================================================================
+
+export async function canEditExternalIntegration(
+  ctx: QueryCtx | MutationCtx,
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (integration.ownerId === user._id) return true;
+
+  // User who owns the integration can edit
+  if (integration.userId === user._id) return true;
+
+  return false;
+}
+
+export async function requireEditExternalIntegrationAccess(
+  ctx: QueryCtx | MutationCtx,
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditExternalIntegration(ctx, integration, user))) {
+    throw new Error('You do not have permission to edit this integration');
+  }
+}
+
+// ============================================================================
+// External Integrations - Delete Access
+// ============================================================================
+
+export async function canDeleteExternalIntegration(
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (integration.ownerId === user._id) return true;
+  if (integration.userId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteExternalIntegrationAccess(
+  integration: ExternalIntegration,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteExternalIntegration(integration, user))) {
+    throw new Error('You do not have permission to delete this integration');
+  }
+}
+
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterApiKeysByAccess(
+  ctx: QueryCtx | MutationCtx,
+  apiKeys: ApiKey[],
+  user: UserProfile
+): Promise<ApiKey[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return apiKeys;
+  }
+
+  const accessible: ApiKey[] = [];
+
+  for (const apiKey of apiKeys) {
+    if (await canViewApiKey(ctx, apiKey, user)) {
+      accessible.push(apiKey);
+    }
+  }
+
+  return accessible;
+}
+
+export async function filterWebhooksByAccess(
+  ctx: QueryCtx | MutationCtx,
+  webhooks: Webhook[],
+  user: UserProfile
+): Promise<Webhook[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return webhooks;
+  }
+
+  const accessible: Webhook[] = [];
+
+  for (const webhook of webhooks) {
+    if (await canViewWebhook(ctx, webhook, user)) {
+      accessible.push(webhook);
+    }
+  }
+
+  return accessible;
+}
+
+export async function filterOAuthAppsByAccess(
+  ctx: QueryCtx | MutationCtx,
+  oauthApps: OAuthApp[],
+  user: UserProfile
+): Promise<OAuthApp[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return oauthApps;
+  }
+
+  const accessible: OAuthApp[] = [];
+
+  for (const app of oauthApps) {
+    if (await canViewOAuthApp(ctx, app, user)) {
+      accessible.push(app);
+    }
+  }
+
+  return accessible;
+}
+
+export async function filterExternalIntegrationsByAccess(
+  ctx: QueryCtx | MutationCtx,
+  integrations: ExternalIntegration[],
+  user: UserProfile
+): Promise<ExternalIntegration[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return integrations;
+  }
+
+  const accessible: ExternalIntegration[] = [];
+
+  for (const integration of integrations) {
+    if (await canViewExternalIntegration(ctx, integration, user)) {
+      accessible.push(integration);
+    }
+  }
+
+  return accessible;
 }

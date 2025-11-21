@@ -1,123 +1,33 @@
 // convex/lib/system/user_settings/user_settings/mutations.ts
-// Write operations for user settings module
+// Write operations for user_settings module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { userSettingsValidators } from '@/schema/system/user_settings/user_settings/validators';
-import {
-  getDefaultUserSettings,
-  validateUserSettings,
-  trimUserSettingsData,
-  generateUserSettingsDisplayName,
-} from './utils';
 import { USER_SETTINGS_CONSTANTS } from './constants';
+import { validateUserSettings, trimUserSettingsData, generateUserSettingsDisplayName, getDefaultUserSettings } from './utils';
+import { requireEditUserSettingsAccess, requireDeleteUserSettingsAccess } from './permissions';
+import type { UserSettingsId } from './types';
 
 /**
  * Update user settings
- * Authentication: Required
- * Authorization: Users can only update their own settings
- * Validation: Applied with trimming and validation rules
- * Audit Log: Created for all updates
  */
 export const updateUserSettings = mutation({
   args: {
-    theme: v.optional(userSettingsValidators.theme),
-    language: v.optional(v.string()),
-    timezone: v.optional(v.string()),
-    dateFormat: v.optional(v.string()),
-    layoutPreferences: v.optional(userSettingsValidators.layoutPreferences),
-    notificationPreferences: v.optional(userSettingsValidators.notificationPreferences),
-    dashboardPreferences: v.optional(userSettingsValidators.dashboardPreferences),
+    data: v.object({
+      theme: v.optional(userSettingsValidators.theme),
+      language: v.optional(v.string()),
+      timezone: v.optional(v.string()),
+      dateFormat: v.optional(v.string()),
+      layoutPreferences: v.optional(userSettingsValidators.layoutPreferences),
+      notificationPreferences: v.optional(userSettingsValidators.notificationPreferences),
+      dashboardPreferences: v.optional(userSettingsValidators.dashboardPreferences),
+    }),
   },
-  handler: async (ctx, args) => {
-    // 1. Authentication
-    const user = await requireCurrentUser(ctx);
-
-    // 2. Trim string fields
-    const trimmedArgs = trimUserSettingsData(args);
-
-    // 3. Validate the updates
-    const errors = validateUserSettings(trimmedArgs);
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(', ')}`);
-    }
-
-    // 4. Get existing settings
-    const existing = await ctx.db
-      .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .unique();
-
-    const now = Date.now();
-
-    // 5. Prepare update data, excluding undefined values
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
-    if (trimmedArgs.theme !== undefined) updateData.theme = trimmedArgs.theme;
-    if (trimmedArgs.language !== undefined) updateData.language = trimmedArgs.language;
-    if (trimmedArgs.timezone !== undefined) updateData.timezone = trimmedArgs.timezone;
-    if (trimmedArgs.dateFormat !== undefined) updateData.dateFormat = trimmedArgs.dateFormat;
-    if (trimmedArgs.layoutPreferences !== undefined) updateData.layoutPreferences = trimmedArgs.layoutPreferences;
-    if (trimmedArgs.notificationPreferences !== undefined) updateData.notificationPreferences = trimmedArgs.notificationPreferences;
-    if (trimmedArgs.dashboardPreferences !== undefined) updateData.dashboardPreferences = trimmedArgs.dashboardPreferences;
-
-    let settingsId: any;
-
-    if (existing) {
-      // 6. Update existing settings
-      updateData.version = existing.version + 1;
-      settingsId = existing._id;
-      await ctx.db.patch(settingsId, updateData);
-    } else {
-      // 6. Create new settings with publicId and displayName
-      const defaults = getDefaultUserSettings();
-      const publicId = crypto.randomUUID();
-      const displayName = generateUserSettingsDisplayName(user.name || user.email || 'User');
-
-      settingsId = await ctx.db.insert('userSettings', {
-        publicId,
-        userId: user._id,
-        displayName,
-        ...defaults,
-        ...updateData,
-        version: 1,
-        createdAt: now,
-        createdBy: user._id,
-      });
-    }
-
-    // 7. Create audit log
-    await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown User',
-      action: 'user.settings_updated',
-      entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-      entityId: settingsId,
-      description: 'Updated user settings',
-      metadata: {
-        updates: trimmedArgs,
-        operation: existing ? 'update' : 'create',
-      },
-      createdAt: now,
-    });
-
-    // 8. Return settings ID
-    return settingsId;
-  },
-});
-
-/**
- * Reset user settings to defaults
- * Authentication: Required
- * Authorization: Users can only reset their own settings
- * Audit Log: Created for reset operation
- */
-export const resetUserSettings = mutation({
-  args: {},
-  handler: async (ctx) => {
-    // 1. Authentication
+  handler: async (ctx, { data }): Promise<UserSettingsId> => {
+    // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
     // 2. Get existing settings
@@ -127,46 +37,169 @@ export const resetUserSettings = mutation({
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .unique();
 
+    // 3. AUTHZ: Check edit permission (if exists)
+    if (existing) {
+      await requireEditUserSettingsAccess(ctx, existing, user);
+    }
+
+    // 4. VALIDATE: Check data validity
+    const trimmedData = trimUserSettingsData(data);
+    const errors = validateUserSettings(trimmedData);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Prepare update/create data
+    const now = Date.now();
+
+    if (existing) {
+      // 6. UPDATE: Apply changes
+      const updateData: any = {
+        updatedAt: now,
+        updatedBy: user._id,
+        version: existing.version + 1,
+      };
+
+      if (trimmedData.theme !== undefined) updateData.theme = trimmedData.theme;
+      if (trimmedData.language !== undefined) updateData.language = trimmedData.language;
+      if (trimmedData.timezone !== undefined) updateData.timezone = trimmedData.timezone;
+      if (trimmedData.dateFormat !== undefined) updateData.dateFormat = trimmedData.dateFormat;
+      if (trimmedData.layoutPreferences !== undefined) updateData.layoutPreferences = trimmedData.layoutPreferences;
+      if (trimmedData.notificationPreferences !== undefined) updateData.notificationPreferences = trimmedData.notificationPreferences;
+      if (trimmedData.dashboardPreferences !== undefined) updateData.dashboardPreferences = trimmedData.dashboardPreferences;
+
+      await ctx.db.patch(existing._id, updateData);
+
+      // 7. AUDIT: Create audit log
+      await ctx.db.insert('auditLogs', {
+        userId: user._id,
+        userName: user.name || user.email || 'Unknown User',
+        action: 'user_settings.updated',
+        entityType: 'system_user_settings',
+        entityId: existing.publicId,
+        entityTitle: existing.displayName,
+        description: `Updated user settings: ${existing.displayName}`,
+        metadata: { changes: trimmedData },
+        createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
+      });
+
+      // 8. RETURN: Return entity ID
+      return existing._id;
+    } else {
+      // 6. CREATE: Insert into database
+      const defaults = getDefaultUserSettings();
+      const publicId = await generateUniquePublicId(ctx, 'userSettings');
+      const displayName = generateUserSettingsDisplayName(user.name || user.email || 'User');
+
+      const settingsId = await ctx.db.insert('userSettings', {
+        publicId,
+        displayName,
+        ownerId: user._id,
+        userId: user._id,
+        theme: trimmedData.theme || defaults.theme,
+        language: trimmedData.language || defaults.language,
+        timezone: trimmedData.timezone || defaults.timezone,
+        dateFormat: trimmedData.dateFormat || defaults.dateFormat,
+        layoutPreferences: trimmedData.layoutPreferences || defaults.layoutPreferences,
+        notificationPreferences: trimmedData.notificationPreferences || defaults.notificationPreferences,
+        dashboardPreferences: trimmedData.dashboardPreferences || defaults.dashboardPreferences,
+        version: 1,
+        metadata: undefined,
+        createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
+        updatedBy: user._id,
+      });
+
+      // 7. AUDIT: Create audit log
+      await ctx.db.insert('auditLogs', {
+        userId: user._id,
+        userName: user.name || user.email || 'Unknown User',
+        action: 'user_settings.created',
+        entityType: 'system_user_settings',
+        entityId: publicId,
+        entityTitle: displayName,
+        description: `Created user settings: ${displayName}`,
+        metadata: { data: trimmedData },
+        createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
+      });
+
+      // 8. RETURN: Return entity ID
+      return settingsId;
+    }
+  },
+});
+
+/**
+ * Reset user settings to defaults
+ */
+export const resetUserSettings = mutation({
+  args: {},
+  handler: async (ctx): Promise<UserSettingsId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. Get existing settings
+    const existing = await ctx.db
+      .query('userSettings')
+      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .unique();
+
+    // 3. AUTHZ: Check edit permission (if exists)
+    if (existing) {
+      await requireEditUserSettingsAccess(ctx, existing, user);
+    }
+
+    // 4. PROCESS: Get defaults
     const defaults = getDefaultUserSettings();
     const now = Date.now();
 
     if (existing) {
-      // 3. Update to defaults
+      // 5. UPDATE: Reset to defaults
       await ctx.db.patch(existing._id, {
-        ...defaults,
-        publicId: existing.publicId,
-        userId: existing.userId,
-        displayName: existing.displayName,
+        theme: defaults.theme,
+        language: defaults.language,
+        timezone: defaults.timezone,
+        dateFormat: defaults.dateFormat,
+        layoutPreferences: defaults.layoutPreferences,
+        notificationPreferences: defaults.notificationPreferences,
+        dashboardPreferences: defaults.dashboardPreferences,
         version: existing.version + 1,
         updatedAt: now,
         updatedBy: user._id,
       });
 
-      // 4. Create audit log
+      // 6. AUDIT: Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
-        action: 'user.settings_reset',
-        entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-        entityId: existing._id,
-        description: 'Reset user settings to defaults',
-        metadata: {
-          operation: 'reset',
-        },
+        action: 'user_settings.reset',
+        entityType: 'system_user_settings',
+        entityId: existing.publicId,
+        entityTitle: existing.displayName,
+        description: `Reset user settings: ${existing.displayName}`,
         createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
       });
 
+      // 7. RETURN: Return entity ID
       return existing._id;
     } else {
-      // 3. Create new settings with defaults
-      const publicId = crypto.randomUUID();
+      // 5. CREATE: Create with defaults
+      const publicId = await generateUniquePublicId(ctx, 'userSettings');
       const displayName = generateUserSettingsDisplayName(user.name || user.email || 'User');
 
       const settingsId = await ctx.db.insert('userSettings', {
         publicId,
-        userId: user._id,
         displayName,
+        ownerId: user._id,
+        userId: user._id,
         ...defaults,
         version: 1,
         createdAt: now,
@@ -175,21 +208,21 @@ export const resetUserSettings = mutation({
         updatedBy: user._id,
       });
 
-      // 4. Create audit log
+      // 6. AUDIT: Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
-        action: 'user.settings_reset',
-        entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-        entityId: settingsId,
-        description: 'Created default user settings',
-        metadata: {
-          operation: 'create',
-        },
+        action: 'user_settings.created',
+        entityType: 'system_user_settings',
+        entityId: publicId,
+        entityTitle: displayName,
+        description: `Created default user settings: ${displayName}`,
         createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
       });
 
+      // 7. RETURN: Return entity ID
       return settingsId;
     }
   },
@@ -197,17 +230,14 @@ export const resetUserSettings = mutation({
 
 /**
  * Update a single user setting by key
- * Authentication: Required
- * Authorization: Users can only update their own settings
- * Audit Log: Created for update
  */
 export const updateUserSetting = mutation({
   args: {
     key: v.string(),
     value: v.any(),
   },
-  handler: async (ctx, { key, value }) => {
-    // 1. Authentication
+  handler: async (ctx, { key, value }): Promise<UserSettingsId> => {
+    // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
     // 2. Get existing settings
@@ -217,125 +247,129 @@ export const updateUserSetting = mutation({
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .unique();
 
-    const now = Date.now();
+    // 3. AUTHZ: Check edit permission (if exists)
+    if (existing) {
+      await requireEditUserSettingsAccess(ctx, existing, user);
+    }
 
-    // 3. Prepare update data
-    const updateData: any = {
-      updatedAt: now,
-      updatedBy: user._id,
-      [key]: value
-    };
+    // 4. PROCESS: Prepare data
+    const now = Date.now();
+    const trimmedKey = key.trim();
 
     if (existing) {
-      // 4. Update existing settings
-      updateData.version = existing.version + 1;
-      await ctx.db.patch(existing._id, updateData);
-
-      // 5. Create audit log
-      await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
-        userId: user._id,
-        userName: user.name || user.email || 'Unknown User',
-        action: 'user.setting_updated',
-        entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-        entityId: existing._id,
-        description: `Updated user setting: ${key}`,
-        metadata: {
-          key,
-          value,
-          operation: 'update',
-        },
-        createdAt: now,
+      // 5. UPDATE: Apply single field change
+      await ctx.db.patch(existing._id, {
+        [trimmedKey]: value,
+        version: existing.version + 1,
+        updatedAt: now,
+        updatedBy: user._id,
       });
 
+      // 6. AUDIT: Create audit log
+      await ctx.db.insert('auditLogs', {
+        userId: user._id,
+        userName: user.name || user.email || 'Unknown User',
+        action: 'user_settings.field_updated',
+        entityType: 'system_user_settings',
+        entityId: existing.publicId,
+        entityTitle: existing.displayName,
+        description: `Updated setting ${trimmedKey}: ${existing.displayName}`,
+        metadata: { key: trimmedKey, value },
+        createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
+      });
+
+      // 7. RETURN: Return entity ID
       return existing._id;
     } else {
-      // 4. Create new settings
+      // 5. CREATE: Create with defaults and override field
       const defaults = getDefaultUserSettings();
-      const publicId = crypto.randomUUID();
+      const publicId = await generateUniquePublicId(ctx, 'userSettings');
       const displayName = generateUserSettingsDisplayName(user.name || user.email || 'User');
 
       const settingsId = await ctx.db.insert('userSettings', {
         publicId,
-        userId: user._id,
         displayName,
+        ownerId: user._id,
+        userId: user._id,
         ...defaults,
-        ...updateData,
+        [trimmedKey]: value,
         version: 1,
         createdAt: now,
         createdBy: user._id,
+        updatedAt: now,
+        updatedBy: user._id,
       });
 
-      // 5. Create audit log
+      // 6. AUDIT: Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
-        action: 'user.setting_updated',
-        entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-        entityId: settingsId,
-        description: `Created and set user setting: ${key}`,
-        metadata: {
-          key,
-          value,
-          operation: 'create',
-        },
+        action: 'user_settings.created',
+        entityType: 'system_user_settings',
+        entityId: publicId,
+        entityTitle: displayName,
+        description: `Created and set ${trimmedKey}: ${displayName}`,
+        metadata: { key: trimmedKey, value },
         createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
       });
 
+      // 7. RETURN: Return entity ID
       return settingsId;
     }
   },
 });
 
 /**
- * Soft delete user settings
- * Authentication: Required
- * Authorization: Users can only delete their own settings
- * Audit Log: Created for deletion
+ * Delete user settings (soft delete)
  */
 export const deleteUserSettings = mutation({
   args: {},
-  handler: async (ctx) => {
-    // 1. Authentication
+  handler: async (ctx): Promise<UserSettingsId> => {
+    // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
-    // 2. Get existing settings
-    const existing = await ctx.db
+    // 2. CHECK: Verify entity exists
+    const settings = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .unique();
 
-    if (!existing) {
-      throw new Error('User settings not found');
+    if (!settings) {
+      throw new Error('Settings not found');
     }
 
-    const now = Date.now();
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteUserSettingsAccess(settings, user);
 
-    // 3. Soft delete (set deletedAt and deletedBy)
-    await ctx.db.patch(existing._id, {
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(settings._id, {
       deletedAt: now,
       deletedBy: user._id,
       updatedAt: now,
       updatedBy: user._id,
     });
 
-    // 4. Create audit log
+    // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'user.settings_deleted',
-      entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-      entityId: existing._id,
-      description: 'Deleted user settings',
-      metadata: {
-        operation: 'soft_delete',
-      },
+      action: 'user_settings.deleted',
+      entityType: 'system_user_settings',
+      entityId: settings.publicId,
+      entityTitle: settings.displayName,
+      description: `Deleted user settings: ${settings.displayName}`,
       createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
     });
 
-    return existing._id;
+    // 6. RETURN: Return entity ID
+    return settings._id;
   },
 });

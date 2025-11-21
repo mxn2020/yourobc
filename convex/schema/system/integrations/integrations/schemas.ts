@@ -12,7 +12,7 @@ import {
   integrationEventsTable,
 } from './integrations';
 
-export const integrationsSchemas = {
+export const systemIntegrationsSchemas = {
   apiKeys: apiKeysTable,
   apiRequestLogs: apiRequestLogsTable,
   webhooks: webhooksTable,

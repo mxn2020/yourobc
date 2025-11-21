@@ -1,8 +1,8 @@
 // convex/schema/system/user_settings/user_model_preferences/schemas.ts
-// Schema exports for user model preferences module
+// Schema exports for user_model_preferences module
 
 import { userModelPreferencesTable } from './user_model_preferences';
 
-export const userModelPreferencesSchemas = {
+export const systemUserSettingsUserModelPreferencesSchemas = {
   userModelPreferences: userModelPreferencesTable,
 };

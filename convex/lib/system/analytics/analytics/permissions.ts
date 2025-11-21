@@ -5,6 +5,10 @@ import { QueryCtx, MutationCtx } from '@/generated/server';
 import { Doc, Id } from '@/generated/dataModel';
 import { ANALYTICS_CONSTANTS } from './constants';
 
+// ============================================================================
+// Analytics Events Access
+// ============================================================================
+
 /**
  * Check if user can view analytics events
  */
@@ -20,6 +24,19 @@ export async function canViewAnalyticsEvents(
   // Regular users can view their own analytics events
   return true;
 }
+
+export async function requireViewAnalyticsEventsAccess(
+  ctx: QueryCtx | MutationCtx,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canViewAnalyticsEvents(ctx, user))) {
+    throw new Error('You do not have permission to view analytics events');
+  }
+}
+
+// ============================================================================
+// Analytics Metrics Access
+// ============================================================================
 
 /**
  * Check if user can view analytics metrics
@@ -37,6 +54,19 @@ export async function canViewAnalyticsMetrics(
   return true;
 }
 
+export async function requireViewAnalyticsMetricsAccess(
+  ctx: QueryCtx | MutationCtx,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canViewAnalyticsMetrics(ctx, user))) {
+    throw new Error('You do not have permission to view analytics metrics');
+  }
+}
+
+// ============================================================================
+// Dashboard Access
+// ============================================================================
+
 /**
  * Check if user can view a dashboard
  */
@@ -45,8 +75,8 @@ export async function canViewDashboard(
   user: Doc<'userProfiles'>,
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
-  // Owner can view
-  if (dashboard.ownerId === user._id) {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') {
     return true;
   }
 
@@ -55,23 +85,27 @@ export async function canViewDashboard(
     return true;
   }
 
-  // Admins and superadmins can view all
-  if (user.role === 'admin' || user.role === 'superadmin') {
+  // Owner can view
+  if (dashboard.ownerId === user._id) {
+    return true;
+  }
+
+  // Creator can view
+  if (dashboard.createdBy === user._id) {
     return true;
   }
 
   return false;
 }
 
-/**
- * Check if user can create dashboards
- */
-export async function canCreateDashboard(
+export async function requireViewDashboardAccess(
   ctx: QueryCtx | MutationCtx,
+  dashboard: Doc<'analyticsDashboards'>,
   user: Doc<'userProfiles'>
-): Promise<boolean> {
-  // All authenticated users can create dashboards
-  return true;
+): Promise<void> {
+  if (!(await canViewDashboard(ctx, user, dashboard))) {
+    throw new Error('You do not have permission to view this dashboard');
+  }
 }
 
 /**
@@ -82,17 +116,33 @@ export async function canEditDashboard(
   user: Doc<'userProfiles'>,
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return true;
+  }
+
   // Owner can edit
   if (dashboard.ownerId === user._id) {
     return true;
   }
 
-  // Admins and superadmins can edit all
-  if (user.role === 'admin' || user.role === 'superadmin') {
-    return true;
+  // Check if dashboard is archived
+  if (dashboard.status === 'archived') {
+    // Only admins can edit archived items
+    return false;
   }
 
   return false;
+}
+
+export async function requireEditDashboardAccess(
+  ctx: QueryCtx | MutationCtx,
+  dashboard: Doc<'analyticsDashboards'>,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canEditDashboard(ctx, user, dashboard))) {
+    throw new Error('You do not have permission to edit this dashboard');
+  }
 }
 
 /**
@@ -103,18 +153,28 @@ export async function canDeleteDashboard(
   user: Doc<'userProfiles'>,
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
-  // Owner can delete
-  if (dashboard.ownerId === user._id) {
-    return true;
-  }
-
-  // Admins and superadmins can delete all
+  // Only admins and owners can delete
   if (user.role === 'admin' || user.role === 'superadmin') {
     return true;
   }
-
+  if (dashboard.ownerId === user._id) {
+    return true;
+  }
   return false;
 }
+
+export async function requireDeleteDashboardAccess(
+  dashboard: Doc<'analyticsDashboards'>,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canDeleteDashboard({} as any, user, dashboard))) {
+    throw new Error('You do not have permission to delete this dashboard');
+  }
+}
+
+// ============================================================================
+// Report Access
+// ============================================================================
 
 /**
  * Check if user can view a report
@@ -124,8 +184,8 @@ export async function canViewReport(
   user: Doc<'userProfiles'>,
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
-  // Owner can view
-  if (report.ownerId === user._id) {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') {
     return true;
   }
 
@@ -134,23 +194,27 @@ export async function canViewReport(
     return true;
   }
 
-  // Admins and superadmins can view all
-  if (user.role === 'admin' || user.role === 'superadmin') {
+  // Owner can view
+  if (report.ownerId === user._id) {
+    return true;
+  }
+
+  // Creator can view
+  if (report.createdBy === user._id) {
     return true;
   }
 
   return false;
 }
 
-/**
- * Check if user can create reports
- */
-export async function canCreateReport(
+export async function requireViewReportAccess(
   ctx: QueryCtx | MutationCtx,
+  report: Doc<'analyticsReports'>,
   user: Doc<'userProfiles'>
-): Promise<boolean> {
-  // All authenticated users can create reports
-  return true;
+): Promise<void> {
+  if (!(await canViewReport(ctx, user, report))) {
+    throw new Error('You do not have permission to view this report');
+  }
 }
 
 /**
@@ -161,17 +225,33 @@ export async function canEditReport(
   user: Doc<'userProfiles'>,
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return true;
+  }
+
   // Owner can edit
   if (report.ownerId === user._id) {
     return true;
   }
 
-  // Admins and superadmins can edit all
-  if (user.role === 'admin' || user.role === 'superadmin') {
-    return true;
+  // Check if report is archived
+  if (report.status === 'archived') {
+    // Only admins can edit archived items
+    return false;
   }
 
   return false;
+}
+
+export async function requireEditReportAccess(
+  ctx: QueryCtx | MutationCtx,
+  report: Doc<'analyticsReports'>,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canEditReport(ctx, user, report))) {
+    throw new Error('You do not have permission to edit this report');
+  }
 }
 
 /**
@@ -182,18 +262,28 @@ export async function canDeleteReport(
   user: Doc<'userProfiles'>,
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
-  // Owner can delete
-  if (report.ownerId === user._id) {
-    return true;
-  }
-
-  // Admins and superadmins can delete all
+  // Only admins and owners can delete
   if (user.role === 'admin' || user.role === 'superadmin') {
     return true;
   }
-
+  if (report.ownerId === user._id) {
+    return true;
+  }
   return false;
 }
+
+export async function requireDeleteReportAccess(
+  report: Doc<'analyticsReports'>,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canDeleteReport({} as any, user, report))) {
+    throw new Error('You do not have permission to delete this report');
+  }
+}
+
+// ============================================================================
+// Provider Configuration Access
+// ============================================================================
 
 /**
  * Check if user can manage analytics providers
@@ -205,6 +295,19 @@ export async function canManageProviders(
   // Only admins and superadmins can manage providers
   return user.role === 'admin' || user.role === 'superadmin';
 }
+
+export async function requireManageProvidersAccess(
+  ctx: QueryCtx | MutationCtx,
+  user: Doc<'userProfiles'>
+): Promise<void> {
+  if (!(await canManageProviders(ctx, user))) {
+    throw new Error('You do not have permission to manage analytics providers');
+  }
+}
+
+// ============================================================================
+// Data Export Access
+// ============================================================================
 
 /**
  * Check if user can export analytics data

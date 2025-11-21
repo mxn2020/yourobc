@@ -1,13 +1,13 @@
 // convex/lib/system/user_settings/user_model_preferences/index.ts
-// Barrel exports for user model preferences module
+// Public API exports for user_model_preferences module
 
-// Export constants
+// Constants
 export { USER_MODEL_PREFERENCES_CONSTANTS } from './constants';
 
-// Export types
-export * from './types';
+// Types
+export type * from './types';
 
-// Export utilities
+// Utilities
 export {
   getDefaultModelPreferences,
   validateModelPreferences,
@@ -15,15 +15,18 @@ export {
   generateModelPreferencesDisplayName,
 } from './utils';
 
-// Export permissions
+// Permissions
 export {
-  canReadModelPreferences,
-  canUpdateModelPreferences,
+  canViewModelPreferences,
+  canEditModelPreferences,
   canDeleteModelPreferences,
-  getModelPreferencesAccessFilter,
+  requireViewModelPreferencesAccess,
+  requireEditModelPreferencesAccess,
+  requireDeleteModelPreferencesAccess,
+  filterModelPreferencesByAccess,
 } from './permissions';
 
-// Export queries
+// Queries
 export {
   getUserModelPreferences,
   getDefaultModel,
@@ -31,7 +34,7 @@ export {
   getModelPreferencesByPublicId,
 } from './queries';
 
-// Export mutations
+// Mutations
 export {
   updateUserModelPreferences,
   setDefaultModel,

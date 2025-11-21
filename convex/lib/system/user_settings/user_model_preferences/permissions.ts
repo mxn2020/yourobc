@@ -1,68 +1,119 @@
 // convex/lib/system/user_settings/user_model_preferences/permissions.ts
-// Access control and permissions for user model preferences module
+// Access control and authorization logic for user_model_preferences module
 
-import { Id } from '@/generated/dataModel';
+import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { UserModelPreferences } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if a user can read model preferences
- *
- * Users can only read their own preferences
- *
- * @param preferences - The preferences document
- * @param currentUserId - The current user's ID
- * @returns true if the user can read the preferences
- */
-export function canReadModelPreferences(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// View Access
+// ============================================================================
+
+export async function canViewModelPreferences(
+  ctx: QueryCtx | MutationCtx,
   preferences: UserModelPreferences,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only read their own preferences
-  return preferences.userId === currentUserId;
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (preferences.ownerId === user._id) return true;
+
+  // User can view their own preferences (using userId for backward compatibility)
+  if (preferences.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if a user can update model preferences
- *
- * Users can only update their own preferences
- *
- * @param preferences - The preferences document
- * @param currentUserId - The current user's ID
- * @returns true if the user can update the preferences
- */
-export function canUpdateModelPreferences(
+export async function requireViewModelPreferencesAccess(
+  ctx: QueryCtx | MutationCtx,
   preferences: UserModelPreferences,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only update their own preferences
-  return preferences.userId === currentUserId;
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewModelPreferences(ctx, preferences, user))) {
+    throw new Error('You do not have permission to view these preferences');
+  }
 }
 
-/**
- * Check if a user can delete model preferences
- *
- * Users can only delete their own preferences (soft delete)
- *
- * @param preferences - The preferences document
- * @param currentUserId - The current user's ID
- * @returns true if the user can delete the preferences
- */
-export function canDeleteModelPreferences(
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+export async function canEditModelPreferences(
+  ctx: QueryCtx | MutationCtx,
   preferences: UserModelPreferences,
-  currentUserId: Id<'userProfiles'>
-): boolean {
-  // Users can only delete their own preferences
-  return preferences.userId === currentUserId;
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (preferences.ownerId === user._id) return true;
+
+  // User can edit their own preferences (using userId for backward compatibility)
+  if (preferences.userId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Filter model preferences query by user access
- *
- * Returns preferences only for the current user
- *
- * @param currentUserId - The current user's ID
- * @returns Filter predicate for preferences query
- */
-export function getModelPreferencesAccessFilter(currentUserId: Id<'userProfiles'>) {
-  return (preferences: UserModelPreferences) => preferences.userId === currentUserId;
+export async function requireEditModelPreferencesAccess(
+  ctx: QueryCtx | MutationCtx,
+  preferences: UserModelPreferences,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditModelPreferences(ctx, preferences, user))) {
+    throw new Error('You do not have permission to edit these preferences');
+  }
+}
+
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteModelPreferences(
+  preferences: UserModelPreferences,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (preferences.ownerId === user._id) return true;
+  if (preferences.userId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteModelPreferencesAccess(
+  preferences: UserModelPreferences,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteModelPreferences(preferences, user))) {
+    throw new Error('You do not have permission to delete these preferences');
+  }
+}
+
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterModelPreferencesByAccess(
+  ctx: QueryCtx | MutationCtx,
+  preferencesList: UserModelPreferences[],
+  user: UserProfile
+): Promise<UserModelPreferences[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return preferencesList;
+  }
+
+  const accessible: UserModelPreferences[] = [];
+
+  for (const preferences of preferencesList) {
+    if (await canViewModelPreferences(ctx, preferences, user)) {
+      accessible.push(preferences);
+    }
+  }
+
+  return accessible;
 }

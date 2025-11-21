@@ -2,27 +2,35 @@
 // Grouped validators for auditLogs module
 
 import { v } from 'convex/values';
-import { metadataSchema } from '../../../base';
-import { entityTypes } from '@/lib/system/audit_logs/entityTypes';
 
 export const auditLogsValidators = {
-  // Action types - common audit actions
-  action: v.string(),
-
-  // Entity type validator
-  entityType: entityTypes.all,
-
-  // Optional entity identification
-  entityId: v.optional(v.string()),
-  entityTitle: v.optional(v.string()),
-
-  // User information
-  userId: v.id('userProfiles'),
+  // User who performed the action
+  userId: v.optional(v.id('userProfiles')),
   userName: v.string(),
 
-  // Description of the action
-  description: v.string(),
+  // Action performed
+  action: v.string(),
+
+  // Entity being audited
+  entityType: v.string(),
+  entityId: v.string(),
+
+  // Entity title (snapshot at time of action)
+  entityTitle: v.optional(v.string()),
+
+  // Action description
+  description: v.optional(v.string()),
 
   // Standard metadata
-  metadata: metadataSchema,
+  metadata: v.optional(v.union(
+    v.object({
+      source: v.optional(v.string()),
+      operation: v.optional(v.string()),
+      oldValues: v.optional(v.record(v.string(), v.any())),
+      newValues: v.optional(v.record(v.string(), v.any())),
+      ipAddress: v.optional(v.string()),
+      userAgent: v.optional(v.string()),
+    }),
+    v.record(v.string(), v.any())
+  )),
 } as const;

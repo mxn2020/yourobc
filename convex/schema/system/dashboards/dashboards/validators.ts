@@ -4,6 +4,27 @@
 import { v } from 'convex/values';
 
 export const dashboardsValidators = {
+  // Standard validators (required by guide)
+  status: v.union(
+    v.literal('active'),
+    v.literal('archived'),
+    v.literal('draft')
+  ),
+
+  priority: v.union(
+    v.literal('low'),
+    v.literal('medium'),
+    v.literal('high'),
+    v.literal('urgent')
+  ),
+
+  visibility: v.union(
+    v.literal('private'),
+    v.literal('team'),
+    v.literal('public')
+  ),
+
+  // Dashboard-specific validators
   layout: v.union(v.literal('grid'), v.literal('freeform')),
 
   widgetType: v.union(

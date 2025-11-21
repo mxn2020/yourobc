@@ -43,7 +43,7 @@ export {
 
 // Mutations
 export {
-  saveEmailTemplate,
+  createEmailTemplate,
   updateEmailTemplate,
   deleteEmailTemplate,
   restoreEmailTemplate,

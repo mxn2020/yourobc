@@ -8,7 +8,12 @@ import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { dashboardsValidators } from '@/schema/system/dashboards/dashboards/validators';
 import { DASHBOARDS_CONSTANTS } from './constants';
 import { validateDashboardData } from './utils';
-import { requireEditDashboardAccess, requireDeleteDashboardAccess } from './permissions';
+import {
+  canEditDashboard,
+  canDeleteDashboard,
+  requireEditDashboardAccess,
+  requireDeleteDashboardAccess,
+} from './permissions';
 import type { DashboardId } from './types';
 
 /**
@@ -19,6 +24,9 @@ export const createDashboard = mutation({
     data: v.object({
       name: v.string(),
       description: v.optional(v.string()),
+      status: v.optional(dashboardsValidators.status),
+      priority: v.optional(dashboardsValidators.priority),
+      visibility: v.optional(dashboardsValidators.visibility),
       layout: v.optional(dashboardsValidators.layout),
       widgets: v.optional(v.array(dashboardsValidators.widget)),
       isDefault: v.optional(v.boolean()),
@@ -50,6 +58,9 @@ export const createDashboard = mutation({
       publicId,
       name: data.name.trim(),
       description: data.description?.trim(),
+      status: data.status || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.STATUS,
+      priority: data.priority,
+      visibility: data.visibility || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.VISIBILITY,
       layout: data.layout || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.LAYOUT,
       widgets: data.widgets || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.WIDGETS,
       isDefault: data.isDefault || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.IS_DEFAULT,
@@ -72,7 +83,9 @@ export const createDashboard = mutation({
       entityTitle: data.name.trim(),
       description: `Created dashboard: ${data.name.trim()}`,
       metadata: {
+        status: data.status || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.STATUS,
         layout: data.layout || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.LAYOUT,
+        visibility: data.visibility || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.VISIBILITY,
         isPublic: data.isPublic || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.IS_PUBLIC,
       },
       createdAt: now,
@@ -94,6 +107,9 @@ export const updateDashboard = mutation({
     updates: v.object({
       name: v.optional(v.string()),
       description: v.optional(v.string()),
+      status: v.optional(dashboardsValidators.status),
+      priority: v.optional(dashboardsValidators.priority),
+      visibility: v.optional(dashboardsValidators.visibility),
       layout: v.optional(dashboardsValidators.layout),
       widgets: v.optional(v.array(dashboardsValidators.widget)),
       isDefault: v.optional(v.boolean()),
@@ -132,6 +148,15 @@ export const updateDashboard = mutation({
     }
     if (updates.description !== undefined) {
       updateData.description = updates.description?.trim();
+    }
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+    }
+    if (updates.priority !== undefined) {
+      updateData.priority = updates.priority;
+    }
+    if (updates.visibility !== undefined) {
+      updateData.visibility = updates.visibility;
     }
     if (updates.layout !== undefined) {
       updateData.layout = updates.layout;
@@ -274,5 +299,227 @@ export const restoreDashboard = mutation({
 
     // 6. RETURN: Return entity ID
     return dashboardId;
+  },
+});
+
+/**
+ * Archive dashboard (status-based soft delete alternative)
+ */
+export const archiveDashboard = mutation({
+  args: {
+    dashboardId: v.id('dashboards'),
+  },
+  handler: async (ctx, { dashboardId }): Promise<DashboardId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const dashboard = await ctx.db.get(dashboardId);
+    if (!dashboard || dashboard.deletedAt) {
+      throw new Error('Dashboard not found');
+    }
+
+    // 3. AUTHZ: Check edit permission
+    await requireEditDashboardAccess(ctx, dashboard, user);
+
+    // 4. ARCHIVE: Update status
+    const now = Date.now();
+    await ctx.db.patch(dashboardId, {
+      status: 'archived',
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'dashboard.archived',
+      entityType: 'system_dashboard',
+      entityId: dashboard.publicId,
+      entityTitle: dashboard.name,
+      description: `Archived dashboard: ${dashboard.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return dashboardId;
+  },
+});
+
+/**
+ * Bulk update multiple dashboards
+ */
+export const bulkUpdateDashboards = mutation({
+  args: {
+    dashboardIds: v.array(v.id('dashboards')),
+    updates: v.object({
+      status: v.optional(dashboardsValidators.status),
+      priority: v.optional(dashboardsValidators.priority),
+      visibility: v.optional(dashboardsValidators.visibility),
+      layout: v.optional(dashboardsValidators.layout),
+      tags: v.optional(v.array(v.string())),
+    }),
+  },
+  handler: async (ctx, { dashboardIds, updates }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. AUTHZ: Check bulk edit permission
+    await requirePermission(ctx, DASHBOARDS_CONSTANTS.PERMISSIONS.BULK_EDIT, {
+      allowAdmin: true,
+    });
+
+    // 3. VALIDATE: Check update data
+    const errors = validateDashboardData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    const now = Date.now();
+    const results = [];
+    const failed = [];
+
+    // 4. PROCESS: Update each entity
+    for (const dashboardId of dashboardIds) {
+      try {
+        const dashboard = await ctx.db.get(dashboardId);
+        if (!dashboard || dashboard.deletedAt) {
+          failed.push({ id: dashboardId, reason: 'Not found' });
+          continue;
+        }
+
+        // Check individual edit access
+        const canEdit = await canEditDashboard(ctx, dashboard, user);
+        if (!canEdit) {
+          failed.push({ id: dashboardId, reason: 'No permission' });
+          continue;
+        }
+
+        // Apply updates
+        const updateData: any = {
+          updatedAt: now,
+          updatedBy: user._id,
+        };
+
+        if (updates.status !== undefined) updateData.status = updates.status;
+        if (updates.priority !== undefined) updateData.priority = updates.priority;
+        if (updates.visibility !== undefined) updateData.visibility = updates.visibility;
+        if (updates.layout !== undefined) updateData.layout = updates.layout;
+        if (updates.tags !== undefined) {
+          updateData.tags = updates.tags.map((tag) => tag.trim());
+        }
+
+        await ctx.db.patch(dashboardId, updateData);
+        results.push({ id: dashboardId, success: true });
+      } catch (error) {
+        failed.push({ id: dashboardId, reason: (error as Error).message });
+      }
+    }
+
+    // 5. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'dashboard.bulk_updated',
+      entityType: 'system_dashboard',
+      entityId: 'bulk',
+      entityTitle: `${results.length} dashboards`,
+      description: `Bulk updated ${results.length} dashboards`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+        updates,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return results summary
+    return {
+      updated: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});
+
+/**
+ * Bulk delete multiple dashboards (soft delete)
+ */
+export const bulkDeleteDashboards = mutation({
+  args: {
+    dashboardIds: v.array(v.id('dashboards')),
+  },
+  handler: async (ctx, { dashboardIds }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. AUTHZ: Check delete permission
+    await requirePermission(ctx, DASHBOARDS_CONSTANTS.PERMISSIONS.DELETE, {
+      allowAdmin: true,
+    });
+
+    const now = Date.now();
+    const results = [];
+    const failed = [];
+
+    // 3. PROCESS: Delete each entity
+    for (const dashboardId of dashboardIds) {
+      try {
+        const dashboard = await ctx.db.get(dashboardId);
+        if (!dashboard || dashboard.deletedAt) {
+          failed.push({ id: dashboardId, reason: 'Not found' });
+          continue;
+        }
+
+        // Check individual delete access
+        const canDelete = await canDeleteDashboard(dashboard, user);
+        if (!canDelete) {
+          failed.push({ id: dashboardId, reason: 'No permission' });
+          continue;
+        }
+
+        // Soft delete
+        await ctx.db.patch(dashboardId, {
+          deletedAt: now,
+          deletedBy: user._id,
+          updatedAt: now,
+          updatedBy: user._id,
+        });
+
+        results.push({ id: dashboardId, success: true });
+      } catch (error) {
+        failed.push({ id: dashboardId, reason: (error as Error).message });
+      }
+    }
+
+    // 4. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'dashboard.bulk_deleted',
+      entityType: 'system_dashboard',
+      entityId: 'bulk',
+      entityTitle: `${results.length} dashboards`,
+      description: `Bulk deleted ${results.length} dashboards`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 5. RETURN: Return results summary
+    return {
+      deleted: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
   },
 });

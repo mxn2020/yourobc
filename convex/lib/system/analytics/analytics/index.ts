@@ -1,20 +1,120 @@
 // convex/lib/system/analytics/analytics/index.ts
-// Barrel exports for analytics module
+// Public API exports for analytics module
 
-// Export all types
-export * from './types';
+// Constants
+export { ANALYTICS_CONSTANTS, METRIC_IMPORTANCE_WEIGHTS } from './constants';
 
-// Export all constants
-export * from './constants';
+// Types
+export type * from './types';
 
-// Export all utility functions
-export * from './utils';
+// Utilities
+export {
+  // Validation functions
+  validateDashboardData,
+  validateReportData,
+  validateEventData,
+  validateMetricData,
+  validateProviderConfigData,
 
-// Export all permission functions
-export * from './permissions';
+  // Display & Formatting functions
+  formatDashboardDisplayName,
+  formatReportDisplayName,
+  formatEventDisplayName,
+  isDashboardEditable,
+  isReportEditable,
 
-// Export queries
-export * as analyticsQueries from './queries';
+  // Utility helpers
+  generateSessionId,
+  generateAnonymousId,
+  hashIpAddress,
+  parseUserAgent,
+  getPeriodBoundaries,
+  getDateRangeFromPreset,
+  calculatePercentageChange,
+  formatMetricValue,
+  isValidDateRange,
+  isSessionExpired,
+  sanitizeEventProperties,
+  generateMetricCacheKey,
+  getNextAggregationTime,
+  batchEvents,
+  calculateRetentionRate,
+  calculateChurnRate,
+  extractDimensionValue,
+  validateDashboardName,
+  validateReportName,
+  generateAnalyticsPublicId,
+} from './utils';
 
-// Export mutations
-export * as analyticsMutations from './mutations';
+// Permissions
+export {
+  // Events
+  canViewAnalyticsEvents,
+  requireViewAnalyticsEventsAccess,
+
+  // Metrics
+  canViewAnalyticsMetrics,
+  requireViewAnalyticsMetricsAccess,
+
+  // Dashboards
+  canViewDashboard,
+  canEditDashboard,
+  canDeleteDashboard,
+  requireViewDashboardAccess,
+  requireEditDashboardAccess,
+  requireDeleteDashboardAccess,
+
+  // Reports
+  canViewReport,
+  canEditReport,
+  canDeleteReport,
+  requireViewReportAccess,
+  requireEditReportAccess,
+  requireDeleteReportAccess,
+
+  // Providers
+  canManageProviders,
+  requireManageProvidersAccess,
+
+  // Data export
+  canExportAnalyticsData,
+  canTrackAnonymousEvents,
+  canAccessMetricType,
+
+  // Bulk filtering
+  filterDashboardsByAccess,
+  filterReportsByAccess,
+  filterEventsByAccess,
+} from './permissions';
+
+// Queries
+export {
+  getMetric,
+  getAnalyticsSummary,
+  getPageViews,
+  getActiveSessions,
+  getUniqueUsers,
+  getDashboards,
+  getDashboard,
+  getReports,
+  getReport,
+  getEventsBySession,
+  getUserEvents,
+  getDashboardBySlug,
+} from './queries';
+
+// Mutations
+export {
+  trackEvent,
+  trackPageView,
+  upsertMetric,
+  createDashboard,
+  updateDashboard,
+  deleteDashboard,
+  createReport,
+  updateReport,
+  deleteReport,
+  upsertProviderConfig,
+  updateProviderSyncStatus,
+  markEventsSynced,
+} from './mutations';

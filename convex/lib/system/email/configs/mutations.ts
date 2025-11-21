@@ -16,28 +16,30 @@ import type { EmailConfigId } from './types';
 import { createAuditLog } from '../../audit_logs/helpers';
 
 /**
- * Create or update email provider configuration
+ * Create new email provider configuration
  * 🔒 Authentication: Required
  * 🔒 Authorization: Admin only
  */
-export const saveEmailConfig = mutation({
+export const createEmailConfig = mutation({
   args: {
-    name: v.optional(v.string()),
-    provider: emailConfigsValidators.provider,
-    config: v.object({
-      apiKey: v.optional(v.string()),
-      apiSecret: v.optional(v.string()),
-      domain: v.optional(v.string()),
-      region: v.optional(v.string()),
-      fromEmail: v.string(),
-      fromName: v.string(),
-      replyToEmail: v.optional(v.string()),
-      additionalSettings: v.optional(v.any()),
+    data: v.object({
+      name: v.string(),
+      provider: emailConfigsValidators.provider,
+      config: v.object({
+        apiKey: v.optional(v.string()),
+        apiSecret: v.optional(v.string()),
+        domain: v.optional(v.string()),
+        region: v.optional(v.string()),
+        fromEmail: v.string(),
+        fromName: v.string(),
+        replyToEmail: v.optional(v.string()),
+        additionalSettings: v.optional(v.any()),
+      }),
+      setAsActive: v.optional(v.boolean()),
+      status: v.optional(emailConfigsValidators.status),
     }),
-    setAsActive: v.optional(v.boolean()),
-    metadata: v.optional(v.any()),
   },
-  handler: async (ctx, args): Promise<EmailConfigId> => {
+  handler: async (ctx, { data }): Promise<EmailConfigId> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -45,32 +47,32 @@ export const saveEmailConfig = mutation({
     requireCreateEmailConfigAccess(user);
 
     // 3. VALIDATE: Check data validity
-    const configName = args.name?.trim() || `${args.provider} Configuration`;
-    const data = { name: configName, provider: args.provider, config: args.config };
     const errors = validateEmailConfigData(data);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Trim string fields in config
-    const trimmedConfig = {
-      ...args.config,
-      apiKey: args.config.apiKey?.trim(),
-      apiSecret: args.config.apiSecret?.trim(),
-      domain: args.config.domain?.trim(),
-      region: args.config.region?.trim(),
-      fromEmail: args.config.fromEmail.trim(),
-      fromName: args.config.fromName.trim(),
-      replyToEmail: args.config.replyToEmail?.trim(),
-    };
-
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'emailConfigs');
     const now = Date.now();
 
-    // 5. PROCESS: If setting as active, deactivate all other configs
-    if (args.setAsActive) {
+    // Trim string fields
+    const trimmedConfig = {
+      ...data.config,
+      apiKey: data.config.apiKey?.trim(),
+      apiSecret: data.config.apiSecret?.trim(),
+      domain: data.config.domain?.trim(),
+      region: data.config.region?.trim(),
+      fromEmail: data.config.fromEmail.trim(),
+      fromName: data.config.fromName.trim(),
+      replyToEmail: data.config.replyToEmail?.trim(),
+    };
+
+    // If setting as active, deactivate all other configs
+    if (data.setAsActive) {
       const existingConfigs = await ctx.db
         .query('emailConfigs')
-        .filter((q) => q.eq(q.field('isActive'), true))
+        .withIndex('by_active', (q) => q.eq('isActive', true))
         .collect();
 
       for (const config of existingConfigs) {
@@ -82,88 +84,43 @@ export const saveEmailConfig = mutation({
       }
     }
 
-    // 6. CHECK: If a config for this provider already exists
-    const existingConfig = await ctx.db
-      .query('emailConfigs')
-      .withIndex('by_provider', (q) => q.eq('provider', args.provider))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first();
+    // 5. CREATE: Insert into database
+    const configId = await ctx.db.insert('emailConfigs', {
+      publicId,
+      name: data.name.trim(),
+      provider: data.provider,
+      isActive: data.setAsActive ?? false,
+      config: trimmedConfig,
+      isVerified: false,
+      status: data.status || 'active',
+      settings: {
+        enableLogging: true,
+        maxRetries: 3,
+      },
+      metadata: {},
+      ownerId: user._id,
+      createdBy: user._id,
+      createdAt: now,
+      updatedAt: now,
+      lastActivityAt: now,
+      updatedBy: user._id,
+    });
 
-    if (existingConfig) {
-      // 7a. UPDATE: Existing config
-      await ctx.db.patch(existingConfig._id, {
-        name: configName,
-        config: trimmedConfig,
-        isActive: args.setAsActive ?? existingConfig.isActive,
-        metadata: args.metadata ?? existingConfig.metadata,
-        updatedAt: now,
-        lastActivityAt: now,
-        updatedBy: user._id,
-      });
+    // 6. AUDIT: Create audit log
+    await createAuditLog(ctx, {
+      action: 'email_config.created',
+      entityType: 'system_email_config',
+      entityId: publicId,
+      entityTitle: data.name.trim(),
+      description: `Created email configuration: ${data.name.trim()}`,
+      metadata: {
+        provider: data.provider,
+        fromEmail: trimmedConfig.fromEmail,
+      },
+    });
 
-      // 8a. AUDIT: Create audit log
-      await createAuditLog(ctx, {
-        action: 'email_config.updated',
-        entityType: 'system_email_config',
-        entityId: existingConfig._id,
-        entityTitle: configName,
-        description: `Updated email configuration for ${args.provider}`,
-        metadata: {
-          operation: 'update_email_config',
-          newValues: {
-            provider: args.provider,
-            fromEmail: trimmedConfig.fromEmail,
-          },
-        },
-      });
-
-      // 9a. RETURN: Config ID
-      return existingConfig._id;
-    } else {
-      // 7b. CREATE: Generate IDs and prepare data
-      const publicId = await generateUniquePublicId(ctx, 'emailConfigs');
-
-      // 8b. CREATE: Insert new config
-      const configId = await ctx.db.insert('emailConfigs', {
-        publicId,
-        name: configName,
-        provider: args.provider,
-        isActive: args.setAsActive ?? false,
-        config: trimmedConfig,
-        isVerified: false,
-        status: 'active',
-        settings: {
-          enableLogging: true,
-          maxRetries: 3,
-        },
-        metadata: args.metadata ?? {},
-        ownerId: user._id,
-        createdBy: user._id,
-        createdAt: now,
-        updatedAt: now,
-        lastActivityAt: now,
-        updatedBy: user._id,
-      });
-
-      // 9b. AUDIT: Create audit log
-      await createAuditLog(ctx, {
-        action: 'email_config.created',
-        entityType: 'system_email_config',
-        entityId: configId,
-        entityTitle: configName,
-        description: `Created email configuration for ${args.provider}`,
-        metadata: {
-          operation: 'create_email_config',
-          newValues: {
-            provider: args.provider,
-            fromEmail: trimmedConfig.fromEmail,
-          },
-        },
-      });
-
-      // 10b. RETURN: Config ID
-      return configId;
-    }
+    // 7. RETURN: Return entity ID
+    return configId;
   },
 });
 

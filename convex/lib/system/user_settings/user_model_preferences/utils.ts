@@ -1,5 +1,5 @@
 // convex/lib/system/user_settings/user_model_preferences/utils.ts
-// Utility functions for user model preferences module
+// Validation functions and utility helpers for user_model_preferences module
 
 import { Id } from '@/generated/dataModel';
 import { USER_MODEL_PREFERENCES_CONSTANTS } from './constants';

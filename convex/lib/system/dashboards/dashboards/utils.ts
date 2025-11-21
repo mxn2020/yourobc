@@ -192,7 +192,7 @@ export function validateDashboardData(
  */
 export function isDashboardEditable(dashboard: {
   deletedAt?: number;
-  isDefault: boolean;
+  isDefault?: boolean;
 }): boolean {
   if (dashboard.deletedAt) return false;
   return true;
@@ -203,11 +203,36 @@ export function isDashboardEditable(dashboard: {
  */
 export function formatDashboardDisplayName(dashboard: {
   name: string;
+  status?: string;
   isDefault?: boolean;
   isPublic?: boolean;
 }): string {
   let displayName = dashboard.name;
+  if (dashboard.status) displayName += ` [${dashboard.status}]`;
   if (dashboard.isDefault) displayName += ' [Default]';
   if (dashboard.isPublic) displayName += ' [Public]';
   return displayName;
+}
+
+/**
+ * Generate slug from name
+ */
+export function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Check if dashboard is editable based on status
+ */
+export function isDashboardEditableByStatus(dashboard: {
+  status: string;
+  deletedAt?: number;
+}): boolean {
+  if (dashboard.deletedAt) return false;
+  return dashboard.status !== 'archived';
 }

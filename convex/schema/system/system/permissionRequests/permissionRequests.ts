@@ -2,16 +2,18 @@
 // Table definitions for permissionRequests module
 
 import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
 import { permissionRequestsValidators } from './validators';
 
-/**
- * Permission Requests Table
- *
- * Tracks requests from users to gain specific permissions.
- * Admins can approve or deny these requests through the admin panel.
- */
 export const permissionRequestsTable = defineTable({
+  // Required: Main display field (permission is the key identifier)
+  name: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // User information
   userId: permissionRequestsValidators.userId,
   userName: permissionRequestsValidators.userName,
@@ -37,6 +39,9 @@ export const permissionRequestsTable = defineTable({
   ...softDeleteFields,
 })
   // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
+  .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

@@ -60,6 +60,7 @@ export const apiKeysTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
@@ -68,6 +69,7 @@ export const apiKeysTable = defineTable({
   .index('by_user', ['userId'])
   .index('by_active', ['isActive'])
   .index('by_expiration', ['expiresAt'])
+  .index('by_status', ['status'])
   .index('by_created_at', ['createdAt']);
 
 /**
@@ -187,12 +189,14 @@ export const webhooksTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_user', ['userId'])
   .index('by_active', ['isActive'])
+  .index('by_status', ['status'])
   .index('by_events', ['events'])
   .index('by_created_at', ['createdAt']);
 
@@ -313,6 +317,7 @@ export const oauthAppsTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
@@ -320,6 +325,7 @@ export const oauthAppsTable = defineTable({
   .index('by_client_id', ['clientId'])
   .index('by_user', ['userId'])
   .index('by_active', ['isActive'])
+  .index('by_status', ['status'])
   .index('by_created_at', ['createdAt']);
 
 /**
@@ -422,6 +428,7 @@ export const externalIntegrationsTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
@@ -429,6 +436,7 @@ export const externalIntegrationsTable = defineTable({
   .index('by_user', ['userId'])
   .index('by_provider', ['provider'])
   .index('by_type', ['type'])
+  .index('by_status', ['status'])
   .index('by_connected', ['isConnected'])
   .index('by_created_at', ['createdAt']);
 

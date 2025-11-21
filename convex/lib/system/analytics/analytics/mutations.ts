@@ -14,7 +14,7 @@ import {
 } from './utils';
 import { ANALYTICS_CONSTANTS } from './constants';
 import { Id } from '@/generated/dataModel';
-import { requireCurrentUser, requireOwnershipOrAdmin, requireAdmin } from '@/shared/auth.helper';
+import { requireCurrentUser, requireOwnershipOrAdmin, requireAdmin, generateUniquePublicId } from '@/lib/auth.helper';
 import type { EventProperties, DimensionBreakdown } from './types';
 
 /**

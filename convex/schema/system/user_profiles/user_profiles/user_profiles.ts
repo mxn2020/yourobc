@@ -1,5 +1,5 @@
 // convex/schema/system/user_profiles/user_profiles/user_profiles.ts
-// User profiles table definition - manages system user profiles with Better Auth integration
+// Table definitions for user_profiles module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
@@ -13,14 +13,16 @@ import { userProfilesValidators } from './validators';
  * application-specific fields for gamification, permissions, and activity tracking.
  *
  * Note: This table uses authUserId as the primary user identifier (from Better Auth),
- * but the _id field serves as ownerId for owned entities.
+ * but the _id field serves as ownerId for entities owned by this user.
+ * This table does not have an ownerId field since it IS the user entity.
  */
 export const userProfilesTable = defineTable({
-  // Required fields per GUIDE pattern
-  publicId: v.string(),
+  // Required: Main display field
   name: v.optional(v.string()), // Optional as users may not have set a name yet
-  // Note: authUserId serves as the primary identifier instead of a separate ownerId
-  // The _id field acts as ownerId for entities owned by this user
+
+  // Required: Core fields
+  publicId: v.string(),
+  // Note: No ownerId - this IS the user entity. The _id field acts as ownerId for owned entities.
 
   // Better Auth Integration
   authUserId: v.string(), // Links to Better Auth user.id (external ID stored as string)
@@ -60,14 +62,15 @@ export const userProfilesTable = defineTable({
   // Standard metadata
   metadata: userProfilesValidators.metadata,
 
-  // Audit fields (required per GUIDE pattern)
+  // Required: Audit fields
   ...auditFields,
   ...softDeleteFields,
 })
-  // Required indexes per GUIDE pattern
+  // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_name', ['name']) // Added for name-based lookups
+  .index('by_name', ['name'])
   .index('by_deleted_at', ['deletedAt'])
+  // Note: No by_owner index - this IS the user entity
 
   // Module-specific indexes
   .index('by_auth_user_id', ['authUserId'])

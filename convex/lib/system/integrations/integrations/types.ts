@@ -1,11 +1,88 @@
 // convex/lib/system/integrations/integrations/types.ts
-// Type definitions for integrations module
+// TypeScript type definitions for integrations module
 
-import { Id } from '@/generated/dataModel';
+import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  IntegrationType,
+  IntegrationStatus,
+  SyncStatus,
+  EventDirection,
+  EventStatus,
+  WebhookDeliveryStatus,
+  WebhookMethod,
+  OAuthGrantType,
+  RateLimit,
+  WebhookRetryConfig,
+  WebhookFilters,
+  ApiError,
+  WebhookError,
+  IntegrationConfig,
+} from '@/schema/system/integrations/integrations/types';
+
+// ============================================================================
+// Entity Types
+// ============================================================================
+
+export type ApiKey = Doc<'apiKeys'>;
+export type ApiKeyId = Id<'apiKeys'>;
+
+export type Webhook = Doc<'webhooks'>;
+export type WebhookId = Id<'webhooks'>;
+
+export type WebhookDelivery = Doc<'webhookDeliveries'>;
+export type WebhookDeliveryId = Id<'webhookDeliveries'>;
+
+export type OAuthApp = Doc<'oauthApps'>;
+export type OAuthAppId = Id<'oauthApps'>;
+
+export type OAuthToken = Doc<'oauthTokens'>;
+export type OAuthTokenId = Id<'oauthTokens'>;
+
+export type ExternalIntegration = Doc<'externalIntegrations'>;
+export type ExternalIntegrationId = Id<'externalIntegrations'>;
+
+export type IntegrationEvent = Doc<'integrationEvents'>;
+export type IntegrationEventId = Id<'integrationEvents'>;
+
+export type ApiRequestLog = Doc<'apiRequestLogs'>;
+export type ApiRequestLogId = Id<'apiRequestLogs'>;
+
+// Re-export schema types
+export type { IntegrationType, IntegrationStatus, SyncStatus, EventDirection, EventStatus, WebhookDeliveryStatus, WebhookMethod, OAuthGrantType };
+
+// ============================================================================
+// Data Interfaces (for mutations)
+// ============================================================================
 
 /**
- * API Key Types
+ * API Key Create/Update Types
  */
+export interface CreateApiKeyData {
+  name: string;
+  description?: string;
+  scopes: string[];
+  rateLimit: {
+    requestsPerMinute: number;
+    requestsPerHour: number;
+    requestsPerDay: number;
+  };
+  allowedIps?: string[];
+  expiresAt?: number;
+}
+
+export interface UpdateApiKeyData {
+  name?: string;
+  description?: string;
+  scopes?: string[];
+  rateLimit?: {
+    requestsPerMinute: number;
+    requestsPerHour: number;
+    requestsPerDay: number;
+  };
+  allowedIps?: string[];
+  isActive?: boolean;
+}
+
 export interface ApiKeyData {
   name: string;
   description?: string;
@@ -29,8 +106,50 @@ export interface ApiKeyValidation {
 }
 
 /**
- * Webhook Types
+ * Webhook Create/Update Types
  */
+export interface CreateWebhookData {
+  name: string;
+  description?: string;
+  url: string;
+  secret?: string;
+  events: string[];
+  method?: 'POST' | 'PUT';
+  headers?: Record<string, string>;
+  timeout?: number;
+  retryConfig?: {
+    enabled: boolean;
+    maxAttempts: number;
+    backoffMultiplier: number;
+    initialDelay: number;
+  };
+  filters?: {
+    conditions?: string;
+    sampleRate?: number;
+  };
+}
+
+export interface UpdateWebhookData {
+  name?: string;
+  description?: string;
+  url?: string;
+  events?: string[];
+  method?: 'POST' | 'PUT';
+  headers?: Record<string, string>;
+  timeout?: number;
+  retryConfig?: {
+    enabled: boolean;
+    maxAttempts: number;
+    backoffMultiplier: number;
+    initialDelay: number;
+  };
+  filters?: {
+    conditions?: string;
+    sampleRate?: number;
+  };
+  isActive?: boolean;
+}
+
 export interface WebhookData {
   name: string;
   description?: string;
@@ -70,8 +189,40 @@ export interface WebhookDeliveryAttempt {
 }
 
 /**
- * OAuth Types
+ * OAuth App Create/Update Types
  */
+export interface CreateOAuthAppData {
+  name: string;
+  description?: string;
+  redirectUris: string[];
+  scopes: string[];
+  grantTypes: ('authorization_code' | 'client_credentials' | 'refresh_token')[];
+  logoUrl?: string;
+  website?: string;
+  privacyPolicyUrl?: string;
+  termsOfServiceUrl?: string;
+  rateLimit?: {
+    requestsPerMinute: number;
+    requestsPerHour: number;
+  };
+}
+
+export interface UpdateOAuthAppData {
+  name?: string;
+  description?: string;
+  redirectUris?: string[];
+  scopes?: string[];
+  logoUrl?: string;
+  website?: string;
+  privacyPolicyUrl?: string;
+  termsOfServiceUrl?: string;
+  rateLimit?: {
+    requestsPerMinute: number;
+    requestsPerHour: number;
+  };
+  isActive?: boolean;
+}
+
 export interface OAuthAppData {
   name: string;
   description?: string;
@@ -115,16 +266,36 @@ export interface OAuthTokenRequest {
 }
 
 /**
- * External Integration Types
+ * External Integration Create/Update Types
  */
-export type IntegrationType = 'automation' | 'auth' | 'api' | 'webhook';
-
 export type IntegrationProvider =
   | 'zapier'
   | 'make'
   | 'n8n'
   | 'auth0'
   | 'workos';
+
+export interface CreateExternalIntegrationData {
+  name: string;
+  provider: IntegrationProvider;
+  type: IntegrationType;
+  config: {
+    apiKey?: string;
+    apiSecret?: string;
+    webhookUrl?: string;
+    additionalConfig?: string;
+  };
+}
+
+export interface UpdateExternalIntegrationData {
+  name?: string;
+  config?: {
+    apiKey?: string;
+    apiSecret?: string;
+    webhookUrl?: string;
+    additionalConfig?: string;
+  };
+}
 
 export interface ExternalIntegrationData {
   name: string;
@@ -138,9 +309,6 @@ export interface ExternalIntegrationData {
   };
 }
 
-export type SyncStatus = 'success' | 'failed' | 'in_progress';
-
-export type EventDirection = 'inbound' | 'outbound';
 
 /**
  * Request Log Types

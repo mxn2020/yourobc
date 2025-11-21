@@ -350,3 +350,225 @@ export interface AnalyticsSummary {
   eventsByType: Record<string, number>;
   avgSessionDuration?: number;
 }
+
+// ============================================================================
+// Entity Types (from Doc<>)
+// ============================================================================
+
+export type AnalyticsEvent = Doc<'analyticsEvents'>;
+export type AnalyticsEventId = Id<'analyticsEvents'>;
+
+export type AnalyticsMetric = Doc<'analyticsMetrics'>;
+export type AnalyticsMetricId = Id<'analyticsMetrics'>;
+
+export type AnalyticsDashboard = Doc<'analyticsDashboards'>;
+export type AnalyticsDashboardId = Id<'analyticsDashboards'>;
+
+export type AnalyticsReport = Doc<'analyticsReports'>;
+export type AnalyticsReportId = Id<'analyticsReports'>;
+
+export type AnalyticsProviderSync = Doc<'analyticsProviderSync'>;
+export type AnalyticsProviderSyncId = Id<'analyticsProviderSync'>;
+
+// ============================================================================
+// Create/Update Data Interfaces
+// ============================================================================
+
+/**
+ * Dashboard Create/Update Interfaces
+ */
+export interface CreateDashboardData {
+  name: string;
+  slug: string;
+  description?: string;
+  type: 'overview' | 'ai_usage' | 'payments' | 'user_behavior' | 'performance' | 'custom';
+  widgets: DashboardWidget[];
+  isPublic: boolean;
+}
+
+export interface UpdateDashboardData {
+  name?: string;
+  description?: string;
+  widgets?: DashboardWidget[];
+  isPublic?: boolean;
+}
+
+/**
+ * Report Create/Update Interfaces
+ */
+export interface CreateReportData {
+  name: string;
+  description?: string;
+  reportType: 'usage_summary' | 'cost_analysis' | 'user_activity' | 'performance' | 'custom';
+  query: ReportQuery;
+  schedule?: ReportSchedule;
+  exportFormats: ('csv' | 'json' | 'pdf')[];
+  isPublic: boolean;
+}
+
+export interface UpdateReportData {
+  name?: string;
+  description?: string;
+  query?: ReportQuery;
+  schedule?: ReportSchedule;
+  exportFormats?: ('csv' | 'json' | 'pdf')[];
+  isPublic?: boolean;
+}
+
+/**
+ * Event Create/Update Interfaces
+ */
+export interface CreateEventData {
+  eventName: string;
+  eventType: 'page_view' | 'user_action' | 'ai_usage' | 'payment' | 'error' | 'custom';
+  sessionId?: string;
+  anonymousId?: string;
+  properties?: EventProperties;
+  value?: number;
+  currency?: string;
+  pageUrl: string;
+  pagePath: string;
+  pageTitle?: string;
+  referrer?: string;
+  userAgent?: string;
+  ipAddress?: string;
+  country?: string;
+  city?: string;
+  timezone?: string;
+}
+
+/**
+ * Metric Create/Update Interfaces
+ */
+export interface CreateMetricData {
+  name: string;
+  metricType: string;
+  dimension?: string;
+  period: 'hour' | 'day' | 'week' | 'month';
+  periodStart: number;
+  periodEnd: number;
+  count: number;
+  sum?: number;
+  average?: number;
+  min?: number;
+  max?: number;
+  breakdown?: DimensionBreakdown;
+}
+
+export interface UpdateMetricData {
+  name?: string;
+  count?: number;
+  sum?: number;
+  average?: number;
+  min?: number;
+  max?: number;
+  breakdown?: DimensionBreakdown;
+}
+
+/**
+ * Provider Config Create/Update Interfaces
+ */
+export interface CreateProviderConfigData {
+  name: string;
+  provider: string;
+  enabled: boolean;
+  config: ProviderConfig;
+  autoSync: boolean;
+  syncDirection: 'export' | 'import' | 'bidirectional';
+  eventMappings?: EventMapping[];
+}
+
+export interface UpdateProviderConfigData {
+  name?: string;
+  enabled?: boolean;
+  config?: ProviderConfig;
+  autoSync?: boolean;
+  syncDirection?: 'export' | 'import' | 'bidirectional';
+  eventMappings?: EventMapping[];
+}
+
+// ============================================================================
+// Response Types
+// ============================================================================
+
+/**
+ * Dashboard List Response
+ */
+export interface DashboardListResponse {
+  dashboards: AnalyticsDashboard[];
+  total: number;
+  hasMore: boolean;
+}
+
+/**
+ * Report List Response
+ */
+export interface ReportListResponse {
+  reports: AnalyticsReport[];
+  total: number;
+  hasMore: boolean;
+}
+
+/**
+ * Event List Response
+ */
+export interface EventListResponse {
+  events: AnalyticsEvent[];
+  total: number;
+  hasMore: boolean;
+}
+
+/**
+ * Metric List Response
+ */
+export interface MetricListResponse {
+  metrics: AnalyticsMetric[];
+  total: number;
+  hasMore: boolean;
+}
+
+// ============================================================================
+// Filter Types for List Queries
+// ============================================================================
+
+/**
+ * Dashboard Filters
+ */
+export interface DashboardFilters {
+  type?: ('overview' | 'ai_usage' | 'payments' | 'user_behavior' | 'performance' | 'custom')[];
+  status?: ('active' | 'archived')[];
+  isPublic?: boolean;
+  search?: string;
+}
+
+/**
+ * Report Filters
+ */
+export interface ReportFilters {
+  reportType?: ('usage_summary' | 'cost_analysis' | 'user_activity' | 'performance' | 'custom')[];
+  status?: ('active' | 'archived' | 'scheduled')[];
+  isPublic?: boolean;
+  search?: string;
+}
+
+/**
+ * Event Filters
+ */
+export interface EventFilters {
+  eventType?: ('page_view' | 'user_action' | 'ai_usage' | 'payment' | 'error' | 'custom')[];
+  status?: ('pending' | 'processed' | 'synced' | 'failed')[];
+  startDate?: number;
+  endDate?: number;
+  search?: string;
+}
+
+/**
+ * Metric Filters
+ */
+export interface MetricFilters {
+  metricType?: string[];
+  period?: ('hour' | 'day' | 'week' | 'month')[];
+  status?: ('active' | 'archived')[];
+  startDate?: number;
+  endDate?: number;
+}

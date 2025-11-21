@@ -1,13 +1,13 @@
 // convex/lib/system/user_settings/user_settings/index.ts
-// Barrel exports for user settings module
+// Public API exports for user_settings module
 
-// Export constants
+// Constants
 export { USER_SETTINGS_CONSTANTS } from './constants';
 
-// Export types
-export * from './types';
+// Types
+export type * from './types';
 
-// Export utilities
+// Utilities
 export {
   getDefaultUserSettings,
   validateUserSettings,
@@ -15,22 +15,25 @@ export {
   generateUserSettingsDisplayName,
 } from './utils';
 
-// Export permissions
+// Permissions
 export {
-  canReadUserSettings,
-  canUpdateUserSettings,
+  canViewUserSettings,
+  canEditUserSettings,
   canDeleteUserSettings,
-  getUserSettingsAccessFilter,
+  requireViewUserSettingsAccess,
+  requireEditUserSettingsAccess,
+  requireDeleteUserSettingsAccess,
+  filterUserSettingsByAccess,
 } from './permissions';
 
-// Export queries
+// Queries
 export {
   getUserSettings,
   getUserSetting,
   getUserSettingsByPublicId,
 } from './queries';
 
-// Export mutations
+// Mutations
 export {
   updateUserSettings,
   resetUserSettings,

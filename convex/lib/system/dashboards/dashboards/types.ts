@@ -3,6 +3,9 @@
 
 import type { Doc, Id } from '@/generated/dataModel';
 import type {
+  DashboardStatus,
+  DashboardPriority,
+  DashboardVisibility,
   DashboardLayout,
   Widget,
   WidgetType,
@@ -19,7 +22,17 @@ export type Dashboard = Doc<'dashboards'>;
 export type DashboardId = Id<'dashboards'>;
 
 // Re-export schema types
-export type { DashboardLayout, Widget, WidgetType, ChartType, AggregationType, FormatType };
+export type {
+  DashboardStatus,
+  DashboardPriority,
+  DashboardVisibility,
+  DashboardLayout,
+  Widget,
+  WidgetType,
+  ChartType,
+  AggregationType,
+  FormatType,
+};
 
 // ============================================
 // Data Interfaces
@@ -28,6 +41,9 @@ export type { DashboardLayout, Widget, WidgetType, ChartType, AggregationType, F
 export interface CreateDashboardData {
   name: string;
   description?: string;
+  status?: DashboardStatus;
+  priority?: DashboardPriority;
+  visibility?: DashboardVisibility;
   layout?: DashboardLayout;
   widgets?: Widget[];
   isDefault?: boolean;
@@ -38,6 +54,9 @@ export interface CreateDashboardData {
 export interface UpdateDashboardData {
   name?: string;
   description?: string;
+  status?: DashboardStatus;
+  priority?: DashboardPriority;
+  visibility?: DashboardVisibility;
   layout?: DashboardLayout;
   widgets?: Widget[];
   isDefault?: boolean;
@@ -60,6 +79,9 @@ export interface DashboardListResponse {
 // ============================================
 
 export interface DashboardFilters {
+  status?: DashboardStatus[];
+  priority?: DashboardPriority[];
+  visibility?: DashboardVisibility[];
   layout?: DashboardLayout[];
   isDefault?: boolean;
   isPublic?: boolean;

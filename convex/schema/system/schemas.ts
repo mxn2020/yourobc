@@ -12,7 +12,12 @@ import { systemSystemPermissionRequestsSchemas } from './system/permissionReques
 import { userSettingsTable } from './user_settings/user_settings/user_settings'
 import { userModelPreferencesTable } from './user_settings/user_model_preferences/user_model_preferences'
 import { systemDashboardsSchemas } from './dashboards/dashboards/schemas'
-import { systemSupportingSupportingSchemas } from './supporting/supporting/schemas'
+import { systemSupportingWikiSchemas } from './supporting/wiki/schemas'
+import { systemSupportingCommentsSchemas } from './supporting/comments/schemas'
+import { systemSupportingRemindersSchemas } from './supporting/reminders/schemas'
+import { systemSupportingDocumentsSchemas } from './supporting/documents/schemas'
+import { systemSupportingSchedulingSchemas } from './supporting/scheduling/schemas'
+import { systemSupportingAvailabilitySchemas } from './supporting/availability/schemas'
 import { blogSchemas } from './blog/blog/schemas'
 import { systemAnalyticsAnalyticsSchemas } from './analytics/analytics/schemas'
 import { systemEmailConfigsSchemas } from './email/configs/schemas'
@@ -37,7 +42,12 @@ export const systemSchemas = {
   ...systemDashboardsSchemas,
 
   // Supporting
-  ...systemSupportingSupportingSchemas,
+  ...systemSupportingWikiSchemas,
+  ...systemSupportingCommentsSchemas,
+  ...systemSupportingRemindersSchemas,
+  ...systemSupportingDocumentsSchemas,
+  ...systemSupportingSchedulingSchemas,
+  ...systemSupportingAvailabilitySchemas,
 
   // Blog
   ...blogSchemas,

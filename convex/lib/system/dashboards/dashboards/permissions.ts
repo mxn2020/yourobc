@@ -56,6 +56,12 @@ export async function canEditDashboard(
   // Owner can edit
   if (dashboard.ownerId === user._id) return true;
 
+  // Check if dashboard is locked/archived
+  if (dashboard.status === 'archived') {
+    // Only admins can edit archived items
+    return false;
+  }
+
   return false;
 }
 

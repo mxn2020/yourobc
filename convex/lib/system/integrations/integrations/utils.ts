@@ -1,9 +1,305 @@
 // convex/lib/system/integrations/integrations/utils.ts
-// Utility functions for integrations module
+// Validation functions and utility helpers for integrations module
 
 declare const process: { env: Record<string, string | undefined> }
 
 import { INTEGRATIONS_CONSTANTS } from './constants';
+import type {
+  ApiKeyData,
+  WebhookData,
+  OAuthAppData,
+  ExternalIntegrationData,
+} from './types';
+
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate API key data for creation/update
+ */
+export function validateApiKeyData(
+  data: Partial<ApiKeyData>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Name is required');
+    } else if (trimmed.length < INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_NAME_MIN) {
+      errors.push(`Name must be at least ${INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_NAME_MIN} characters`);
+    } else if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_NAME_MAX) {
+      errors.push(`Name cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_NAME_MAX} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_DESCRIPTION_MAX) {
+      errors.push(`Description cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_DESCRIPTION_MAX} characters`);
+    }
+  }
+
+  // Validate scopes
+  if (data.scopes !== undefined) {
+    if (data.scopes.length === 0) {
+      errors.push('At least one scope is required');
+    } else if (data.scopes.length > INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_SCOPES_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_SCOPES_MAX} scopes`);
+    }
+
+    const emptyScopes = data.scopes.filter(scope => !scope.trim());
+    if (emptyScopes.length > 0) {
+      errors.push('Scopes cannot be empty');
+    }
+  }
+
+  // Validate allowed IPs
+  if (data.allowedIps !== undefined && data.allowedIps.length > 0) {
+    if (data.allowedIps.length > INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_ALLOWED_IPS_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.API_KEY_ALLOWED_IPS_MAX} allowed IPs`);
+    }
+  }
+
+  // Validate rate limit
+  if (data.rateLimit !== undefined) {
+    if (data.rateLimit.requestsPerMinute <= 0) {
+      errors.push('Requests per minute must be greater than 0');
+    }
+    if (data.rateLimit.requestsPerHour <= 0) {
+      errors.push('Requests per hour must be greater than 0');
+    }
+    if (data.rateLimit.requestsPerDay <= 0) {
+      errors.push('Requests per day must be greater than 0');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate webhook data for creation/update
+ */
+export function validateWebhookData(
+  data: Partial<WebhookData>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Name is required');
+    } else if (trimmed.length < INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_NAME_MIN) {
+      errors.push(`Name must be at least ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_NAME_MIN} characters`);
+    } else if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_NAME_MAX) {
+      errors.push(`Name cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_NAME_MAX} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_DESCRIPTION_MAX) {
+      errors.push(`Description cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_DESCRIPTION_MAX} characters`);
+    }
+  }
+
+  // Validate URL
+  if (data.url !== undefined) {
+    const trimmed = data.url.trim();
+
+    if (!trimmed) {
+      errors.push('URL is required');
+    } else if (!isValidWebhookUrl(trimmed)) {
+      errors.push('Invalid webhook URL');
+    } else if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_URL_MAX) {
+      errors.push(`URL cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_URL_MAX} characters`);
+    }
+  }
+
+  // Validate events
+  if (data.events !== undefined) {
+    if (data.events.length === 0) {
+      errors.push('At least one event is required');
+    } else if (data.events.length > INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_EVENTS_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_EVENTS_MAX} events`);
+    }
+
+    const emptyEvents = data.events.filter(event => !event.trim());
+    if (emptyEvents.length > 0) {
+      errors.push('Events cannot be empty');
+    }
+  }
+
+  // Validate headers
+  if (data.headers !== undefined) {
+    const headerCount = Object.keys(data.headers).length;
+    if (headerCount > INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_HEADERS_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.WEBHOOK_HEADERS_MAX} headers`);
+    }
+  }
+
+  // Validate timeout
+  if (data.timeout !== undefined && data.timeout <= 0) {
+    errors.push('Timeout must be greater than 0');
+  }
+
+  // Validate retry config
+  if (data.retryConfig !== undefined) {
+    if (data.retryConfig.maxAttempts < 0) {
+      errors.push('Max attempts cannot be negative');
+    }
+    if (data.retryConfig.backoffMultiplier <= 0) {
+      errors.push('Backoff multiplier must be greater than 0');
+    }
+    if (data.retryConfig.initialDelay <= 0) {
+      errors.push('Initial delay must be greater than 0');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate OAuth app data for creation/update
+ */
+export function validateOAuthAppData(
+  data: Partial<OAuthAppData>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Name is required');
+    } else if (trimmed.length < INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_NAME_MIN) {
+      errors.push(`Name must be at least ${INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_NAME_MIN} characters`);
+    } else if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_NAME_MAX) {
+      errors.push(`Name cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_NAME_MAX} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_DESCRIPTION_MAX) {
+      errors.push(`Description cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_DESCRIPTION_MAX} characters`);
+    }
+  }
+
+  // Validate redirect URIs
+  if (data.redirectUris !== undefined) {
+    if (data.redirectUris.length === 0) {
+      errors.push('At least one redirect URI is required');
+    } else if (data.redirectUris.length > INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_REDIRECT_URIS_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_REDIRECT_URIS_MAX} redirect URIs`);
+    }
+
+    const invalidUris = data.redirectUris.filter(uri => !isValidUrl(uri.trim()));
+    if (invalidUris.length > 0) {
+      errors.push('All redirect URIs must be valid URLs');
+    }
+  }
+
+  // Validate scopes
+  if (data.scopes !== undefined) {
+    if (data.scopes.length === 0) {
+      errors.push('At least one scope is required');
+    } else if (data.scopes.length > INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_SCOPES_MAX) {
+      errors.push(`Cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.OAUTH_APP_SCOPES_MAX} scopes`);
+    }
+  }
+
+  // Validate grant types
+  if (data.grantTypes !== undefined && data.grantTypes.length === 0) {
+    errors.push('At least one grant type is required');
+  }
+
+  // Validate URLs
+  if (data.logoUrl !== undefined && data.logoUrl.trim() && !isValidUrl(data.logoUrl.trim())) {
+    errors.push('Invalid logo URL');
+  }
+  if (data.website !== undefined && data.website.trim() && !isValidUrl(data.website.trim())) {
+    errors.push('Invalid website URL');
+  }
+  if (data.privacyPolicyUrl !== undefined && data.privacyPolicyUrl.trim() && !isValidUrl(data.privacyPolicyUrl.trim())) {
+    errors.push('Invalid privacy policy URL');
+  }
+  if (data.termsOfServiceUrl !== undefined && data.termsOfServiceUrl.trim() && !isValidUrl(data.termsOfServiceUrl.trim())) {
+    errors.push('Invalid terms of service URL');
+  }
+
+  // Validate rate limit
+  if (data.rateLimit !== undefined) {
+    if (data.rateLimit.requestsPerMinute <= 0) {
+      errors.push('Requests per minute must be greater than 0');
+    }
+    if (data.rateLimit.requestsPerHour <= 0) {
+      errors.push('Requests per hour must be greater than 0');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate external integration data for creation/update
+ */
+export function validateExternalIntegrationData(
+  data: Partial<ExternalIntegrationData>
+): string[] {
+  const errors: string[] = [];
+
+  // Validate name
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
+
+    if (!trimmed) {
+      errors.push('Name is required');
+    } else if (trimmed.length < INTEGRATIONS_CONSTANTS.LIMITS.INTEGRATION_NAME_MIN) {
+      errors.push(`Name must be at least ${INTEGRATIONS_CONSTANTS.LIMITS.INTEGRATION_NAME_MIN} characters`);
+    } else if (trimmed.length > INTEGRATIONS_CONSTANTS.LIMITS.INTEGRATION_NAME_MAX) {
+      errors.push(`Name cannot exceed ${INTEGRATIONS_CONSTANTS.LIMITS.INTEGRATION_NAME_MAX} characters`);
+    }
+  }
+
+  // Validate provider
+  if (data.provider !== undefined) {
+    const validProviders = ['zapier', 'make', 'n8n', 'auth0', 'workos'];
+    if (!validProviders.includes(data.provider)) {
+      errors.push('Invalid provider');
+    }
+  }
+
+  // Validate type
+  if (data.type !== undefined) {
+    const validTypes = ['automation', 'auth', 'api', 'webhook'];
+    if (!validTypes.includes(data.type)) {
+      errors.push('Invalid integration type');
+    }
+  }
+
+  // Validate config
+  if (data.config !== undefined) {
+    if (data.config.webhookUrl && !isValidUrl(data.config.webhookUrl.trim())) {
+      errors.push('Invalid webhook URL in configuration');
+    }
+  }
+
+  return errors;
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 /**
  * Generate a secure API key

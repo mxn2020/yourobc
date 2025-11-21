@@ -10,4 +10,7 @@ export type BlogPostVisibility = Infer<typeof blogValidators.postVisibility>;
 export type BlogSyncStatus = Infer<typeof blogValidators.syncStatus>;
 export type BlogSyncDirection = Infer<typeof blogValidators.syncDirection>;
 export type BlogLastSyncStatus = Infer<typeof blogValidators.lastSyncStatus>;
+export type BlogEntityStatus = Infer<typeof blogValidators.entityStatus>;
+export type BlogAuthorStatus = Infer<typeof blogValidators.authorStatus>;
+export type BlogProviderStatus = Infer<typeof blogValidators.providerStatus>;
 export type BlogFeaturedImage = Infer<typeof blogValidators.featuredImage>;

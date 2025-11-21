@@ -14,6 +14,7 @@ import {
   getRolePermissions,
   updateExtendedMetadata
 } from './utils';
+import { requireDeleteUserProfileAccess } from './permissions';
 import { vUserRole } from '@/shared/validators';
 import type { UserRole } from '@/schema/system/user_profiles/user_profiles/types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
@@ -731,5 +732,121 @@ export const updateMetadataTags = mutation({
     });
 
     return { added: tagsToAdd, removed: tagsToRemove, currentTags: newTags };
+  },
+});
+
+/**
+ * Delete user profile (soft delete)
+ * Authentication: Required
+ * Authorization: Admin only
+ */
+export const deleteUserProfile = mutation({
+  args: {
+    targetUserId: v.id('userProfiles'),
+  },
+  handler: async (ctx, { targetUserId }): Promise<typeof targetUserId> => {
+    // 1. AUTH: Get authenticated user
+    const currentUser = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const targetProfile = await ctx.db.get(targetUserId);
+    if (!targetProfile || targetProfile.deletedAt) {
+      throw new Error('User profile not found');
+    }
+
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteUserProfileAccess(targetProfile, currentUser);
+
+    // Prevent self-deletion
+    if (targetProfile._id === currentUser._id) {
+      throw new Error('Cannot delete your own profile');
+    }
+
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(targetUserId, {
+      deletedAt: now,
+      deletedBy: currentUser._id,
+      updatedAt: now,
+      updatedBy: currentUser._id,
+      isActive: false, // Also deactivate on delete
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: currentUser._id,
+      userName: currentUser.name || currentUser.email || 'Admin',
+      action: 'user.deleted',
+      entityType: 'system_user',
+      entityId: targetProfile.publicId,
+      entityTitle: targetProfile.email,
+      description: `Deleted user profile: ${targetProfile.email}`,
+      createdAt: now,
+      createdBy: currentUser._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return targetUserId;
+  },
+});
+
+/**
+ * Restore soft-deleted user profile
+ * Authentication: Required
+ * Authorization: Admin only
+ */
+export const restoreUserProfile = mutation({
+  args: {
+    targetUserId: v.id('userProfiles'),
+  },
+  handler: async (ctx, { targetUserId }): Promise<typeof targetUserId> => {
+    // 1. AUTH: Get authenticated user
+    const currentUser = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists and is deleted
+    const targetProfile = await ctx.db.get(targetUserId);
+    if (!targetProfile) {
+      throw new Error('User profile not found');
+    }
+    if (!targetProfile.deletedAt) {
+      throw new Error('User profile is not deleted');
+    }
+
+    // 3. AUTHZ: Check permission (owners and admins can restore)
+    if (
+      currentUser.role !== 'admin' &&
+      currentUser.role !== 'superadmin' &&
+      !hasPermission(currentUser, USER_PROFILES_CONSTANTS.PERMISSIONS.USER_MANAGEMENT)
+    ) {
+      throw new Error('You do not have permission to restore this user profile');
+    }
+
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(targetUserId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: currentUser._id,
+      isActive: true, // Reactivate on restore
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: currentUser._id,
+      userName: currentUser.name || currentUser.email || 'Admin',
+      action: 'user.restored',
+      entityType: 'system_user',
+      entityId: targetProfile.publicId,
+      entityTitle: targetProfile.email,
+      description: `Restored user profile: ${targetProfile.email}`,
+      createdAt: now,
+      createdBy: currentUser._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return targetUserId;
   },
 });

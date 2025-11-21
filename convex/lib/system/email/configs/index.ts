@@ -42,7 +42,7 @@ export {
 
 // Mutations
 export {
-  saveEmailConfig,
+  createEmailConfig,
   updateEmailConfig,
   setActiveConfig,
   updateTestStatus,

@@ -16,6 +16,9 @@ export const dashboardsTable = defineTable({
 
   // Module-specific fields
   description: v.optional(v.string()),
+  status: dashboardsValidators.status,
+  priority: v.optional(dashboardsValidators.priority),
+  visibility: v.optional(dashboardsValidators.visibility),
   layout: dashboardsValidators.layout,
   widgets: v.array(dashboardsValidators.widget),
   isDefault: v.boolean(),
@@ -36,6 +39,8 @@ export const dashboardsTable = defineTable({
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
+  .index('by_status', ['status'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_is_default', ['isDefault'])
   .index('by_is_public', ['isPublic'])
   .index('by_owner_and_is_default', ['ownerId', 'isDefault'])

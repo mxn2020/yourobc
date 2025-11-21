@@ -2,13 +2,12 @@
 // Grouped validators for permissionRequests module
 
 import { v } from 'convex/values';
-import { metadataSchema } from '../../../base';
 
 export const permissionRequestsValidators = {
   // User information
   userId: v.id('userProfiles'),
   userName: v.string(),
-  userEmail: v.optional(v.string()),
+  userEmail: v.string(),
 
   // Permission details
   permission: v.string(),
@@ -29,5 +28,15 @@ export const permissionRequestsValidators = {
   reviewNotes: v.optional(v.string()),
 
   // Standard metadata
-  metadata: metadataSchema,
+  metadata: v.optional(v.union(
+    v.object({
+      source: v.optional(v.string()),
+      operation: v.optional(v.string()),
+      oldValues: v.optional(v.record(v.string(), v.any())),
+      newValues: v.optional(v.record(v.string(), v.any())),
+      ipAddress: v.optional(v.string()),
+      userAgent: v.optional(v.string()),
+    }),
+    v.record(v.string(), v.any())
+  )),
 } as const;

@@ -13,7 +13,9 @@ export {
   validateUpdateDashboardData,
   validateDashboardData,
   isDashboardEditable,
+  isDashboardEditableByStatus,
   formatDashboardDisplayName,
+  generateSlug,
 } from './utils';
 
 // Permissions
@@ -44,4 +46,7 @@ export {
   updateDashboard,
   deleteDashboard,
   restoreDashboard,
+  archiveDashboard,
+  bulkUpdateDashboards,
+  bulkDeleteDashboards,
 } from './mutations';

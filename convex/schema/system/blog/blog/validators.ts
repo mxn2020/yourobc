@@ -47,6 +47,25 @@ export const blogValidators = {
     v.literal('error')
   ),
 
+  // Category/Tag/Media Status
+  entityStatus: v.union(
+    v.literal('active'),
+    v.literal('inactive'),
+    v.literal('archived')
+  ),
+
+  // Author Status
+  authorStatus: v.union(
+    v.literal('active'),
+    v.literal('inactive')
+  ),
+
+  // Provider Sync Config Status
+  providerStatus: v.union(
+    v.literal('enabled'),
+    v.literal('disabled')
+  ),
+
   // Featured Image
   featuredImage: v.object({
     url: v.string(),

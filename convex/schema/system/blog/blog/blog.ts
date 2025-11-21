@@ -94,6 +94,7 @@ export const blogPostsTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
@@ -107,6 +108,7 @@ export const blogPostsTable = defineTable({
   .index('by_provider', ['provider', 'externalId'])
   .index('by_featured', ['featured', 'publishedAt'])
   .index('by_series', ['series', 'seriesOrder'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .searchIndex('search_posts', {
     searchField: 'title',
     filterFields: ['status', 'categoryId', 'authorId'],
@@ -122,10 +124,9 @@ export const blogCategoriesTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
   title: v.string(),
-  status: v.optional(v.literal('active')),
+  status: blogValidators.entityStatus,
 
   // Category Details
-  name: v.string(),
   slug: v.string(),
   description: v.optional(v.string()),
 
@@ -154,13 +155,16 @@ export const blogCategoriesTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_slug', ['slug'])
+  .index('by_status', ['status'])
   .index('by_parent', ['parentId'])
   .index('by_order', ['order'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_created', ['createdAt']);
 
 /**
@@ -173,10 +177,9 @@ export const blogTagsTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
   title: v.string(),
-  status: v.optional(v.literal('active')),
+  status: blogValidators.entityStatus,
 
   // Tag Details
-  name: v.string(),
   slug: v.string(),
   description: v.optional(v.string()),
 
@@ -197,12 +200,15 @@ export const blogTagsTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_slug', ['slug'])
+  .index('by_status', ['status'])
   .index('by_post_count', ['postCount'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_created', ['createdAt']);
 
 /**
@@ -215,10 +221,9 @@ export const blogAuthorsTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
   title: v.string(),
-  status: v.optional(v.union(v.literal('active'), v.literal('inactive'))),
+  status: blogValidators.authorStatus,
 
   // Author Details
-  name: v.string(),
   slug: v.string(),
   email: v.string(),
   bio: v.optional(v.string()),
@@ -251,14 +256,17 @@ export const blogAuthorsTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_slug', ['slug'])
+  .index('by_status', ['status'])
   .index('by_email', ['email'])
   .index('by_user', ['userId'])
   .index('by_active', ['isActive'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_created', ['createdAt']);
 
 /**
@@ -271,7 +279,7 @@ export const blogProviderSyncTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
   title: v.string(),
-  status: v.optional(v.union(v.literal('enabled'), v.literal('disabled'))),
+  status: blogValidators.providerStatus,
 
   // Provider Configuration
   provider: v.string(),
@@ -303,12 +311,15 @@ export const blogProviderSyncTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
+  .index('by_status', ['status'])
   .index('by_provider', ['provider'])
   .index('by_enabled', ['enabled'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_created', ['createdAt']);
 
 /**
@@ -321,7 +332,7 @@ export const blogMediaTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
   title: v.string(),
-  status: v.optional(v.literal('active')),
+  status: blogValidators.entityStatus,
 
   // File Details
   filename: v.string(),
@@ -357,11 +368,14 @@ export const blogMediaTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
+  .index('by_status', ['status'])
   .index('by_uploaded_at', ['uploadedAt'])
   .index('by_uploader', ['uploadedBy'])
   .index('by_folder', ['folder'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_created', ['createdAt']);

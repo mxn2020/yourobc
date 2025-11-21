@@ -16,34 +16,36 @@ import type { EmailTemplateId } from './types';
 import { createAuditLog } from '../../audit_logs/helpers';
 
 /**
- * Create or update email template
+ * Create new email template
  * 🔒 Authentication: Required
  * 🔒 Authorization: Admin only
  */
-export const saveEmailTemplate = mutation({
+export const createEmailTemplate = mutation({
   args: {
-    name: v.string(),
-    slug: v.string(),
-    description: v.optional(v.string()),
-    subject: v.string(),
-    htmlTemplate: v.string(),
-    textTemplate: v.optional(v.string()),
-    reactComponentPath: v.optional(v.string()),
-    variables: v.array(
-      v.object({
-        name: v.string(),
-        type: emailTemplatesValidators.variableType,
-        required: v.boolean(),
-        defaultValue: v.optional(v.string()),
-        description: v.optional(v.string()),
-      })
-    ),
-    previewData: v.optional(v.any()),
-    isActive: v.boolean(),
-    category: v.optional(v.string()),
-    metadata: v.optional(v.any()),
+    data: v.object({
+      name: v.string(),
+      slug: v.string(),
+      description: v.optional(v.string()),
+      subject: v.string(),
+      htmlTemplate: v.string(),
+      textTemplate: v.optional(v.string()),
+      reactComponentPath: v.optional(v.string()),
+      variables: v.array(
+        v.object({
+          name: v.string(),
+          type: emailTemplatesValidators.variableType,
+          required: v.boolean(),
+          defaultValue: v.optional(v.string()),
+          description: v.optional(v.string()),
+        })
+      ),
+      previewData: v.optional(v.any()),
+      isActive: v.optional(v.boolean()),
+      category: v.optional(v.string()),
+      status: v.optional(emailTemplatesValidators.status),
+    }),
   },
-  handler: async (ctx, args): Promise<EmailTemplateId> => {
+  handler: async (ctx, { data }): Promise<EmailTemplateId> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -51,122 +53,56 @@ export const saveEmailTemplate = mutation({
     requireCreateEmailTemplateAccess(user);
 
     // 3. VALIDATE: Check data validity
-    const errors = validateEmailTemplateData(args);
+    const errors = validateEmailTemplateData(data);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Trim string fields
-    const trimmedName = args.name.trim();
-    const trimmedSlug = args.slug.trim();
-    const trimmedDescription = args.description?.trim();
-    const trimmedSubject = args.subject.trim();
-    const trimmedReactComponentPath = args.reactComponentPath?.trim();
-    const trimmedCategory = args.category?.trim();
-
-    // 5. CHECK: If template with this slug already exists
-    const existingTemplate = await ctx.db
-      .query('emailTemplates')
-      .withIndex('by_slug', (q) => q.eq('slug', trimmedSlug))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first();
-
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'emailTemplates');
     const now = Date.now();
 
-    if (existingTemplate) {
-      // 6a. UPDATE: Existing template
-      await ctx.db.patch(existingTemplate._id, {
-        name: trimmedName,
-        description: trimmedDescription,
-        subject: trimmedSubject,
-        htmlTemplate: args.htmlTemplate,
-        textTemplate: args.textTemplate,
-        reactComponentPath: trimmedReactComponentPath,
-        variables: args.variables,
-        previewData: args.previewData,
-        isActive: args.isActive,
-        category: trimmedCategory,
-        metadata: args.metadata ?? existingTemplate.metadata,
-        updatedAt: now,
-        lastActivityAt: now,
-        updatedBy: user._id,
-      });
+    // 5. CREATE: Insert into database
+    const templateId = await ctx.db.insert('emailTemplates', {
+      publicId,
+      name: data.name.trim(),
+      slug: data.slug.trim(),
+      description: data.description?.trim(),
+      subject: data.subject.trim(),
+      htmlTemplate: data.htmlTemplate,
+      textTemplate: data.textTemplate,
+      reactComponentPath: data.reactComponentPath?.trim(),
+      variables: data.variables,
+      previewData: data.previewData,
+      isActive: data.isActive ?? true,
+      status: data.status || 'active',
+      category: data.category?.trim(),
+      settings: {},
+      metadata: {},
+      ownerId: user._id,
+      createdBy: user._id,
+      createdAt: now,
+      updatedAt: now,
+      lastActivityAt: now,
+      updatedBy: user._id,
+      timesUsed: 0,
+    });
 
-      // 7a. AUDIT: Create audit log
-      await createAuditLog(ctx, {
-        action: 'email_template.updated',
-        entityType: 'system_email_template',
-        entityId: existingTemplate._id,
-        entityTitle: trimmedName,
-        description: `Updated email template: ${trimmedName}`,
-        metadata: {
-          operation: 'update_email_template',
-          newValues: trimmedCategory
-            ? {
-                slug: trimmedSlug,
-                category: trimmedCategory,
-              }
-            : {
-                slug: trimmedSlug,
-              },
-        },
-      });
+    // 6. AUDIT: Create audit log
+    await createAuditLog(ctx, {
+      action: 'email_template.created',
+      entityType: 'system_email_template',
+      entityId: publicId,
+      entityTitle: data.name.trim(),
+      description: `Created email template: ${data.name.trim()}`,
+      metadata: {
+        slug: data.slug.trim(),
+        category: data.category?.trim(),
+      },
+    });
 
-      // 8a. RETURN: Template ID
-      return existingTemplate._id;
-    } else {
-      // 6b. CREATE: Generate publicId and prepare data
-      const publicId = await generateUniquePublicId(ctx, 'emailTemplates');
-
-      // 7b. CREATE: Insert new template
-      const templateId = await ctx.db.insert('emailTemplates', {
-        publicId,
-        name: trimmedName,
-        slug: trimmedSlug,
-        description: trimmedDescription,
-        subject: trimmedSubject,
-        htmlTemplate: args.htmlTemplate,
-        textTemplate: args.textTemplate,
-        reactComponentPath: trimmedReactComponentPath,
-        variables: args.variables,
-        previewData: args.previewData,
-        isActive: args.isActive,
-        status: 'active',
-        category: trimmedCategory,
-        settings: {},
-        metadata: args.metadata ?? {},
-        ownerId: user._id,
-        createdBy: user._id,
-        createdAt: now,
-        updatedAt: now,
-        lastActivityAt: now,
-        updatedBy: user._id,
-        timesUsed: 0,
-      });
-
-      // 8b. AUDIT: Create audit log
-      await createAuditLog(ctx, {
-        action: 'email_template.created',
-        entityType: 'system_email_template',
-        entityId: templateId,
-        entityTitle: trimmedName,
-        description: `Created email template: ${trimmedName}`,
-        metadata: {
-          operation: 'create_email_template',
-          newValues: trimmedCategory
-            ? {
-                slug: trimmedSlug,
-                category: trimmedCategory,
-              }
-            : {
-                slug: trimmedSlug,
-              },
-        },
-      });
-
-      // 9b. RETURN: Template ID
-      return templateId;
-    }
+    // 7. RETURN: Return entity ID
+    return templateId;
   },
 });
 

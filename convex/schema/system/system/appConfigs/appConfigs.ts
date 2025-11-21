@@ -2,6 +2,7 @@
 // Table definitions for appConfigs module
 
 import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
 import { appConfigsValidators } from './validators';
 
@@ -24,6 +25,13 @@ import { appConfigsValidators } from './validators';
  * - Tenant-specific overrides (multi-tenant apps)
  */
 export const appConfigsTable = defineTable({
+  // Required: Main display field
+  name: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Configuration identification
   feature: appConfigsValidators.feature,
   key: appConfigsValidators.key,
@@ -65,6 +73,9 @@ export const appConfigsTable = defineTable({
   ...softDeleteFields,
 })
   // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
+  .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
@@ -76,5 +87,5 @@ export const appConfigsTable = defineTable({
   .index('by_user', ['userId'])
   .index('by_visible', ['isVisible'])
   .index('by_editable', ['isEditable'])
-  .index('by_created_at', ['createdAt'])
-  .index('by_updated_at', ['updatedAt']);
+  .index('by_owner_and_feature', ['ownerId', 'feature'])
+  .index('by_created_at', ['createdAt']);
