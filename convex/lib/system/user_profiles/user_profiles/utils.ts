@@ -12,7 +12,7 @@ import {
   editorRole,
   analystRole,
   guestRole,
-} from '../../../../../../src/features/system/auth/lib/auth-permissions';
+} from '../../../../../src/features/system/auth/lib/auth-permissions';
 
 // ============================================================================
 // Better Auth Role Permissions Integration
