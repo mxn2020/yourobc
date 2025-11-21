@@ -1,7 +1,7 @@
 // src/features/marketing/link-shortener/service.ts
 
 import { queryOptions } from '@tanstack/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { MarketingLinkId } from './types'
 
 export const linkShortenerService = {

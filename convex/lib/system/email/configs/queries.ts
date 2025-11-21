@@ -4,7 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { emailConfigsValidators } from '@/schema/system/email/configs/validators';
+import { emailValidators } from '@/schema/system/email/validators';
 import { filterEmailConfigsByAccess, requireViewEmailConfigAccess } from './permissions';
 import type { EmailConfigListResponse } from './types';
 
@@ -43,8 +43,8 @@ export const getEmailConfigs = query({
     limit: v.optional(v.number()),
     offset: v.optional(v.number()),
     filters: v.optional(v.object({
-      provider: v.optional(v.array(emailConfigsValidators.provider)),
-      status: v.optional(v.array(emailConfigsValidators.status)),
+      provider: v.optional(v.array(emailValidators.provider)),
+      status: v.optional(v.array(emailValidators.status)),
       isActive: v.optional(v.boolean()),
       isVerified: v.optional(v.boolean()),
       search: v.optional(v.string()),
@@ -172,7 +172,7 @@ export const getEmailConfigByPublicId = query({
  */
 export const getConfigByProvider = query({
   args: {
-    provider: emailConfigsValidators.provider,
+    provider: emailValidators.provider,
   },
   handler: async (ctx, { provider }) => {
     const user = await requireCurrentUser(ctx);

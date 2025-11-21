@@ -1,4 +1,5 @@
-// components/ErrorBoundary.tsx
+// components/App/ErrorBoundary.tsx
+
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Button, Card, Alert, AlertTitle, AlertDescription } from '@/components/ui'
 import { AlertCircle } from 'lucide-react'

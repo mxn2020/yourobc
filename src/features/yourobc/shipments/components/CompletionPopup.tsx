@@ -2,7 +2,7 @@
 
 import { FC, useState, useEffect } from 'react'
 import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import {
   Dialog,
   DialogContent,

@@ -1,4 +1,4 @@
-// src/components/app/Sidebar.tsx
+// src/components/App/Sidebar.tsx
 import { useState, useMemo } from 'react';
 import { User, Bell, LogOut, Shield, ChevronLeft, ChevronRight, BarChart3, Building, Globe } from 'lucide-react';
 import { Link, useLocation, useParams } from '@tanstack/react-router';

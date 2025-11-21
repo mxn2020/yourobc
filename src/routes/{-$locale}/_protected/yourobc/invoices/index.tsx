@@ -3,10 +3,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { InvoicesPage } from '@/features/yourobc/invoices/pages/InvoicesPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/invoices/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/invoices/')({
   loader: async ({ context }) => {
     try {
       const session = await authService.getSession()

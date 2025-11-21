@@ -1,5 +1,6 @@
 // src/routes/__root.tsx
 /// <reference types="vite/client" />
+
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import {
   Outlet,
@@ -14,7 +15,7 @@ import { Toaster } from 'react-hot-toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ConvexQueryClient } from '@convex-dev/react-query'
 import { ConvexProvider, ConvexReactClient, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
 import { NotFound } from '@/components/NotFound'
 import { AppLayout } from '@/components/App/AppLayout'
@@ -23,8 +24,6 @@ import { ErrorProvider, useErrorContext } from '@/contexts/ErrorContext'
 import { PermissionDeniedModal } from '@/components/Permission/PermissionDeniedModal'
 import { RequestAccessModal } from '@/components/Permission/RequestAccessModal'
 import { useToast } from '@/features/system/notifications'
-import { BlogProvider, isBlogEnabled } from '@/features/system/blog'
-import { PAYMENT_CONFIG } from '@/features/system/payments'
 import { authService } from '@/features/system/auth'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import appCss from '@/styles/app.css?url'
@@ -315,12 +314,6 @@ function ConvexWithAuth({
 function RootComponent() {
   const { queryClient, convexQueryClient, locale, translations } = Route.useRouteContext()
 
-  // Check if Autumn payments are enabled
-  const isAutumnEnabled = PAYMENT_CONFIG.primaryProvider?.includes('autumn')
-
-  // Check if blog feature is enabled
-  const blogEnabled = isBlogEnabled()
-
   // Core app content without blog wrapper
   const coreContent = (
     <>
@@ -344,13 +337,7 @@ function RootComponent() {
   )
 
   // Conditionally wrap with BlogProvider
-  const appContent = blogEnabled ? (
-    <BlogProvider>
-      {coreContent}
-    </BlogProvider>
-  ) : (
-    coreContent
-  )
+  const appContent = coreContent
 
   return (
     <RootDocument>
@@ -358,13 +345,7 @@ function RootComponent() {
         <ConvexWithAuth convexClient={convexQueryClient.convexClient}>
           <ErrorProvider>
             <I18nProvider locale={locale} translations={translations}>
-              {isAutumnEnabled ? (
-                <AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL || "http://localhost:3000"}>
-                  {appContent}
-                </AutumnProvider>
-              ) : (
-                appContent
-              )}
+              { appContent }
             </I18nProvider>
           </ErrorProvider>
         </ConvexWithAuth>

@@ -1,7 +1,9 @@
 // convex/schema/base.ts
 
+import { entityTypes } from '@/config/entityTypes'
 import { v } from 'convex/values'
-import { entityTypes } from '@/lib/system/audit_logs/entityTypes'
+
+export const userProfileIdSchema = v.id('userProfiles')
 
 // Common union types
 export const statusTypes = {
@@ -135,32 +137,6 @@ export const emailStatusTypes = v.union(
   v.literal('bounced')
 )
 
-// AI Request types
-export const aiRequestTypes = v.union(
-  v.literal('text_generation'),
-  v.literal('streaming'),
-  v.literal('embedding'),
-  v.literal('image_generation'),
-  v.literal('speech'),
-  v.literal('transcription'),
-  v.literal('test'),
-  v.literal('object_generation')
-)
-
-export const aiTestTypes = v.union(
-  v.literal('text_generation'),
-  v.literal('object_generation'),
-  v.literal('embedding'),
-  v.literal('image_generation'),
-  v.literal('speech'),
-  v.literal('transcription'),
-  v.literal('streaming'),
-  v.literal('tool_calling'),
-  v.literal('caching'),
-  v.literal('multimodal'),
-  v.literal('error_handling')
-)
-
 export const collaboratorRoles = v.union(
   v.literal('viewer'),
   v.literal('editor'),
@@ -202,32 +178,31 @@ export const cacheSchema = v.optional(v.object({
   cacheHit: v.optional(v.boolean()),
 }))
 
-// Common metadata schema
-// Note: Uses flexible types for extensibility, but with validation
-export const metadataValueSchema = v.union(
-  v.string(),
-  v.number(),
-  v.boolean(),
-  v.null(),
-  v.array(v.union(v.string(), v.number(), v.boolean())),
-  v.object({}) // For nested objects - can be extended
-)
-
-export const metadataSchema = v.optional(v.union(
-  v.object({
-    source: v.optional(v.string()),
-    operation: v.optional(v.string()),
-    oldValues: v.optional(v.record(v.string(), metadataValueSchema)),
-    newValues: v.optional(v.record(v.string(), metadataValueSchema)),
-    ipAddress: v.optional(v.string()),
-    userAgent: v.optional(v.string()),
-  }),
-  v.record(v.string(), metadataValueSchema)
-))
-
 // ============================================================================
 // Supporting Module Validators
 // ============================================================================
+
+/**
+ * Service priority validator
+ */
+export const servicePriorityValidator = v.union(
+  v.literal('standard'),
+  v.literal('urgent'),
+  v.literal('critical')
+)
+export type ServicePriority = 'standard' | 'urgent' | 'critical'
+
+/**
+ * Inquiry source type validator
+ */
+export const inquirySourceTypeValidator = v.union(
+  v.literal('website'),
+  v.literal('referral'),
+  v.literal('partner'),
+  v.literal('advertising'),
+  v.literal('direct')
+)
+export type InquirySourceType = 'website' | 'referral' | 'partner' | 'advertising' | 'direct'
 
 /**
  * Wiki entry type validator
@@ -334,6 +309,35 @@ export const documentStatusValidator = v.union(
 export type DocumentStatus = 'ready' | 'processing' | 'archived' | 'error'
 
 /**
+ * Notification type validator
+ */
+export const notificationTypeValidator = v.union(
+  v.literal('quote_expiring'),
+  v.literal('sla_warning'),
+  v.literal('payment_overdue'),
+  v.literal('task_assigned'),
+  v.literal('reminder_due'),
+  v.literal('vacation_request'),
+  v.literal('vacation_approved'),
+  v.literal('vacation_denied'),
+  v.literal('commission_ready'),
+  v.literal('performance_review_due'),
+  v.literal('employee_status_change')
+)
+export type NotificationType =
+  | 'quote_expiring'
+  | 'sla_warning'
+  | 'payment_overdue'
+  | 'task_assigned'
+  | 'reminder_due'
+  | 'vacation_request'
+  | 'vacation_approved'
+  | 'vacation_denied'
+  | 'commission_ready'
+  | 'performance_review_due'
+  | 'employee_status_change'
+
+/**
  * Supporting notification type validator
  */
 export const supportingNotificationTypeValidator = v.union(
@@ -346,6 +350,19 @@ export const supportingNotificationTypeValidator = v.union(
   v.literal('wiki_updated')
 )
 export type SupportingNotificationType = 'system' | 'comment_added' | 'comment_mentioned' | 'document_uploaded' | 'reminder_due' | 'reminder_overdue' | 'wiki_updated'
+
+/**
+ * Counter type validator
+ */
+export const counterTypeValidator = v.union(
+  v.literal('customer'),
+  v.literal('quote'),
+  v.literal('shipment'),
+  v.literal('invoice'),
+  v.literal('employee'),
+  v.literal('courier')
+)
+export type CounterType = 'customer' | 'quote' | 'shipment' | 'invoice' | 'employee' | 'courier'
 
 /**
  * Notification priority validator
@@ -417,105 +434,6 @@ export const eventPriorityValidator = v.union(
 export type EventPriority = 'low' | 'medium' | 'high' | 'urgent'
 
 // ============================================================================
-// Website Module Validators
-// ============================================================================
-
-/**
- * Page template type validator
- */
-export const pageTemplateTypeValidator = v.union(
-  v.literal('landing'),
-  v.literal('features'),
-  v.literal('about'),
-  v.literal('contact'),
-  v.literal('blog'),
-  v.literal('services'),
-  v.literal('pricing'),
-  v.literal('testimonials'),
-  v.literal('privacy'),
-  v.literal('terms'),
-  v.literal('cookies'),
-  v.literal('gdpr'),
-  v.literal('custom')
-)
-export type PageTemplateType = 'landing' | 'features' | 'about' | 'contact' | 'blog' | 'services' | 'pricing' | 'testimonials' | 'privacy' | 'terms' | 'cookies' | 'gdpr' | 'custom'
-
-/**
- * Section type validator
- */
-export const sectionTypeValidator = v.union(
-  v.literal('hero'),
-  v.literal('features'),
-  v.literal('testimonials'),
-  v.literal('pricing'),
-  v.literal('cta'),
-  v.literal('faq'),
-  v.literal('team'),
-  v.literal('gallery'),
-  v.literal('stats'),
-  v.literal('contact_form'),
-  v.literal('newsletter'),
-  v.literal('blog_list'),
-  v.literal('custom')
-)
-export type SectionType = 'hero' | 'features' | 'testimonials' | 'pricing' | 'cta' | 'faq' | 'team' | 'gallery' | 'stats' | 'contact_form' | 'newsletter' | 'blog_list' | 'custom'
-
-/**
- * Theme type validator
- */
-export const themeTypeValidator = v.union(
-  v.literal('modern'),
-  v.literal('classic'),
-  v.literal('minimal'),
-  v.literal('bold'),
-  v.literal('elegant'),
-  v.literal('creative'),
-  v.literal('custom')
-)
-export type ThemeType = 'modern' | 'classic' | 'minimal' | 'bold' | 'elegant' | 'creative' | 'custom'
-
-/**
- * Layout type validator
- */
-export const layoutTypeValidator = v.union(
-  v.literal('full_width'),
-  v.literal('boxed'),
-  v.literal('split'),
-  v.literal('sidebar_left'),
-  v.literal('sidebar_right'),
-  v.literal('custom')
-)
-export type LayoutType = 'full_width' | 'boxed' | 'split' | 'sidebar_left' | 'sidebar_right' | 'custom'
-
-/**
- * Content block type validator
- */
-export const blockTypeValidator = v.union(
-  v.literal('text'),
-  v.literal('image'),
-  v.literal('video'),
-  v.literal('button'),
-  v.literal('form'),
-  v.literal('code'),
-  v.literal('divider'),
-  v.literal('spacer'),
-  v.literal('html'),
-  v.literal('custom')
-)
-export type BlockType = 'text' | 'image' | 'video' | 'button' | 'form' | 'code' | 'divider' | 'spacer' | 'html' | 'custom'
-
-/**
- * Website collaborator role validator
- */
-export const websiteCollaboratorRoleValidator = v.union(
-  v.literal('owner'),
-  v.literal('admin'),
-  v.literal('editor'),
-  v.literal('viewer')
-)
-export type WebsiteCollaboratorRole = 'owner' | 'admin' | 'editor' | 'viewer'
-
-// ============================================================================
 // Audit & Soft Delete Fields
 // ============================================================================
 
@@ -539,6 +457,7 @@ export const auditFields = {
   createdAt: v.number(),
   updatedBy: v.optional(v.id('userProfiles')),
   updatedAt: v.optional(v.number()),
+  lastActivityAt: v.optional(v.number()),
 }
 
 /**
@@ -550,3 +469,134 @@ export const softDeleteFields = {
   deletedAt: v.optional(v.number()),
   deletedBy: v.optional(v.id('userProfiles')),
 }
+
+export const classificationFields = {
+  tags: v.optional(v.array(v.string())),
+  category: v.optional(v.string()),
+  customFields: v.optional(v.object({})),
+}
+
+// ============================================================================
+// YourOBC Statistics Validators
+// ============================================================================
+
+/**
+ * Difficulty level validator
+ */
+export const difficultyValidator = v.union(
+  v.literal('beginner'),
+  v.literal('intermediate'),
+  v.literal('advanced')
+)
+export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
+
+/**
+ * Visibility level validator
+ */
+export const visibilityValidator = v.union(
+  v.literal('public'),
+  v.literal('private'),
+  v.literal('shared'),
+  v.literal('organization')
+)
+export type Visibility = 'public' | 'private' | 'shared' | 'organization'
+
+/**
+ * Currency validator
+ */
+export const currencyValidator = v.union(
+  v.literal('EUR'),
+  v.literal('USD')
+)
+export type Currency = 'EUR' | 'USD'
+
+/**
+ * Currency amount schema validator
+ */
+export const currencyAmountSchema = v.object({
+  amount: v.number(),
+  currency: currencyValidator,
+})
+
+/**
+ * Office cost category validator
+ */
+export const officeCostCategoryValidator = v.union(
+  v.literal('rent'),
+  v.literal('utilities'),
+  v.literal('insurance'),
+  v.literal('maintenance'),
+  v.literal('supplies'),
+  v.literal('technology'),
+  v.literal('other')
+)
+export type OfficeCostCategory =
+  | 'rent'
+  | 'utilities'
+  | 'insurance'
+  | 'maintenance'
+  | 'supplies'
+  | 'technology'
+  | 'other'
+
+/**
+ * Cost frequency validator
+ */
+export const costFrequencyValidator = v.union(
+  v.literal('one_time'),
+  v.literal('monthly'),
+  v.literal('quarterly'),
+  v.literal('yearly')
+)
+export type CostFrequency = 'one_time' | 'monthly' | 'quarterly' | 'yearly'
+
+/**
+ * Miscellaneous expense category validator
+ */
+export const miscExpenseCategoryValidator = v.union(
+  v.literal('trade_show'),
+  v.literal('marketing'),
+  v.literal('tools'),
+  v.literal('software'),
+  v.literal('travel'),
+  v.literal('entertainment'),
+  v.literal('other')
+)
+export type MiscExpenseCategory =
+  | 'trade_show'
+  | 'marketing'
+  | 'tools'
+  | 'software'
+  | 'travel'
+  | 'entertainment'
+  | 'other'
+
+/**
+ * Target type validator
+ */
+export const targetTypeValidator = v.union(
+  v.literal('employee'),
+  v.literal('team'),
+  v.literal('company')
+)
+export type TargetType = 'employee' | 'team' | 'company'
+
+/**
+ * KPI cache type validator
+ */
+export const kpiCacheTypeValidator = v.union(
+  v.literal('employee'),
+  v.literal('customer'),
+  v.literal('company'),
+  v.literal('department')
+)
+export type KpiCacheType = 'employee' | 'customer' | 'company' | 'department'
+
+/**
+ * Statistics schema validator (for usage tracking)
+ */
+export const statsSchema = v.object({
+  usageCount: v.number(),
+  rating: v.optional(v.number()),
+  ratingCount: v.optional(v.number()),
+})

@@ -10,14 +10,9 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { entityTypes } from '../../../lib/system/audit_logs/entityTypes'
-import {
-  notificationTypeValidator,
-  notificationPriorityValidator,
-  metadataSchema,
-  auditFields,
-  softDeleteFields,
-} from './validators'
+import { entityTypes } from '@/config/entityTypes'
+import { supportingValidators, supportingFields } from './validators'
+import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**
  * YourOBC notifications table
@@ -26,17 +21,16 @@ import {
 export const notificationsTable = defineTable({
   // Core fields
   userId: v.string(),
-  type: notificationTypeValidator,
+  type: supportingValidators.notificationType,
   title: v.string(),
   message: v.string(),
   entityType: entityTypes.notifiable,
   entityId: v.string(),
-  priority: notificationPriorityValidator,
+  priority: supportingValidators.notificationPriority,
   isRead: v.boolean(),
   actionUrl: v.optional(v.string()),
 
   // Metadata and audit fields
-  ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })

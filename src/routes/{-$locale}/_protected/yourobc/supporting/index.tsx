@@ -1,7 +1,7 @@
 // src/routes/_protected/yourobc/supporting/index.tsx
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_protected/yourobc/supporting/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/')({
   component: SupportingIndexPage,
   head: () => ({
     meta: [

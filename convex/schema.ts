@@ -5,48 +5,15 @@
 import { defineSchema } from 'convex/server'
 
 import { systemSchemas } from './schema/system'
-import {
-  yourobcAccountingSchemas,
-  yourobcCouriersSchemas,
-  yourobcCustomerMarginsSchemas,
-  yourobcCustomersSchemas,
-  yourobcDashboardSchemas,
-  yourobcEmployeeCommissionsSchemas,
-  yourobcEmployeeKpisSchemas,
-  yourobcEmployeeSessionsSchemas,
-  yourobcEmployeesSchemas,
-  yourobcInvoicesSchemas,
-  yourobcPartnersSchemas,
-  yourobcQuotesSchemas,
-  yourobcShipmentsSchemas,
-  yourobcStatisticsSchemas,
-  yourobcSupportingSchemas,
-  yourobcTasksSchemas,
-  yourobcTrackingMessagesSchemas,
-} from './schema/yourobc/index'
+import { yourobcSchemas } from './schema/yourobc'
 
 const schema = defineSchema({
   // System Tables
   ...systemSchemas,
 
-  // YouROBC Modules (all tables prefixed with 'yourobc')
-  ...yourobcAccountingSchemas,
-  ...yourobcCouriersSchemas,
-  ...yourobcCustomerMarginsSchemas,
-  ...yourobcCustomersSchemas,
-  ...yourobcDashboardSchemas,
-  ...yourobcEmployeeCommissionsSchemas,
-  ...yourobcEmployeeKpisSchemas,
-  ...yourobcEmployeeSessionsSchemas,
-  ...yourobcEmployeesSchemas,
-  ...yourobcInvoicesSchemas,
-  ...yourobcPartnersSchemas,
-  ...yourobcQuotesSchemas,
-  ...yourobcShipmentsSchemas,
-  ...yourobcStatisticsSchemas,
-  ...yourobcSupportingSchemas,
-  ...yourobcTasksSchemas,
-  ...yourobcTrackingMessagesSchemas,
+  // YouROBC Tables
+  ...yourobcSchemas,
+  
 })
 
 export default schema

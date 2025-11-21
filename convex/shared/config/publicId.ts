@@ -41,84 +41,17 @@ export const PUBLIC_ID_CONFIG: PublicIdConfig = {
  */
 export const PUBLIC_ID_PREFIXES = {
   // High Priority - User-facing entities
-  projects: 'proj',
-  blogPosts: 'post',
-  blogAuthors: 'auth',
-  blogCategories: 'cat',
-  blogTags: 'tag',
-  blogMedia: 'med',
   wikiEntries: 'wiki',
   documents: 'doc',
   userProfiles: 'user',
+  appThemeSettings: 'theme',
+  dashboards: 'dash',
 
-  // Medium Priority - Integrations
-  webhooks: 'hook',
-  oauthApps: 'app',
-  externalIntegrations: 'int',
-  apiKeys: 'key',
+  emailConfigs: 'emcfg',
+  emailTemplates: 'emtpl',
 
   // Medium Priority - Events & Scheduling
   scheduledEvents: 'evt',
-
-  // Medium Priority - AI & Logging
-  aiLogs: 'ailog',
-  aiTests: 'test',
-
-  // Medium Priority - Commerce
-  subscriptions: 'sub',
-  clientProducts: 'prod',
-  clientPayments: 'pay',
-  connectedAccounts: 'acct',
-
-  // Lower Priority - Tasks & Milestones (if needed)
-  projectTasks: 'task',
-  projectMilestones: 'mile',
-
-  // Games - Core
-  gameScores: 'score',
-  gameSessions: 'sess',
-
-  // Games - Achievements
-  achievements: 'achv',
-  achievementMilestones: 'mile',
-
-  // Games - Replays
-  replays: 'rply',
-  replayComments: 'rcmt',
-
-  // Games - Multiplayer
-  multiplayerRooms: 'room',
-  matchResults: 'match',
-
-  // Games - Tetris
-  tetrisGames: 'tgame',
-  tetrisHighScores: 'tscore',
-
-  // Games - Dino
-  dinoGames: 'dgame',
-  dinoHighScores: 'dscore',
-
-  // Product Launch Platform
-  apps_products: 'prod',
-  apps_product_comments: 'pcmt',
-  apps_product_collections: 'pcol',
-
-  // Office - Document Generation
-  officeExcelDocuments: 'xldoc',
-  officeWordDocuments: 'wdoc',
-  officePowerpointPresentations: 'ppt',
-  officePdfDocuments: 'pdf',
-  officeDocumentTemplates: 'tmpl',
-  officeAutomatedReports: 'rpt',
-  officeSpreadsheetFormulas: 'fmla',
-  officePresentationDesigns: 'pdes',
-  officeCollaborativeSessions: 'collab',
-
-  // Design Tools
-  design_brandAssets: 'brand',
-  design_mockups: 'mock',
-  design_colorPalettes: 'pal',
-  design_fontPairings: 'font',
 
   // Data Analytics - Forms
   formsForms: 'form',
@@ -130,6 +63,23 @@ export const PUBLIC_ID_PREFIXES = {
   surveysQuestions: 'ques',
   surveysResponses: 'sresp',
   surveysBranchingRules: 'rule',
+
+  // YourOBC Specific
+  yourobcCouriers: 'cour',
+  yourobcEmployees: 'empl',
+  yourobcEmployeeCommissions: 'ecom',
+  yourobcEmployeeSessions: 'esess',
+  yourobcEmployeeKPIs: 'ekpi',
+  yourobcVacationDays: 'vac',
+  yourobcAccounting: 'acct',
+  yourobcTrackingMessages: 'tmsg',
+  yourobcTasks: 'task',
+  yourobcInvoices: 'inv',
+  yourobcPartners: 'part',
+  yourobcShipments: 'ship',
+  yourobcQuotes: 'quot',
+  yourobcCustomers: 'cust',
+
 } as const;
 
 export type PublicIdTable = keyof typeof PUBLIC_ID_PREFIXES;

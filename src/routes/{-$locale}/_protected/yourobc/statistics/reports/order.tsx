@@ -3,6 +3,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { OrderAnalysisReportPage } from '@/features/yourobc/statistics/pages/OrderAnalysisReportPage'
 
-export const Route = createFileRoute('/_protected/yourobc/statistics/reports/order')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/statistics/reports/order')({
   component: OrderAnalysisReportPage,
 })

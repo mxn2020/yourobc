@@ -3,7 +3,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PermissionRequestsPage } from '@/features/system/admin/pages/PermissionRequestsPage'
 import { permissionRequestsService } from '@/features/system/admin/services/PermissionRequestsService'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Loading } from '@/components/ui'
 import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'

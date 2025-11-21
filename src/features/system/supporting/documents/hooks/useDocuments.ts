@@ -1,7 +1,7 @@
 // src/features/system/supporting/documents/hooks/useDocuments.ts
 
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import type { CreateDocumentData, UpdateDocumentData } from '../types';
 

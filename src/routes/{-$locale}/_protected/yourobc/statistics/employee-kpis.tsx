@@ -3,6 +3,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { EmployeeKPIsPage } from '@/features/yourobc/statistics/pages/EmployeeKPIsPage'
 
-export const Route = createFileRoute('/_protected/yourobc/statistics/employee-kpis')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/statistics/employee-kpis')({
   component: EmployeeKPIsPage,
 })

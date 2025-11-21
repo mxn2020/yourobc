@@ -2,7 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useConvexMutation } from '@convex-dev/react-query';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import { useAuth } from '@/features/system/auth';
 import type { EmailRequest, EmailResponse, SendEmailOptions } from '../types';
 import { validateEmailRequest } from '../utils';

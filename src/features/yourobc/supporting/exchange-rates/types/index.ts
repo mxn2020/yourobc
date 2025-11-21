@@ -2,8 +2,8 @@
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 
-export type ExchangeRate = Doc<'yourobcExchangeRates'>
-export type ExchangeRateId = Id<'yourobcExchangeRates'>
+export type ExchangeRate = Doc<'exchangeRates'>
+export type ExchangeRateId = Id<'exchangeRates'>
 
 export type Currency = 'EUR' | 'USD'
 

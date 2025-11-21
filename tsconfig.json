@@ -1,7 +1,7 @@
 {
   "include": [
     "**/*.ts",
-    "**/*.tsx", "convex/schema.ts.bak",
+    "**/*.tsx",
   ],
   "compilerOptions": {
     "strict": true,
@@ -30,7 +30,8 @@
       "@/features/*": ["src/features/*"],
       "@/components/*": ["src/components/*"],
       "@/routes/*": ["src/routes/*"],
-      "@/convex/*": ["convex/*"]
+      "@/convex/*": ["convex/*"],
+      "@/generated/*": ["convex/_generated/*"],  // Add this
     },
     "noEmit": true
   },

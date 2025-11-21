@@ -4,7 +4,7 @@ import { admin } from "better-auth/plugins"
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { reactStartCookies } from "better-auth/react-start";
 import { PrismaClient } from "@prisma/client";
-import { api } from "@/convex/_generated/api";
+import { api } from '@/generated/api';
 import { AuthSession, AuthUser } from "../types/auth.types";
 import { 
   ac, 

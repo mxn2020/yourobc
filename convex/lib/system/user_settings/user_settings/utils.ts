@@ -32,7 +32,6 @@ export function getDefaultUserSettings(): Omit<UserSettings, '_id' | '_creationT
       showCompletedProjects: USER_SETTINGS_CONSTANTS.DEFAULTS.SHOW_COMPLETED_PROJECTS,
     },
     version: 1,
-    metadata: undefined,
     createdAt: now,
     createdBy: undefined,
     updatedAt: now,

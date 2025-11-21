@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
 import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { socialSchedulerService } from '../service'
 import { toast } from 'react-hot-toast'
 

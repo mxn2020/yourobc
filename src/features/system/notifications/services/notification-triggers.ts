@@ -1,5 +1,5 @@
 // src/features/notifications/services/notification-triggers.ts
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { FunctionReference } from 'convex/server'
 import type { Id } from '@/convex/_generated/dataModel'
 

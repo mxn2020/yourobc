@@ -3,13 +3,7 @@
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import { invoicesValidators } from '@/schema/yourobc/invoices/validators';
-import {
-  currencyAmountSchema,
-  addressSchema,
-  lineItemSchema,
-  collectionAttemptSchema,
-} from '@/schema/base';
+import { invoicesValidators, invoicesFields } from '@/schema/yourobc/invoices/validators';
 import { INVOICES_CONSTANTS } from './constants';
 import {
   validateInvoiceData,
@@ -29,6 +23,8 @@ import {
   isFinanceRole,
 } from './permissions';
 import type { InvoiceId, CreateInvoiceData, ProcessPaymentData, AddCollectionAttemptData } from './types';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Get current user - helper function for authentication
@@ -47,15 +43,6 @@ async function requireCurrentUser(ctx: any) {
 }
 
 /**
- * Generate unique public ID
- */
-async function generateUniquePublicId(ctx: any, prefix: string = 'INV'): Promise<string> {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `${prefix}-${timestamp}-${random}`;
-}
-
-/**
  * Create new invoice
  */
 export const createInvoice = mutation({
@@ -70,12 +57,12 @@ export const createInvoice = mutation({
       issueDate: v.number(),
       dueDate: v.number(),
       description: v.string(),
-      lineItems: v.array(lineItemSchema),
-      billingAddress: v.optional(addressSchema),
-      subtotal: currencyAmountSchema,
+      lineItems: v.array(invoicesFields.lineItem),
+      billingAddress: v.optional(invoicesFields.address),
+      subtotal: invoicesFields.currencyAmount,
       taxRate: v.optional(v.number()),
-      taxAmount: v.optional(currencyAmountSchema),
-      totalAmount: currencyAmountSchema,
+      taxAmount: v.optional(invoicesFields.currencyAmount),
+      totalAmount: invoicesFields.currencyAmount,
       paymentTerms: v.number(),
       purchaseOrderNumber: v.optional(v.string()),
       status: v.optional(invoicesValidators.status),
@@ -101,7 +88,7 @@ export const createInvoice = mutation({
     }
 
     // 4. PROCESS: Generate IDs and prepare data
-    const publicId = await generateUniquePublicId(ctx, 'INV');
+    const publicId = await generateUniquePublicId(ctx, 'yourobcInvoices');
     const now = Date.now();
 
     // 5. CREATE: Insert into database
@@ -175,12 +162,12 @@ export const updateInvoice = mutation({
       issueDate: v.optional(v.number()),
       dueDate: v.optional(v.number()),
       description: v.optional(v.string()),
-      lineItems: v.optional(v.array(lineItemSchema)),
-      billingAddress: v.optional(addressSchema),
-      subtotal: v.optional(currencyAmountSchema),
+      lineItems: v.optional(v.array(invoicesFields.lineItem)),
+      billingAddress: v.optional(invoicesFields.address),
+      subtotal: v.optional(invoicesFields.currencyAmount),
       taxRate: v.optional(v.number()),
-      taxAmount: v.optional(currencyAmountSchema),
-      totalAmount: v.optional(currencyAmountSchema),
+      taxAmount: v.optional(invoicesFields.currencyAmount),
+      totalAmount: v.optional(invoicesFields.currencyAmount),
       paymentTerms: v.optional(v.number()),
       purchaseOrderNumber: v.optional(v.string()),
       status: v.optional(invoicesValidators.status),
@@ -422,10 +409,10 @@ export const processPayment = mutation({
   args: {
     invoiceId: v.id('yourobcInvoices'),
     paymentData: v.object({
-      paymentMethod: invoicesValidators.paymentMethod,
+      paymentMethod: baseValidators.paymentMethod,
       paymentDate: v.number(),
       paymentReference: v.optional(v.string()),
-      paidAmount: currencyAmountSchema,
+      paidAmount: invoicesFields.currencyAmount,
       notes: v.optional(v.string()),
     }),
   },
@@ -474,7 +461,7 @@ export const processPayment = mutation({
         paymentMethod: paymentData.paymentMethod,
         paidAmount: paymentData.paidAmount.amount,
         currency: paymentData.paidAmount.currency,
-        paymentReference: paymentData.paymentReference,
+        paymentReference: paymentData.paymentReference || '',
       },
       createdAt: now,
       createdBy: user.authUserId,
@@ -493,13 +480,7 @@ export const addCollectionAttempt = mutation({
   args: {
     invoiceId: v.id('yourobcInvoices'),
     attemptData: v.object({
-      method: v.union(
-        v.literal('email'),
-        v.literal('phone'),
-        v.literal('letter'),
-        v.literal('legal_notice'),
-        v.literal('debt_collection')
-      ),
+      method: invoicesValidators.collectionMethod,
       result: v.string(),
       notes: v.optional(v.string()),
     }),
@@ -623,7 +604,7 @@ export const escalateDunning = mutation({
         newLevel,
         additionalFee,
         totalDunningFee,
-        notes,
+        notes: notes || '',
       },
       createdAt: now,
       createdBy: user.authUserId,

@@ -3,10 +3,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CustomersPage } from '@/features/yourobc/customers/pages/CustomersPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/customers/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/customers/')({
   loader: async ({ context }) => {
     try {
       // Get authenticated session (already verified by _protected layout)

@@ -4,11 +4,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreateCourierPage } from '@/features/yourobc/couriers/pages/CreateCourierPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import type { CourierId } from '@/features/yourobc/couriers/types'
 
-export const Route = createFileRoute('/_protected/yourobc/couriers/$courierId/edit')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/$courierId/edit')({
   loader: async ({ params, context }) => {
     try {
       const session = await authService.getSession()

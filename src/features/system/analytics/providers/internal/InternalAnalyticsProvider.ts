@@ -1,7 +1,7 @@
 // src/features/system/analytics/providers/internal/InternalAnalyticsProvider.ts
 
 import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { api } from '@/generated/api';
 import { Id } from "@/convex/_generated/dataModel";
 import {
   AnalyticsProvider,

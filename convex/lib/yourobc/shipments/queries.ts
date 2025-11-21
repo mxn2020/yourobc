@@ -7,6 +7,7 @@ import { requireCurrentUser } from '@/shared/auth.helper';
 import { shipmentsValidators } from '@/schema/yourobc/shipments/validators';
 import { filterShipmentsByAccess, requireViewShipmentAccess } from './permissions';
 import type { ShipmentListResponse, ShipmentFilters } from './types';
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Get paginated list of shipments with filtering
@@ -17,7 +18,7 @@ export const getShipments = query({
     offset: v.optional(v.number()),
     filters: v.optional(v.object({
       status: v.optional(v.array(shipmentsValidators.status)),
-      serviceType: v.optional(v.array(shipmentsValidators.serviceType)),
+      serviceType: v.optional(v.array(baseValidators.serviceType)),
       priority: v.optional(v.array(shipmentsValidators.priority)),
       customerId: v.optional(v.id('yourobcCustomers')),
       assignedCourierId: v.optional(v.id('yourobcCouriers')),

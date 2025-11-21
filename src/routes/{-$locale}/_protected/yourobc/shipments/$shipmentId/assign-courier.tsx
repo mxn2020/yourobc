@@ -6,14 +6,14 @@ import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense, useState } from 'react'
 import { Card, Loading, Button, Textarea, Alert, AlertDescription } from '@/components/ui'
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { ShipmentId } from '@/features/yourobc/shipments/types'
 import type { CourierListItem, CourierId } from '@/features/yourobc/couriers/types'
 
-export const Route = createFileRoute('/_protected/yourobc/shipments/$shipmentId/assign-courier')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier')({
   loader: async ({ params, context }) => {
     try {
       const session = await authService.getSession()

@@ -1,7 +1,7 @@
 // src/features/marketing/social-scheduler/service.ts
 
 import { queryOptions } from '@tanstack/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 
 export const socialSchedulerService = {
   getPostsQueryOptions: (options?: { limit?: number }) =>

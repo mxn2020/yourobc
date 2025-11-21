@@ -3,11 +3,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ShipmentDetailsPage } from '@/features/yourobc/shipments/pages/ShipmentDetailsPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import { ShipmentId } from '@/features/yourobc/shipments/types'
 
-export const Route = createFileRoute('/_protected/yourobc/shipments/$shipmentId/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$shipmentId/')({
   loader: async ({ params, context }) => {
     try {
       const session = await authService.getSession()

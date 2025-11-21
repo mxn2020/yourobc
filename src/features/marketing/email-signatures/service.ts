@@ -1,7 +1,7 @@
 // src/features/marketing/email-signatures/service.ts
 
 import { queryOptions } from '@tanstack/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { EmailSignatureId } from './types'
 
 export const emailSignaturesService = {

@@ -1,7 +1,7 @@
 // src/features/system/supporting/comments/hooks/useComments.ts
 
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
 import type { CreateCommentData, UpdateCommentData, CommentFilters } from '../types'
 

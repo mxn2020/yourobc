@@ -3,10 +3,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CommentsPage } from '@/features/yourobc/supporting/comments/pages/CommentsPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/supporting/comments/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/comments/')({
   loader: async ({ context }) => {
     try {
       // Get authenticated session (already verified by _protected layout)

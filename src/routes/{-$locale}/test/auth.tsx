@@ -1,7 +1,7 @@
 // src/routes/test/auth.tsx
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery as useConvexQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { authService } from '@/features/system/auth'
 import { useState } from 'react'
 

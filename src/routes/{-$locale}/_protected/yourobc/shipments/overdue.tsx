@@ -4,12 +4,12 @@ import { ShipmentList } from '@/features/yourobc/shipments/components/ShipmentLi
 import { useOverdueShipments } from '@/features/yourobc/shipments/hooks/useShipments'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import { Card, Alert, AlertDescription, Button } from '@/components/ui'
 import { Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_protected/yourobc/shipments/overdue')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/overdue')({
   loader: async ({ context }) => {
     try {
       const session = await authService.getSession()

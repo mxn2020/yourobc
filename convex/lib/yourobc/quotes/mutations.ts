@@ -3,16 +3,7 @@
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import { quotesValidators } from '@/schema/yourobc/quotes/validators';
-import {
-  addressSchema,
-  dimensionsSchema,
-  currencyAmountSchema,
-  flightDetailsSchema,
-  partnerQuoteSchema,
-  airlineRulesSchema,
-  shipmentTypeValidator,
-} from '@/schema/base';
+import { quotesValidators, quotesFields } from '@/schema/yourobc/quotes/validators';
 import { QUOTES_CONSTANTS } from './constants';
 import { validateQuoteData, trimQuoteData, canSendQuote as canSendQuoteUtil, canAcceptQuote, canRejectQuote, canConvertToShipment } from './utils';
 import {
@@ -23,6 +14,8 @@ import {
   requireConvertQuoteAccess,
 } from './permissions';
 import type { QuoteId } from './types';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { baseFields, baseValidators } from '@/schema/base.validators';
 
 /**
  * Get current user - helper function for authentication
@@ -41,16 +34,6 @@ async function requireCurrentUser(ctx: any) {
 }
 
 /**
- * Generate unique public ID
- */
-async function generateUniquePublicId(ctx: any, tableName: string): Promise<string> {
-  const prefix = tableName.replace(/([A-Z])/g, '-$1').toLowerCase().slice(1);
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${prefix}-${timestamp}-${random}`;
-}
-
-/**
  * Create new quote
  */
 export const createQuote = mutation({
@@ -58,26 +41,26 @@ export const createQuote = mutation({
     data: v.object({
       quoteNumber: v.string(),
       customerReference: v.optional(v.string()),
-      serviceType: quotesValidators.serviceType,
+      serviceType: baseValidators.serviceType,
       priority: quotesValidators.priority,
       customerId: v.id('yourobcCustomers'),
-      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
-      origin: addressSchema,
-      destination: addressSchema,
-      dimensions: dimensionsSchema,
+      inquirySourceId: v.optional(v.id('inquirySources')),
+      origin: baseFields.address,
+      destination: baseFields.address,
+      dimensions: quotesFields.dimensions,
       description: v.string(),
       specialInstructions: v.optional(v.string()),
       deadline: v.number(),
       validUntil: v.number(),
-      baseCost: v.optional(currencyAmountSchema),
+      baseCost: v.optional(baseFields.currencyAmount),
       markup: v.optional(v.number()),
-      totalPrice: v.optional(currencyAmountSchema),
-      partnerQuotes: v.optional(v.array(partnerQuoteSchema)),
+      totalPrice: v.optional(baseFields.currencyAmount),
+      partnerQuotes: v.optional(v.array(quotesFields.partnerQuote)),
       selectedPartnerQuote: v.optional(v.id('yourobcPartners')),
-      flightDetails: v.optional(flightDetailsSchema),
-      shipmentType: v.optional(shipmentTypeValidator),
+      flightDetails: v.optional(quotesFields.flightDetails),
+      shipmentType: v.optional(quotesValidators.shipmentType),
       incoterms: v.optional(v.string()),
-      appliedAirlineRules: v.optional(airlineRulesSchema),
+      appliedAirlineRules: v.optional(quotesFields.airlineRules),
       assignedCourierId: v.optional(v.id('yourobcCouriers')),
       employeeId: v.optional(v.id('yourobcEmployees')),
       status: v.optional(quotesValidators.status),
@@ -173,25 +156,25 @@ export const updateQuote = mutation({
     quoteId: v.id('yourobcQuotes'),
     updates: v.object({
       customerReference: v.optional(v.string()),
-      serviceType: v.optional(quotesValidators.serviceType),
+      serviceType: v.optional(baseValidators.serviceType),
       priority: v.optional(quotesValidators.priority),
-      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
-      origin: v.optional(addressSchema),
-      destination: v.optional(addressSchema),
-      dimensions: v.optional(dimensionsSchema),
+      inquirySourceId: v.optional(v.id('inquirySources')),
+      origin: v.optional(baseFields.address),
+      destination: v.optional(baseFields.address),
+      dimensions: v.optional(quotesFields.dimensions),
       description: v.optional(v.string()),
       specialInstructions: v.optional(v.string()),
       deadline: v.optional(v.number()),
       validUntil: v.optional(v.number()),
-      baseCost: v.optional(currencyAmountSchema),
+      baseCost: v.optional(baseFields.currencyAmount),
       markup: v.optional(v.number()),
-      totalPrice: v.optional(currencyAmountSchema),
-      partnerQuotes: v.optional(v.array(partnerQuoteSchema)),
+      totalPrice: v.optional(baseFields.currencyAmount),
+      partnerQuotes: v.optional(v.array(quotesFields.partnerQuote)),
       selectedPartnerQuote: v.optional(v.id('yourobcPartners')),
-      flightDetails: v.optional(flightDetailsSchema),
-      shipmentType: v.optional(shipmentTypeValidator),
+      flightDetails: v.optional(quotesFields.flightDetails),
+      shipmentType: v.optional(quotesValidators.shipmentType),
       incoterms: v.optional(v.string()),
-      appliedAirlineRules: v.optional(airlineRulesSchema),
+      appliedAirlineRules: v.optional(quotesFields.airlineRules),
       assignedCourierId: v.optional(v.id('yourobcCouriers')),
       employeeId: v.optional(v.id('yourobcEmployees')),
       status: v.optional(quotesValidators.status),
@@ -534,7 +517,9 @@ export const rejectQuote = mutation({
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Rejected quote: ${quote.quoteNumber}${rejectionReason ? ` - Reason: ${rejectionReason}` : ''}`,
-      metadata: { rejectionReason },
+      metadata: {
+        rejectionReason: rejectionReason || 'No reason provided'
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,

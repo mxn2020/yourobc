@@ -48,14 +48,7 @@ export type NotificationType = 'assignment' | 'completion' | 'invite' | 'achieve
  * - System entities (from convex/config/system/entities.config.ts)
  * - Your app entities (from convex/config/app/entities.config.ts)
  */
-export {
-  ALL_ENTITY_TYPES,
-  COMMENTABLE_ENTITY_TYPES,
-  DOCUMENTABLE_ENTITY_TYPES,
-  type EntityType,
-  type CommentableEntityType,
-  type DocumentableEntityType,
-} from './config';
+
 
 /**
  * Prompt-specific status types
@@ -134,4 +127,3 @@ export type AIAgentType =
  * Entity type labels - Now managed via configuration system
  * Auto-generated from entity types in config
  */
-export { ENTITY_TYPE_LABELS } from './config';

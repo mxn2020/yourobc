@@ -1,7 +1,7 @@
 // src/features/email/hooks/useEmailLogs.ts
 
 import { useConvexQuery } from '@convex-dev/react-query';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import type { EmailProvider, EmailStatus } from '../types';
 import { Id } from "@/convex/_generated/dataModel";
 

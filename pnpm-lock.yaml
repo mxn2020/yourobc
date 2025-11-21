@@ -113,9 +113,6 @@ importers:
       convex:
         specifier: ^1.29.2
         version: 1.29.2(react@19.2.0)
-      convex.config:
-        specifier: link:@useautumn/convex/convex.config
-        version: link:@useautumn/convex/convex.config
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0

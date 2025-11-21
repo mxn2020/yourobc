@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreatePartnerPage } from '@/features/yourobc/partners/pages/CreatePartnerPage'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/partners/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/partners/new')({
   component: CreatePartnerIndexPage,
   head: () => ({
     meta: [

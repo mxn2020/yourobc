@@ -5,7 +5,10 @@ import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { shipmentsValidators } from '@/schema/yourobc/shipments/validators';
+import {
+  shipmentsValidators,
+  shipmentsFields,
+} from '@/schema/yourobc/shipments/validators';
 import { SHIPMENTS_CONSTANTS } from './constants';
 import { validateShipmentData, trimShipmentData, calculateChargeableWeight } from './utils';
 import {
@@ -16,47 +19,7 @@ import {
   canDeleteShipment,
 } from './permissions';
 import type { ShipmentId } from './types';
-
-// Address schema validator for args
-const addressValidator = v.object({
-  street: v.optional(v.string()),
-  city: v.string(),
-  postalCode: v.optional(v.string()),
-  country: v.string(),
-  countryCode: v.string(),
-});
-
-// Dimensions schema validator for args
-const dimensionsValidator = v.object({
-  length: v.number(),
-  width: v.number(),
-  height: v.number(),
-  weight: v.number(),
-  unit: v.union(v.literal('cm'), v.literal('inch')),
-  weightUnit: v.union(v.literal('kg'), v.literal('lb')),
-  chargeableWeight: v.optional(v.number()),
-});
-
-// Currency amount validator for args
-const currencyAmountValidator = v.object({
-  amount: v.number(),
-  currency: v.union(v.literal('EUR'), v.literal('USD')),
-  exchangeRate: v.optional(v.number()),
-  exchangeRateDate: v.optional(v.number()),
-});
-
-// SLA validator for args
-const slaValidator = v.object({
-  deadline: v.number(),
-  status: v.union(v.literal('on_time'), v.literal('warning'), v.literal('overdue')),
-  remainingHours: v.optional(v.number()),
-});
-
-// Scheduled time validator for args
-const scheduledTimeValidator = v.object({
-  utcTimestamp: v.number(),
-  timezone: v.string(),
-});
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Create new shipment
@@ -67,29 +30,29 @@ export const createShipment = mutation({
       shipmentNumber: v.string(),
       awbNumber: v.optional(v.string()),
       customerReference: v.optional(v.string()),
-      serviceType: shipmentsValidators.serviceType,
+      serviceType: baseValidators.serviceType,
       priority: shipmentsValidators.priority,
       customerId: v.id('yourobcCustomers'),
       quoteId: v.optional(v.id('yourobcQuotes')),
-      origin: addressValidator,
-      destination: addressValidator,
-      dimensions: dimensionsValidator,
+      origin: shipmentsFields.address,
+      destination: shipmentsFields.address,
+      dimensions: shipmentsFields.dimensions,
       description: v.string(),
       specialInstructions: v.optional(v.string()),
       currentStatus: v.optional(shipmentsValidators.status),
-      sla: slaValidator,
+      sla: shipmentsFields.sla,
       assignedCourierId: v.optional(v.id('yourobcCouriers')),
       courierInstructions: v.optional(v.string()),
       employeeId: v.optional(v.id('yourobcEmployees')),
       partnerId: v.optional(v.id('yourobcPartners')),
       partnerReference: v.optional(v.string()),
-      agreedPrice: currencyAmountValidator,
-      actualCosts: v.optional(currencyAmountValidator),
-      totalPrice: v.optional(currencyAmountValidator),
-      purchasePrice: v.optional(currencyAmountValidator),
-      commission: v.optional(currencyAmountValidator),
-      pickupTime: v.optional(scheduledTimeValidator),
-      deliveryTime: v.optional(scheduledTimeValidator),
+      agreedPrice: shipmentsFields.currencyAmount,
+      actualCosts: v.optional(shipmentsFields.currencyAmount),
+      totalPrice: v.optional(shipmentsFields.currencyAmount),
+      purchasePrice: v.optional(shipmentsFields.currencyAmount),
+      commission: v.optional(shipmentsFields.currencyAmount),
+      pickupTime: v.optional(shipmentsFields.scheduledTime),
+      deliveryTime: v.optional(shipmentsFields.scheduledTime),
       communicationChannel: v.optional(v.object({
         type: shipmentsValidators.communicationChannel,
         identifier: v.optional(v.string()),
@@ -217,7 +180,7 @@ export const updateShipment = mutation({
       shipmentNumber: v.optional(v.string()),
       awbNumber: v.optional(v.string()),
       customerReference: v.optional(v.string()),
-      serviceType: v.optional(shipmentsValidators.serviceType),
+      serviceType: v.optional(baseValidators.serviceType),
       priority: v.optional(shipmentsValidators.priority),
       description: v.optional(v.string()),
       specialInstructions: v.optional(v.string()),
@@ -227,12 +190,12 @@ export const updateShipment = mutation({
       employeeId: v.optional(v.id('yourobcEmployees')),
       partnerId: v.optional(v.id('yourobcPartners')),
       partnerReference: v.optional(v.string()),
-      actualCosts: v.optional(currencyAmountValidator),
-      totalPrice: v.optional(currencyAmountValidator),
-      purchasePrice: v.optional(currencyAmountValidator),
-      commission: v.optional(currencyAmountValidator),
-      pickupTime: v.optional(scheduledTimeValidator),
-      deliveryTime: v.optional(scheduledTimeValidator),
+      actualCosts: v.optional(shipmentsFields.currencyAmount),
+      totalPrice: v.optional(shipmentsFields.currencyAmount),
+      purchasePrice: v.optional(shipmentsFields.currencyAmount),
+      commission: v.optional(shipmentsFields.currencyAmount),
+      pickupTime: v.optional(shipmentsFields.scheduledTime),
+      deliveryTime: v.optional(shipmentsFields.scheduledTime),
       tags: v.optional(v.array(v.string())),
       category: v.optional(v.string()),
     }),

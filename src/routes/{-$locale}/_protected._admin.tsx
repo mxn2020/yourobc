@@ -3,7 +3,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { requireAdminServer } from '@/features/system/auth/lib/server-functions'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { locales, defaultLocale } from '@/features/system/i18n'
 import type { Locale } from '@/features/system/i18n'
 

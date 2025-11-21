@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'

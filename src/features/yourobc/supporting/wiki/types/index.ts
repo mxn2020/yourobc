@@ -2,8 +2,8 @@
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 
-export type WikiEntry = Doc<'yourobcWikiEntries'>
-export type WikiEntryId = Id<'yourobcWikiEntries'>
+export type WikiEntry = Doc<'wikiEntries'>
+export type WikiEntryId = Id<'wikiEntries'>
 
 export type { CreateWikiEntryData } from '@/convex/lib/yourobc/supporting/wiki/types'
 

@@ -2,7 +2,8 @@
 
 import { UserRole } from '@/features/system/auth';
 import type { Id } from '../../convex/_generated/dataModel'
-import { EntityType, NotificationType } from '@/convex/types';
+import { NotificationType } from '@/convex/types';
+import { EntityType } from '@/config';
 
 // ============================================================================
 // User ID Type Aliases

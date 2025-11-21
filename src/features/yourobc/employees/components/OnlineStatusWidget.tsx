@@ -8,7 +8,7 @@
 
 import { FC, useEffect } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Card, Badge } from '@/components/ui'
 import { CompoundAvatar } from '@/components/ui/Avatar'
 import { useAuthenticatedUser } from '@/features/system/auth'

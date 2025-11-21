@@ -11,7 +11,7 @@ interface CommissionNewSearch {
   shipmentId?: string
 }
 
-export const Route = createFileRoute('/_protected/yourobc/couriers/commissions/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/commissions/new')({
   validateSearch: (search: Record<string, unknown>): CommissionNewSearch => {
     return {
       courierId: search.courierId as CourierId | undefined,

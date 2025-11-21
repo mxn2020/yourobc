@@ -10,16 +10,9 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { entityTypes } from '../../../lib/system/audit_logs/entityTypes'
-import {
-  reminderTypeValidator,
-  servicePriorityValidator,
-  reminderStatusValidator,
-  recurrenceFrequencyValidator,
-  metadataSchema,
-  auditFields,
-  softDeleteFields,
-} from './validators'
+import { entityTypes } from '@/config/entityTypes'
+import { supportingValidators, supportingFields } from './validators'
+import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**
  * Followup reminders table
@@ -29,33 +22,28 @@ export const followupRemindersTable = defineTable({
   // Core fields
   title: v.string(),
   description: v.optional(v.string()),
-  type: reminderTypeValidator,
+  type: supportingValidators.reminderType,
   entityType: entityTypes.all,
   entityId: v.string(),
 
   // Timeline
   dueDate: v.number(),
   reminderDate: v.optional(v.number()),
-  priority: servicePriorityValidator,
+  priority: supportingValidators.servicePriority,
 
   // Assignment
   assignedTo: v.string(),
   assignedBy: v.string(),
 
   // Status & Completion
-  status: reminderStatusValidator,
+  status: supportingValidators.reminderStatus,
   completedAt: v.optional(v.number()),
   completedBy: v.optional(v.string()),
   completionNotes: v.optional(v.string()),
 
   // Recurrence
   isRecurring: v.optional(v.boolean()),
-  recurrencePattern: v.optional(v.object({
-    frequency: recurrenceFrequencyValidator,
-    interval: v.number(),
-    endDate: v.optional(v.number()),
-    maxOccurrences: v.optional(v.number()),
-  })),
+  recurrencePattern: v.optional(supportingFields.recurrencePattern),
 
   // Snooze
   snoozeUntil: v.optional(v.number()),
@@ -67,7 +55,6 @@ export const followupRemindersTable = defineTable({
   emailReminder: v.boolean(),
 
   // Metadata and audit fields
-  ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })

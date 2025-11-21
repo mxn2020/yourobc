@@ -16,95 +16,87 @@ import { Route as Char123LocaleChar125IndexRouteImport } from './routes/{-$local
 import { Route as Char123LocaleChar125UnauthorizedRouteImport } from './routes/{-$locale}/unauthorized'
 import { Route as Char123LocaleChar125AuthRouteImport } from './routes/{-$locale}/auth'
 import { Route as Char123LocaleChar125ProtectedRouteImport } from './routes/{-$locale}/_protected'
-import { Route as Char123LocaleChar125BlogIndexRouteImport } from './routes/{-$locale}/blog/index'
 import { Route as Char123LocaleChar125TestAuthRouteImport } from './routes/{-$locale}/test/auth'
-import { Route as Char123LocaleChar125BlogSlugRouteImport } from './routes/{-$locale}/blog/$slug'
 import { Route as Char123LocaleChar125AuthSignupRouteImport } from './routes/{-$locale}/auth/signup'
 import { Route as Char123LocaleChar125AuthResetPasswordRouteImport } from './routes/{-$locale}/auth/reset-password'
 import { Route as Char123LocaleChar125AuthLoginRouteImport } from './routes/{-$locale}/auth/login'
 import { Route as Char123LocaleChar125AuthForgotPasswordRouteImport } from './routes/{-$locale}/auth/forgot-password'
 import { Route as Char123LocaleChar125ProtectedAdminRouteImport } from './routes/{-$locale}/_protected._admin'
 import { Route as ApiSettingsAiRouteImport } from './routes/api/settings/ai'
-import { Route as ApiPaymentsUsageRouteImport } from './routes/api/payments/usage'
-import { Route as ApiPaymentsSubscriptionRouteImport } from './routes/api/payments/subscription'
-import { Route as ApiPaymentsPortalRouteImport } from './routes/api/payments/portal'
-import { Route as ApiPaymentsCheckoutRouteImport } from './routes/api/payments/checkout'
-import { Route as ApiPaymentsCancelRouteImport } from './routes/api/payments/cancel'
-import { Route as ApiCacheContextsFileNameRouteImport } from './routes/api/cache-contexts/$fileName'
 import { Route as ApiAuthTestJwtRouteImport } from './routes/api/auth/test-jwt'
 import { Route as ApiAuthTestConvexRouteImport } from './routes/api/auth/test-convex'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiAiModelsIndexRouteImport } from './routes/api/ai/models/index'
-import { Route as ApiAiLogsIndexRouteImport } from './routes/api/ai/logs/index'
-import { Route as Char123LocaleChar125BlogTagSlugRouteImport } from './routes/{-$locale}/blog/tag/$slug'
-import { Route as Char123LocaleChar125BlogCategorySlugRouteImport } from './routes/{-$locale}/blog/category/$slug'
+import { Route as Char123LocaleChar125ProtectedYourobcIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting'
 import { Route as Char123LocaleChar125ProtectedSystemSettingsRouteImport } from './routes/{-$locale}/_protected/_system/settings'
 import { Route as Char123LocaleChar125ProtectedSystemDashboardRouteImport } from './routes/{-$locale}/_protected/_system/dashboard'
-import { Route as Char123LocaleChar125ProtectedSystemAiTestingRouteImport } from './routes/{-$locale}/_protected/_system/ai-testing'
-import { Route as ApiPaymentsStripeWebhooksRouteImport } from './routes/api/payments/stripe/webhooks'
-import { Route as ApiPaymentsStripeResumeSubscriptionRouteImport } from './routes/api/payments/stripe/resume-subscription'
-import { Route as ApiPaymentsStripeCreateSubscriptionRouteImport } from './routes/api/payments/stripe/create-subscription'
-import { Route as ApiPaymentsStripeCreatePaymentRouteImport } from './routes/api/payments/stripe/create-payment'
-import { Route as ApiPaymentsStripeCancelSubscriptionRouteImport } from './routes/api/payments/stripe/cancel-subscription'
-import { Route as ApiPaymentsStripeBillingPortalRouteImport } from './routes/api/payments/stripe/billing-portal'
-import { Route as ApiPaymentsStripeConnectWebhooksRouteImport } from './routes/api/payments/stripe-connect/webhooks'
-import { Route as ApiPaymentsStripeConnectOnboardingLinkRouteImport } from './routes/api/payments/stripe-connect/onboarding-link'
-import { Route as ApiPaymentsStripeConnectCreateProductRouteImport } from './routes/api/payments/stripe-connect/create-product'
-import { Route as ApiPaymentsStripeConnectCreateCheckoutRouteImport } from './routes/api/payments/stripe-connect/create-checkout'
-import { Route as ApiPaymentsStripeConnectCreateAccountRouteImport } from './routes/api/payments/stripe-connect/create-account'
-import { Route as ApiPaymentsStripeConnectAccountStatusRouteImport } from './routes/api/payments/stripe-connect/account-status'
-import { Route as ApiPaymentsAutumnWebhooksRouteImport } from './routes/api/payments/autumn/webhooks'
-import { Route as ApiAiTestHistoryRouteImport } from './routes/api/ai/test/history'
-import { Route as ApiAiTestExecuteRouteImport } from './routes/api/ai/test/execute'
-import { Route as ApiAiTestCompareRouteImport } from './routes/api/ai/test/compare'
-import { Route as ApiAiTestBatchRouteImport } from './routes/api/ai/test/batch'
-import { Route as ApiAiTestAnalyticsRouteImport } from './routes/api/ai/test/analytics'
-import { Route as ApiAiModelsTestRouteImport } from './routes/api/ai/models/test'
-import { Route as ApiAiModelsModelIdRouteImport } from './routes/api/ai/models/$modelId'
-import { Route as ApiAiLogsExportRouteImport } from './routes/api/ai/logs/export'
-import { Route as ApiAiLogsAnalyticsRouteImport } from './routes/api/ai/logs/analytics'
-import { Route as ApiAiLogsLogIdRouteImport } from './routes/api/ai/logs/$logId'
-import { Route as ApiAiGenerateTranscriptionRouteImport } from './routes/api/ai/generate/transcription'
-import { Route as ApiAiGenerateTextRouteImport } from './routes/api/ai/generate/text'
-import { Route as ApiAiGenerateStreamObjectRouteImport } from './routes/api/ai/generate/stream-object'
-import { Route as ApiAiGenerateStreamRouteImport } from './routes/api/ai/generate/stream'
-import { Route as ApiAiGenerateSpeechRouteImport } from './routes/api/ai/generate/speech'
-import { Route as ApiAiGenerateObjectRouteImport } from './routes/api/ai/generate/object'
-import { Route as ApiAiGenerateImageRouteImport } from './routes/api/ai/generate/image'
-import { Route as ApiAiGenerateEmbeddingRouteImport } from './routes/api/ai/generate/embedding'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport } from './routes/{-$locale}/_protected/_system/projects/index'
+import { Route as Char123LocaleChar125ProtectedYourobcTasksIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/tasks/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/index'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/index'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/index'
+import { Route as Char123LocaleChar125ProtectedYourobcQuotesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/quotes/index'
+import { Route as Char123LocaleChar125ProtectedYourobcPartnersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/partners/index'
+import { Route as Char123LocaleChar125ProtectedYourobcInvoicesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/invoices/index'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/index'
+import { Route as Char123LocaleChar125ProtectedYourobcCustomersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/index'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/index'
 import { Route as Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport } from './routes/{-$locale}/_protected/_system/notifications/index'
-import { Route as Char123LocaleChar125ProtectedSystemGamesIndexRouteImport } from './routes/{-$locale}/_protected/_system/games/index'
 import { Route as Char123LocaleChar125ProtectedSystemEmailIndexRouteImport } from './routes/{-$locale}/_protected/_system/email/index'
-import { Route as Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport } from './routes/{-$locale}/_protected/_system/ai-models/index'
-import { Route as Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport } from './routes/{-$locale}/_protected/_system/ai-logs/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/index'
-import { Route as ApiAiTestTestIdIndexRouteImport } from './routes/api/ai/test/$testId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcTasksDashboardRouteImport } from './routes/{-$locale}/_protected/yourobc/tasks/dashboard'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/top-customers'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsRevenueRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/revenue'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/operating-costs'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/employee-kpis'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsOverdueRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/overdue'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsNewRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/new'
+import { Route as Char123LocaleChar125ProtectedYourobcQuotesNewRouteImport } from './routes/{-$locale}/_protected/yourobc/quotes/new'
+import { Route as Char123LocaleChar125ProtectedYourobcPartnersNewRouteImport } from './routes/{-$locale}/_protected/yourobc/partners/new'
+import { Route as Char123LocaleChar125ProtectedYourobcInvoicesOverdueRouteImport } from './routes/{-$locale}/_protected/yourobc/invoices/overdue'
+import { Route as Char123LocaleChar125ProtectedYourobcInvoicesNewRouteImport } from './routes/{-$locale}/_protected/yourobc/invoices/new'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesNewRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/new'
+import { Route as Char123LocaleChar125ProtectedYourobcCustomersNewRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/new'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/new'
 import { Route as Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport } from './routes/{-$locale}/_protected/_system/settings/notifications'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport } from './routes/{-$locale}/_protected/_system/projects/timeline'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport } from './routes/{-$locale}/_protected/_system/projects/team'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport } from './routes/{-$locale}/_protected/_system/projects/tasks'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsNewRouteImport } from './routes/{-$locale}/_protected/_system/projects/new'
-import { Route as Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport } from './routes/{-$locale}/_protected/_system/games/$gameId'
 import { Route as Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport } from './routes/{-$locale}/_protected/_system/email/templates'
 import { Route as Char123LocaleChar125ProtectedSystemEmailLogsRouteImport } from './routes/{-$locale}/_protected/_system/email/logs'
-import { Route as Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport } from './routes/{-$locale}/_protected/_system/ai-models/$modelId'
-import { Route as Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport } from './routes/{-$locale}/_protected/_system/ai-logs/$logId'
 import { Route as Char123LocaleChar125ProtectedAdminAdminUsersRouteImport } from './routes/{-$locale}/_protected/_admin/admin/users'
 import { Route as Char123LocaleChar125ProtectedAdminAdminSettingsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/settings'
 import { Route as Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/permission-requests'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAuditLogsRouteImport } from './routes/{-$locale}/_protected/_admin/admin/audit-logs'
-import { Route as ApiAiTestTestIdResultsRouteImport } from './routes/api/ai/test/$testId/results'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport } from './routes/{-$locale}/_protected/_system/projects/$projectId/index'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/wiki/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/inquiry-sources/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/followup-reminders/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/exchange-rates/index'
+import { Route as Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting/comments/index'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/$shipmentId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/quotes/$quoteId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/partners/$partnerId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/invoices/$invoiceId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/vacations/index'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/$employeeId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/$customerId/index'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/commissions/index'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/$courierId/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/advanced-audit-logs/index'
-import { Route as Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport } from './routes/{-$locale}/_protected/_system/projects/$projectId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports/order'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports/monthly'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports/executive'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports/employee'
+import { Route as Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRouteImport } from './routes/{-$locale}/_protected/yourobc/statistics/reports/customer'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/$shipmentId/status'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/$shipmentId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRouteImport } from './routes/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier'
+import { Route as Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/quotes/$quoteId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/partners/$partnerId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/invoices/$invoiceId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/vacations/new'
+import { Route as Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/$employeeId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/$customerId/edit'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/commissions/new'
+import { Route as Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/$courierId/edit'
 import { Route as Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRouteImport } from './routes/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/tags/index'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/posts/index'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/categories/index'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/posts/new'
-import { Route as Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRouteImport } from './routes/{-$locale}/_protected/_admin/admin/blog/posts/$postId.edit'
 
 const Char123LocaleChar125RouteImport = createFileRoute('/{-$locale}')()
 
@@ -141,22 +133,10 @@ const Char123LocaleChar125ProtectedRoute =
     id: '/_protected',
     getParentRoute: () => Char123LocaleChar125Route,
   } as any)
-const Char123LocaleChar125BlogIndexRoute =
-  Char123LocaleChar125BlogIndexRouteImport.update({
-    id: '/blog/',
-    path: '/blog/',
-    getParentRoute: () => Char123LocaleChar125Route,
-  } as any)
 const Char123LocaleChar125TestAuthRoute =
   Char123LocaleChar125TestAuthRouteImport.update({
     id: '/test/auth',
     path: '/test/auth',
-    getParentRoute: () => Char123LocaleChar125Route,
-  } as any)
-const Char123LocaleChar125BlogSlugRoute =
-  Char123LocaleChar125BlogSlugRouteImport.update({
-    id: '/blog/$slug',
-    path: '/blog/$slug',
     getParentRoute: () => Char123LocaleChar125Route,
   } as any)
 const Char123LocaleChar125AuthSignupRoute =
@@ -193,37 +173,6 @@ const ApiSettingsAiRoute = ApiSettingsAiRouteImport.update({
   path: '/api/settings/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPaymentsUsageRoute = ApiPaymentsUsageRouteImport.update({
-  id: '/api/payments/usage',
-  path: '/api/payments/usage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaymentsSubscriptionRoute = ApiPaymentsSubscriptionRouteImport.update({
-  id: '/api/payments/subscription',
-  path: '/api/payments/subscription',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaymentsPortalRoute = ApiPaymentsPortalRouteImport.update({
-  id: '/api/payments/portal',
-  path: '/api/payments/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaymentsCheckoutRoute = ApiPaymentsCheckoutRouteImport.update({
-  id: '/api/payments/checkout',
-  path: '/api/payments/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaymentsCancelRoute = ApiPaymentsCancelRouteImport.update({
-  id: '/api/payments/cancel',
-  path: '/api/payments/cancel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCacheContextsFileNameRoute =
-  ApiCacheContextsFileNameRouteImport.update({
-    id: '/api/cache-contexts/$fileName',
-    path: '/api/cache-contexts/$fileName',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiAuthTestJwtRoute = ApiAuthTestJwtRouteImport.update({
   id: '/api/auth/test-jwt',
   path: '/api/auth/test-jwt',
@@ -239,27 +188,17 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAiModelsIndexRoute = ApiAiModelsIndexRouteImport.update({
-  id: '/api/ai/models/',
-  path: '/api/ai/models/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiLogsIndexRoute = ApiAiLogsIndexRouteImport.update({
-  id: '/api/ai/logs/',
-  path: '/api/ai/logs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char123LocaleChar125BlogTagSlugRoute =
-  Char123LocaleChar125BlogTagSlugRouteImport.update({
-    id: '/blog/tag/$slug',
-    path: '/blog/tag/$slug',
-    getParentRoute: () => Char123LocaleChar125Route,
+const Char123LocaleChar125ProtectedYourobcIndexRoute =
+  Char123LocaleChar125ProtectedYourobcIndexRouteImport.update({
+    id: '/yourobc/',
+    path: '/yourobc/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125BlogCategorySlugRoute =
-  Char123LocaleChar125BlogCategorySlugRouteImport.update({
-    id: '/blog/category/$slug',
-    path: '/blog/category/$slug',
-    getParentRoute: () => Char123LocaleChar125Route,
+const Char123LocaleChar125ProtectedYourobcSupportingRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingRouteImport.update({
+    id: '/yourobc/supporting',
+    path: '/yourobc/supporting',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemSettingsRoute =
   Char123LocaleChar125ProtectedSystemSettingsRouteImport.update({
@@ -273,186 +212,64 @@ const Char123LocaleChar125ProtectedSystemDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemAiTestingRoute =
-  Char123LocaleChar125ProtectedSystemAiTestingRouteImport.update({
-    id: '/_system/ai-testing',
-    path: '/ai-testing',
+const Char123LocaleChar125ProtectedYourobcTasksIndexRoute =
+  Char123LocaleChar125ProtectedYourobcTasksIndexRouteImport.update({
+    id: '/yourobc/tasks/',
+    path: '/yourobc/tasks/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeWebhooksRoute =
-  ApiPaymentsStripeWebhooksRouteImport.update({
-    id: '/api/payments/stripe/webhooks',
-    path: '/api/payments/stripe/webhooks',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcSupportingIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
   } as any)
-const ApiPaymentsStripeResumeSubscriptionRoute =
-  ApiPaymentsStripeResumeSubscriptionRouteImport.update({
-    id: '/api/payments/stripe/resume-subscription',
-    path: '/api/payments/stripe/resume-subscription',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsIndexRouteImport.update({
+    id: '/yourobc/statistics/',
+    path: '/yourobc/statistics/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeCreateSubscriptionRoute =
-  ApiPaymentsStripeCreateSubscriptionRouteImport.update({
-    id: '/api/payments/stripe/create-subscription',
-    path: '/api/payments/stripe/create-subscription',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsIndexRouteImport.update({
+    id: '/yourobc/shipments/',
+    path: '/yourobc/shipments/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeCreatePaymentRoute =
-  ApiPaymentsStripeCreatePaymentRouteImport.update({
-    id: '/api/payments/stripe/create-payment',
-    path: '/api/payments/stripe/create-payment',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcQuotesIndexRoute =
+  Char123LocaleChar125ProtectedYourobcQuotesIndexRouteImport.update({
+    id: '/yourobc/quotes/',
+    path: '/yourobc/quotes/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeCancelSubscriptionRoute =
-  ApiPaymentsStripeCancelSubscriptionRouteImport.update({
-    id: '/api/payments/stripe/cancel-subscription',
-    path: '/api/payments/stripe/cancel-subscription',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcPartnersIndexRoute =
+  Char123LocaleChar125ProtectedYourobcPartnersIndexRouteImport.update({
+    id: '/yourobc/partners/',
+    path: '/yourobc/partners/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeBillingPortalRoute =
-  ApiPaymentsStripeBillingPortalRouteImport.update({
-    id: '/api/payments/stripe/billing-portal',
-    path: '/api/payments/stripe/billing-portal',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute =
+  Char123LocaleChar125ProtectedYourobcInvoicesIndexRouteImport.update({
+    id: '/yourobc/invoices/',
+    path: '/yourobc/invoices/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeConnectWebhooksRoute =
-  ApiPaymentsStripeConnectWebhooksRouteImport.update({
-    id: '/api/payments/stripe-connect/webhooks',
-    path: '/api/payments/stripe-connect/webhooks',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesIndexRouteImport.update({
+    id: '/yourobc/employees/',
+    path: '/yourobc/employees/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeConnectOnboardingLinkRoute =
-  ApiPaymentsStripeConnectOnboardingLinkRouteImport.update({
-    id: '/api/payments/stripe-connect/onboarding-link',
-    path: '/api/payments/stripe-connect/onboarding-link',
-    getParentRoute: () => rootRouteImport,
+const Char123LocaleChar125ProtectedYourobcCustomersIndexRoute =
+  Char123LocaleChar125ProtectedYourobcCustomersIndexRouteImport.update({
+    id: '/yourobc/customers/',
+    path: '/yourobc/customers/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const ApiPaymentsStripeConnectCreateProductRoute =
-  ApiPaymentsStripeConnectCreateProductRouteImport.update({
-    id: '/api/payments/stripe-connect/create-product',
-    path: '/api/payments/stripe-connect/create-product',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPaymentsStripeConnectCreateCheckoutRoute =
-  ApiPaymentsStripeConnectCreateCheckoutRouteImport.update({
-    id: '/api/payments/stripe-connect/create-checkout',
-    path: '/api/payments/stripe-connect/create-checkout',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPaymentsStripeConnectCreateAccountRoute =
-  ApiPaymentsStripeConnectCreateAccountRouteImport.update({
-    id: '/api/payments/stripe-connect/create-account',
-    path: '/api/payments/stripe-connect/create-account',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPaymentsStripeConnectAccountStatusRoute =
-  ApiPaymentsStripeConnectAccountStatusRouteImport.update({
-    id: '/api/payments/stripe-connect/account-status',
-    path: '/api/payments/stripe-connect/account-status',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPaymentsAutumnWebhooksRoute =
-  ApiPaymentsAutumnWebhooksRouteImport.update({
-    id: '/api/payments/autumn/webhooks',
-    path: '/api/payments/autumn/webhooks',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAiTestHistoryRoute = ApiAiTestHistoryRouteImport.update({
-  id: '/api/ai/test/history',
-  path: '/api/ai/test/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiTestExecuteRoute = ApiAiTestExecuteRouteImport.update({
-  id: '/api/ai/test/execute',
-  path: '/api/ai/test/execute',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiTestCompareRoute = ApiAiTestCompareRouteImport.update({
-  id: '/api/ai/test/compare',
-  path: '/api/ai/test/compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiTestBatchRoute = ApiAiTestBatchRouteImport.update({
-  id: '/api/ai/test/batch',
-  path: '/api/ai/test/batch',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiTestAnalyticsRoute = ApiAiTestAnalyticsRouteImport.update({
-  id: '/api/ai/test/analytics',
-  path: '/api/ai/test/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiModelsTestRoute = ApiAiModelsTestRouteImport.update({
-  id: '/api/ai/models/test',
-  path: '/api/ai/models/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiModelsModelIdRoute = ApiAiModelsModelIdRouteImport.update({
-  id: '/api/ai/models/$modelId',
-  path: '/api/ai/models/$modelId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiLogsExportRoute = ApiAiLogsExportRouteImport.update({
-  id: '/api/ai/logs/export',
-  path: '/api/ai/logs/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiLogsAnalyticsRoute = ApiAiLogsAnalyticsRouteImport.update({
-  id: '/api/ai/logs/analytics',
-  path: '/api/ai/logs/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiLogsLogIdRoute = ApiAiLogsLogIdRouteImport.update({
-  id: '/api/ai/logs/$logId',
-  path: '/api/ai/logs/$logId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateTranscriptionRoute =
-  ApiAiGenerateTranscriptionRouteImport.update({
-    id: '/api/ai/generate/transcription',
-    path: '/api/ai/generate/transcription',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAiGenerateTextRoute = ApiAiGenerateTextRouteImport.update({
-  id: '/api/ai/generate/text',
-  path: '/api/ai/generate/text',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateStreamObjectRoute =
-  ApiAiGenerateStreamObjectRouteImport.update({
-    id: '/api/ai/generate/stream-object',
-    path: '/api/ai/generate/stream-object',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAiGenerateStreamRoute = ApiAiGenerateStreamRouteImport.update({
-  id: '/api/ai/generate/stream',
-  path: '/api/ai/generate/stream',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateSpeechRoute = ApiAiGenerateSpeechRouteImport.update({
-  id: '/api/ai/generate/speech',
-  path: '/api/ai/generate/speech',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateObjectRoute = ApiAiGenerateObjectRouteImport.update({
-  id: '/api/ai/generate/object',
-  path: '/api/ai/generate/object',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateImageRoute = ApiAiGenerateImageRouteImport.update({
-  id: '/api/ai/generate/image',
-  path: '/api/ai/generate/image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiGenerateEmbeddingRoute = ApiAiGenerateEmbeddingRouteImport.update({
-  id: '/api/ai/generate/embedding',
-  path: '/api/ai/generate/embedding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char123LocaleChar125ProtectedSystemProjectsIndexRoute =
-  Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport.update({
-    id: '/_system/projects/',
-    path: '/projects/',
+const Char123LocaleChar125ProtectedYourobcCouriersIndexRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport.update({
+    id: '/yourobc/couriers/',
+    path: '/yourobc/couriers/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemNotificationsIndexRoute =
@@ -461,28 +278,10 @@ const Char123LocaleChar125ProtectedSystemNotificationsIndexRoute =
     path: '/notifications/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemGamesIndexRoute =
-  Char123LocaleChar125ProtectedSystemGamesIndexRouteImport.update({
-    id: '/_system/games/',
-    path: '/games/',
-    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
-  } as any)
 const Char123LocaleChar125ProtectedSystemEmailIndexRoute =
   Char123LocaleChar125ProtectedSystemEmailIndexRouteImport.update({
     id: '/_system/email/',
     path: '/email/',
-    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
-  } as any)
-const Char123LocaleChar125ProtectedSystemAiModelsIndexRoute =
-  Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport.update({
-    id: '/_system/ai-models/',
-    path: '/ai-models/',
-    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
-  } as any)
-const Char123LocaleChar125ProtectedSystemAiLogsIndexRoute =
-  Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport.update({
-    id: '/_system/ai-logs/',
-    path: '/ai-logs/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedAdminAdminIndexRoute =
@@ -491,49 +290,103 @@ const Char123LocaleChar125ProtectedAdminAdminIndexRoute =
     path: '/admin/',
     getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
   } as any)
-const ApiAiTestTestIdIndexRoute = ApiAiTestTestIdIndexRouteImport.update({
-  id: '/api/ai/test/$testId/',
-  path: '/api/ai/test/$testId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute =
-  Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport.update(
+const Char123LocaleChar125ProtectedYourobcTasksDashboardRoute =
+  Char123LocaleChar125ProtectedYourobcTasksDashboardRouteImport.update({
+    id: '/yourobc/tasks/dashboard',
+    path: '/yourobc/tasks/dashboard',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRouteImport.update({
+    id: '/yourobc/statistics/top-customers',
+    path: '/yourobc/statistics/top-customers',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsRevenueRouteImport.update({
+    id: '/yourobc/statistics/revenue',
+    path: '/yourobc/statistics/revenue',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteImport.update({
+    id: '/yourobc/statistics/reports',
+    path: '/yourobc/statistics/reports',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRouteImport.update(
     {
-      id: '/notifications',
-      path: '/notifications',
-      getParentRoute: () =>
-        Char123LocaleChar125ProtectedSystemSettingsRoute,
+      id: '/yourobc/statistics/operating-costs',
+      path: '/yourobc/statistics/operating-costs',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedSystemProjectsTimelineRoute =
-  Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport.update({
-    id: '/_system/projects/timeline',
-    path: '/projects/timeline',
+const Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRouteImport.update({
+    id: '/yourobc/statistics/employee-kpis',
+    path: '/yourobc/statistics/employee-kpis',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemProjectsTeamRoute =
-  Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport.update({
-    id: '/_system/projects/team',
-    path: '/projects/team',
+const Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsOverdueRouteImport.update({
+    id: '/yourobc/shipments/overdue',
+    path: '/yourobc/shipments/overdue',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemProjectsTasksRoute =
-  Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport.update({
-    id: '/_system/projects/tasks',
-    path: '/projects/tasks',
+const Char123LocaleChar125ProtectedYourobcShipmentsNewRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsNewRouteImport.update({
+    id: '/yourobc/shipments/new',
+    path: '/yourobc/shipments/new',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemProjectsNewRoute =
-  Char123LocaleChar125ProtectedSystemProjectsNewRouteImport.update({
-    id: '/_system/projects/new',
-    path: '/projects/new',
+const Char123LocaleChar125ProtectedYourobcQuotesNewRoute =
+  Char123LocaleChar125ProtectedYourobcQuotesNewRouteImport.update({
+    id: '/yourobc/quotes/new',
+    path: '/yourobc/quotes/new',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
-const Char123LocaleChar125ProtectedSystemGamesGameIdRoute =
-  Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport.update({
-    id: '/_system/games/$gameId',
-    path: '/games/$gameId',
+const Char123LocaleChar125ProtectedYourobcPartnersNewRoute =
+  Char123LocaleChar125ProtectedYourobcPartnersNewRouteImport.update({
+    id: '/yourobc/partners/new',
+    path: '/yourobc/partners/new',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute =
+  Char123LocaleChar125ProtectedYourobcInvoicesOverdueRouteImport.update({
+    id: '/yourobc/invoices/overdue',
+    path: '/yourobc/invoices/overdue',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcInvoicesNewRoute =
+  Char123LocaleChar125ProtectedYourobcInvoicesNewRouteImport.update({
+    id: '/yourobc/invoices/new',
+    path: '/yourobc/invoices/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcEmployeesNewRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesNewRouteImport.update({
+    id: '/yourobc/employees/new',
+    path: '/yourobc/employees/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcCustomersNewRoute =
+  Char123LocaleChar125ProtectedYourobcCustomersNewRouteImport.update({
+    id: '/yourobc/customers/new',
+    path: '/yourobc/customers/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcCouriersNewRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport.update({
+    id: '/yourobc/couriers/new',
+    path: '/yourobc/couriers/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute =
+  Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => Char123LocaleChar125ProtectedSystemSettingsRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemEmailTemplatesRoute =
   Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport.update({
@@ -545,18 +398,6 @@ const Char123LocaleChar125ProtectedSystemEmailLogsRoute =
   Char123LocaleChar125ProtectedSystemEmailLogsRouteImport.update({
     id: '/_system/email/logs',
     path: '/email/logs',
-    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
-  } as any)
-const Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute =
-  Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport.update({
-    id: '/_system/ai-models/$modelId',
-    path: '/ai-models/$modelId',
-    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
-  } as any)
-const Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute =
-  Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport.update({
-    id: '/_system/ai-logs/$logId',
-    path: '/ai-logs/$logId',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedAdminAdminUsersRoute =
@@ -583,24 +424,107 @@ const Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute =
     path: '/admin/audit-logs',
     getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
   } as any)
-const ApiAiTestTestIdResultsRoute = ApiAiTestTestIdResultsRouteImport.update({
-  id: '/api/ai/test/$testId/results',
-  path: '/api/ai/test/$testId/results',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute =
-  Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport.update(
+const Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRouteImport.update({
+    id: '/wiki/',
+    path: '/wiki/',
+    getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRouteImport.update(
     {
-      id: '/_system/projects/$projectId/',
-      path: '/projects/$projectId/',
+      id: '/inquiry-sources/',
+      path: '/inquiry-sources/',
+      getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRouteImport.update(
+    {
+      id: '/followup-reminders/',
+      path: '/followup-reminders/',
+      getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRouteImport.update(
+    {
+      id: '/exchange-rates/',
+      path: '/exchange-rates/',
+      getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute =
+  Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRouteImport.update(
+    {
+      id: '/comments/',
+      path: '/comments/',
+      getParentRoute: () => Char123LocaleChar125ProtectedYourobcSupportingRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRouteImport.update(
+    {
+      id: '/yourobc/shipments/$shipmentId/',
+      path: '/yourobc/shipments/$shipmentId/',
       getParentRoute: () => Char123LocaleChar125ProtectedRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogIndexRouteImport.update({
-    id: '/admin/blog/',
-    path: '/admin/blog/',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
+const Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRouteImport.update({
+    id: '/yourobc/quotes/$quoteId/',
+    path: '/yourobc/quotes/$quoteId/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRouteImport.update({
+    id: '/yourobc/partners/$partnerId/',
+    path: '/yourobc/partners/$partnerId/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRouteImport.update({
+    id: '/yourobc/invoices/$invoiceId/',
+    path: '/yourobc/invoices/$invoiceId/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRouteImport.update(
+    {
+      id: '/yourobc/employees/vacations/',
+      path: '/yourobc/employees/vacations/',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRouteImport.update(
+    {
+      id: '/yourobc/employees/$employeeId/',
+      path: '/yourobc/employees/$employeeId/',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRouteImport.update(
+    {
+      id: '/yourobc/customers/$customerId/',
+      path: '/yourobc/customers/$customerId/',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRouteImport.update(
+    {
+      id: '/yourobc/couriers/commissions/',
+      path: '/yourobc/couriers/commissions/',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRouteImport.update({
+    id: '/yourobc/couriers/$courierId/',
+    path: '/yourobc/couriers/$courierId/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute =
   Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRouteImport.update(
@@ -610,14 +534,125 @@ const Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute =
       getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute =
-  Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport.update(
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRouteImport.update({
+    id: '/order',
+    path: '/order',
+    getParentRoute: () =>
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRouteImport.update(
     {
-      id: '/_system/projects/$projectId/edit',
-      path: '/projects/$projectId/edit',
+      id: '/monthly',
+      path: '/monthly',
+      getParentRoute: () =>
+        Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRouteImport.update(
+    {
+      id: '/executive',
+      path: '/executive',
+      getParentRoute: () =>
+        Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRouteImport.update(
+    {
+      id: '/employee',
+      path: '/employee',
+      getParentRoute: () =>
+        Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRouteImport.update(
+    {
+      id: '/customer',
+      path: '/customer',
+      getParentRoute: () =>
+        Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRouteImport.update(
+    {
+      id: '/yourobc/shipments/$shipmentId/status',
+      path: '/yourobc/shipments/$shipmentId/status',
       getParentRoute: () => Char123LocaleChar125ProtectedRoute,
     } as any,
   )
+const Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRouteImport.update(
+    {
+      id: '/yourobc/shipments/$shipmentId/edit',
+      path: '/yourobc/shipments/$shipmentId/edit',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute =
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRouteImport.update(
+    {
+      id: '/yourobc/shipments/$shipmentId/assign-courier',
+      path: '/yourobc/shipments/$shipmentId/assign-courier',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRouteImport.update({
+    id: '/yourobc/quotes/$quoteId/edit',
+    path: '/yourobc/quotes/$quoteId/edit',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRouteImport.update({
+    id: '/yourobc/partners/$partnerId/edit',
+    path: '/yourobc/partners/$partnerId/edit',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRouteImport.update({
+    id: '/yourobc/invoices/$invoiceId/edit',
+    path: '/yourobc/invoices/$invoiceId/edit',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRouteImport.update({
+    id: '/yourobc/employees/vacations/new',
+    path: '/yourobc/employees/vacations/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRouteImport.update(
+    {
+      id: '/yourobc/employees/$employeeId/edit',
+      path: '/yourobc/employees/$employeeId/edit',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRouteImport.update(
+    {
+      id: '/yourobc/customers/$customerId/edit',
+      path: '/yourobc/customers/$customerId/edit',
+      getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+    } as any,
+  )
+const Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRouteImport.update({
+    id: '/yourobc/couriers/commissions/new',
+    path: '/yourobc/couriers/commissions/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute =
+  Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRouteImport.update({
+    id: '/yourobc/couriers/$courierId/edit',
+    path: '/yourobc/couriers/$courierId/edit',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
 const Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute =
   Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRouteImport.update(
     {
@@ -626,36 +661,6 @@ const Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute =
       getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
     } as any,
   )
-const Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRouteImport.update({
-    id: '/admin/blog/tags/',
-    path: '/admin/blog/tags/',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
-  } as any)
-const Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRouteImport.update({
-    id: '/admin/blog/posts/',
-    path: '/admin/blog/posts/',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
-  } as any)
-const Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRouteImport.update({
-    id: '/admin/blog/categories/',
-    path: '/admin/blog/categories/',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
-  } as any)
-const Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRouteImport.update({
-    id: '/admin/blog/posts/new',
-    path: '/admin/blog/posts/new',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
-  } as any)
-const Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute =
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRouteImport.update({
-    id: '/admin/blog/posts/$postId/edit',
-    path: '/admin/blog/posts/$postId/edit',
-    getParentRoute: () => Char123LocaleChar125ProtectedAdminRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -666,91 +671,83 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/test-convex': typeof ApiAuthTestConvexRoute
   '/api/auth/test-jwt': typeof ApiAuthTestJwtRoute
-  '/api/cache-contexts/$fileName': typeof ApiCacheContextsFileNameRoute
-  '/api/payments/cancel': typeof ApiPaymentsCancelRoute
-  '/api/payments/checkout': typeof ApiPaymentsCheckoutRoute
-  '/api/payments/portal': typeof ApiPaymentsPortalRoute
-  '/api/payments/subscription': typeof ApiPaymentsSubscriptionRoute
-  '/api/payments/usage': typeof ApiPaymentsUsageRoute
   '/api/settings/ai': typeof ApiSettingsAiRoute
   '/{-$locale}/auth/forgot-password': typeof Char123LocaleChar125AuthForgotPasswordRoute
   '/{-$locale}/auth/login': typeof Char123LocaleChar125AuthLoginRoute
   '/{-$locale}/auth/reset-password': typeof Char123LocaleChar125AuthResetPasswordRoute
   '/{-$locale}/auth/signup': typeof Char123LocaleChar125AuthSignupRoute
-  '/{-$locale}/blog/$slug': typeof Char123LocaleChar125BlogSlugRoute
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
-  '/{-$locale}/blog': typeof Char123LocaleChar125BlogIndexRoute
-  '/api/ai/generate/embedding': typeof ApiAiGenerateEmbeddingRoute
-  '/api/ai/generate/image': typeof ApiAiGenerateImageRoute
-  '/api/ai/generate/object': typeof ApiAiGenerateObjectRoute
-  '/api/ai/generate/speech': typeof ApiAiGenerateSpeechRoute
-  '/api/ai/generate/stream': typeof ApiAiGenerateStreamRoute
-  '/api/ai/generate/stream-object': typeof ApiAiGenerateStreamObjectRoute
-  '/api/ai/generate/text': typeof ApiAiGenerateTextRoute
-  '/api/ai/generate/transcription': typeof ApiAiGenerateTranscriptionRoute
-  '/api/ai/logs/$logId': typeof ApiAiLogsLogIdRoute
-  '/api/ai/logs/analytics': typeof ApiAiLogsAnalyticsRoute
-  '/api/ai/logs/export': typeof ApiAiLogsExportRoute
-  '/api/ai/models/$modelId': typeof ApiAiModelsModelIdRoute
-  '/api/ai/models/test': typeof ApiAiModelsTestRoute
-  '/api/ai/test/analytics': typeof ApiAiTestAnalyticsRoute
-  '/api/ai/test/batch': typeof ApiAiTestBatchRoute
-  '/api/ai/test/compare': typeof ApiAiTestCompareRoute
-  '/api/ai/test/execute': typeof ApiAiTestExecuteRoute
-  '/api/ai/test/history': typeof ApiAiTestHistoryRoute
-  '/api/payments/autumn/webhooks': typeof ApiPaymentsAutumnWebhooksRoute
-  '/api/payments/stripe-connect/account-status': typeof ApiPaymentsStripeConnectAccountStatusRoute
-  '/api/payments/stripe-connect/create-account': typeof ApiPaymentsStripeConnectCreateAccountRoute
-  '/api/payments/stripe-connect/create-checkout': typeof ApiPaymentsStripeConnectCreateCheckoutRoute
-  '/api/payments/stripe-connect/create-product': typeof ApiPaymentsStripeConnectCreateProductRoute
-  '/api/payments/stripe-connect/onboarding-link': typeof ApiPaymentsStripeConnectOnboardingLinkRoute
-  '/api/payments/stripe-connect/webhooks': typeof ApiPaymentsStripeConnectWebhooksRoute
-  '/api/payments/stripe/billing-portal': typeof ApiPaymentsStripeBillingPortalRoute
-  '/api/payments/stripe/cancel-subscription': typeof ApiPaymentsStripeCancelSubscriptionRoute
-  '/api/payments/stripe/create-payment': typeof ApiPaymentsStripeCreatePaymentRoute
-  '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
-  '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
-  '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
   '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
-  '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
-  '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
-  '/api/ai/logs': typeof ApiAiLogsIndexRoute
-  '/api/ai/models': typeof ApiAiModelsIndexRoute
-  '/api/ai/test/$testId/results': typeof ApiAiTestTestIdResultsRoute
+  '/{-$locale}/yourobc/supporting': typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  '/{-$locale}/yourobc': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
-  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
   '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
-  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
-  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
-  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
-  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
-  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
   '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
-  '/api/ai/test/$testId': typeof ApiAiTestTestIdIndexRoute
+  '/{-$locale}/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
+  '/{-$locale}/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
+  '/{-$locale}/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
+  '/{-$locale}/yourobc/invoices/new': typeof Char123LocaleChar125ProtectedYourobcInvoicesNewRoute
+  '/{-$locale}/yourobc/invoices/overdue': typeof Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute
+  '/{-$locale}/yourobc/partners/new': typeof Char123LocaleChar125ProtectedYourobcPartnersNewRoute
+  '/{-$locale}/yourobc/quotes/new': typeof Char123LocaleChar125ProtectedYourobcQuotesNewRoute
+  '/{-$locale}/yourobc/shipments/new': typeof Char123LocaleChar125ProtectedYourobcShipmentsNewRoute
+  '/{-$locale}/yourobc/shipments/overdue': typeof Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute
+  '/{-$locale}/yourobc/statistics/employee-kpis': typeof Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute
+  '/{-$locale}/yourobc/statistics/operating-costs': typeof Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute
+  '/{-$locale}/yourobc/statistics/reports': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren
+  '/{-$locale}/yourobc/statistics/revenue': typeof Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute
+  '/{-$locale}/yourobc/statistics/top-customers': typeof Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute
+  '/{-$locale}/yourobc/tasks/dashboard': typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRoute
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
-  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
   '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
-  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
   '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
-  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
+  '/{-$locale}/yourobc/couriers': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
+  '/{-$locale}/yourobc/customers': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
+  '/{-$locale}/yourobc/employees': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
+  '/{-$locale}/yourobc/invoices': typeof Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute
+  '/{-$locale}/yourobc/partners': typeof Char123LocaleChar125ProtectedYourobcPartnersIndexRoute
+  '/{-$locale}/yourobc/quotes': typeof Char123LocaleChar125ProtectedYourobcQuotesIndexRoute
+  '/{-$locale}/yourobc/shipments': typeof Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute
+  '/{-$locale}/yourobc/statistics': typeof Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute
+  '/{-$locale}/yourobc/supporting/': typeof Char123LocaleChar125ProtectedYourobcSupportingIndexRoute
+  '/{-$locale}/yourobc/tasks': typeof Char123LocaleChar125ProtectedYourobcTasksIndexRoute
   '/{-$locale}/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
+  '/{-$locale}/yourobc/couriers/$courierId/edit': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute
+  '/{-$locale}/yourobc/couriers/commissions/new': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute
+  '/{-$locale}/yourobc/customers/$customerId/edit': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute
+  '/{-$locale}/yourobc/employees/$employeeId/edit': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute
+  '/{-$locale}/yourobc/employees/vacations/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute
+  '/{-$locale}/yourobc/invoices/$invoiceId/edit': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute
+  '/{-$locale}/yourobc/partners/$partnerId/edit': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute
+  '/{-$locale}/yourobc/quotes/$quoteId/edit': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/assign-courier': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/edit': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/status': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute
+  '/{-$locale}/yourobc/statistics/reports/customer': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute
+  '/{-$locale}/yourobc/statistics/reports/employee': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute
+  '/{-$locale}/yourobc/statistics/reports/executive': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute
+  '/{-$locale}/yourobc/statistics/reports/monthly': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute
+  '/{-$locale}/yourobc/statistics/reports/order': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute
   '/{-$locale}/admin/advanced-audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
-  '/{-$locale}/admin/blog': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
-  '/{-$locale}/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
-  '/{-$locale}/admin/blog/categories': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
-  '/{-$locale}/admin/blog/posts': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
-  '/{-$locale}/admin/blog/tags': typeof Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute
-  '/{-$locale}/admin/blog/posts/$postId/edit': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute
+  '/{-$locale}/yourobc/couriers/$courierId': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute
+  '/{-$locale}/yourobc/couriers/commissions': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute
+  '/{-$locale}/yourobc/customers/$customerId': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute
+  '/{-$locale}/yourobc/employees/$employeeId': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute
+  '/{-$locale}/yourobc/employees/vacations': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute
+  '/{-$locale}/yourobc/invoices/$invoiceId': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute
+  '/{-$locale}/yourobc/partners/$partnerId': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute
+  '/{-$locale}/yourobc/quotes/$quoteId': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute
+  '/{-$locale}/yourobc/supporting/comments': typeof Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute
+  '/{-$locale}/yourobc/supporting/exchange-rates': typeof Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute
+  '/{-$locale}/yourobc/supporting/followup-reminders': typeof Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute
+  '/{-$locale}/yourobc/supporting/inquiry-sources': typeof Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute
+  '/{-$locale}/yourobc/supporting/wiki': typeof Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute
 }
 export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -760,91 +757,82 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/test-convex': typeof ApiAuthTestConvexRoute
   '/api/auth/test-jwt': typeof ApiAuthTestJwtRoute
-  '/api/cache-contexts/$fileName': typeof ApiCacheContextsFileNameRoute
-  '/api/payments/cancel': typeof ApiPaymentsCancelRoute
-  '/api/payments/checkout': typeof ApiPaymentsCheckoutRoute
-  '/api/payments/portal': typeof ApiPaymentsPortalRoute
-  '/api/payments/subscription': typeof ApiPaymentsSubscriptionRoute
-  '/api/payments/usage': typeof ApiPaymentsUsageRoute
   '/api/settings/ai': typeof ApiSettingsAiRoute
   '/{-$locale}/auth/forgot-password': typeof Char123LocaleChar125AuthForgotPasswordRoute
   '/{-$locale}/auth/login': typeof Char123LocaleChar125AuthLoginRoute
   '/{-$locale}/auth/reset-password': typeof Char123LocaleChar125AuthResetPasswordRoute
   '/{-$locale}/auth/signup': typeof Char123LocaleChar125AuthSignupRoute
-  '/{-$locale}/blog/$slug': typeof Char123LocaleChar125BlogSlugRoute
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
-  '/{-$locale}/blog': typeof Char123LocaleChar125BlogIndexRoute
-  '/api/ai/generate/embedding': typeof ApiAiGenerateEmbeddingRoute
-  '/api/ai/generate/image': typeof ApiAiGenerateImageRoute
-  '/api/ai/generate/object': typeof ApiAiGenerateObjectRoute
-  '/api/ai/generate/speech': typeof ApiAiGenerateSpeechRoute
-  '/api/ai/generate/stream': typeof ApiAiGenerateStreamRoute
-  '/api/ai/generate/stream-object': typeof ApiAiGenerateStreamObjectRoute
-  '/api/ai/generate/text': typeof ApiAiGenerateTextRoute
-  '/api/ai/generate/transcription': typeof ApiAiGenerateTranscriptionRoute
-  '/api/ai/logs/$logId': typeof ApiAiLogsLogIdRoute
-  '/api/ai/logs/analytics': typeof ApiAiLogsAnalyticsRoute
-  '/api/ai/logs/export': typeof ApiAiLogsExportRoute
-  '/api/ai/models/$modelId': typeof ApiAiModelsModelIdRoute
-  '/api/ai/models/test': typeof ApiAiModelsTestRoute
-  '/api/ai/test/analytics': typeof ApiAiTestAnalyticsRoute
-  '/api/ai/test/batch': typeof ApiAiTestBatchRoute
-  '/api/ai/test/compare': typeof ApiAiTestCompareRoute
-  '/api/ai/test/execute': typeof ApiAiTestExecuteRoute
-  '/api/ai/test/history': typeof ApiAiTestHistoryRoute
-  '/api/payments/autumn/webhooks': typeof ApiPaymentsAutumnWebhooksRoute
-  '/api/payments/stripe-connect/account-status': typeof ApiPaymentsStripeConnectAccountStatusRoute
-  '/api/payments/stripe-connect/create-account': typeof ApiPaymentsStripeConnectCreateAccountRoute
-  '/api/payments/stripe-connect/create-checkout': typeof ApiPaymentsStripeConnectCreateCheckoutRoute
-  '/api/payments/stripe-connect/create-product': typeof ApiPaymentsStripeConnectCreateProductRoute
-  '/api/payments/stripe-connect/onboarding-link': typeof ApiPaymentsStripeConnectOnboardingLinkRoute
-  '/api/payments/stripe-connect/webhooks': typeof ApiPaymentsStripeConnectWebhooksRoute
-  '/api/payments/stripe/billing-portal': typeof ApiPaymentsStripeBillingPortalRoute
-  '/api/payments/stripe/cancel-subscription': typeof ApiPaymentsStripeCancelSubscriptionRoute
-  '/api/payments/stripe/create-payment': typeof ApiPaymentsStripeCreatePaymentRoute
-  '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
-  '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
-  '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
   '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
-  '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
-  '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
-  '/api/ai/logs': typeof ApiAiLogsIndexRoute
-  '/api/ai/models': typeof ApiAiModelsIndexRoute
-  '/api/ai/test/$testId/results': typeof ApiAiTestTestIdResultsRoute
+  '/{-$locale}/yourobc': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
-  '/{-$locale}/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
   '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
-  '/{-$locale}/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
-  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
-  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
-  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
-  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
   '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
-  '/api/ai/test/$testId': typeof ApiAiTestTestIdIndexRoute
+  '/{-$locale}/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
+  '/{-$locale}/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
+  '/{-$locale}/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
+  '/{-$locale}/yourobc/invoices/new': typeof Char123LocaleChar125ProtectedYourobcInvoicesNewRoute
+  '/{-$locale}/yourobc/invoices/overdue': typeof Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute
+  '/{-$locale}/yourobc/partners/new': typeof Char123LocaleChar125ProtectedYourobcPartnersNewRoute
+  '/{-$locale}/yourobc/quotes/new': typeof Char123LocaleChar125ProtectedYourobcQuotesNewRoute
+  '/{-$locale}/yourobc/shipments/new': typeof Char123LocaleChar125ProtectedYourobcShipmentsNewRoute
+  '/{-$locale}/yourobc/shipments/overdue': typeof Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute
+  '/{-$locale}/yourobc/statistics/employee-kpis': typeof Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute
+  '/{-$locale}/yourobc/statistics/operating-costs': typeof Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute
+  '/{-$locale}/yourobc/statistics/reports': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren
+  '/{-$locale}/yourobc/statistics/revenue': typeof Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute
+  '/{-$locale}/yourobc/statistics/top-customers': typeof Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute
+  '/{-$locale}/yourobc/tasks/dashboard': typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRoute
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/ai-logs': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
-  '/{-$locale}/ai-models': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
   '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
-  '/{-$locale}/games': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
   '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
-  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
+  '/{-$locale}/yourobc/couriers': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
+  '/{-$locale}/yourobc/customers': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
+  '/{-$locale}/yourobc/employees': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
+  '/{-$locale}/yourobc/invoices': typeof Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute
+  '/{-$locale}/yourobc/partners': typeof Char123LocaleChar125ProtectedYourobcPartnersIndexRoute
+  '/{-$locale}/yourobc/quotes': typeof Char123LocaleChar125ProtectedYourobcQuotesIndexRoute
+  '/{-$locale}/yourobc/shipments': typeof Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute
+  '/{-$locale}/yourobc/statistics': typeof Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute
+  '/{-$locale}/yourobc/supporting': typeof Char123LocaleChar125ProtectedYourobcSupportingIndexRoute
+  '/{-$locale}/yourobc/tasks': typeof Char123LocaleChar125ProtectedYourobcTasksIndexRoute
   '/{-$locale}/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
+  '/{-$locale}/yourobc/couriers/$courierId/edit': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute
+  '/{-$locale}/yourobc/couriers/commissions/new': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute
+  '/{-$locale}/yourobc/customers/$customerId/edit': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute
+  '/{-$locale}/yourobc/employees/$employeeId/edit': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute
+  '/{-$locale}/yourobc/employees/vacations/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute
+  '/{-$locale}/yourobc/invoices/$invoiceId/edit': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute
+  '/{-$locale}/yourobc/partners/$partnerId/edit': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute
+  '/{-$locale}/yourobc/quotes/$quoteId/edit': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/assign-courier': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/edit': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId/status': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute
+  '/{-$locale}/yourobc/statistics/reports/customer': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute
+  '/{-$locale}/yourobc/statistics/reports/employee': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute
+  '/{-$locale}/yourobc/statistics/reports/executive': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute
+  '/{-$locale}/yourobc/statistics/reports/monthly': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute
+  '/{-$locale}/yourobc/statistics/reports/order': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute
   '/{-$locale}/admin/advanced-audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
-  '/{-$locale}/admin/blog': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
-  '/{-$locale}/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
-  '/{-$locale}/admin/blog/categories': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
-  '/{-$locale}/admin/blog/posts': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
-  '/{-$locale}/admin/blog/tags': typeof Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute
-  '/{-$locale}/admin/blog/posts/$postId/edit': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute
+  '/{-$locale}/yourobc/couriers/$courierId': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute
+  '/{-$locale}/yourobc/couriers/commissions': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute
+  '/{-$locale}/yourobc/customers/$customerId': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute
+  '/{-$locale}/yourobc/employees/$employeeId': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute
+  '/{-$locale}/yourobc/employees/vacations': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute
+  '/{-$locale}/yourobc/invoices/$invoiceId': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute
+  '/{-$locale}/yourobc/partners/$partnerId': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute
+  '/{-$locale}/yourobc/quotes/$quoteId': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute
+  '/{-$locale}/yourobc/shipments/$shipmentId': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute
+  '/{-$locale}/yourobc/supporting/comments': typeof Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute
+  '/{-$locale}/yourobc/supporting/exchange-rates': typeof Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute
+  '/{-$locale}/yourobc/supporting/followup-reminders': typeof Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute
+  '/{-$locale}/yourobc/supporting/inquiry-sources': typeof Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute
+  '/{-$locale}/yourobc/supporting/wiki': typeof Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -857,92 +845,84 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/test-convex': typeof ApiAuthTestConvexRoute
   '/api/auth/test-jwt': typeof ApiAuthTestJwtRoute
-  '/api/cache-contexts/$fileName': typeof ApiCacheContextsFileNameRoute
-  '/api/payments/cancel': typeof ApiPaymentsCancelRoute
-  '/api/payments/checkout': typeof ApiPaymentsCheckoutRoute
-  '/api/payments/portal': typeof ApiPaymentsPortalRoute
-  '/api/payments/subscription': typeof ApiPaymentsSubscriptionRoute
-  '/api/payments/usage': typeof ApiPaymentsUsageRoute
   '/api/settings/ai': typeof ApiSettingsAiRoute
   '/{-$locale}/_protected/_admin': typeof Char123LocaleChar125ProtectedAdminRouteWithChildren
   '/{-$locale}/auth/forgot-password': typeof Char123LocaleChar125AuthForgotPasswordRoute
   '/{-$locale}/auth/login': typeof Char123LocaleChar125AuthLoginRoute
   '/{-$locale}/auth/reset-password': typeof Char123LocaleChar125AuthResetPasswordRoute
   '/{-$locale}/auth/signup': typeof Char123LocaleChar125AuthSignupRoute
-  '/{-$locale}/blog/$slug': typeof Char123LocaleChar125BlogSlugRoute
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
-  '/{-$locale}/blog/': typeof Char123LocaleChar125BlogIndexRoute
-  '/api/ai/generate/embedding': typeof ApiAiGenerateEmbeddingRoute
-  '/api/ai/generate/image': typeof ApiAiGenerateImageRoute
-  '/api/ai/generate/object': typeof ApiAiGenerateObjectRoute
-  '/api/ai/generate/speech': typeof ApiAiGenerateSpeechRoute
-  '/api/ai/generate/stream': typeof ApiAiGenerateStreamRoute
-  '/api/ai/generate/stream-object': typeof ApiAiGenerateStreamObjectRoute
-  '/api/ai/generate/text': typeof ApiAiGenerateTextRoute
-  '/api/ai/generate/transcription': typeof ApiAiGenerateTranscriptionRoute
-  '/api/ai/logs/$logId': typeof ApiAiLogsLogIdRoute
-  '/api/ai/logs/analytics': typeof ApiAiLogsAnalyticsRoute
-  '/api/ai/logs/export': typeof ApiAiLogsExportRoute
-  '/api/ai/models/$modelId': typeof ApiAiModelsModelIdRoute
-  '/api/ai/models/test': typeof ApiAiModelsTestRoute
-  '/api/ai/test/analytics': typeof ApiAiTestAnalyticsRoute
-  '/api/ai/test/batch': typeof ApiAiTestBatchRoute
-  '/api/ai/test/compare': typeof ApiAiTestCompareRoute
-  '/api/ai/test/execute': typeof ApiAiTestExecuteRoute
-  '/api/ai/test/history': typeof ApiAiTestHistoryRoute
-  '/api/payments/autumn/webhooks': typeof ApiPaymentsAutumnWebhooksRoute
-  '/api/payments/stripe-connect/account-status': typeof ApiPaymentsStripeConnectAccountStatusRoute
-  '/api/payments/stripe-connect/create-account': typeof ApiPaymentsStripeConnectCreateAccountRoute
-  '/api/payments/stripe-connect/create-checkout': typeof ApiPaymentsStripeConnectCreateCheckoutRoute
-  '/api/payments/stripe-connect/create-product': typeof ApiPaymentsStripeConnectCreateProductRoute
-  '/api/payments/stripe-connect/onboarding-link': typeof ApiPaymentsStripeConnectOnboardingLinkRoute
-  '/api/payments/stripe-connect/webhooks': typeof ApiPaymentsStripeConnectWebhooksRoute
-  '/api/payments/stripe/billing-portal': typeof ApiPaymentsStripeBillingPortalRoute
-  '/api/payments/stripe/cancel-subscription': typeof ApiPaymentsStripeCancelSubscriptionRoute
-  '/api/payments/stripe/create-payment': typeof ApiPaymentsStripeCreatePaymentRoute
-  '/api/payments/stripe/create-subscription': typeof ApiPaymentsStripeCreateSubscriptionRoute
-  '/api/payments/stripe/resume-subscription': typeof ApiPaymentsStripeResumeSubscriptionRoute
-  '/api/payments/stripe/webhooks': typeof ApiPaymentsStripeWebhooksRoute
-  '/{-$locale}/_protected/_system/ai-testing': typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
   '/{-$locale}/_protected/_system/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/_protected/_system/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
-  '/{-$locale}/blog/category/$slug': typeof Char123LocaleChar125BlogCategorySlugRoute
-  '/{-$locale}/blog/tag/$slug': typeof Char123LocaleChar125BlogTagSlugRoute
-  '/api/ai/logs/': typeof ApiAiLogsIndexRoute
-  '/api/ai/models/': typeof ApiAiModelsIndexRoute
-  '/api/ai/test/$testId/results': typeof ApiAiTestTestIdResultsRoute
+  '/{-$locale}/_protected/yourobc/supporting': typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  '/{-$locale}/_protected/yourobc/': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/_protected/_admin/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/_protected/_admin/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
   '/{-$locale}/_protected/_admin/admin/settings': typeof Char123LocaleChar125ProtectedAdminAdminSettingsRoute
   '/{-$locale}/_protected/_admin/admin/users': typeof Char123LocaleChar125ProtectedAdminAdminUsersRoute
-  '/{-$locale}/_protected/_system/ai-logs/$logId': typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
-  '/{-$locale}/_protected/_system/ai-models/$modelId': typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
   '/{-$locale}/_protected/_system/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/_protected/_system/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
-  '/{-$locale}/_protected/_system/games/$gameId': typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
-  '/{-$locale}/_protected/_system/projects/new': typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
-  '/{-$locale}/_protected/_system/projects/tasks': typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
-  '/{-$locale}/_protected/_system/projects/team': typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
-  '/{-$locale}/_protected/_system/projects/timeline': typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
   '/{-$locale}/_protected/_system/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
-  '/api/ai/test/$testId/': typeof ApiAiTestTestIdIndexRoute
+  '/{-$locale}/_protected/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
+  '/{-$locale}/_protected/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
+  '/{-$locale}/_protected/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
+  '/{-$locale}/_protected/yourobc/invoices/new': typeof Char123LocaleChar125ProtectedYourobcInvoicesNewRoute
+  '/{-$locale}/_protected/yourobc/invoices/overdue': typeof Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute
+  '/{-$locale}/_protected/yourobc/partners/new': typeof Char123LocaleChar125ProtectedYourobcPartnersNewRoute
+  '/{-$locale}/_protected/yourobc/quotes/new': typeof Char123LocaleChar125ProtectedYourobcQuotesNewRoute
+  '/{-$locale}/_protected/yourobc/shipments/new': typeof Char123LocaleChar125ProtectedYourobcShipmentsNewRoute
+  '/{-$locale}/_protected/yourobc/shipments/overdue': typeof Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute
+  '/{-$locale}/_protected/yourobc/statistics/employee-kpis': typeof Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute
+  '/{-$locale}/_protected/yourobc/statistics/operating-costs': typeof Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren
+  '/{-$locale}/_protected/yourobc/statistics/revenue': typeof Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute
+  '/{-$locale}/_protected/yourobc/statistics/top-customers': typeof Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute
+  '/{-$locale}/_protected/yourobc/tasks/dashboard': typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRoute
   '/{-$locale}/_protected/_admin/admin/': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
-  '/{-$locale}/_protected/_system/ai-logs/': typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
-  '/{-$locale}/_protected/_system/ai-models/': typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
   '/{-$locale}/_protected/_system/email/': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
-  '/{-$locale}/_protected/_system/games/': typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
   '/{-$locale}/_protected/_system/notifications/': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
-  '/{-$locale}/_protected/_system/projects/': typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
+  '/{-$locale}/_protected/yourobc/couriers/': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
+  '/{-$locale}/_protected/yourobc/customers/': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
+  '/{-$locale}/_protected/yourobc/employees/': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
+  '/{-$locale}/_protected/yourobc/invoices/': typeof Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute
+  '/{-$locale}/_protected/yourobc/partners/': typeof Char123LocaleChar125ProtectedYourobcPartnersIndexRoute
+  '/{-$locale}/_protected/yourobc/quotes/': typeof Char123LocaleChar125ProtectedYourobcQuotesIndexRoute
+  '/{-$locale}/_protected/yourobc/shipments/': typeof Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute
+  '/{-$locale}/_protected/yourobc/statistics/': typeof Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/': typeof Char123LocaleChar125ProtectedYourobcSupportingIndexRoute
+  '/{-$locale}/_protected/yourobc/tasks/': typeof Char123LocaleChar125ProtectedYourobcTasksIndexRoute
   '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
-  '/{-$locale}/_protected/_system/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
+  '/{-$locale}/_protected/yourobc/couriers/$courierId/edit': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute
+  '/{-$locale}/_protected/yourobc/couriers/commissions/new': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute
+  '/{-$locale}/_protected/yourobc/customers/$customerId/edit': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute
+  '/{-$locale}/_protected/yourobc/employees/$employeeId/edit': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute
+  '/{-$locale}/_protected/yourobc/employees/vacations/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute
+  '/{-$locale}/_protected/yourobc/invoices/$invoiceId/edit': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute
+  '/{-$locale}/_protected/yourobc/partners/$partnerId/edit': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute
+  '/{-$locale}/_protected/yourobc/quotes/$quoteId/edit': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute
+  '/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute
+  '/{-$locale}/_protected/yourobc/shipments/$shipmentId/edit': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute
+  '/{-$locale}/_protected/yourobc/shipments/$shipmentId/status': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports/customer': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports/employee': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports/executive': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports/monthly': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute
+  '/{-$locale}/_protected/yourobc/statistics/reports/order': typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute
   '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/': typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
-  '/{-$locale}/_protected/_admin/admin/blog/': typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  '/{-$locale}/_protected/_system/projects/$projectId/': typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
-  '/{-$locale}/_protected/_admin/admin/blog/posts/new': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
-  '/{-$locale}/_protected/_admin/admin/blog/categories/': typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
-  '/{-$locale}/_protected/_admin/admin/blog/posts/': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
-  '/{-$locale}/_protected/_admin/admin/blog/tags/': typeof Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute
-  '/{-$locale}/_protected/_admin/admin/blog/posts/$postId/edit': typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute
+  '/{-$locale}/_protected/yourobc/couriers/$courierId/': typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute
+  '/{-$locale}/_protected/yourobc/couriers/commissions/': typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute
+  '/{-$locale}/_protected/yourobc/customers/$customerId/': typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute
+  '/{-$locale}/_protected/yourobc/employees/$employeeId/': typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute
+  '/{-$locale}/_protected/yourobc/employees/vacations/': typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute
+  '/{-$locale}/_protected/yourobc/invoices/$invoiceId/': typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute
+  '/{-$locale}/_protected/yourobc/partners/$partnerId/': typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute
+  '/{-$locale}/_protected/yourobc/quotes/$quoteId/': typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute
+  '/{-$locale}/_protected/yourobc/shipments/$shipmentId/': typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/comments/': typeof Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/exchange-rates/': typeof Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/followup-reminders/': typeof Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/inquiry-sources/': typeof Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute
+  '/{-$locale}/_protected/yourobc/supporting/wiki/': typeof Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -955,91 +935,83 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/auth/test-convex'
     | '/api/auth/test-jwt'
-    | '/api/cache-contexts/$fileName'
-    | '/api/payments/cancel'
-    | '/api/payments/checkout'
-    | '/api/payments/portal'
-    | '/api/payments/subscription'
-    | '/api/payments/usage'
     | '/api/settings/ai'
     | '/{-$locale}/auth/forgot-password'
     | '/{-$locale}/auth/login'
     | '/{-$locale}/auth/reset-password'
     | '/{-$locale}/auth/signup'
-    | '/{-$locale}/blog/$slug'
     | '/{-$locale}/test/auth'
-    | '/{-$locale}/blog'
-    | '/api/ai/generate/embedding'
-    | '/api/ai/generate/image'
-    | '/api/ai/generate/object'
-    | '/api/ai/generate/speech'
-    | '/api/ai/generate/stream'
-    | '/api/ai/generate/stream-object'
-    | '/api/ai/generate/text'
-    | '/api/ai/generate/transcription'
-    | '/api/ai/logs/$logId'
-    | '/api/ai/logs/analytics'
-    | '/api/ai/logs/export'
-    | '/api/ai/models/$modelId'
-    | '/api/ai/models/test'
-    | '/api/ai/test/analytics'
-    | '/api/ai/test/batch'
-    | '/api/ai/test/compare'
-    | '/api/ai/test/execute'
-    | '/api/ai/test/history'
-    | '/api/payments/autumn/webhooks'
-    | '/api/payments/stripe-connect/account-status'
-    | '/api/payments/stripe-connect/create-account'
-    | '/api/payments/stripe-connect/create-checkout'
-    | '/api/payments/stripe-connect/create-product'
-    | '/api/payments/stripe-connect/onboarding-link'
-    | '/api/payments/stripe-connect/webhooks'
-    | '/api/payments/stripe/billing-portal'
-    | '/api/payments/stripe/cancel-subscription'
-    | '/api/payments/stripe/create-payment'
-    | '/api/payments/stripe/create-subscription'
-    | '/api/payments/stripe/resume-subscription'
-    | '/api/payments/stripe/webhooks'
-    | '/{-$locale}/ai-testing'
     | '/{-$locale}/dashboard'
     | '/{-$locale}/settings'
-    | '/{-$locale}/blog/category/$slug'
-    | '/{-$locale}/blog/tag/$slug'
-    | '/api/ai/logs'
-    | '/api/ai/models'
-    | '/api/ai/test/$testId/results'
+    | '/{-$locale}/yourobc/supporting'
+    | '/{-$locale}/yourobc'
     | '/{-$locale}/admin/audit-logs'
     | '/{-$locale}/admin/permission-requests'
     | '/{-$locale}/admin/settings'
     | '/{-$locale}/admin/users'
-    | '/{-$locale}/ai-logs/$logId'
-    | '/{-$locale}/ai-models/$modelId'
     | '/{-$locale}/email/logs'
     | '/{-$locale}/email/templates'
-    | '/{-$locale}/games/$gameId'
-    | '/{-$locale}/projects/new'
-    | '/{-$locale}/projects/tasks'
-    | '/{-$locale}/projects/team'
-    | '/{-$locale}/projects/timeline'
     | '/{-$locale}/settings/notifications'
-    | '/api/ai/test/$testId'
+    | '/{-$locale}/yourobc/couriers/new'
+    | '/{-$locale}/yourobc/customers/new'
+    | '/{-$locale}/yourobc/employees/new'
+    | '/{-$locale}/yourobc/invoices/new'
+    | '/{-$locale}/yourobc/invoices/overdue'
+    | '/{-$locale}/yourobc/partners/new'
+    | '/{-$locale}/yourobc/quotes/new'
+    | '/{-$locale}/yourobc/shipments/new'
+    | '/{-$locale}/yourobc/shipments/overdue'
+    | '/{-$locale}/yourobc/statistics/employee-kpis'
+    | '/{-$locale}/yourobc/statistics/operating-costs'
+    | '/{-$locale}/yourobc/statistics/reports'
+    | '/{-$locale}/yourobc/statistics/revenue'
+    | '/{-$locale}/yourobc/statistics/top-customers'
+    | '/{-$locale}/yourobc/tasks/dashboard'
     | '/{-$locale}/admin'
-    | '/{-$locale}/ai-logs'
-    | '/{-$locale}/ai-models'
     | '/{-$locale}/email'
-    | '/{-$locale}/games'
     | '/{-$locale}/notifications'
-    | '/{-$locale}/projects'
+    | '/{-$locale}/yourobc/couriers'
+    | '/{-$locale}/yourobc/customers'
+    | '/{-$locale}/yourobc/employees'
+    | '/{-$locale}/yourobc/invoices'
+    | '/{-$locale}/yourobc/partners'
+    | '/{-$locale}/yourobc/quotes'
+    | '/{-$locale}/yourobc/shipments'
+    | '/{-$locale}/yourobc/statistics'
+    | '/{-$locale}/yourobc/supporting/'
+    | '/{-$locale}/yourobc/tasks'
     | '/{-$locale}/admin/advanced-audit-logs/$logId'
-    | '/{-$locale}/projects/$projectId/edit'
+    | '/{-$locale}/yourobc/couriers/$courierId/edit'
+    | '/{-$locale}/yourobc/couriers/commissions/new'
+    | '/{-$locale}/yourobc/customers/$customerId/edit'
+    | '/{-$locale}/yourobc/employees/$employeeId/edit'
+    | '/{-$locale}/yourobc/employees/vacations/new'
+    | '/{-$locale}/yourobc/invoices/$invoiceId/edit'
+    | '/{-$locale}/yourobc/partners/$partnerId/edit'
+    | '/{-$locale}/yourobc/quotes/$quoteId/edit'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/assign-courier'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/edit'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/status'
+    | '/{-$locale}/yourobc/statistics/reports/customer'
+    | '/{-$locale}/yourobc/statistics/reports/employee'
+    | '/{-$locale}/yourobc/statistics/reports/executive'
+    | '/{-$locale}/yourobc/statistics/reports/monthly'
+    | '/{-$locale}/yourobc/statistics/reports/order'
     | '/{-$locale}/admin/advanced-audit-logs'
-    | '/{-$locale}/admin/blog'
-    | '/{-$locale}/projects/$projectId'
-    | '/{-$locale}/admin/blog/posts/new'
-    | '/{-$locale}/admin/blog/categories'
-    | '/{-$locale}/admin/blog/posts'
-    | '/{-$locale}/admin/blog/tags'
-    | '/{-$locale}/admin/blog/posts/$postId/edit'
+    | '/{-$locale}/yourobc/couriers/$courierId'
+    | '/{-$locale}/yourobc/couriers/commissions'
+    | '/{-$locale}/yourobc/customers/$customerId'
+    | '/{-$locale}/yourobc/employees/$employeeId'
+    | '/{-$locale}/yourobc/employees/vacations'
+    | '/{-$locale}/yourobc/invoices/$invoiceId'
+    | '/{-$locale}/yourobc/partners/$partnerId'
+    | '/{-$locale}/yourobc/quotes/$quoteId'
+    | '/{-$locale}/yourobc/shipments/$shipmentId'
+    | '/{-$locale}/yourobc/supporting/comments'
+    | '/{-$locale}/yourobc/supporting/exchange-rates'
+    | '/{-$locale}/yourobc/supporting/followup-reminders'
+    | '/{-$locale}/yourobc/supporting/inquiry-sources'
+    | '/{-$locale}/yourobc/supporting/wiki'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sitemap.xml'
@@ -1049,91 +1021,82 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/auth/test-convex'
     | '/api/auth/test-jwt'
-    | '/api/cache-contexts/$fileName'
-    | '/api/payments/cancel'
-    | '/api/payments/checkout'
-    | '/api/payments/portal'
-    | '/api/payments/subscription'
-    | '/api/payments/usage'
     | '/api/settings/ai'
     | '/{-$locale}/auth/forgot-password'
     | '/{-$locale}/auth/login'
     | '/{-$locale}/auth/reset-password'
     | '/{-$locale}/auth/signup'
-    | '/{-$locale}/blog/$slug'
     | '/{-$locale}/test/auth'
-    | '/{-$locale}/blog'
-    | '/api/ai/generate/embedding'
-    | '/api/ai/generate/image'
-    | '/api/ai/generate/object'
-    | '/api/ai/generate/speech'
-    | '/api/ai/generate/stream'
-    | '/api/ai/generate/stream-object'
-    | '/api/ai/generate/text'
-    | '/api/ai/generate/transcription'
-    | '/api/ai/logs/$logId'
-    | '/api/ai/logs/analytics'
-    | '/api/ai/logs/export'
-    | '/api/ai/models/$modelId'
-    | '/api/ai/models/test'
-    | '/api/ai/test/analytics'
-    | '/api/ai/test/batch'
-    | '/api/ai/test/compare'
-    | '/api/ai/test/execute'
-    | '/api/ai/test/history'
-    | '/api/payments/autumn/webhooks'
-    | '/api/payments/stripe-connect/account-status'
-    | '/api/payments/stripe-connect/create-account'
-    | '/api/payments/stripe-connect/create-checkout'
-    | '/api/payments/stripe-connect/create-product'
-    | '/api/payments/stripe-connect/onboarding-link'
-    | '/api/payments/stripe-connect/webhooks'
-    | '/api/payments/stripe/billing-portal'
-    | '/api/payments/stripe/cancel-subscription'
-    | '/api/payments/stripe/create-payment'
-    | '/api/payments/stripe/create-subscription'
-    | '/api/payments/stripe/resume-subscription'
-    | '/api/payments/stripe/webhooks'
-    | '/{-$locale}/ai-testing'
     | '/{-$locale}/dashboard'
     | '/{-$locale}/settings'
-    | '/{-$locale}/blog/category/$slug'
-    | '/{-$locale}/blog/tag/$slug'
-    | '/api/ai/logs'
-    | '/api/ai/models'
-    | '/api/ai/test/$testId/results'
+    | '/{-$locale}/yourobc'
     | '/{-$locale}/admin/audit-logs'
     | '/{-$locale}/admin/permission-requests'
     | '/{-$locale}/admin/settings'
     | '/{-$locale}/admin/users'
-    | '/{-$locale}/ai-logs/$logId'
-    | '/{-$locale}/ai-models/$modelId'
     | '/{-$locale}/email/logs'
     | '/{-$locale}/email/templates'
-    | '/{-$locale}/games/$gameId'
-    | '/{-$locale}/projects/new'
-    | '/{-$locale}/projects/tasks'
-    | '/{-$locale}/projects/team'
-    | '/{-$locale}/projects/timeline'
     | '/{-$locale}/settings/notifications'
-    | '/api/ai/test/$testId'
+    | '/{-$locale}/yourobc/couriers/new'
+    | '/{-$locale}/yourobc/customers/new'
+    | '/{-$locale}/yourobc/employees/new'
+    | '/{-$locale}/yourobc/invoices/new'
+    | '/{-$locale}/yourobc/invoices/overdue'
+    | '/{-$locale}/yourobc/partners/new'
+    | '/{-$locale}/yourobc/quotes/new'
+    | '/{-$locale}/yourobc/shipments/new'
+    | '/{-$locale}/yourobc/shipments/overdue'
+    | '/{-$locale}/yourobc/statistics/employee-kpis'
+    | '/{-$locale}/yourobc/statistics/operating-costs'
+    | '/{-$locale}/yourobc/statistics/reports'
+    | '/{-$locale}/yourobc/statistics/revenue'
+    | '/{-$locale}/yourobc/statistics/top-customers'
+    | '/{-$locale}/yourobc/tasks/dashboard'
     | '/{-$locale}/admin'
-    | '/{-$locale}/ai-logs'
-    | '/{-$locale}/ai-models'
     | '/{-$locale}/email'
-    | '/{-$locale}/games'
     | '/{-$locale}/notifications'
-    | '/{-$locale}/projects'
+    | '/{-$locale}/yourobc/couriers'
+    | '/{-$locale}/yourobc/customers'
+    | '/{-$locale}/yourobc/employees'
+    | '/{-$locale}/yourobc/invoices'
+    | '/{-$locale}/yourobc/partners'
+    | '/{-$locale}/yourobc/quotes'
+    | '/{-$locale}/yourobc/shipments'
+    | '/{-$locale}/yourobc/statistics'
+    | '/{-$locale}/yourobc/supporting'
+    | '/{-$locale}/yourobc/tasks'
     | '/{-$locale}/admin/advanced-audit-logs/$logId'
-    | '/{-$locale}/projects/$projectId/edit'
+    | '/{-$locale}/yourobc/couriers/$courierId/edit'
+    | '/{-$locale}/yourobc/couriers/commissions/new'
+    | '/{-$locale}/yourobc/customers/$customerId/edit'
+    | '/{-$locale}/yourobc/employees/$employeeId/edit'
+    | '/{-$locale}/yourobc/employees/vacations/new'
+    | '/{-$locale}/yourobc/invoices/$invoiceId/edit'
+    | '/{-$locale}/yourobc/partners/$partnerId/edit'
+    | '/{-$locale}/yourobc/quotes/$quoteId/edit'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/assign-courier'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/edit'
+    | '/{-$locale}/yourobc/shipments/$shipmentId/status'
+    | '/{-$locale}/yourobc/statistics/reports/customer'
+    | '/{-$locale}/yourobc/statistics/reports/employee'
+    | '/{-$locale}/yourobc/statistics/reports/executive'
+    | '/{-$locale}/yourobc/statistics/reports/monthly'
+    | '/{-$locale}/yourobc/statistics/reports/order'
     | '/{-$locale}/admin/advanced-audit-logs'
-    | '/{-$locale}/admin/blog'
-    | '/{-$locale}/projects/$projectId'
-    | '/{-$locale}/admin/blog/posts/new'
-    | '/{-$locale}/admin/blog/categories'
-    | '/{-$locale}/admin/blog/posts'
-    | '/{-$locale}/admin/blog/tags'
-    | '/{-$locale}/admin/blog/posts/$postId/edit'
+    | '/{-$locale}/yourobc/couriers/$courierId'
+    | '/{-$locale}/yourobc/couriers/commissions'
+    | '/{-$locale}/yourobc/customers/$customerId'
+    | '/{-$locale}/yourobc/employees/$employeeId'
+    | '/{-$locale}/yourobc/employees/vacations'
+    | '/{-$locale}/yourobc/invoices/$invoiceId'
+    | '/{-$locale}/yourobc/partners/$partnerId'
+    | '/{-$locale}/yourobc/quotes/$quoteId'
+    | '/{-$locale}/yourobc/shipments/$shipmentId'
+    | '/{-$locale}/yourobc/supporting/comments'
+    | '/{-$locale}/yourobc/supporting/exchange-rates'
+    | '/{-$locale}/yourobc/supporting/followup-reminders'
+    | '/{-$locale}/yourobc/supporting/inquiry-sources'
+    | '/{-$locale}/yourobc/supporting/wiki'
   id:
     | '__root__'
     | '/sitemap.xml'
@@ -1145,92 +1108,84 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/auth/test-convex'
     | '/api/auth/test-jwt'
-    | '/api/cache-contexts/$fileName'
-    | '/api/payments/cancel'
-    | '/api/payments/checkout'
-    | '/api/payments/portal'
-    | '/api/payments/subscription'
-    | '/api/payments/usage'
     | '/api/settings/ai'
     | '/{-$locale}/_protected/_admin'
     | '/{-$locale}/auth/forgot-password'
     | '/{-$locale}/auth/login'
     | '/{-$locale}/auth/reset-password'
     | '/{-$locale}/auth/signup'
-    | '/{-$locale}/blog/$slug'
     | '/{-$locale}/test/auth'
-    | '/{-$locale}/blog/'
-    | '/api/ai/generate/embedding'
-    | '/api/ai/generate/image'
-    | '/api/ai/generate/object'
-    | '/api/ai/generate/speech'
-    | '/api/ai/generate/stream'
-    | '/api/ai/generate/stream-object'
-    | '/api/ai/generate/text'
-    | '/api/ai/generate/transcription'
-    | '/api/ai/logs/$logId'
-    | '/api/ai/logs/analytics'
-    | '/api/ai/logs/export'
-    | '/api/ai/models/$modelId'
-    | '/api/ai/models/test'
-    | '/api/ai/test/analytics'
-    | '/api/ai/test/batch'
-    | '/api/ai/test/compare'
-    | '/api/ai/test/execute'
-    | '/api/ai/test/history'
-    | '/api/payments/autumn/webhooks'
-    | '/api/payments/stripe-connect/account-status'
-    | '/api/payments/stripe-connect/create-account'
-    | '/api/payments/stripe-connect/create-checkout'
-    | '/api/payments/stripe-connect/create-product'
-    | '/api/payments/stripe-connect/onboarding-link'
-    | '/api/payments/stripe-connect/webhooks'
-    | '/api/payments/stripe/billing-portal'
-    | '/api/payments/stripe/cancel-subscription'
-    | '/api/payments/stripe/create-payment'
-    | '/api/payments/stripe/create-subscription'
-    | '/api/payments/stripe/resume-subscription'
-    | '/api/payments/stripe/webhooks'
-    | '/{-$locale}/_protected/_system/ai-testing'
     | '/{-$locale}/_protected/_system/dashboard'
     | '/{-$locale}/_protected/_system/settings'
-    | '/{-$locale}/blog/category/$slug'
-    | '/{-$locale}/blog/tag/$slug'
-    | '/api/ai/logs/'
-    | '/api/ai/models/'
-    | '/api/ai/test/$testId/results'
+    | '/{-$locale}/_protected/yourobc/supporting'
+    | '/{-$locale}/_protected/yourobc/'
     | '/{-$locale}/_protected/_admin/admin/audit-logs'
     | '/{-$locale}/_protected/_admin/admin/permission-requests'
     | '/{-$locale}/_protected/_admin/admin/settings'
     | '/{-$locale}/_protected/_admin/admin/users'
-    | '/{-$locale}/_protected/_system/ai-logs/$logId'
-    | '/{-$locale}/_protected/_system/ai-models/$modelId'
     | '/{-$locale}/_protected/_system/email/logs'
     | '/{-$locale}/_protected/_system/email/templates'
-    | '/{-$locale}/_protected/_system/games/$gameId'
-    | '/{-$locale}/_protected/_system/projects/new'
-    | '/{-$locale}/_protected/_system/projects/tasks'
-    | '/{-$locale}/_protected/_system/projects/team'
-    | '/{-$locale}/_protected/_system/projects/timeline'
     | '/{-$locale}/_protected/_system/settings/notifications'
-    | '/api/ai/test/$testId/'
+    | '/{-$locale}/_protected/yourobc/couriers/new'
+    | '/{-$locale}/_protected/yourobc/customers/new'
+    | '/{-$locale}/_protected/yourobc/employees/new'
+    | '/{-$locale}/_protected/yourobc/invoices/new'
+    | '/{-$locale}/_protected/yourobc/invoices/overdue'
+    | '/{-$locale}/_protected/yourobc/partners/new'
+    | '/{-$locale}/_protected/yourobc/quotes/new'
+    | '/{-$locale}/_protected/yourobc/shipments/new'
+    | '/{-$locale}/_protected/yourobc/shipments/overdue'
+    | '/{-$locale}/_protected/yourobc/statistics/employee-kpis'
+    | '/{-$locale}/_protected/yourobc/statistics/operating-costs'
+    | '/{-$locale}/_protected/yourobc/statistics/reports'
+    | '/{-$locale}/_protected/yourobc/statistics/revenue'
+    | '/{-$locale}/_protected/yourobc/statistics/top-customers'
+    | '/{-$locale}/_protected/yourobc/tasks/dashboard'
     | '/{-$locale}/_protected/_admin/admin/'
-    | '/{-$locale}/_protected/_system/ai-logs/'
-    | '/{-$locale}/_protected/_system/ai-models/'
     | '/{-$locale}/_protected/_system/email/'
-    | '/{-$locale}/_protected/_system/games/'
     | '/{-$locale}/_protected/_system/notifications/'
-    | '/{-$locale}/_protected/_system/projects/'
+    | '/{-$locale}/_protected/yourobc/couriers/'
+    | '/{-$locale}/_protected/yourobc/customers/'
+    | '/{-$locale}/_protected/yourobc/employees/'
+    | '/{-$locale}/_protected/yourobc/invoices/'
+    | '/{-$locale}/_protected/yourobc/partners/'
+    | '/{-$locale}/_protected/yourobc/quotes/'
+    | '/{-$locale}/_protected/yourobc/shipments/'
+    | '/{-$locale}/_protected/yourobc/statistics/'
+    | '/{-$locale}/_protected/yourobc/supporting/'
+    | '/{-$locale}/_protected/yourobc/tasks/'
     | '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId'
-    | '/{-$locale}/_protected/_system/projects/$projectId/edit'
+    | '/{-$locale}/_protected/yourobc/couriers/$courierId/edit'
+    | '/{-$locale}/_protected/yourobc/couriers/commissions/new'
+    | '/{-$locale}/_protected/yourobc/customers/$customerId/edit'
+    | '/{-$locale}/_protected/yourobc/employees/$employeeId/edit'
+    | '/{-$locale}/_protected/yourobc/employees/vacations/new'
+    | '/{-$locale}/_protected/yourobc/invoices/$invoiceId/edit'
+    | '/{-$locale}/_protected/yourobc/partners/$partnerId/edit'
+    | '/{-$locale}/_protected/yourobc/quotes/$quoteId/edit'
+    | '/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier'
+    | '/{-$locale}/_protected/yourobc/shipments/$shipmentId/edit'
+    | '/{-$locale}/_protected/yourobc/shipments/$shipmentId/status'
+    | '/{-$locale}/_protected/yourobc/statistics/reports/customer'
+    | '/{-$locale}/_protected/yourobc/statistics/reports/employee'
+    | '/{-$locale}/_protected/yourobc/statistics/reports/executive'
+    | '/{-$locale}/_protected/yourobc/statistics/reports/monthly'
+    | '/{-$locale}/_protected/yourobc/statistics/reports/order'
     | '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/'
-    | '/{-$locale}/_protected/_admin/admin/blog/'
-    | '/{-$locale}/_protected/_system/projects/$projectId/'
-    | '/{-$locale}/_protected/_admin/admin/blog/posts/new'
-    | '/{-$locale}/_protected/_admin/admin/blog/categories/'
-    | '/{-$locale}/_protected/_admin/admin/blog/posts/'
-    | '/{-$locale}/_protected/_admin/admin/blog/tags/'
-    | '/{-$locale}/_protected/_admin/admin/blog/posts/$postId/edit'
+    | '/{-$locale}/_protected/yourobc/couriers/$courierId/'
+    | '/{-$locale}/_protected/yourobc/couriers/commissions/'
+    | '/{-$locale}/_protected/yourobc/customers/$customerId/'
+    | '/{-$locale}/_protected/yourobc/employees/$employeeId/'
+    | '/{-$locale}/_protected/yourobc/employees/vacations/'
+    | '/{-$locale}/_protected/yourobc/invoices/$invoiceId/'
+    | '/{-$locale}/_protected/yourobc/partners/$partnerId/'
+    | '/{-$locale}/_protected/yourobc/quotes/$quoteId/'
+    | '/{-$locale}/_protected/yourobc/shipments/$shipmentId/'
+    | '/{-$locale}/_protected/yourobc/supporting/comments/'
+    | '/{-$locale}/_protected/yourobc/supporting/exchange-rates/'
+    | '/{-$locale}/_protected/yourobc/supporting/followup-reminders/'
+    | '/{-$locale}/_protected/yourobc/supporting/inquiry-sources/'
+    | '/{-$locale}/_protected/yourobc/supporting/wiki/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1239,48 +1194,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthTestConvexRoute: typeof ApiAuthTestConvexRoute
   ApiAuthTestJwtRoute: typeof ApiAuthTestJwtRoute
-  ApiCacheContextsFileNameRoute: typeof ApiCacheContextsFileNameRoute
-  ApiPaymentsCancelRoute: typeof ApiPaymentsCancelRoute
-  ApiPaymentsCheckoutRoute: typeof ApiPaymentsCheckoutRoute
-  ApiPaymentsPortalRoute: typeof ApiPaymentsPortalRoute
-  ApiPaymentsSubscriptionRoute: typeof ApiPaymentsSubscriptionRoute
-  ApiPaymentsUsageRoute: typeof ApiPaymentsUsageRoute
   ApiSettingsAiRoute: typeof ApiSettingsAiRoute
-  ApiAiGenerateEmbeddingRoute: typeof ApiAiGenerateEmbeddingRoute
-  ApiAiGenerateImageRoute: typeof ApiAiGenerateImageRoute
-  ApiAiGenerateObjectRoute: typeof ApiAiGenerateObjectRoute
-  ApiAiGenerateSpeechRoute: typeof ApiAiGenerateSpeechRoute
-  ApiAiGenerateStreamRoute: typeof ApiAiGenerateStreamRoute
-  ApiAiGenerateStreamObjectRoute: typeof ApiAiGenerateStreamObjectRoute
-  ApiAiGenerateTextRoute: typeof ApiAiGenerateTextRoute
-  ApiAiGenerateTranscriptionRoute: typeof ApiAiGenerateTranscriptionRoute
-  ApiAiLogsLogIdRoute: typeof ApiAiLogsLogIdRoute
-  ApiAiLogsAnalyticsRoute: typeof ApiAiLogsAnalyticsRoute
-  ApiAiLogsExportRoute: typeof ApiAiLogsExportRoute
-  ApiAiModelsModelIdRoute: typeof ApiAiModelsModelIdRoute
-  ApiAiModelsTestRoute: typeof ApiAiModelsTestRoute
-  ApiAiTestAnalyticsRoute: typeof ApiAiTestAnalyticsRoute
-  ApiAiTestBatchRoute: typeof ApiAiTestBatchRoute
-  ApiAiTestCompareRoute: typeof ApiAiTestCompareRoute
-  ApiAiTestExecuteRoute: typeof ApiAiTestExecuteRoute
-  ApiAiTestHistoryRoute: typeof ApiAiTestHistoryRoute
-  ApiPaymentsAutumnWebhooksRoute: typeof ApiPaymentsAutumnWebhooksRoute
-  ApiPaymentsStripeConnectAccountStatusRoute: typeof ApiPaymentsStripeConnectAccountStatusRoute
-  ApiPaymentsStripeConnectCreateAccountRoute: typeof ApiPaymentsStripeConnectCreateAccountRoute
-  ApiPaymentsStripeConnectCreateCheckoutRoute: typeof ApiPaymentsStripeConnectCreateCheckoutRoute
-  ApiPaymentsStripeConnectCreateProductRoute: typeof ApiPaymentsStripeConnectCreateProductRoute
-  ApiPaymentsStripeConnectOnboardingLinkRoute: typeof ApiPaymentsStripeConnectOnboardingLinkRoute
-  ApiPaymentsStripeConnectWebhooksRoute: typeof ApiPaymentsStripeConnectWebhooksRoute
-  ApiPaymentsStripeBillingPortalRoute: typeof ApiPaymentsStripeBillingPortalRoute
-  ApiPaymentsStripeCancelSubscriptionRoute: typeof ApiPaymentsStripeCancelSubscriptionRoute
-  ApiPaymentsStripeCreatePaymentRoute: typeof ApiPaymentsStripeCreatePaymentRoute
-  ApiPaymentsStripeCreateSubscriptionRoute: typeof ApiPaymentsStripeCreateSubscriptionRoute
-  ApiPaymentsStripeResumeSubscriptionRoute: typeof ApiPaymentsStripeResumeSubscriptionRoute
-  ApiPaymentsStripeWebhooksRoute: typeof ApiPaymentsStripeWebhooksRoute
-  ApiAiLogsIndexRoute: typeof ApiAiLogsIndexRoute
-  ApiAiModelsIndexRoute: typeof ApiAiModelsIndexRoute
-  ApiAiTestTestIdResultsRoute: typeof ApiAiTestTestIdResultsRoute
-  ApiAiTestTestIdIndexRoute: typeof ApiAiTestTestIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1327,25 +1241,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedRouteImport
       parentRoute: typeof Char123LocaleChar125Route
     }
-    '/{-$locale}/blog/': {
-      id: '/{-$locale}/blog/'
-      path: '/blog'
-      fullPath: '/{-$locale}/blog'
-      preLoaderRoute: typeof Char123LocaleChar125BlogIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125Route
-    }
     '/{-$locale}/test/auth': {
       id: '/{-$locale}/test/auth'
       path: '/test/auth'
       fullPath: '/{-$locale}/test/auth'
       preLoaderRoute: typeof Char123LocaleChar125TestAuthRouteImport
-      parentRoute: typeof Char123LocaleChar125Route
-    }
-    '/{-$locale}/blog/$slug': {
-      id: '/{-$locale}/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/{-$locale}/blog/$slug'
-      preLoaderRoute: typeof Char123LocaleChar125BlogSlugRouteImport
       parentRoute: typeof Char123LocaleChar125Route
     }
     '/{-$locale}/auth/signup': {
@@ -1390,48 +1290,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSettingsAiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/payments/usage': {
-      id: '/api/payments/usage'
-      path: '/api/payments/usage'
-      fullPath: '/api/payments/usage'
-      preLoaderRoute: typeof ApiPaymentsUsageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/subscription': {
-      id: '/api/payments/subscription'
-      path: '/api/payments/subscription'
-      fullPath: '/api/payments/subscription'
-      preLoaderRoute: typeof ApiPaymentsSubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/portal': {
-      id: '/api/payments/portal'
-      path: '/api/payments/portal'
-      fullPath: '/api/payments/portal'
-      preLoaderRoute: typeof ApiPaymentsPortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/checkout': {
-      id: '/api/payments/checkout'
-      path: '/api/payments/checkout'
-      fullPath: '/api/payments/checkout'
-      preLoaderRoute: typeof ApiPaymentsCheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/cancel': {
-      id: '/api/payments/cancel'
-      path: '/api/payments/cancel'
-      fullPath: '/api/payments/cancel'
-      preLoaderRoute: typeof ApiPaymentsCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cache-contexts/$fileName': {
-      id: '/api/cache-contexts/$fileName'
-      path: '/api/cache-contexts/$fileName'
-      fullPath: '/api/cache-contexts/$fileName'
-      preLoaderRoute: typeof ApiCacheContextsFileNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/test-jwt': {
       id: '/api/auth/test-jwt'
       path: '/api/auth/test-jwt'
@@ -1453,33 +1311,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/ai/models/': {
-      id: '/api/ai/models/'
-      path: '/api/ai/models'
-      fullPath: '/api/ai/models'
-      preLoaderRoute: typeof ApiAiModelsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/': {
+      id: '/{-$locale}/_protected/yourobc/'
+      path: '/yourobc'
+      fullPath: '/{-$locale}/yourobc'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/ai/logs/': {
-      id: '/api/ai/logs/'
-      path: '/api/ai/logs'
-      fullPath: '/api/ai/logs'
-      preLoaderRoute: typeof ApiAiLogsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/{-$locale}/blog/tag/$slug': {
-      id: '/{-$locale}/blog/tag/$slug'
-      path: '/blog/tag/$slug'
-      fullPath: '/{-$locale}/blog/tag/$slug'
-      preLoaderRoute: typeof Char123LocaleChar125BlogTagSlugRouteImport
-      parentRoute: typeof Char123LocaleChar125Route
-    }
-    '/{-$locale}/blog/category/$slug': {
-      id: '/{-$locale}/blog/category/$slug'
-      path: '/blog/category/$slug'
-      fullPath: '/{-$locale}/blog/category/$slug'
-      preLoaderRoute: typeof Char123LocaleChar125BlogCategorySlugRouteImport
-      parentRoute: typeof Char123LocaleChar125Route
+    '/{-$locale}/_protected/yourobc/supporting': {
+      id: '/{-$locale}/_protected/yourobc/supporting'
+      path: '/yourobc/supporting'
+      fullPath: '/{-$locale}/yourobc/supporting'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/settings': {
       id: '/{-$locale}/_protected/_system/settings'
@@ -1495,235 +1339,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemDashboardRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_system/ai-testing': {
-      id: '/{-$locale}/_protected/_system/ai-testing'
-      path: '/ai-testing'
-      fullPath: '/{-$locale}/ai-testing'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiTestingRouteImport
+    '/{-$locale}/_protected/yourobc/tasks/': {
+      id: '/{-$locale}/_protected/yourobc/tasks/'
+      path: '/yourobc/tasks'
+      fullPath: '/{-$locale}/yourobc/tasks'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcTasksIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe/webhooks': {
-      id: '/api/payments/stripe/webhooks'
-      path: '/api/payments/stripe/webhooks'
-      fullPath: '/api/payments/stripe/webhooks'
-      preLoaderRoute: typeof ApiPaymentsStripeWebhooksRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/supporting/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/'
+      path: '/'
+      fullPath: '/{-$locale}/yourobc/supporting/'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
     }
-    '/api/payments/stripe/resume-subscription': {
-      id: '/api/payments/stripe/resume-subscription'
-      path: '/api/payments/stripe/resume-subscription'
-      fullPath: '/api/payments/stripe/resume-subscription'
-      preLoaderRoute: typeof ApiPaymentsStripeResumeSubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/statistics/': {
+      id: '/{-$locale}/_protected/yourobc/statistics/'
+      path: '/yourobc/statistics'
+      fullPath: '/{-$locale}/yourobc/statistics'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe/create-subscription': {
-      id: '/api/payments/stripe/create-subscription'
-      path: '/api/payments/stripe/create-subscription'
-      fullPath: '/api/payments/stripe/create-subscription'
-      preLoaderRoute: typeof ApiPaymentsStripeCreateSubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/shipments/': {
+      id: '/{-$locale}/_protected/yourobc/shipments/'
+      path: '/yourobc/shipments'
+      fullPath: '/{-$locale}/yourobc/shipments'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe/create-payment': {
-      id: '/api/payments/stripe/create-payment'
-      path: '/api/payments/stripe/create-payment'
-      fullPath: '/api/payments/stripe/create-payment'
-      preLoaderRoute: typeof ApiPaymentsStripeCreatePaymentRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/quotes/': {
+      id: '/{-$locale}/_protected/yourobc/quotes/'
+      path: '/yourobc/quotes'
+      fullPath: '/{-$locale}/yourobc/quotes'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe/cancel-subscription': {
-      id: '/api/payments/stripe/cancel-subscription'
-      path: '/api/payments/stripe/cancel-subscription'
-      fullPath: '/api/payments/stripe/cancel-subscription'
-      preLoaderRoute: typeof ApiPaymentsStripeCancelSubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/partners/': {
+      id: '/{-$locale}/_protected/yourobc/partners/'
+      path: '/yourobc/partners'
+      fullPath: '/{-$locale}/yourobc/partners'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe/billing-portal': {
-      id: '/api/payments/stripe/billing-portal'
-      path: '/api/payments/stripe/billing-portal'
-      fullPath: '/api/payments/stripe/billing-portal'
-      preLoaderRoute: typeof ApiPaymentsStripeBillingPortalRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/invoices/': {
+      id: '/{-$locale}/_protected/yourobc/invoices/'
+      path: '/yourobc/invoices'
+      fullPath: '/{-$locale}/yourobc/invoices'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe-connect/webhooks': {
-      id: '/api/payments/stripe-connect/webhooks'
-      path: '/api/payments/stripe-connect/webhooks'
-      fullPath: '/api/payments/stripe-connect/webhooks'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectWebhooksRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/employees/': {
+      id: '/{-$locale}/_protected/yourobc/employees/'
+      path: '/yourobc/employees'
+      fullPath: '/{-$locale}/yourobc/employees'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe-connect/onboarding-link': {
-      id: '/api/payments/stripe-connect/onboarding-link'
-      path: '/api/payments/stripe-connect/onboarding-link'
-      fullPath: '/api/payments/stripe-connect/onboarding-link'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectOnboardingLinkRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/customers/': {
+      id: '/{-$locale}/_protected/yourobc/customers/'
+      path: '/yourobc/customers'
+      fullPath: '/{-$locale}/yourobc/customers'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/api/payments/stripe-connect/create-product': {
-      id: '/api/payments/stripe-connect/create-product'
-      path: '/api/payments/stripe-connect/create-product'
-      fullPath: '/api/payments/stripe-connect/create-product'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectCreateProductRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/stripe-connect/create-checkout': {
-      id: '/api/payments/stripe-connect/create-checkout'
-      path: '/api/payments/stripe-connect/create-checkout'
-      fullPath: '/api/payments/stripe-connect/create-checkout'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectCreateCheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/stripe-connect/create-account': {
-      id: '/api/payments/stripe-connect/create-account'
-      path: '/api/payments/stripe-connect/create-account'
-      fullPath: '/api/payments/stripe-connect/create-account'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectCreateAccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/stripe-connect/account-status': {
-      id: '/api/payments/stripe-connect/account-status'
-      path: '/api/payments/stripe-connect/account-status'
-      fullPath: '/api/payments/stripe-connect/account-status'
-      preLoaderRoute: typeof ApiPaymentsStripeConnectAccountStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/autumn/webhooks': {
-      id: '/api/payments/autumn/webhooks'
-      path: '/api/payments/autumn/webhooks'
-      fullPath: '/api/payments/autumn/webhooks'
-      preLoaderRoute: typeof ApiPaymentsAutumnWebhooksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/test/history': {
-      id: '/api/ai/test/history'
-      path: '/api/ai/test/history'
-      fullPath: '/api/ai/test/history'
-      preLoaderRoute: typeof ApiAiTestHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/test/execute': {
-      id: '/api/ai/test/execute'
-      path: '/api/ai/test/execute'
-      fullPath: '/api/ai/test/execute'
-      preLoaderRoute: typeof ApiAiTestExecuteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/test/compare': {
-      id: '/api/ai/test/compare'
-      path: '/api/ai/test/compare'
-      fullPath: '/api/ai/test/compare'
-      preLoaderRoute: typeof ApiAiTestCompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/test/batch': {
-      id: '/api/ai/test/batch'
-      path: '/api/ai/test/batch'
-      fullPath: '/api/ai/test/batch'
-      preLoaderRoute: typeof ApiAiTestBatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/test/analytics': {
-      id: '/api/ai/test/analytics'
-      path: '/api/ai/test/analytics'
-      fullPath: '/api/ai/test/analytics'
-      preLoaderRoute: typeof ApiAiTestAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/models/test': {
-      id: '/api/ai/models/test'
-      path: '/api/ai/models/test'
-      fullPath: '/api/ai/models/test'
-      preLoaderRoute: typeof ApiAiModelsTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/models/$modelId': {
-      id: '/api/ai/models/$modelId'
-      path: '/api/ai/models/$modelId'
-      fullPath: '/api/ai/models/$modelId'
-      preLoaderRoute: typeof ApiAiModelsModelIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/logs/export': {
-      id: '/api/ai/logs/export'
-      path: '/api/ai/logs/export'
-      fullPath: '/api/ai/logs/export'
-      preLoaderRoute: typeof ApiAiLogsExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/logs/analytics': {
-      id: '/api/ai/logs/analytics'
-      path: '/api/ai/logs/analytics'
-      fullPath: '/api/ai/logs/analytics'
-      preLoaderRoute: typeof ApiAiLogsAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/logs/$logId': {
-      id: '/api/ai/logs/$logId'
-      path: '/api/ai/logs/$logId'
-      fullPath: '/api/ai/logs/$logId'
-      preLoaderRoute: typeof ApiAiLogsLogIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/transcription': {
-      id: '/api/ai/generate/transcription'
-      path: '/api/ai/generate/transcription'
-      fullPath: '/api/ai/generate/transcription'
-      preLoaderRoute: typeof ApiAiGenerateTranscriptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/text': {
-      id: '/api/ai/generate/text'
-      path: '/api/ai/generate/text'
-      fullPath: '/api/ai/generate/text'
-      preLoaderRoute: typeof ApiAiGenerateTextRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/stream-object': {
-      id: '/api/ai/generate/stream-object'
-      path: '/api/ai/generate/stream-object'
-      fullPath: '/api/ai/generate/stream-object'
-      preLoaderRoute: typeof ApiAiGenerateStreamObjectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/stream': {
-      id: '/api/ai/generate/stream'
-      path: '/api/ai/generate/stream'
-      fullPath: '/api/ai/generate/stream'
-      preLoaderRoute: typeof ApiAiGenerateStreamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/speech': {
-      id: '/api/ai/generate/speech'
-      path: '/api/ai/generate/speech'
-      fullPath: '/api/ai/generate/speech'
-      preLoaderRoute: typeof ApiAiGenerateSpeechRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/object': {
-      id: '/api/ai/generate/object'
-      path: '/api/ai/generate/object'
-      fullPath: '/api/ai/generate/object'
-      preLoaderRoute: typeof ApiAiGenerateObjectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/image': {
-      id: '/api/ai/generate/image'
-      path: '/api/ai/generate/image'
-      fullPath: '/api/ai/generate/image'
-      preLoaderRoute: typeof ApiAiGenerateImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate/embedding': {
-      id: '/api/ai/generate/embedding'
-      path: '/api/ai/generate/embedding'
-      fullPath: '/api/ai/generate/embedding'
-      preLoaderRoute: typeof ApiAiGenerateEmbeddingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/{-$locale}/_protected/_system/projects/': {
-      id: '/{-$locale}/_protected/_system/projects/'
-      path: '/projects'
-      fullPath: '/{-$locale}/projects'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsIndexRouteImport
+    '/{-$locale}/_protected/yourobc/couriers/': {
+      id: '/{-$locale}/_protected/yourobc/couriers/'
+      path: '/yourobc/couriers'
+      fullPath: '/{-$locale}/yourobc/couriers'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/notifications/': {
@@ -1733,32 +1416,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_system/games/': {
-      id: '/{-$locale}/_protected/_system/games/'
-      path: '/games'
-      fullPath: '/{-$locale}/games'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemGamesIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
     '/{-$locale}/_protected/_system/email/': {
       id: '/{-$locale}/_protected/_system/email/'
       path: '/email'
       fullPath: '/{-$locale}/email'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemEmailIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/ai-models/': {
-      id: '/{-$locale}/_protected/_system/ai-models/'
-      path: '/ai-models'
-      fullPath: '/{-$locale}/ai-models'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/ai-logs/': {
-      id: '/{-$locale}/_protected/_system/ai-logs/'
-      path: '/ai-logs'
-      fullPath: '/{-$locale}/ai-logs'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/': {
@@ -1768,12 +1430,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
     }
-    '/api/ai/test/$testId/': {
-      id: '/api/ai/test/$testId/'
-      path: '/api/ai/test/$testId'
-      fullPath: '/api/ai/test/$testId'
-      preLoaderRoute: typeof ApiAiTestTestIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/tasks/dashboard': {
+      id: '/{-$locale}/_protected/yourobc/tasks/dashboard'
+      path: '/yourobc/tasks/dashboard'
+      fullPath: '/{-$locale}/yourobc/tasks/dashboard'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/top-customers': {
+      id: '/{-$locale}/_protected/yourobc/statistics/top-customers'
+      path: '/yourobc/statistics/top-customers'
+      fullPath: '/{-$locale}/yourobc/statistics/top-customers'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/revenue': {
+      id: '/{-$locale}/_protected/yourobc/statistics/revenue'
+      path: '/yourobc/statistics/revenue'
+      fullPath: '/{-$locale}/yourobc/statistics/revenue'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsRevenueRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/reports': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports'
+      path: '/yourobc/statistics/reports'
+      fullPath: '/{-$locale}/yourobc/statistics/reports'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/operating-costs': {
+      id: '/{-$locale}/_protected/yourobc/statistics/operating-costs'
+      path: '/yourobc/statistics/operating-costs'
+      fullPath: '/{-$locale}/yourobc/statistics/operating-costs'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/employee-kpis': {
+      id: '/{-$locale}/_protected/yourobc/statistics/employee-kpis'
+      path: '/yourobc/statistics/employee-kpis'
+      fullPath: '/{-$locale}/yourobc/statistics/employee-kpis'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/overdue': {
+      id: '/{-$locale}/_protected/yourobc/shipments/overdue'
+      path: '/yourobc/shipments/overdue'
+      fullPath: '/{-$locale}/yourobc/shipments/overdue'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsOverdueRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/new': {
+      id: '/{-$locale}/_protected/yourobc/shipments/new'
+      path: '/yourobc/shipments/new'
+      fullPath: '/{-$locale}/yourobc/shipments/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/quotes/new': {
+      id: '/{-$locale}/_protected/yourobc/quotes/new'
+      path: '/yourobc/quotes/new'
+      fullPath: '/{-$locale}/yourobc/quotes/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/partners/new': {
+      id: '/{-$locale}/_protected/yourobc/partners/new'
+      path: '/yourobc/partners/new'
+      fullPath: '/{-$locale}/yourobc/partners/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/invoices/overdue': {
+      id: '/{-$locale}/_protected/yourobc/invoices/overdue'
+      path: '/yourobc/invoices/overdue'
+      fullPath: '/{-$locale}/yourobc/invoices/overdue'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesOverdueRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/invoices/new': {
+      id: '/{-$locale}/_protected/yourobc/invoices/new'
+      path: '/yourobc/invoices/new'
+      fullPath: '/{-$locale}/yourobc/invoices/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/employees/new': {
+      id: '/{-$locale}/_protected/yourobc/employees/new'
+      path: '/yourobc/employees/new'
+      fullPath: '/{-$locale}/yourobc/employees/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/customers/new': {
+      id: '/{-$locale}/_protected/yourobc/customers/new'
+      path: '/yourobc/customers/new'
+      fullPath: '/{-$locale}/yourobc/customers/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/couriers/new': {
+      id: '/{-$locale}/_protected/yourobc/couriers/new'
+      path: '/yourobc/couriers/new'
+      fullPath: '/{-$locale}/yourobc/couriers/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/settings/notifications': {
       id: '/{-$locale}/_protected/_system/settings/notifications'
@@ -1781,41 +1541,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/{-$locale}/settings/notifications'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRoute
-    }
-    '/{-$locale}/_protected/_system/projects/timeline': {
-      id: '/{-$locale}/_protected/_system/projects/timeline'
-      path: '/projects/timeline'
-      fullPath: '/{-$locale}/projects/timeline'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/projects/team': {
-      id: '/{-$locale}/_protected/_system/projects/team'
-      path: '/projects/team'
-      fullPath: '/{-$locale}/projects/team'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTeamRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/projects/tasks': {
-      id: '/{-$locale}/_protected/_system/projects/tasks'
-      path: '/projects/tasks'
-      fullPath: '/{-$locale}/projects/tasks'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTasksRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/projects/new': {
-      id: '/{-$locale}/_protected/_system/projects/new'
-      path: '/projects/new'
-      fullPath: '/{-$locale}/projects/new'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsNewRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/games/$gameId': {
-      id: '/{-$locale}/_protected/_system/games/$gameId'
-      path: '/games/$gameId'
-      fullPath: '/{-$locale}/games/$gameId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemGamesGameIdRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/email/templates': {
       id: '/{-$locale}/_protected/_system/email/templates'
@@ -1829,20 +1554,6 @@ declare module '@tanstack/react-router' {
       path: '/email/logs'
       fullPath: '/{-$locale}/email/logs'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemEmailLogsRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/ai-models/$modelId': {
-      id: '/{-$locale}/_protected/_system/ai-models/$modelId'
-      path: '/ai-models/$modelId'
-      fullPath: '/{-$locale}/ai-models/$modelId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedRoute
-    }
-    '/{-$locale}/_protected/_system/ai-logs/$logId': {
-      id: '/{-$locale}/_protected/_system/ai-logs/$logId'
-      path: '/ai-logs/$logId'
-      fullPath: '/{-$locale}/ai-logs/$logId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/users': {
@@ -1873,26 +1584,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
     }
-    '/api/ai/test/$testId/results': {
-      id: '/api/ai/test/$testId/results'
-      path: '/api/ai/test/$testId/results'
-      fullPath: '/api/ai/test/$testId/results'
-      preLoaderRoute: typeof ApiAiTestTestIdResultsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/{-$locale}/_protected/yourobc/supporting/wiki/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/wiki/'
+      path: '/wiki'
+      fullPath: '/{-$locale}/yourobc/supporting/wiki'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
     }
-    '/{-$locale}/_protected/_system/projects/$projectId/': {
-      id: '/{-$locale}/_protected/_system/projects/$projectId/'
-      path: '/projects/$projectId'
-      fullPath: '/{-$locale}/projects/$projectId'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRouteImport
+    '/{-$locale}/_protected/yourobc/supporting/inquiry-sources/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/inquiry-sources/'
+      path: '/inquiry-sources'
+      fullPath: '/{-$locale}/yourobc/supporting/inquiry-sources'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
+    }
+    '/{-$locale}/_protected/yourobc/supporting/followup-reminders/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/followup-reminders/'
+      path: '/followup-reminders'
+      fullPath: '/{-$locale}/yourobc/supporting/followup-reminders'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
+    }
+    '/{-$locale}/_protected/yourobc/supporting/exchange-rates/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/exchange-rates/'
+      path: '/exchange-rates'
+      fullPath: '/{-$locale}/yourobc/supporting/exchange-rates'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
+    }
+    '/{-$locale}/_protected/yourobc/supporting/comments/': {
+      id: '/{-$locale}/_protected/yourobc/supporting/comments/'
+      path: '/comments'
+      fullPath: '/{-$locale}/yourobc/supporting/comments'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/$shipmentId/': {
+      id: '/{-$locale}/_protected/yourobc/shipments/$shipmentId/'
+      path: '/yourobc/shipments/$shipmentId'
+      fullPath: '/{-$locale}/yourobc/shipments/$shipmentId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
-    '/{-$locale}/_protected/_admin/admin/blog/': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/'
-      path: '/admin/blog'
-      fullPath: '/{-$locale}/admin/blog'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
+    '/{-$locale}/_protected/yourobc/quotes/$quoteId/': {
+      id: '/{-$locale}/_protected/yourobc/quotes/$quoteId/'
+      path: '/yourobc/quotes/$quoteId'
+      fullPath: '/{-$locale}/yourobc/quotes/$quoteId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/partners/$partnerId/': {
+      id: '/{-$locale}/_protected/yourobc/partners/$partnerId/'
+      path: '/yourobc/partners/$partnerId'
+      fullPath: '/{-$locale}/yourobc/partners/$partnerId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/invoices/$invoiceId/': {
+      id: '/{-$locale}/_protected/yourobc/invoices/$invoiceId/'
+      path: '/yourobc/invoices/$invoiceId'
+      fullPath: '/{-$locale}/yourobc/invoices/$invoiceId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/employees/vacations/': {
+      id: '/{-$locale}/_protected/yourobc/employees/vacations/'
+      path: '/yourobc/employees/vacations'
+      fullPath: '/{-$locale}/yourobc/employees/vacations'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/employees/$employeeId/': {
+      id: '/{-$locale}/_protected/yourobc/employees/$employeeId/'
+      path: '/yourobc/employees/$employeeId'
+      fullPath: '/{-$locale}/yourobc/employees/$employeeId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/customers/$customerId/': {
+      id: '/{-$locale}/_protected/yourobc/customers/$customerId/'
+      path: '/yourobc/customers/$customerId'
+      fullPath: '/{-$locale}/yourobc/customers/$customerId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/couriers/commissions/': {
+      id: '/{-$locale}/_protected/yourobc/couriers/commissions/'
+      path: '/yourobc/couriers/commissions'
+      fullPath: '/{-$locale}/yourobc/couriers/commissions'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/couriers/$courierId/': {
+      id: '/{-$locale}/_protected/yourobc/couriers/$courierId/'
+      path: '/yourobc/couriers/$courierId'
+      fullPath: '/{-$locale}/yourobc/couriers/$courierId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/': {
       id: '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/'
@@ -1901,11 +1689,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
     }
-    '/{-$locale}/_protected/_system/projects/$projectId/edit': {
-      id: '/{-$locale}/_protected/_system/projects/$projectId/edit'
-      path: '/projects/$projectId/edit'
-      fullPath: '/{-$locale}/projects/$projectId/edit'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRouteImport
+    '/{-$locale}/_protected/yourobc/statistics/reports/order': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports/order'
+      path: '/order'
+      fullPath: '/{-$locale}/yourobc/statistics/reports/order'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/reports/monthly': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports/monthly'
+      path: '/monthly'
+      fullPath: '/{-$locale}/yourobc/statistics/reports/monthly'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/reports/executive': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports/executive'
+      path: '/executive'
+      fullPath: '/{-$locale}/yourobc/statistics/reports/executive'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/reports/employee': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports/employee'
+      path: '/employee'
+      fullPath: '/{-$locale}/yourobc/statistics/reports/employee'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute
+    }
+    '/{-$locale}/_protected/yourobc/statistics/reports/customer': {
+      id: '/{-$locale}/_protected/yourobc/statistics/reports/customer'
+      path: '/customer'
+      fullPath: '/{-$locale}/yourobc/statistics/reports/customer'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/$shipmentId/status': {
+      id: '/{-$locale}/_protected/yourobc/shipments/$shipmentId/status'
+      path: '/yourobc/shipments/$shipmentId/status'
+      fullPath: '/{-$locale}/yourobc/shipments/$shipmentId/status'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/$shipmentId/edit': {
+      id: '/{-$locale}/_protected/yourobc/shipments/$shipmentId/edit'
+      path: '/yourobc/shipments/$shipmentId/edit'
+      fullPath: '/{-$locale}/yourobc/shipments/$shipmentId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier': {
+      id: '/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier'
+      path: '/yourobc/shipments/$shipmentId/assign-courier'
+      fullPath: '/{-$locale}/yourobc/shipments/$shipmentId/assign-courier'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/quotes/$quoteId/edit': {
+      id: '/{-$locale}/_protected/yourobc/quotes/$quoteId/edit'
+      path: '/yourobc/quotes/$quoteId/edit'
+      fullPath: '/{-$locale}/yourobc/quotes/$quoteId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/partners/$partnerId/edit': {
+      id: '/{-$locale}/_protected/yourobc/partners/$partnerId/edit'
+      path: '/yourobc/partners/$partnerId/edit'
+      fullPath: '/{-$locale}/yourobc/partners/$partnerId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/invoices/$invoiceId/edit': {
+      id: '/{-$locale}/_protected/yourobc/invoices/$invoiceId/edit'
+      path: '/yourobc/invoices/$invoiceId/edit'
+      fullPath: '/{-$locale}/yourobc/invoices/$invoiceId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/employees/vacations/new': {
+      id: '/{-$locale}/_protected/yourobc/employees/vacations/new'
+      path: '/yourobc/employees/vacations/new'
+      fullPath: '/{-$locale}/yourobc/employees/vacations/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/employees/$employeeId/edit': {
+      id: '/{-$locale}/_protected/yourobc/employees/$employeeId/edit'
+      path: '/yourobc/employees/$employeeId/edit'
+      fullPath: '/{-$locale}/yourobc/employees/$employeeId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/customers/$customerId/edit': {
+      id: '/{-$locale}/_protected/yourobc/customers/$customerId/edit'
+      path: '/yourobc/customers/$customerId/edit'
+      fullPath: '/{-$locale}/yourobc/customers/$customerId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/couriers/commissions/new': {
+      id: '/{-$locale}/_protected/yourobc/couriers/commissions/new'
+      path: '/yourobc/couriers/commissions/new'
+      fullPath: '/{-$locale}/yourobc/couriers/commissions/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/yourobc/couriers/$courierId/edit': {
+      id: '/{-$locale}/_protected/yourobc/couriers/$courierId/edit'
+      path: '/yourobc/couriers/$courierId/edit'
+      fullPath: '/{-$locale}/yourobc/couriers/$courierId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_admin/admin/advanced-audit-logs/$logId': {
@@ -1913,41 +1806,6 @@ declare module '@tanstack/react-router' {
       path: '/admin/advanced-audit-logs/$logId'
       fullPath: '/{-$locale}/admin/advanced-audit-logs/$logId'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
-    }
-    '/{-$locale}/_protected/_admin/admin/blog/tags/': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/tags/'
-      path: '/admin/blog/tags'
-      fullPath: '/{-$locale}/admin/blog/tags'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
-    }
-    '/{-$locale}/_protected/_admin/admin/blog/posts/': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/posts/'
-      path: '/admin/blog/posts'
-      fullPath: '/{-$locale}/admin/blog/posts'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
-    }
-    '/{-$locale}/_protected/_admin/admin/blog/categories/': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/categories/'
-      path: '/admin/blog/categories'
-      fullPath: '/{-$locale}/admin/blog/categories'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
-    }
-    '/{-$locale}/_protected/_admin/admin/blog/posts/new': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/posts/new'
-      path: '/admin/blog/posts/new'
-      fullPath: '/{-$locale}/admin/blog/posts/new'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRouteImport
-      parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
-    }
-    '/{-$locale}/_protected/_admin/admin/blog/posts/$postId/edit': {
-      id: '/{-$locale}/_protected/_admin/admin/blog/posts/$postId/edit'
-      path: '/admin/blog/posts/$postId/edit'
-      fullPath: '/{-$locale}/admin/blog/posts/$postId/edit'
-      preLoaderRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedAdminRoute
     }
   }
@@ -1961,12 +1819,6 @@ interface Char123LocaleChar125ProtectedAdminRouteChildren {
   Char123LocaleChar125ProtectedAdminAdminIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
   Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute: typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute
   Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute
-  Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute: typeof Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute
 }
 
 const Char123LocaleChar125ProtectedAdminRouteChildren: Char123LocaleChar125ProtectedAdminRouteChildren =
@@ -1985,18 +1837,6 @@ const Char123LocaleChar125ProtectedAdminRouteChildren: Char123LocaleChar125Prote
       Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsLogIdRoute,
     Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute:
       Char123LocaleChar125ProtectedAdminAdminAdvancedAuditLogsIndexRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogIndexRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogPostsNewRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogCategoriesIndexRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogPostsIndexRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogTagsIndexRoute,
-    Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute:
-      Char123LocaleChar125ProtectedAdminAdminBlogPostsPostIdEditRoute,
   }
 
 const Char123LocaleChar125ProtectedAdminRouteWithChildren =
@@ -2019,74 +1859,227 @@ const Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren =
     Char123LocaleChar125ProtectedSystemSettingsRouteChildren,
   )
 
+interface Char123LocaleChar125ProtectedYourobcSupportingRouteChildren {
+  Char123LocaleChar125ProtectedYourobcSupportingIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingIndexRoute
+  Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute
+  Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute
+  Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute
+  Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute
+  Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute
+}
+
+const Char123LocaleChar125ProtectedYourobcSupportingRouteChildren: Char123LocaleChar125ProtectedYourobcSupportingRouteChildren =
+  {
+    Char123LocaleChar125ProtectedYourobcSupportingIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingIndexRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingCommentsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingExchangeRatesIndexRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingFollowupRemindersIndexRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingInquirySourcesIndexRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingWikiIndexRoute,
+  }
+
+const Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren =
+  Char123LocaleChar125ProtectedYourobcSupportingRoute._addFileChildren(
+    Char123LocaleChar125ProtectedYourobcSupportingRouteChildren,
+  )
+
+interface Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteChildren {
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute
+}
+
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteChildren: Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteChildren =
+  {
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsCustomerRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsEmployeeRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsExecutiveRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsMonthlyRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsOrderRoute,
+  }
+
+const Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren =
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute._addFileChildren(
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteChildren,
+  )
+
 interface Char123LocaleChar125ProtectedRouteChildren {
   Char123LocaleChar125ProtectedAdminRoute: typeof Char123LocaleChar125ProtectedAdminRouteWithChildren
-  Char123LocaleChar125ProtectedSystemAiTestingRoute: typeof Char123LocaleChar125ProtectedSystemAiTestingRoute
   Char123LocaleChar125ProtectedSystemDashboardRoute: typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   Char123LocaleChar125ProtectedSystemSettingsRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
-  Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute
-  Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute
+  Char123LocaleChar125ProtectedYourobcSupportingRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  Char123LocaleChar125ProtectedYourobcIndexRoute: typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   Char123LocaleChar125ProtectedSystemEmailLogsRoute: typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   Char123LocaleChar125ProtectedSystemEmailTemplatesRoute: typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
-  Char123LocaleChar125ProtectedSystemGamesGameIdRoute: typeof Char123LocaleChar125ProtectedSystemGamesGameIdRoute
-  Char123LocaleChar125ProtectedSystemProjectsNewRoute: typeof Char123LocaleChar125ProtectedSystemProjectsNewRoute
-  Char123LocaleChar125ProtectedSystemProjectsTasksRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTasksRoute
-  Char123LocaleChar125ProtectedSystemProjectsTeamRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTeamRoute
-  Char123LocaleChar125ProtectedSystemProjectsTimelineRoute: typeof Char123LocaleChar125ProtectedSystemProjectsTimelineRoute
-  Char123LocaleChar125ProtectedSystemAiLogsIndexRoute: typeof Char123LocaleChar125ProtectedSystemAiLogsIndexRoute
-  Char123LocaleChar125ProtectedSystemAiModelsIndexRoute: typeof Char123LocaleChar125ProtectedSystemAiModelsIndexRoute
+  Char123LocaleChar125ProtectedYourobcCouriersNewRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
+  Char123LocaleChar125ProtectedYourobcCustomersNewRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesNewRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
+  Char123LocaleChar125ProtectedYourobcInvoicesNewRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesNewRoute
+  Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute
+  Char123LocaleChar125ProtectedYourobcPartnersNewRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersNewRoute
+  Char123LocaleChar125ProtectedYourobcQuotesNewRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesNewRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsNewRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsNewRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren
+  Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute
+  Char123LocaleChar125ProtectedYourobcTasksDashboardRoute: typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRoute
   Char123LocaleChar125ProtectedSystemEmailIndexRoute: typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
-  Char123LocaleChar125ProtectedSystemGamesIndexRoute: typeof Char123LocaleChar125ProtectedSystemGamesIndexRoute
   Char123LocaleChar125ProtectedSystemNotificationsIndexRoute: typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
-  Char123LocaleChar125ProtectedSystemProjectsIndexRoute: typeof Char123LocaleChar125ProtectedSystemProjectsIndexRoute
-  Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute
-  Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute: typeof Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcCouriersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
+  Char123LocaleChar125ProtectedYourobcCustomersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
+  Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute
+  Char123LocaleChar125ProtectedYourobcPartnersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersIndexRoute
+  Char123LocaleChar125ProtectedYourobcQuotesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesIndexRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute
+  Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute: typeof Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute
+  Char123LocaleChar125ProtectedYourobcTasksIndexRoute: typeof Char123LocaleChar125ProtectedYourobcTasksIndexRoute
+  Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute
+  Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute
+  Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute
+  Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute
+  Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute
+  Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute
+  Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute
+  Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute
+  Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute
+  Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute: typeof Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute
 }
 
 const Char123LocaleChar125ProtectedRouteChildren: Char123LocaleChar125ProtectedRouteChildren =
   {
     Char123LocaleChar125ProtectedAdminRoute:
       Char123LocaleChar125ProtectedAdminRouteWithChildren,
-    Char123LocaleChar125ProtectedSystemAiTestingRoute:
-      Char123LocaleChar125ProtectedSystemAiTestingRoute,
     Char123LocaleChar125ProtectedSystemDashboardRoute:
       Char123LocaleChar125ProtectedSystemDashboardRoute,
     Char123LocaleChar125ProtectedSystemSettingsRoute:
       Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren,
-    Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute:
-      Char123LocaleChar125ProtectedSystemAiLogsLogIdRoute,
-    Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute:
-      Char123LocaleChar125ProtectedSystemAiModelsModelIdRoute,
+    Char123LocaleChar125ProtectedYourobcSupportingRoute:
+      Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren,
+    Char123LocaleChar125ProtectedYourobcIndexRoute:
+      Char123LocaleChar125ProtectedYourobcIndexRoute,
     Char123LocaleChar125ProtectedSystemEmailLogsRoute:
       Char123LocaleChar125ProtectedSystemEmailLogsRoute,
     Char123LocaleChar125ProtectedSystemEmailTemplatesRoute:
       Char123LocaleChar125ProtectedSystemEmailTemplatesRoute,
-    Char123LocaleChar125ProtectedSystemGamesGameIdRoute:
-      Char123LocaleChar125ProtectedSystemGamesGameIdRoute,
-    Char123LocaleChar125ProtectedSystemProjectsNewRoute:
-      Char123LocaleChar125ProtectedSystemProjectsNewRoute,
-    Char123LocaleChar125ProtectedSystemProjectsTasksRoute:
-      Char123LocaleChar125ProtectedSystemProjectsTasksRoute,
-    Char123LocaleChar125ProtectedSystemProjectsTeamRoute:
-      Char123LocaleChar125ProtectedSystemProjectsTeamRoute,
-    Char123LocaleChar125ProtectedSystemProjectsTimelineRoute:
-      Char123LocaleChar125ProtectedSystemProjectsTimelineRoute,
-    Char123LocaleChar125ProtectedSystemAiLogsIndexRoute:
-      Char123LocaleChar125ProtectedSystemAiLogsIndexRoute,
-    Char123LocaleChar125ProtectedSystemAiModelsIndexRoute:
-      Char123LocaleChar125ProtectedSystemAiModelsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersNewRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersNewRoute,
+    Char123LocaleChar125ProtectedYourobcCustomersNewRoute:
+      Char123LocaleChar125ProtectedYourobcCustomersNewRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesNewRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesNewRoute,
+    Char123LocaleChar125ProtectedYourobcInvoicesNewRoute:
+      Char123LocaleChar125ProtectedYourobcInvoicesNewRoute,
+    Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute:
+      Char123LocaleChar125ProtectedYourobcInvoicesOverdueRoute,
+    Char123LocaleChar125ProtectedYourobcPartnersNewRoute:
+      Char123LocaleChar125ProtectedYourobcPartnersNewRoute,
+    Char123LocaleChar125ProtectedYourobcQuotesNewRoute:
+      Char123LocaleChar125ProtectedYourobcQuotesNewRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsNewRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsNewRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsOverdueRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsEmployeeKpisRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsOperatingCostsRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsReportsRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsReportsRouteWithChildren,
+    Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsRevenueRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsTopCustomersRoute,
+    Char123LocaleChar125ProtectedYourobcTasksDashboardRoute:
+      Char123LocaleChar125ProtectedYourobcTasksDashboardRoute,
     Char123LocaleChar125ProtectedSystemEmailIndexRoute:
       Char123LocaleChar125ProtectedSystemEmailIndexRoute,
-    Char123LocaleChar125ProtectedSystemGamesIndexRoute:
-      Char123LocaleChar125ProtectedSystemGamesIndexRoute,
     Char123LocaleChar125ProtectedSystemNotificationsIndexRoute:
       Char123LocaleChar125ProtectedSystemNotificationsIndexRoute,
-    Char123LocaleChar125ProtectedSystemProjectsIndexRoute:
-      Char123LocaleChar125ProtectedSystemProjectsIndexRoute,
-    Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute:
-      Char123LocaleChar125ProtectedSystemProjectsProjectIdEditRoute,
-    Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute:
-      Char123LocaleChar125ProtectedSystemProjectsProjectIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersIndexRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCustomersIndexRoute:
+      Char123LocaleChar125ProtectedYourobcCustomersIndexRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute,
+    Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute:
+      Char123LocaleChar125ProtectedYourobcInvoicesIndexRoute,
+    Char123LocaleChar125ProtectedYourobcPartnersIndexRoute:
+      Char123LocaleChar125ProtectedYourobcPartnersIndexRoute,
+    Char123LocaleChar125ProtectedYourobcQuotesIndexRoute:
+      Char123LocaleChar125ProtectedYourobcQuotesIndexRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute:
+      Char123LocaleChar125ProtectedYourobcStatisticsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcTasksIndexRoute:
+      Char123LocaleChar125ProtectedYourobcTasksIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersCourierIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersCommissionsNewRoute,
+    Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcCustomersCustomerIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesVacationsNewRoute,
+    Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcPartnersPartnerIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcQuotesQuoteIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdAssignCourierRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdEditRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdStatusRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersCourierIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute:
+      Char123LocaleChar125ProtectedYourobcCouriersCommissionsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcCustomersCustomerIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesEmployeeIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute:
+      Char123LocaleChar125ProtectedYourobcEmployeesVacationsIndexRoute,
+    Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcInvoicesInvoiceIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcPartnersPartnerIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcQuotesQuoteIdIndexRoute,
+    Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute:
+      Char123LocaleChar125ProtectedYourobcShipmentsShipmentIdIndexRoute,
   }
 
 const Char123LocaleChar125ProtectedRouteWithChildren =
@@ -2121,11 +2114,7 @@ interface Char123LocaleChar125RouteChildren {
   Char123LocaleChar125AuthRoute: typeof Char123LocaleChar125AuthRouteWithChildren
   Char123LocaleChar125UnauthorizedRoute: typeof Char123LocaleChar125UnauthorizedRoute
   Char123LocaleChar125IndexRoute: typeof Char123LocaleChar125IndexRoute
-  Char123LocaleChar125BlogSlugRoute: typeof Char123LocaleChar125BlogSlugRoute
   Char123LocaleChar125TestAuthRoute: typeof Char123LocaleChar125TestAuthRoute
-  Char123LocaleChar125BlogIndexRoute: typeof Char123LocaleChar125BlogIndexRoute
-  Char123LocaleChar125BlogCategorySlugRoute: typeof Char123LocaleChar125BlogCategorySlugRoute
-  Char123LocaleChar125BlogTagSlugRoute: typeof Char123LocaleChar125BlogTagSlugRoute
 }
 
 const Char123LocaleChar125RouteChildren: Char123LocaleChar125RouteChildren = {
@@ -2134,12 +2123,7 @@ const Char123LocaleChar125RouteChildren: Char123LocaleChar125RouteChildren = {
   Char123LocaleChar125AuthRoute: Char123LocaleChar125AuthRouteWithChildren,
   Char123LocaleChar125UnauthorizedRoute: Char123LocaleChar125UnauthorizedRoute,
   Char123LocaleChar125IndexRoute: Char123LocaleChar125IndexRoute,
-  Char123LocaleChar125BlogSlugRoute: Char123LocaleChar125BlogSlugRoute,
   Char123LocaleChar125TestAuthRoute: Char123LocaleChar125TestAuthRoute,
-  Char123LocaleChar125BlogIndexRoute: Char123LocaleChar125BlogIndexRoute,
-  Char123LocaleChar125BlogCategorySlugRoute:
-    Char123LocaleChar125BlogCategorySlugRoute,
-  Char123LocaleChar125BlogTagSlugRoute: Char123LocaleChar125BlogTagSlugRoute,
 }
 
 const Char123LocaleChar125RouteWithChildren =
@@ -2151,56 +2135,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthTestConvexRoute: ApiAuthTestConvexRoute,
   ApiAuthTestJwtRoute: ApiAuthTestJwtRoute,
-  ApiCacheContextsFileNameRoute: ApiCacheContextsFileNameRoute,
-  ApiPaymentsCancelRoute: ApiPaymentsCancelRoute,
-  ApiPaymentsCheckoutRoute: ApiPaymentsCheckoutRoute,
-  ApiPaymentsPortalRoute: ApiPaymentsPortalRoute,
-  ApiPaymentsSubscriptionRoute: ApiPaymentsSubscriptionRoute,
-  ApiPaymentsUsageRoute: ApiPaymentsUsageRoute,
   ApiSettingsAiRoute: ApiSettingsAiRoute,
-  ApiAiGenerateEmbeddingRoute: ApiAiGenerateEmbeddingRoute,
-  ApiAiGenerateImageRoute: ApiAiGenerateImageRoute,
-  ApiAiGenerateObjectRoute: ApiAiGenerateObjectRoute,
-  ApiAiGenerateSpeechRoute: ApiAiGenerateSpeechRoute,
-  ApiAiGenerateStreamRoute: ApiAiGenerateStreamRoute,
-  ApiAiGenerateStreamObjectRoute: ApiAiGenerateStreamObjectRoute,
-  ApiAiGenerateTextRoute: ApiAiGenerateTextRoute,
-  ApiAiGenerateTranscriptionRoute: ApiAiGenerateTranscriptionRoute,
-  ApiAiLogsLogIdRoute: ApiAiLogsLogIdRoute,
-  ApiAiLogsAnalyticsRoute: ApiAiLogsAnalyticsRoute,
-  ApiAiLogsExportRoute: ApiAiLogsExportRoute,
-  ApiAiModelsModelIdRoute: ApiAiModelsModelIdRoute,
-  ApiAiModelsTestRoute: ApiAiModelsTestRoute,
-  ApiAiTestAnalyticsRoute: ApiAiTestAnalyticsRoute,
-  ApiAiTestBatchRoute: ApiAiTestBatchRoute,
-  ApiAiTestCompareRoute: ApiAiTestCompareRoute,
-  ApiAiTestExecuteRoute: ApiAiTestExecuteRoute,
-  ApiAiTestHistoryRoute: ApiAiTestHistoryRoute,
-  ApiPaymentsAutumnWebhooksRoute: ApiPaymentsAutumnWebhooksRoute,
-  ApiPaymentsStripeConnectAccountStatusRoute:
-    ApiPaymentsStripeConnectAccountStatusRoute,
-  ApiPaymentsStripeConnectCreateAccountRoute:
-    ApiPaymentsStripeConnectCreateAccountRoute,
-  ApiPaymentsStripeConnectCreateCheckoutRoute:
-    ApiPaymentsStripeConnectCreateCheckoutRoute,
-  ApiPaymentsStripeConnectCreateProductRoute:
-    ApiPaymentsStripeConnectCreateProductRoute,
-  ApiPaymentsStripeConnectOnboardingLinkRoute:
-    ApiPaymentsStripeConnectOnboardingLinkRoute,
-  ApiPaymentsStripeConnectWebhooksRoute: ApiPaymentsStripeConnectWebhooksRoute,
-  ApiPaymentsStripeBillingPortalRoute: ApiPaymentsStripeBillingPortalRoute,
-  ApiPaymentsStripeCancelSubscriptionRoute:
-    ApiPaymentsStripeCancelSubscriptionRoute,
-  ApiPaymentsStripeCreatePaymentRoute: ApiPaymentsStripeCreatePaymentRoute,
-  ApiPaymentsStripeCreateSubscriptionRoute:
-    ApiPaymentsStripeCreateSubscriptionRoute,
-  ApiPaymentsStripeResumeSubscriptionRoute:
-    ApiPaymentsStripeResumeSubscriptionRoute,
-  ApiPaymentsStripeWebhooksRoute: ApiPaymentsStripeWebhooksRoute,
-  ApiAiLogsIndexRoute: ApiAiLogsIndexRoute,
-  ApiAiModelsIndexRoute: ApiAiModelsIndexRoute,
-  ApiAiTestTestIdResultsRoute: ApiAiTestTestIdResultsRoute,
-  ApiAiTestTestIdIndexRoute: ApiAiTestTestIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,7 +2,7 @@
 
 import { FC, useState, useMemo } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { ShipmentId } from '@/features/yourobc/shipments/types'
 import { ShipmentCard, ShipmentCardSkeleton } from './ShipmentCard'
 import { MobileFilters, type QuickFilter } from './MobileFilters'

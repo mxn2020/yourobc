@@ -18,7 +18,7 @@ import {
 } from '@/components/ui'
 import { COURIER_CONSTANTS } from '../types'
 import type { CourierFormData, Courier } from '../types'
-import { DEFAULT_TIMEZONES, COMMON_LANGUAGES } from '@/convex/lib/yourobc'
+import { DEFAULT_TIMEZONES, COMMON_LANGUAGES } from '@/convex/lib/yourobc/shared'
 
 interface CourierFormProps {
   initialData?: Partial<Courier> | null

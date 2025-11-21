@@ -8,7 +8,7 @@
  * @module convex/schema/yourobc/statistics/types
  */
 
-import { Doc } from '../../../_generated/dataModel'
+import { Doc } from '@/generated/dataModel'
 
 // ============================================================================
 // Table Document Types
@@ -17,27 +17,27 @@ import { Doc } from '../../../_generated/dataModel'
 /**
  * Employee Cost entry document type
  */
-export type EmployeeCost = Doc<'yourobcStatisticsEmployeeCosts'>
+export type EmployeeCost = Doc<'yourobcEmployeeCosts'>
 
 /**
  * Office Cost entry document type
  */
-export type OfficeCost = Doc<'yourobcStatisticsOfficeCosts'>
+export type OfficeCost = Doc<'yourobcOfficeCosts'>
 
 /**
  * Miscellaneous Expense entry document type
  */
-export type MiscExpense = Doc<'yourobcStatisticsMiscExpenses'>
+export type MiscExpense = Doc<'yourobcMiscExpenses'>
 
 /**
  * KPI Target entry document type
  */
-export type KpiTarget = Doc<'yourobcStatisticsKpiTargets'>
+export type KpiTarget = Doc<'yourobcKpiTargets'>
 
 /**
  * KPI Cache entry document type
  */
-export type KpiCache = Doc<'yourobcStatisticsKpiCache'>
+export type KpiCache = Doc<'yourobcKpiCache'>
 
 // ============================================================================
 // Re-export Validator Types
@@ -51,6 +51,7 @@ export type {
   KpiCacheType,
   Difficulty,
   Visibility,
+  Currency,
 } from './validators'
 
 // ============================================================================
@@ -60,7 +61,7 @@ export type {
 /**
  * All statistics table types
  */
-export type StatisticsEntity =
+export type Entity =
   | EmployeeCost
   | OfficeCost
   | MiscExpense
@@ -68,11 +69,11 @@ export type StatisticsEntity =
   | KpiCache
 
 /**
- * Statistics table names
+ *  table names
  */
-export type StatisticsTableName =
-  | 'yourobcStatisticsEmployeeCosts'
-  | 'yourobcStatisticsOfficeCosts'
-  | 'yourobcStatisticsMiscExpenses'
-  | 'yourobcStatisticsKpiTargets'
-  | 'yourobcStatisticsKpiCache'
+export type TableName =
+  | 'yourobcEmployeeCosts'
+  | 'yourobcOfficeCosts'
+  | 'yourobcMiscExpenses'
+  | 'yourobcKpiTargets'
+  | 'yourobcKpiCache'

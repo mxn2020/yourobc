@@ -10,7 +10,7 @@ interface VacationNewSearch {
   employeeId?: EmployeeId
 }
 
-export const Route = createFileRoute('/_protected/yourobc/employees/vacations/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/employees/vacations/new')({
   validateSearch: (search: Record<string, unknown>): VacationNewSearch => {
     return {
       employeeId: search.employeeId as EmployeeId | undefined,

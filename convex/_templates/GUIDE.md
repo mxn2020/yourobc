@@ -947,7 +947,8 @@ export const get{Module}Stats = query({
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { {module}Validators } from '@/schema/{category}/{entity}/{module}/validators';
 import { {MODULE}_CONSTANTS } from './constants';
 import { validate{Module}Data } from './utils';

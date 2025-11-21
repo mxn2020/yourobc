@@ -1,85 +1,107 @@
 // convex/schema/system/types.ts
+// Type exports for system schema module
 
-import { type Infer } from 'convex/values'
-import type { Id } from '@/generated/dataModel'
-import * as validators from './validators'
+import { type Infer } from 'convex/values';
+import type { Doc, Id } from '@/generated/dataModel';
+import * as validators from './validators';
 
-// User & Profile types
-export type UserProfile = Infer<typeof validators.userProfile>
-export type UserSettings = Infer<typeof validators.userSettings>
-export type UserModelPreference = Infer<typeof validators.userModelPreference>
+// ============================================================================
+// User & Profile Types
+// ============================================================================
 
-// Project types
-export type Project = Infer<typeof validators.project>
-export type ProjectCollaborator = Infer<typeof validators.projectCollaborator>
-export type ProjectTask = Infer<typeof validators.projectTask>
-export type ProjectMember = Infer<typeof validators.projectMember>
-export type Milestone = Infer<typeof validators.projectMilestone>
+// Full document types (includes _id and _creationTime)
+export type UserProfile = Doc<'userProfiles'>;
+export type UserProfileId = Id<'userProfiles'>;
 
-// System types
-export type AuditLog = Infer<typeof validators.auditLog>
-export type Notification = Infer<typeof validators.notification>
-export type AILog = Infer<typeof validators.aiLog>
-export type AITest = Infer<typeof validators.aiTest>
-export type AppSetting = Infer<typeof validators.appSetting>
-export type SystemMetric = Infer<typeof validators.systemMetric>
-export type AppThemeSetting = Infer<typeof validators.appThemeSetting>
-export type AppConfig = Infer<typeof validators.appConfig>
-export type Dashboard = Infer<typeof validators.dashboard>
+export type UserSettings = Doc<'userSettings'>;
+export type UserSettingsId = Id<'userSettings'>;
 
-// Supporting types
-export type WikiEntry = Infer<typeof validators.wikiEntry>
-export type Comment = Infer<typeof validators.comment>
-export type Reminder = Infer<typeof validators.reminder>
-export type Document = Infer<typeof validators.document>
-export type ScheduledEvent = Infer<typeof validators.scheduledEvent>
-export type AvailabilityPreference = Infer<typeof validators.availabilityPreference>
+export type UserModelPreference = Doc<'userModelPreferences'>;
+export type UserModelPreferenceId = Id<'userModelPreferences'>;
 
-// Blog types (with Convex document fields)
-export type BlogPost = Infer<typeof validators.blogPost> & { _id: Id<'blogPosts'>; _creationTime: number }
-export type BlogCategory = Infer<typeof validators.blogCategory> & { _id: Id<'blogCategories'>; _creationTime: number }
-export type BlogTag = Infer<typeof validators.blogTag> & { _id: Id<'blogTags'>; _creationTime: number }
-export type BlogAuthor = Infer<typeof validators.blogAuthor> & { _id: Id<'blogAuthors'>; _creationTime: number }
-export type BlogProviderSync = Infer<typeof validators.blogProviderSync> & { _id: Id<'blogProviderSync'>; _creationTime: number }
-export type BlogMedia = Infer<typeof validators.blogMedia> & { _id: Id<'blogMedia'>; _creationTime: number }
+// Validator types (field definitions only)
+export type UserProfileSchema = Infer<typeof validators.userProfile>;
+export type UserSettingsSchema = Infer<typeof validators.userSettings>;
+export type UserModelPreferenceSchema = Infer<typeof validators.userModelPreference>;
 
-// Website types (with Convex document fields)
-export type Website = Infer<typeof validators.website> & { _id: Id<'websites'>; _creationTime: number }
-export type WebsitePage = Infer<typeof validators.websitePage> & { _id: Id<'websitePages'>; _creationTime: number }
-export type WebsiteSection = Infer<typeof validators.websiteSection> & { _id: Id<'websiteSections'>; _creationTime: number }
-export type WebsiteTheme = Infer<typeof validators.websiteTheme> & { _id: Id<'websiteThemes'>; _creationTime: number }
-export type WebsiteTemplate = Infer<typeof validators.websiteTemplate> & { _id: Id<'websiteTemplates'>; _creationTime: number }
-export type WebsiteCollaborator = Infer<typeof validators.websiteCollaborator> & { _id: Id<'websiteCollaborators'>; _creationTime: number }
+// ============================================================================
+// System Types
+// ============================================================================
 
-// Analytics types
-export type AnalyticsEvent = Infer<typeof validators.analyticsEvent>
-export type AnalyticsMetric = Infer<typeof validators.analyticsMetric>
-export type AnalyticsDashboard = Infer<typeof validators.analyticsDashboard>
-export type AnalyticsReport = Infer<typeof validators.analyticsReport>
-export type AnalyticsProviderSync = Infer<typeof validators.analyticsProviderSync>
+// Full document types
+export type AuditLog = Doc<'auditLogs'>;
+export type AuditLogId = Id<'auditLogs'>;
 
-// Integrations types
-export type ApiKey = Infer<typeof validators.apiKey>
-export type ApiRequestLog = Infer<typeof validators.apiRequestLog>
-export type Webhook = Infer<typeof validators.webhook>
-export type WebhookDelivery = Infer<typeof validators.webhookDelivery>
-export type OAuthApp = Infer<typeof validators.oauthApp>
-export type OAuthToken = Infer<typeof validators.oauthToken>
-export type ExternalIntegration = Infer<typeof validators.externalIntegration>
-export type IntegrationEvent = Infer<typeof validators.integrationEvent>
+export type Notification = Doc<'notifications'>;
+export type NotificationId = Id<'notifications'>;
 
-// Email types
-export type EmailConfig = Infer<typeof validators.emailConfig>
-export type EmailLog = Infer<typeof validators.emailLog>
-export type EmailTemplate = Infer<typeof validators.emailTemplate>
+export type AppSetting = Doc<'appSettings'>;
+export type AppSettingId = Id<'appSettings'>;
 
-// Payment & Subscription types
-export type Subscription = Infer<typeof validators.subscription>
-export type UsageLog = Infer<typeof validators.usageLog>
-export type PaymentEvent = Infer<typeof validators.paymentEvent>
+export type SystemMetric = Doc<'systemMetrics'>;
+export type SystemMetricId = Id<'systemMetrics'>;
 
-// Stripe Connect types
-export type ConnectedAccount = Infer<typeof validators.connectedAccount>
-export type ClientProduct = Infer<typeof validators.clientProduct>
-export type ClientPayment = Infer<typeof validators.clientPayment>
-export type ConnectEvent = Infer<typeof validators.connectEvent>
+export type AppThemeSetting = Doc<'appThemeSettings'>;
+export type AppThemeSettingId = Id<'appThemeSettings'>;
+
+export type AppConfig = Doc<'appConfigs'>;
+export type AppConfigId = Id<'appConfigs'>;
+
+export type Dashboard = Doc<'dashboards'>;
+export type DashboardId = Id<'dashboards'>;
+
+// Validator types
+export type AuditLogSchema = Infer<typeof validators.auditLog>;
+export type NotificationSchema = Infer<typeof validators.notification>;
+export type AppSettingSchema = Infer<typeof validators.appSetting>;
+export type SystemMetricSchema = Infer<typeof validators.systemMetric>;
+export type AppThemeSettingSchema = Infer<typeof validators.appThemeSetting>;
+export type AppConfigSchema = Infer<typeof validators.appConfig>;
+export type DashboardSchema = Infer<typeof validators.dashboard>;
+
+// ============================================================================
+// Analytics Types
+// ============================================================================
+
+// Full document types
+export type AnalyticsEvent = Doc<'analyticsEvents'>;
+export type AnalyticsEventId = Id<'analyticsEvents'>;
+
+export type AnalyticsMetric = Doc<'analyticsMetrics'>;
+export type AnalyticsMetricId = Id<'analyticsMetrics'>;
+
+export type AnalyticsDashboard = Doc<'analyticsDashboards'>;
+export type AnalyticsDashboardId = Id<'analyticsDashboards'>;
+
+export type AnalyticsReport = Doc<'analyticsReports'>;
+export type AnalyticsReportId = Id<'analyticsReports'>;
+
+export type AnalyticsProviderSync = Doc<'analyticsProviderSync'>;
+export type AnalyticsProviderSyncId = Id<'analyticsProviderSync'>;
+
+// Validator types
+export type AnalyticsEventSchema = Infer<typeof validators.analyticsEvent>;
+export type AnalyticsMetricSchema = Infer<typeof validators.analyticsMetric>;
+export type AnalyticsDashboardSchema = Infer<typeof validators.analyticsDashboard>;
+export type AnalyticsReportSchema = Infer<typeof validators.analyticsReport>;
+export type AnalyticsProviderSyncSchema = Infer<typeof validators.analyticsProviderSync>;
+
+// ============================================================================
+// Email Types
+// ============================================================================
+
+// Full document types
+export type EmailConfig = Doc<'emailConfigs'>;
+export type EmailConfigId = Id<'emailConfigs'>;
+
+export type EmailTemplate = Doc<'emailTemplates'>;
+export type EmailTemplateId = Id<'emailTemplates'>;
+
+export type EmailLog = Doc<'emailLogs'>;
+export type EmailLogId = Id<'emailLogs'>;
+
+// Validator types
+export type EmailConfigSchema = Infer<typeof validators.emailConfig>;
+export type EmailTemplateSchema = Infer<typeof validators.emailTemplate>;
+export type EmailLogSchema = Infer<typeof validators.emailLog>;
+

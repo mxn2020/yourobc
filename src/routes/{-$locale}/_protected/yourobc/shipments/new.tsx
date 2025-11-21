@@ -11,7 +11,7 @@ interface ShipmentNewSearch {
   courierId?: Id<'yourobcCouriers'>
 }
 
-export const Route = createFileRoute('/_protected/yourobc/shipments/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/new')({
   validateSearch: (search: Record<string, unknown>): ShipmentNewSearch => {
     return {
       customerId: search.customerId as Id<'yourobcCustomers'> | undefined,

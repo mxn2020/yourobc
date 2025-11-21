@@ -6,7 +6,7 @@
 
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { auditFields, softDeleteFields, metadataSchema } from "../../../base";
+import { auditFields, softDeleteFields } from "../../../base";
 import { userSettingsValidators } from './validators';
 
 /**
@@ -43,9 +43,6 @@ export const userSettingsTable = defineTable({
   // Version for optimistic concurrency control
   version: v.number(),
 
-  // Standard metadata
-  metadata: metadataSchema,
-
   // Audit fields
   ...auditFields,
   ...softDeleteFields,
@@ -53,7 +50,6 @@ export const userSettingsTable = defineTable({
   // Required indexes
   .index("by_public_id", ["publicId"])
   .index("by_display_name", ["displayName"])
-  .index("by_owner", ["userId"]) // userId serves as ownerId
   .index("by_deleted_at", ["deletedAt"])
 
   // Module-specific indexes

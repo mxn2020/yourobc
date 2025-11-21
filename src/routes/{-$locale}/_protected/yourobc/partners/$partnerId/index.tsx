@@ -4,11 +4,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { PartnerDetailsPage } from '@/features/yourobc/partners/pages/PartnerDetailsPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import type { PartnerId } from '@/features/yourobc/partners/types'
 
-export const Route = createFileRoute('/_protected/yourobc/partners/$partnerId/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/partners/$partnerId/')({
   loader: async ({ params, context }) => {
     try {
       const session = await authService.getSession()

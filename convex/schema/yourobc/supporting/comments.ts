@@ -10,13 +10,9 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { entityTypes } from '../../../lib/system/audit_logs/entityTypes'
-import {
-  commentTypeValidator,
-  metadataSchema,
-  auditFields,
-  softDeleteFields,
-} from './validators'
+import { entityTypes } from '@/config/entityTypes'
+import { supportingValidators, supportingFields } from './validators'
+import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**
  * Comments table
@@ -27,43 +23,26 @@ export const commentsTable = defineTable({
   entityType: entityTypes.commentable,
   entityId: v.string(),
   content: v.string(),
-  type: v.optional(commentTypeValidator),
+  type: v.optional(supportingValidators.commentType),
   isInternal: v.boolean(),
 
   // Reactions & Mentions
-  mentions: v.optional(v.array(v.object({
-    userId: v.string(),
-    userName: v.string(),
-  }))),
-  reactions: v.optional(v.array(v.object({
-    userId: v.string(),
-    reaction: v.string(),
-    createdAt: v.number(),
-  }))),
+  mentions: v.optional(v.array(supportingFields.mention)),
+  reactions: v.optional(v.array(supportingFields.reaction)),
 
   // Attachments
-  attachments: v.optional(v.array(v.object({
-    filename: v.string(),
-    fileUrl: v.string(),
-    fileSize: v.number(),
-    mimeType: v.string(),
-  }))),
+  attachments: v.optional(v.array(supportingFields.attachment)),
 
   // Edit History
   isEdited: v.optional(v.boolean()),
-  editHistory: v.optional(v.array(v.object({
-    content: v.string(),
-    editedAt: v.number(),
-    reason: v.optional(v.string()),
-  }))),
+  editHistory: v.optional(v.array(supportingFields.editHistoryEntry)),
 
   // Replies & Threading
-  parentCommentId: v.optional(v.id('yourobcComments')),
+  parentCommentId: v.optional(v.id('comments')),
   replies: v.optional(v.array(v.any())), // Will be populated at query time
   replyCount: v.optional(v.number()),
 
   // Metadata and audit fields
-  ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })

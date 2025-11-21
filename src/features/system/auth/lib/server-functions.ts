@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { auth } from './auth-config' // Your Better Auth instance
 import { ConvexHttpClient } from 'convex/browser'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { AuthUser, Session } from '../types/auth.types'
 
 /**

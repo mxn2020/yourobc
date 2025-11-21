@@ -2,7 +2,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { SettingsPage } from '@/components/Settings/SettingsPage'
 import { Loading } from '@/components/ui'
 import { defaultLocale } from '@/features/system/i18n'

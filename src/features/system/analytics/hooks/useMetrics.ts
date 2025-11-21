@@ -1,7 +1,7 @@
 // src/features/system/analytics/hooks/useMetrics.ts
 
 import { useQuery } from "convex/react";
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { GetMetricParams, MetricData, DateRangePreset } from "../types";
 import { getDateRangeFromPreset } from "../utils/date-utils";
 import { useMemo } from "react";

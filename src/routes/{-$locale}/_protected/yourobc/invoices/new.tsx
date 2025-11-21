@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreateInvoicePage } from '@/features/yourobc/invoices/pages/CreateInvoicePage'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/invoices/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/invoices/new')({
   component: CreateInvoiceIndexPage,
   head: () => ({
     meta: [

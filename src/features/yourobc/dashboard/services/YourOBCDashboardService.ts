@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { ConvexHttpClient } from 'convex/browser'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 import type {
   YourOBCOverview,

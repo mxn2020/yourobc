@@ -1,4 +1,4 @@
-// src/components/app/NotificationBell.tsx
+// src/components/App/NotificationBell.tsx
 import { useState } from 'react'
 import { Bell } from 'lucide-react'
 import { useUnreadCount } from '@/features/system/notifications'

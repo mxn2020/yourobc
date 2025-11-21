@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreateQuotePage } from '@/features/yourobc/quotes/pages/CreateQuotePage'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/quotes/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/quotes/new')({
   component: CreateQuoteIndexPage,
   head: () => ({
     meta: [

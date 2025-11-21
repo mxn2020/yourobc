@@ -11,7 +11,7 @@ import {
 } from '@/components/ui'
 import { useAuth } from '@/features/system/auth'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import { useToast } from '@/features/system/notifications'
 import { Settings, User, Bell, Palette, Globe } from 'lucide-react'
 import { Id } from '@/convex/_generated/dataModel';

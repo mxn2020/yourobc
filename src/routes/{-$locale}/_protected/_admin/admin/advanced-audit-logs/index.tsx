@@ -2,7 +2,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { AuditLogsPage } from '@/features/system/audit-logs';
 import { auditLogsAdminService } from '@/features/system/audit-logs/services/AuditLogsAdminService';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import { Loading } from '@/components/ui';
 import { defaultLocale } from '@/features/system/i18n';
 import { createI18nSeo } from '@/utils/seo';

@@ -8,7 +8,7 @@ import { useAnalyticsAudit } from '../hooks/useAnalyticsAudit'
 import { useAdminPermissions } from '../hooks/useAdmin'
 import type { AuditLogEntry, AuditLogFilters, AdminAction } from '../types/admin.types'
 import { TableColumn } from '@/types'
-import { EntityType } from '@/convex/types'
+import { EntityType } from '@/config'
 import type { BadgeVariant } from '@/components/ui'
 import { useTranslation } from '@/features/system/i18n'
 

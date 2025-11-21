@@ -1,7 +1,7 @@
 // src/features/marketing/landing-pages/service.ts
 
 import { queryOptions } from '@tanstack/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { LandingPageId } from './types'
 
 export const landingPagesService = {

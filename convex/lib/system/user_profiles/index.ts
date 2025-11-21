@@ -2,10 +2,10 @@
 // Public API exports for user_profiles module
 
 // Constants
-export { USER_PROFILES_CONSTANTS } from './user_profiles/constants';
+export { USER_PROFILES_CONSTANTS } from './constants';
 
 // Types
-export type * from './user_profiles/types';
+export type * from './types';
 
 // Utilities
 export {
@@ -20,7 +20,7 @@ export {
   addExtendedMetadataTag,
   removeExtendedMetadataTag,
   formatUserDisplayName,
-} from './user_profiles/utils';
+} from './utils';
 
 // Permissions
 export {
@@ -40,7 +40,7 @@ export {
   requireEditUserMetadataAccess,
   filterUserProfilesByAccess,
   getPublicProfileView,
-} from './user_profiles/permissions';
+} from './permissions';
 
 // Queries
 export {
@@ -50,7 +50,7 @@ export {
   getAllProfiles,
   getProfileStats,
   searchUsers,
-} from './user_profiles/queries';
+} from './queries';
 
 // Mutations
 export {
@@ -63,4 +63,4 @@ export {
   syncProfileFromAuth,
   updateProfileMetadata,
   updateMetadataTags,
-} from './user_profiles/mutations';
+} from './mutations';

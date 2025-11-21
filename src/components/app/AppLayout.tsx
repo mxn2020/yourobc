@@ -1,4 +1,4 @@
-// src/components/app/AppLayout.tsx
+// src/components/App/AppLayout.tsx
 
 import { useState } from 'react';
 import { useLocation } from '@tanstack/react-router';

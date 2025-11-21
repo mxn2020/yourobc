@@ -29,7 +29,6 @@ export function getDefaultModelPreferences(): Omit<UserModelPreferences, '_id' |
       topP: USER_MODEL_PREFERENCES_CONSTANTS.DEFAULTS.TOP_P,
     },
     version: 1,
-    metadata: undefined,
     createdAt: now,
     createdBy: undefined,
     updatedAt: now,

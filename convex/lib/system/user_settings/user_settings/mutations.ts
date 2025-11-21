@@ -89,7 +89,6 @@ export const updateUserSettings = mutation({
 
     // 7. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.settings_updated',
@@ -144,7 +143,6 @@ export const resetUserSettings = mutation({
 
       // 4. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.settings_reset',
@@ -177,7 +175,6 @@ export const resetUserSettings = mutation({
 
       // 4. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.settings_reset',
@@ -233,7 +230,6 @@ export const updateUserSetting = mutation({
 
       // 5. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.setting_updated',
@@ -268,7 +264,6 @@ export const updateUserSetting = mutation({
 
       // 5. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.setting_updated',
@@ -323,7 +318,6 @@ export const deleteUserSettings = mutation({
 
     // 4. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.settings_deleted',

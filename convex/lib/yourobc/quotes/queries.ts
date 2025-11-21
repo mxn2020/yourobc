@@ -6,6 +6,7 @@ import { v } from 'convex/values';
 import { quotesValidators } from '@/schema/yourobc/quotes/validators';
 import { filterQuotesByAccess, requireViewQuoteAccess } from './permissions';
 import type { QuoteListResponse, QuoteStatsResponse, QuoteFilters } from './types';
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Get current user - helper function for authentication
@@ -32,7 +33,7 @@ export const getQuotes = query({
     offset: v.optional(v.number()),
     filters: v.optional(v.object({
       status: v.optional(v.array(quotesValidators.status)),
-      serviceType: v.optional(v.array(quotesValidators.serviceType)),
+      serviceType: v.optional(v.array(baseValidators.serviceType)),
       priority: v.optional(v.array(quotesValidators.priority)),
       search: v.optional(v.string()),
       customerId: v.optional(v.id('yourobcCustomers')),

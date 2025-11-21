@@ -2,7 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from '@/features/system/auth';
 import type { EmailTemplateData } from '../types';

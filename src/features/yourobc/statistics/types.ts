@@ -1,5 +1,5 @@
 // src/features/yourobc/statistics/types.ts
-import type { Id, Doc } from "../../../../convex/_generated/dataModel";
+import type { Id, Doc } from "@/convex/_generated/dataModel";
 
 // ============================================================================
 // Revenue Analysis Types

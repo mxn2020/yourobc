@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { RemindersPage } from '@/features/yourobc/supporting/followup-reminders'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import { z } from 'zod'
 import { entityTypeOptionalSchema } from '@/lib/validation/entity-types'
@@ -18,7 +18,7 @@ const remindersSearchSchema = z.object({
   overdue: z.boolean().optional(),
 })
 
-export const Route = createFileRoute('/_protected/yourobc/supporting/followup-reminders/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/followup-reminders/')({
   validateSearch: remindersSearchSchema,
   loader: async ({ context }) => {
     try {

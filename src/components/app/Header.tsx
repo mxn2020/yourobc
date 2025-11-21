@@ -1,4 +1,4 @@
-// src/components/app/Header.tsx
+// src/components/App/Header.tsx
 
 import { useState, useMemo } from 'react';
 import { User, Search, Plus, LogOut, Shield, ChevronDown, Building, ListTodo, Users, CalendarDays, BarChart3, Globe } from 'lucide-react';

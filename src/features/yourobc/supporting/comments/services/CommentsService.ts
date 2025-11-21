@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
 import type {
   CreateCommentData,
@@ -34,7 +34,7 @@ export class CommentsService {
     })
   }
 
-  useComment(authUserId: string, commentId?: Id<'yourobcComments'>) {
+  useComment(authUserId: string, commentId?: Id<'comments'>) {
     return useQuery({
       ...convexQuery(api.lib.yourobc.supporting.comments.queries.getComment, {
         authUserId,
@@ -115,7 +115,7 @@ export class CommentsService {
   async updateComment(
     mutation: ReturnType<typeof this.useUpdateComment>,
     authUserId: string,
-    commentId: Id<'yourobcComments'>,
+    commentId: Id<'comments'>,
     data: {
       content?: string
       isInternal?: boolean
@@ -132,7 +132,7 @@ export class CommentsService {
   async deleteComment(
     mutation: ReturnType<typeof this.useDeleteComment>,
     authUserId: string,
-    commentId: Id<'yourobcComments'>
+    commentId: Id<'comments'>
   ) {
     try {
       return await mutation.mutateAsync({ authUserId, commentId })
@@ -144,7 +144,7 @@ export class CommentsService {
   async addReaction(
     mutation: ReturnType<typeof this.useAddReaction>,
     authUserId: string,
-    commentId: Id<'yourobcComments'>,
+    commentId: Id<'comments'>,
     reaction: string
   ) {
     try {

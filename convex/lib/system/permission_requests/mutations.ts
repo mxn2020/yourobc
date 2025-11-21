@@ -51,7 +51,6 @@ export const requestPermission = mutation({
       module: trimmedModule,
       message: trimmedMessage,
       status: 'pending',
-      metadata: {},
       createdAt: now,
       updatedAt: now,
       createdBy: currentUser._id,

@@ -93,7 +93,6 @@ export const updateUserModelPreferences = mutation({
 
     // 7. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.model_preferences_updated',
@@ -186,7 +185,6 @@ export const setDefaultModel = mutation({
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.default_model_set',
@@ -278,7 +276,6 @@ export const toggleFavoriteModel = mutation({
 
     // 7. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: isFavorite ? 'user.model_unfavorited' : 'user.model_favorited',
@@ -354,7 +351,6 @@ export const clearDefaultModel = mutation({
 
     // 5. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.default_model_cleared',
@@ -408,7 +404,6 @@ export const resetUserModelPreferences = mutation({
 
       // 4. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.model_preferences_reset',
@@ -441,7 +436,6 @@ export const resetUserModelPreferences = mutation({
 
       // 4. Create audit log
       await ctx.db.insert('auditLogs', {
-        id: crypto.randomUUID(),
         userId: user._id,
         userName: user.name || user.email || 'Unknown User',
         action: 'user.model_preferences_reset',
@@ -494,7 +488,6 @@ export const deleteUserModelPreferences = mutation({
 
     // 4. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'user.model_preferences_deleted',

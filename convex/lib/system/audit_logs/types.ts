@@ -1,8 +1,8 @@
 // convex/lib/system/audit_logs/types.ts
 // convex/auditLogs/types.ts
 
+import { EntityType } from '@/config/index';
 import type { Doc, Id } from '@/generated/dataModel';
-import { EntityType } from '../../../types';
 
 export type AuditLog = Doc<'auditLogs'>;
 export type AuditLogId = Id<'auditLogs'>;

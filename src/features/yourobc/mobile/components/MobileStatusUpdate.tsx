@@ -2,7 +2,7 @@
 
 import { FC, useState, useMemo } from 'react'
 import { useMutation, useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { ShipmentId, Shipment } from '@/features/yourobc/shipments/types'
 import { Button, Badge } from '@/components/ui'
 import { useClipboard, useShare } from '../hooks/useClipboard'

@@ -1,7 +1,8 @@
 // filepath: src/features/system/admin/types/admin.types.ts
 import type { Id } from '@/convex/_generated/dataModel'
-import { EntityType } from '@/convex/types'
-import { UserProfile, UserRole, AuthUserId, UserProfileId } from '@/features/system/auth/types/auth.types'
+import { EntityType } from '@/config'
+import { UserProfile, UserRole, } from '@/features/system/auth/types/auth.types'
+import { UserProfileId, AuthUserId } from '@/types'
 import { LucideIcon } from 'lucide-react'
 import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
 

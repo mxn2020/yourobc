@@ -2,7 +2,7 @@
 
 import { FC, useState } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
 import { Card, Badge, Button, Loading, Progress } from '@/components/ui'
 import { TrendingUp, Target, Award, DollarSign, BarChart3 } from 'lucide-react'

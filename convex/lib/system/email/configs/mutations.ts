@@ -3,8 +3,9 @@
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import { requireCurrentUser, generateUniquePublicId } from '@/shared/auth.helper';
-import { emailConfigsValidators } from '@/schema/system/email/configs/validators';
+import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { emailValidators } from '@/schema/system/email/validators';
 import { EMAIL_CONFIGS_CONSTANTS } from './constants';
 import { validateEmailConfigData } from './utils';
 import {
@@ -23,7 +24,7 @@ import { createAuditLog } from '../../audit_logs/helpers';
 export const saveEmailConfig = mutation({
   args: {
     name: v.optional(v.string()),
-    provider: emailConfigsValidators.provider,
+    provider: emailValidators.provider,
     config: v.object({
       apiKey: v.optional(v.string()),
       apiSecret: v.optional(v.string()),
@@ -95,7 +96,6 @@ export const saveEmailConfig = mutation({
         name: configName,
         config: trimmedConfig,
         isActive: args.setAsActive ?? existingConfig.isActive,
-        metadata: args.metadata ?? existingConfig.metadata,
         updatedAt: now,
         lastActivityAt: now,
         updatedBy: user._id,
@@ -136,7 +136,6 @@ export const saveEmailConfig = mutation({
           enableLogging: true,
           maxRetries: 3,
         },
-        metadata: args.metadata ?? {},
         ownerId: user._id,
         createdBy: user._id,
         createdAt: now,
@@ -187,7 +186,7 @@ export const updateEmailConfig = mutation({
         replyToEmail: v.optional(v.string()),
         additionalSettings: v.optional(v.any()),
       })),
-      status: v.optional(emailConfigsValidators.status),
+      status: v.optional(emailValidators.status),
       isActive: v.optional(v.boolean()),
       settings: v.optional(v.object({
         enableLogging: v.optional(v.boolean()),
@@ -277,7 +276,7 @@ export const updateEmailConfig = mutation({
       entityId: configId,
       entityTitle: updateData.name || config.name,
       description: `Updated email configuration: ${updateData.name || config.name}`,
-      metadata: { changes: updates },
+      // metadata: { changes: updates },
     });
 
     // 8. RETURN: Config ID

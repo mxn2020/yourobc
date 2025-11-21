@@ -3,14 +3,14 @@ import React, { useState } from 'react'
 import { useQuery } from 'convex/react'
 import { useRouter, useParams } from '@tanstack/react-router'
 import { useAuth } from '@/features/system/auth'
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 import { defaultLocale } from '@/features/system/i18n';
 import { StatsCard } from './StatsCard'
 import { ProjectChart } from './ProjectChart'
 import { QuickActions } from './QuickActions'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '../ui/Modal'
 import { Button } from '../ui/Button'
-import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/system/projects'
+// import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/system/projects'
 import { Card, CardHeader, CardContent } from '../ui/Card'
 import { Progress } from '../ui/Progress'
 import { FolderOpen, CheckCircle, Clock, AlertTriangle, DollarSign, TrendingUp, Calendar, Target } from 'lucide-react'
@@ -32,6 +32,7 @@ export function Dashboard() {
   const [requestAccessOpen, setRequestAccessOpen] = useState(false)
   const toast = useToast()
 
+  /*
   const { createProject, isCreating } = useProjects()
 
   // TanStack Query will use prefetched data automatically if available
@@ -105,6 +106,7 @@ export function Dashboard() {
       }
     }
   }
+    */
 
   const handleRequestAccess = async (message?: string) => {
     try {
@@ -117,7 +119,7 @@ export function Dashboard() {
   }
 
   // Show loading state while auth is loading or data is not ready
-  if (!isReady || !isAuthenticated || !dashboardStats || !projectsList) {
+  if (!isReady || !isAuthenticated) { // || !dashboardStats || !projectsList) {
     return (
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-pulse">
@@ -132,6 +134,7 @@ export function Dashboard() {
     )
   }
 
+  /*
   const projects = projectsList.projects || []
 
   const statusChartData: ChartDataPoint[] = [
@@ -154,6 +157,7 @@ export function Dashboard() {
     const now = new Date()
     return completedDate.getMonth() === now.getMonth() && completedDate.getFullYear() === now.getFullYear()
   }).length
+  */
 
   return (
     <>
@@ -168,6 +172,7 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/*
           <StatsCard
             title="Total Projects"
             value={dashboardStats.totalProjects}
@@ -197,9 +202,11 @@ export function Dashboard() {
             icon={AlertTriangle}
             color="red"
           />
+          */}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/*
           <StatsCard
             title="Total Budget"
             value={`$${dashboardStats.totalBudget.toLocaleString()}`}
@@ -218,6 +225,7 @@ export function Dashboard() {
             icon={Calendar}
             color="blue"
           />
+          */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

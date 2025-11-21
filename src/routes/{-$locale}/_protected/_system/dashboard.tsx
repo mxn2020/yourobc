@@ -1,8 +1,7 @@
 // routes/{-$locale}/_protected/_system/dashboard.tsx
 
 import { createFileRoute } from '@tanstack/react-router'
-import { Dashboard } from '@/components/Dashboard/Dashboard'
-import { projectsService } from '@/features/system/projects/services/ProjectsService'
+// import { Dashboard } from '@/components/Dashboard/Dashboard'
 import { Loading } from '@/components/ui'
 import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
@@ -15,8 +14,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/dashboard')
     console.time('Route Loader: Dashboard Page')
 
     // Get query options for dashboard data
-    const dashboardStatsQueryOptions = projectsService.getDashboardStatsQueryOptions()
-    const projectsQueryOptions = projectsService.getProjectsQueryOptions({ limit: 10 })
+    // const dashboardStatsQueryOptions = projectsService.getDashboardStatsQueryOptions()
+    // const projectsQueryOptions = projectsService.getProjectsQueryOptions({ limit: 10 })
 
     // SERVER: SSR prefetching with authenticated Convex client
     if (isServer) {
@@ -28,17 +27,17 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/dashboard')
         if (convexClient) {
           // Fetch dashboard data in parallel
           const [dashboardStats, projects] = await Promise.all([
-            convexClient.query(dashboardStatsQueryOptions.queryFn as any),
-            convexClient.query(projectsQueryOptions.queryFn as any),
+            // convexClient.query(dashboardStatsQueryOptions.queryFn as any),
+            // convexClient.query(projectsQueryOptions.queryFn as any),
           ])
 
           // Cache data using query options
-          context.queryClient.setQueryData(dashboardStatsQueryOptions.queryKey, dashboardStats)
-          context.queryClient.setQueryData(projectsQueryOptions.queryKey, projects)
+          // context.queryClient.setQueryData(dashboardStatsQueryOptions.queryKey, dashboardStats)
+          // context.queryClient.setQueryData(projectsQueryOptions.queryKey, projects)
 
           console.log('✅ SSR: Dashboard data cached:', {
-            dashboardStats: dashboardStatsQueryOptions.queryKey,
-            projects: projectsQueryOptions.queryKey,
+            // dashboardStats: dashboardStatsQueryOptions.queryKey,
+            // projects: projectsQueryOptions.queryKey,
           })
 
           console.timeEnd('Route Loader: SSR Data Fetch')
@@ -53,17 +52,17 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/dashboard')
       // CLIENT: Use ensureQueryData to leverage cache or fetch if needed
       console.time('Route Loader: Client ensureQueryData')
 
-      const cachedStats = context.queryClient.getQueryData(dashboardStatsQueryOptions.queryKey)
-      const cachedProjects = context.queryClient.getQueryData(projectsQueryOptions.queryKey)
+      // const cachedStats = context.queryClient.getQueryData(dashboardStatsQueryOptions.queryKey)
+      // const cachedProjects = context.queryClient.getQueryData(projectsQueryOptions.queryKey)
 
       console.log('📦 CLIENT: Cache check:', {
-        statsCached: !!cachedStats,
-        projectsCached: !!cachedProjects,
+        // statsCached: !!cachedStats,
+        // projectsCached: !!cachedProjects,
       })
 
       await Promise.all([
-        context.queryClient.ensureQueryData(dashboardStatsQueryOptions),
-        context.queryClient.ensureQueryData(projectsQueryOptions),
+        // context.queryClient.ensureQueryData(dashboardStatsQueryOptions),
+        // context.queryClient.ensureQueryData(projectsQueryOptions),
       ])
 
       console.timeEnd('Route Loader: Client ensureQueryData')
@@ -104,5 +103,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/dashboard')
 })
 
 function DashboardComponent() {
-  return <Dashboard />
+  return <div>
+    {/* <Dashboard /> */}
+  </div>
 }

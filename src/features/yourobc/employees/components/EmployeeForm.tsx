@@ -22,7 +22,7 @@ import {
   COMMON_POSITIONS,
 } from '../types'
 import type { EmployeeFormData, Employee, EmployeeId } from '../types'
-import { DEFAULT_TIMEZONES } from '@/convex/lib/yourobc'
+import { DEFAULT_TIMEZONES } from '@/convex/lib/yourobc/shared'
 
 interface EmployeeFormProps {
   initialData?: Partial<Employee>

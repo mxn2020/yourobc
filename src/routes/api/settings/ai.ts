@@ -2,7 +2,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { ConvexHttpClient } from 'convex/browser';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/generated/api';
 
 export const Route = createFileRoute('/api/settings/ai')({
   server: {

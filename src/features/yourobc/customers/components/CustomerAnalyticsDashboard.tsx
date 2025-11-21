@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Card } from '@/components/ui'
 import {
   TrendingUp,

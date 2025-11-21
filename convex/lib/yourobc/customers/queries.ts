@@ -8,6 +8,7 @@ import { customersValidators } from '@/schema/yourobc/customers/validators';
 import { filterCustomersByAccess } from './permissions';
 import { calculateAverageMargin, calculateAveragePaymentTerms } from './utils';
 import type { CustomerListResponse, CustomerFilters, CustomerStatsResponse } from './types';
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Get paginated list of customers with filtering
@@ -18,9 +19,9 @@ export const getCustomers = query({
     offset: v.optional(v.number()),
     filters: v.optional(v.object({
       status: v.optional(v.array(customersValidators.status)),
-      currency: v.optional(v.array(customersValidators.currency)),
+      currency: v.optional(v.array(baseValidators.currency)),
       search: v.optional(v.string()),
-      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
+      inquirySourceId: v.optional(v.id('inquirySources')),
       country: v.optional(v.string()),
       serviceSuspended: v.optional(v.boolean()),
     })),

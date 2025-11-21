@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreateCourierPage } from '@/features/yourobc/couriers/pages/CreateCourierPage'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/couriers/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/new')({
   component: CreateCourierIndexPage,
   head: () => ({
     meta: [

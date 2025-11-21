@@ -2,7 +2,7 @@
 
 import { FC, useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Card, Button, Badge, Loading, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import { useToast } from '@/features/system/notifications'
 import { useAuthenticatedUser } from '@/features/system/auth'

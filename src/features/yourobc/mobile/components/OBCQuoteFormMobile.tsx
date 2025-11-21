@@ -2,7 +2,7 @@
 
 import { FC, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { CustomerId, QuoteId } from '@/features/yourobc/quotes/types'
 import { Button } from '@/components/ui'
 import { useClipboard } from '../hooks/useClipboard'

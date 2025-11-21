@@ -36,7 +36,7 @@ import { SHIPMENTS_CONFIG } from '../shipments/config'
 import { STATISTICS_CONFIG } from '../statistics/config'
 import { SUPPORTING_CONFIG } from '../supporting/config'
 import { TASKS_CONFIG } from '../tasks/config'
-import { TRACKING_MESSAGES_CONFIG } from '../tracking_messages/config'
+import { TRACKING_MESSAGES_CONFIG } from '../trackingMessages/config'
 
 import type { YourOBCConfig, YourOBCModuleName } from './types'
 import { yourOBCConfigSchema, safeValidateConfig } from './schemas'

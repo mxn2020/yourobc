@@ -64,7 +64,6 @@ export const createOrUpdateAppSetting = mutation({
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: existingSetting ? 'app_settings.updated' : 'app_settings.created',
@@ -117,7 +116,6 @@ export const deleteAppSetting = mutation({
 
     // 5. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'app_settings.deleted',
@@ -193,7 +191,6 @@ export const updateAISettings = mutation({
 
     // Create audit log for batch update
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'app_settings.ai_updated',
@@ -255,7 +252,6 @@ export const updateAISetting = mutation({
 
     // Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: existingSetting ? 'app_settings.updated' : 'app_settings.created',
@@ -852,7 +848,6 @@ export const batchUpdateSettings = mutation({
 
     // Create audit log for batch update
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'app_settings.batch_updated',
@@ -897,7 +892,6 @@ export const resetCategoryToDefaults = mutation({
 
     // 4. Create audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'app_settings.category_reset',

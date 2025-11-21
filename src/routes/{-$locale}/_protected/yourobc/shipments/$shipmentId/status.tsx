@@ -6,13 +6,13 @@ import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import { Card, Loading } from '@/components/ui'
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { ShipmentId, StatusUpdateFormData } from '@/features/yourobc/shipments/types'
 
-export const Route = createFileRoute('/_protected/yourobc/shipments/$shipmentId/status')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$shipmentId/status')({
   loader: async ({ params, context }) => {
     try {
       const session = await authService.getSession()

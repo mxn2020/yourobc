@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
 import type {
   CreateInquirySourceData,
@@ -66,7 +66,7 @@ export class InquirySourcesService {
   async updateInquirySource(
     mutation: ReturnType<typeof this.useUpdateInquirySource>,
     authUserId: string,
-    sourceId: Id<'yourobcInquirySources'>,
+    sourceId: Id<'inquirySources'>,
     data: UpdateInquirySourceData
   ) {
     try {

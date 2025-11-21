@@ -3,10 +3,10 @@
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
-import { entityTypes } from '../audit_logs/entityTypes';
 import { NOTIFICATION_CONSTANTS } from './constants';
 import { vNotificationType } from '@/shared/validators';
 import { validateCreateNotificationData, canDeleteNotification, isAdmin } from './utils';
+import { entityTypes } from '@/config/entityTypes';
 
 /**
  * Create a notification

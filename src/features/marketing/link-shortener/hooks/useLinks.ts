@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { linkShortenerService } from '../service'
 import type { CreateLinkData, UpdateLinkData, MarketingLinkId } from '../types'
 import { toast } from 'react-hot-toast'

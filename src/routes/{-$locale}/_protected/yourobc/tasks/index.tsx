@@ -3,10 +3,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { TaskDashboardPage } from '@/features/yourobc/tasks/pages/TaskDashboardPage'
 import { authService } from '@/features/system/auth'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Suspense } from 'react'
 
-export const Route = createFileRoute('/_protected/yourobc/tasks/')({
+export const Route = createFileRoute('/{-$locale}/_protected/yourobc/tasks/')({
   loader: async ({ context }) => {
     try {
       // Get authenticated session (already verified by _protected layout)

@@ -16,7 +16,7 @@ import type { ShipmentsConfig } from '../shipments/config'
 import type { StatisticsConfig } from '../statistics/config'
 import type { SupportingConfig } from '../supporting/config'
 import type { TasksConfig } from '../tasks/config'
-import type { TrackingMessagesConfig } from '../tracking_messages/config'
+import type { TrackingMessagesConfig } from '../trackingMessages/config'
 
 /**
  * Central YourOBC Configuration Registry

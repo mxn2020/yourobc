@@ -1,6 +1,6 @@
 // src/features/system/analytics/types/index.ts
 
-import { Id } from "@/convex/_generated/dataModel";
+import { Id } from "@/generated/dataModel";
 import type {
   AnalyticsEventType,
   DeviceType,
@@ -15,7 +15,7 @@ import type {
   EventProperties,
   WidgetConfig,
   Filters,
-} from "../../../../../convex/lib/system/analytics/types";
+} from "@/convex/lib/system/analytics/types";
 
 /**
  * Re-export backend types that are used in frontend

@@ -1,7 +1,7 @@
 // src/features/notifications/hooks/useNotificationSettings.ts
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 export interface NotificationSettings {
   // In-app notifications
   inAppEnabled: boolean

@@ -3,13 +3,14 @@
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
-import { partnersValidators } from '@/schema/yourobc/partners/validators';
-import { partnerServiceTypeValidator, currencyValidator, addressSchema, contactSchema, serviceCoverageSchema } from '@/schema/base';
+import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { partnersValidators, partnersFields } from '@/schema/yourobc/partners/validators';
 import { PARTNERS_CONSTANTS } from './constants';
 import { validatePartnerData } from './utils';
 import { requireEditPartnerAccess, requireDeletePartnerAccess, canEditPartner, canDeletePartner } from './permissions';
 import type { PartnerId } from './types';
+import { baseValidators } from '@/schema/base.validators';
 
 /**
  * Create new partner
@@ -20,23 +21,17 @@ export const createPartner = mutation({
       companyName: v.string(),
       shortName: v.optional(v.string()),
       partnerCode: v.optional(v.string()),
-      primaryContact: contactSchema,
+      primaryContact: partnersFields.contact,
       quotingEmail: v.optional(v.string()),
-      address: addressSchema,
-      serviceCoverage: serviceCoverageSchema,
-      serviceType: partnerServiceTypeValidator,
-      preferredCurrency: currencyValidator,
+      address: partnersFields.address,
+      serviceCoverage: partnersFields.serviceCoverage,
+      serviceType: partnersValidators.partnerServiceType,
+      preferredCurrency: baseValidators.currency,
       paymentTerms: v.number(),
       ranking: v.optional(v.number()),
       rankingNotes: v.optional(v.string()),
       internalPaymentNotes: v.optional(v.string()),
-      serviceCapabilities: v.optional(v.object({
-        handlesCustoms: v.optional(v.boolean()),
-        handlesPickup: v.optional(v.boolean()),
-        handlesDelivery: v.optional(v.boolean()),
-        handlesNFO: v.optional(v.boolean()),
-        handlesTrucking: v.optional(v.boolean()),
-      })),
+      serviceCapabilities: v.optional(partnersFields.serviceCapabilities),
       commissionRate: v.optional(v.number()),
       apiEnabled: v.optional(v.boolean()),
       apiKey: v.optional(v.string()),
@@ -126,23 +121,17 @@ export const updatePartner = mutation({
       companyName: v.optional(v.string()),
       shortName: v.optional(v.string()),
       partnerCode: v.optional(v.string()),
-      primaryContact: v.optional(contactSchema),
+      primaryContact: v.optional(partnersFields.contact),
       quotingEmail: v.optional(v.string()),
-      address: v.optional(addressSchema),
-      serviceCoverage: v.optional(serviceCoverageSchema),
-      serviceType: v.optional(partnerServiceTypeValidator),
-      preferredCurrency: v.optional(currencyValidator),
+      address: v.optional(partnersFields.address),
+      serviceCoverage: v.optional(partnersFields.serviceCoverage),
+      serviceType: v.optional(partnersValidators.partnerServiceType),
+      preferredCurrency: v.optional(baseValidators.currency),
       paymentTerms: v.optional(v.number()),
       ranking: v.optional(v.number()),
       rankingNotes: v.optional(v.string()),
       internalPaymentNotes: v.optional(v.string()),
-      serviceCapabilities: v.optional(v.object({
-        handlesCustoms: v.optional(v.boolean()),
-        handlesPickup: v.optional(v.boolean()),
-        handlesDelivery: v.optional(v.boolean()),
-        handlesNFO: v.optional(v.boolean()),
-        handlesTrucking: v.optional(v.boolean()),
-      })),
+      serviceCapabilities: v.optional(partnersFields.serviceCapabilities),
       commissionRate: v.optional(v.number()),
       apiEnabled: v.optional(v.boolean()),
       apiKey: v.optional(v.string()),

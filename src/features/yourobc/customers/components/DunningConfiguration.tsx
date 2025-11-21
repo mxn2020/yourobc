@@ -2,7 +2,7 @@
 
 import { FC, useState, useEffect } from 'react'
 import { useMutation, useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { useToast } from '@/features/system/notifications'
 import {
   Card,

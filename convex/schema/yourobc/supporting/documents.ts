@@ -10,14 +10,9 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { entityTypes } from '../../../lib/system/audit_logs/entityTypes'
-import {
-  documentTypeValidator,
-  documentStatusValidator,
-  metadataSchema,
-  auditFields,
-  softDeleteFields,
-} from './validators'
+import { entityTypes } from '@/config/entityTypes'
+import { supportingValidators, supportingFields } from './validators'
+import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**
  * Documents table
@@ -27,7 +22,7 @@ export const documentsTable = defineTable({
   // Core fields
   entityType: entityTypes.documentable,
   entityId: v.string(),
-  documentType: documentTypeValidator,
+  documentType: supportingValidators.documentType,
 
   // File Information
   filename: v.string(),
@@ -43,11 +38,10 @@ export const documentsTable = defineTable({
   // Access Control
   isPublic: v.boolean(),
   isConfidential: v.boolean(),
-  status: documentStatusValidator,
+  status: supportingValidators.documentStatus,
   uploadedBy: v.string(),
 
   // Metadata and audit fields
-  ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })

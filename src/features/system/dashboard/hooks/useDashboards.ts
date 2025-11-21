@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { queryKeys } from '../../../../lib/query-keys'
 import type { DashboardFilters } from '../types/dashboard.types'
 import { Id } from "@/convex/_generated/dataModel";

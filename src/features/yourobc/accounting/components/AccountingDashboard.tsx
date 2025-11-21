@@ -1,7 +1,7 @@
 // src/components/Dashboard/AccountingDashboard.tsx
 
 import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '@/generated/api'
 import { Card, Button } from '@/components/ui'
 import { ArrowUpRight, ArrowDownRight, AlertTriangle, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 

@@ -6,8 +6,8 @@ import { reactStartCookies } from "better-auth/react-start";
 import { autumn } from "autumn-js/better-auth";
 import { PrismaClient } from "@prisma/client";
 import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
-import { AuthSession, AuthUser, AuthUserId } from "../types/auth.types";
+import { api } from '@/generated/api';
+import { AuthSession, AuthUser } from "../types/auth.types";
 import {
   ac,
   adminRole,
@@ -18,6 +18,7 @@ import {
   superadminRole,
   userRole,
 } from "./auth-permissions";
+import { AuthUserId } from "@/types";
 
 const convex = new ConvexHttpClient(process.env.CONVEX_URL!);
 
@@ -186,12 +187,6 @@ export const auth = betterAuth({
       defaultBanExpiresIn: 60 * 60 * 24 * 30, // 30 days default
       bannedUserMessage: "Your account has been suspended. Contact support for assistance.",
     }),
-    // Only include Autumn plugin if AUTUMN_SECRET_KEY is configured
-    ...(process.env.AUTUMN_SECRET_KEY ? [
-      autumn({
-        customerScope: "user", // Make each user a customer (can be changed to "organization" if needed)
-      })
-    ] : []),
     reactStartCookies(),
   ],
 });
