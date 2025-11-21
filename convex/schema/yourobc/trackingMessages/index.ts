@@ -1,26 +1,6 @@
 // convex/schema/yourobc/trackingMessages/index.ts
-/**
- * Tracking Messages Schema Module
- *
- * Barrel export for all tracking messages schema components.
- * Provides a centralized access point for validators, types, and schemas.
- *
- * @module convex/schema/yourobc/trackingMessages
- */
+// Public API exports for trackingMessages schema module
 
-// ============================================================================
-// Exports
-// ============================================================================
-
-// Validators
-export * from './validators'
-
-// Types
-export * from './types'
-
-// Table definitions
-export * from './trackingMessages'
-
-// Schema exports
-export * from './schemas'
-export { default as trackingMessagesSchemas } from './schemas'
+export { yourobcTrackingMessagesSchemas } from './schemas';
+export * from './types';
+export * from './validators';

@@ -3,6 +3,6 @@
 
 import { accountingTable } from './accounting';
 
-export const softwareYourObcAccountingSchemas = {
-  softwareYourObcAccounting: accountingTable,
+export const yourobcAccountingSchemas = {
+  yourobcAccounting: accountingTable,
 };

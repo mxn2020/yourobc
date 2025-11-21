@@ -12,6 +12,6 @@ import { dashboardAlertAcknowledgmentsTable } from './dashboardAlertAcknowledgme
  *
  * Complete set of table definitions for the dashboard module.
  */
-export const dashboardSchemas = {
+export const yourobcDashboardSchemas = {
   dashboardAlertAcknowledgments: dashboardAlertAcknowledgmentsTable,
 };

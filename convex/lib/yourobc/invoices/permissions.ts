@@ -1,4 +1,4 @@
-// convex/lib/yourobc/convex/lib/yourobc/invoices/permissions.ts
+// convex/lib/yourobc/invoices/permissions.ts
 // Access control and authorization logic for invoices module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

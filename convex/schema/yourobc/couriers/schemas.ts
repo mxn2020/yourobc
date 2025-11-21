@@ -3,6 +3,6 @@
 
 import { couriersTable } from './couriers';
 
-export const softwareYourObcCouriersSchemas = {
+export const yourobcCouriersSchemas = {
   yourobcCouriers: couriersTable,
 };

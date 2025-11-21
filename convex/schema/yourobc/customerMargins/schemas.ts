@@ -3,6 +3,6 @@
 
 import { customerMarginsTable } from './customerMargins';
 
-export const softwareYourObcCustomerMarginsSchemas = {
-  softwareYourObcCustomerMargins: customerMarginsTable,
+export const yourobcCustomerMarginsSchemas = {
+  yourobcCustomerMargins: customerMarginsTable,
 };

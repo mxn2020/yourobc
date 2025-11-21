@@ -1,18 +1,22 @@
 // convex/schema/yourobc/supporting/schemas.ts
-/**
- * Supporting Module Schema Exports
- *
- * Exports all table schemas for registration with Convex.
- * These are imported by the main schema definition.
- *
- * @module convex/schema/yourobc/supporting/schemas
- */
+// Schema exports for supporting module
 
-export { exchangeRatesTable } from './exchangeRates'
-export { inquirySourcesTable } from './inquirySources'
-export { wikiEntriesTable } from './wikiEntries'
-export { commentsTable } from './comments'
-export { followupRemindersTable } from './followupReminders'
-export { documentsTable } from './documents'
-export { notificationsTable } from './notifications'
-export { countersTable } from './counters'
+import { exchangeRatesTable } from './exchangeRates';
+import { inquirySourcesTable } from './inquirySources';
+import { wikiEntriesTable } from './wikiEntries';
+import { commentsTable } from './comments';
+import { followupRemindersTable } from './followupReminders';
+import { documentsTable } from './documents';
+import { notificationsTable } from './notifications';
+import { countersTable } from './counters';
+
+export const yourobcSupportingSchemas = {
+  yourobcExchangeRates: exchangeRatesTable,
+  yourobcInquirySources: inquirySourcesTable,
+  yourobcWikiEntries: wikiEntriesTable,
+  yourobcComments: commentsTable,
+  yourobcFollowupReminders: followupRemindersTable,
+  yourobcDocuments: documentsTable,
+  yourobcNotifications: notificationsTable,
+  yourobcCounters: countersTable,
+};

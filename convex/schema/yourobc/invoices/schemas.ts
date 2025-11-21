@@ -3,6 +3,6 @@
 
 import { invoicesTable } from './invoices';
 
-export const softwareYourObcInvoicesSchemas = {
+export const yourobcInvoicesSchemas = {
   yourobcInvoices: invoicesTable,
 };

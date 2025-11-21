@@ -1,17 +1,6 @@
 // convex/schema/yourobc/quotes/index.ts
-/**
- * Quote Schema Public API
- *
- * Barrel export file for clean imports of quote schema components.
- *
- * @module convex/schema/yourobc/quotes
- */
+// Public API exports for quotes schema module
 
-// Export schemas for registration
-export { softwareYourobcQuotesSchemas } from './schemas'
-
-// Export validators
-export { quotesValidators } from './validators'
-
-// Export types
-export type * from './types'
+export { yourobcQuotesSchemas } from './schemas';
+export * from './types';
+export * from './validators';

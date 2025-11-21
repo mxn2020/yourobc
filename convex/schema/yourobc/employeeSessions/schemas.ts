@@ -3,6 +3,6 @@
 
 import { employeeSessionsTable } from './employeeSessions';
 
-export const softwareYourObcEmployeeSessionsSchemas = {
+export const yourobcEmployeeSessionsSchemas = {
   yourobcEmployeeSessions: employeeSessionsTable,
 };
