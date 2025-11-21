@@ -1,668 +1,397 @@
 // convex/lib/software/yourobc/accounting/mutations.ts
-/**
- * Accounting Mutations
- *
- * Mutation functions for creating, updating, and deleting accounting data.
- *
- * @module convex/lib/software/yourobc/accounting/mutations
- */
+// Write operations for accounting module
 
-import { MutationCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
-import {
-  IncomingInvoiceTracking,
-  InvoiceNumbering,
-  StatementOfAccounts,
-  AccountingDashboardCache,
-  InvoiceAutoGenLog,
-  CreateIncomingInvoiceTrackingInput,
-  UpdateIncomingInvoiceTrackingInput,
-  CreateInvoiceNumberingInput,
-  CreateStatementOfAccountsInput,
-  CreateDashboardCacheInput,
-  CreateInvoiceAutoGenLogInput,
-} from './types'
-import {
-  assertCanModifyAccounting,
-  assertCanApproveInvoices,
-  assertCanGenerateStatements,
-  assertCanManageInvoiceNumbering,
-} from './permissions'
-import {
-  generatePublicId,
-  generateInvoiceNumber,
-  calculateCacheExpiry,
-  createZeroAmount,
-} from './utils'
-import {
-  PUBLIC_ID_PREFIXES,
-  DEFAULT_INCREMENT,
-  DEFAULT_INVOICE_FORMAT,
-  CACHE_VALIDITY_HOURS,
-} from './constants'
-
-// ============================================================================
-// Incoming Invoice Tracking Mutations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { accountingValidators } from '@/schema/software/yourobc/accounting/validators';
+import { ACCOUNTING_CONSTANTS } from './constants';
+import { validateAccountingEntryData, generateJournalEntryNumber, calculateFiscalYear, calculateFiscalPeriod } from './utils';
+import { requireEditAccountingEntryAccess, requireDeleteAccountingEntryAccess, requireApproveAccountingEntryAccess } from './permissions';
+import type { AccountingEntryId } from './types';
 
 /**
- * Create a new incoming invoice tracking record
+ * Create new accounting entry
  */
-export async function createIncomingInvoiceTracking(
-  ctx: MutationCtx,
-  ownerId: string,
-  input: CreateIncomingInvoiceTrackingInput
-): Promise<Id<'yourobcIncomingInvoiceTracking'>> {
-  await assertCanModifyAccounting(ctx, ownerId)
+export const createAccountingEntry = mutation({
+  args: {
+    data: v.object({
+      journalEntryNumber: v.optional(v.string()),
+      referenceNumber: v.optional(v.string()),
+      status: v.optional(accountingValidators.status),
+      transactionType: accountingValidators.transactionType,
+      transactionDate: v.number(),
+      postingDate: v.optional(v.number()),
+      debitAmount: v.number(),
+      creditAmount: v.number(),
+      currency: v.string(),
+      debitAccountId: v.optional(v.string()),
+      creditAccountId: v.optional(v.string()),
+      accountCode: v.optional(v.string()),
+      relatedInvoiceId: v.optional(v.id('yourobcInvoices')),
+      relatedExpenseId: v.optional(v.string()),
+      relatedShipmentId: v.optional(v.id('yourobcShipments')),
+      relatedCustomerId: v.optional(v.id('yourobcCustomers')),
+      relatedPartnerId: v.optional(v.id('yourobcPartners')),
+      memo: v.optional(v.string()),
+      description: v.optional(v.string()),
+      taxAmount: v.optional(v.number()),
+      taxRate: v.optional(v.number()),
+      taxCategory: v.optional(v.string()),
+      isTaxable: v.optional(v.boolean()),
+      attachments: v.optional(v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        url: v.string(),
+        type: v.string(),
+      }))),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      fiscalYear: v.optional(v.number()),
+      fiscalPeriod: v.optional(v.number()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<AccountingEntryId> => {
+    const user = await requireCurrentUser(ctx);
 
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
+    await requirePermission(ctx, ACCOUNTING_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  const userId = identity.subject
-
-  // Generate next sequence number
-  const lastRecord = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .order('desc')
-    .first()
-
-  const currentYear = new Date().getFullYear()
-  const sequence = lastRecord ? parseInt(lastRecord.publicId.split('-')[2]) + 1 : 1
-
-  const publicId = generatePublicId({
-    prefix: PUBLIC_ID_PREFIXES.INCOMING_INVOICE_TRACKING,
-    year: currentYear,
-    sequence,
-  })
-
-  const id = await ctx.db.insert('yourobcIncomingInvoiceTracking', {
-    publicId,
-    ownerId,
-    shipmentId: input.shipmentId,
-    partnerId: input.partnerId,
-    expectedDate: input.expectedDate,
-    expectedAmount: input.expectedAmount,
-    status: 'expected',
-    remindersSent: 0,
-    internalNotes: input.internalNotes,
-    tags: [],
-    createdBy: userId,
-    createdAt: Date.now(),
-  })
-
-  return id
-}
-
-/**
- * Update an incoming invoice tracking record
- */
-export async function updateIncomingInvoiceTracking(
-  ctx: MutationCtx,
-  input: UpdateIncomingInvoiceTrackingInput
-): Promise<void> {
-  const record = await ctx.db.get(input.id)
-  if (!record || record.deletedAt) {
-    throw new Error('Incoming invoice tracking record not found')
-  }
-
-  await assertCanModifyAccounting(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  const updates: Partial<IncomingInvoiceTracking> = {
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  }
-
-  if (input.status !== undefined) updates.status = input.status
-  if (input.invoiceId !== undefined) updates.invoiceId = input.invoiceId
-  if (input.receivedDate !== undefined) updates.receivedDate = input.receivedDate
-  if (input.actualAmount !== undefined) updates.actualAmount = input.actualAmount
-  if (input.approvedBy !== undefined) updates.approvedBy = input.approvedBy
-  if (input.approvedDate !== undefined) updates.approvedDate = input.approvedDate
-  if (input.approvalNotes !== undefined) updates.approvalNotes = input.approvalNotes
-  if (input.paidDate !== undefined) updates.paidDate = input.paidDate
-  if (input.paymentReference !== undefined) updates.paymentReference = input.paymentReference
-  if (input.disputeReason !== undefined) updates.disputeReason = input.disputeReason
-  if (input.disputeDate !== undefined) updates.disputeDate = input.disputeDate
-  if (input.disputeResolvedDate !== undefined) updates.disputeResolvedDate = input.disputeResolvedDate
-  if (input.internalNotes !== undefined) updates.internalNotes = input.internalNotes
-
-  await ctx.db.patch(input.id, updates)
-}
-
-/**
- * Approve an incoming invoice
- */
-export async function approveIncomingInvoice(
-  ctx: MutationCtx,
-  id: Id<'yourobcIncomingInvoiceTracking'>,
-  approvalNotes?: string
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Incoming invoice tracking record not found')
-  }
-
-  await assertCanApproveInvoices(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  await ctx.db.patch(id, {
-    status: 'approved',
-    approvedBy: userId,
-    approvedDate: Date.now(),
-    approvalNotes,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
-
-/**
- * Send reminder for missing invoice
- */
-export async function sendInvoiceReminder(
-  ctx: MutationCtx,
-  id: Id<'yourobcIncomingInvoiceTracking'>
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Incoming invoice tracking record not found')
-  }
-
-  await assertCanModifyAccounting(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  await ctx.db.patch(id, {
-    remindersSent: record.remindersSent + 1,
-    lastReminderDate: Date.now(),
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
-
-/**
- * Soft delete an incoming invoice tracking record
- */
-export async function deleteIncomingInvoiceTracking(
-  ctx: MutationCtx,
-  id: Id<'yourobcIncomingInvoiceTracking'>
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Incoming invoice tracking record not found')
-  }
-
-  await assertCanModifyAccounting(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  await ctx.db.patch(id, {
-    deletedAt: Date.now(),
-    deletedBy: userId,
-  })
-}
-
-// ============================================================================
-// Invoice Numbering Mutations
-// ============================================================================
-
-/**
- * Create or initialize invoice numbering for a month
- */
-export async function initializeInvoiceNumbering(
-  ctx: MutationCtx,
-  ownerId: string,
-  input: CreateInvoiceNumberingInput
-): Promise<Id<'yourobcInvoiceNumbering'>> {
-  await assertCanManageInvoiceNumbering(ctx, ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  // Check if already exists
-  const existing = await ctx.db
-    .query('yourobcInvoiceNumbering')
-    .withIndex('by_ownerId_year_month', (q) =>
-      q.eq('ownerId', ownerId).eq('year', input.year).eq('month', input.month)
-    )
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  if (existing) {
-    throw new Error('Invoice numbering already exists for this month')
-  }
-
-  const publicId = generatePublicId({
-    prefix: PUBLIC_ID_PREFIXES.INVOICE_NUMBERING,
-    year: input.year,
-    sequence: input.month,
-  })
-
-  const id = await ctx.db.insert('yourobcInvoiceNumbering', {
-    publicId,
-    ownerId,
-    year: input.year,
-    month: input.month,
-    lastNumber: 0,
-    format: input.format || DEFAULT_INVOICE_FORMAT,
-    incrementBy: input.incrementBy || DEFAULT_INCREMENT,
-    createdBy: userId,
-    createdAt: Date.now(),
-  })
-
-  return id
-}
-
-/**
- * Get next invoice number and increment sequence
- */
-export async function getNextInvoiceNumber(
-  ctx: MutationCtx,
-  ownerId: string,
-  year?: number,
-  month?: number
-): Promise<string> {
-  await assertCanModifyAccounting(ctx, ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  // Use current month if not specified
-  const now = new Date()
-  const targetYear = year || now.getFullYear()
-  const targetMonth = month || (now.getMonth() + 1)
-
-  // Get or create numbering record for this month
-  let numberingRecord = await ctx.db
-    .query('yourobcInvoiceNumbering')
-    .withIndex('by_ownerId_year_month', (q) =>
-      q.eq('ownerId', ownerId).eq('year', targetYear).eq('month', targetMonth)
-    )
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  if (!numberingRecord) {
-    // Initialize numbering for this month
-    const id = await initializeInvoiceNumbering(ctx, ownerId, {
-      year: targetYear,
-      month: targetMonth,
-      format: DEFAULT_INVOICE_FORMAT,
-      incrementBy: DEFAULT_INCREMENT,
-    })
-    numberingRecord = await ctx.db.get(id)
-    if (!numberingRecord) {
-      throw new Error('Failed to initialize invoice numbering')
+    const errors = validateAccountingEntryData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
-  }
 
-  // Calculate next number
-  const nextNumber = numberingRecord.lastNumber + numberingRecord.incrementBy
+    const publicId = await generateUniquePublicId(ctx, 'softwareYourObcAccounting');
+    const now = Date.now();
 
-  // Generate invoice number
-  const result = generateInvoiceNumber(
-    targetYear,
-    targetMonth,
-    nextNumber,
-    numberingRecord.format
-  )
+    // Auto-calculate fiscal year and period if not provided
+    const fiscalYear = data.fiscalYear || calculateFiscalYear(data.transactionDate);
+    const fiscalPeriod = data.fiscalPeriod || calculateFiscalPeriod(data.transactionDate);
 
-  // Update last number
-  await ctx.db.patch(numberingRecord._id, {
-    lastNumber: nextNumber,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
+    // Generate journal entry number if not provided
+    const sequence = Math.floor(Math.random() * 1000000);
+    const journalEntryNumber = data.journalEntryNumber?.trim() || generateJournalEntryNumber(fiscalYear, sequence);
 
-  return result.invoiceNumber
-}
-
-// ============================================================================
-// Statement of Accounts Mutations
-// ============================================================================
-
-/**
- * Create a new statement of accounts
- */
-export async function createStatementOfAccounts(
-  ctx: MutationCtx,
-  ownerId: string,
-  input: CreateStatementOfAccountsInput
-): Promise<Id<'yourobcStatementOfAccounts'>> {
-  await assertCanGenerateStatements(ctx, ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  // Generate next sequence number
-  const lastRecord = await ctx.db
-    .query('yourobcStatementOfAccounts')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .order('desc')
-    .first()
-
-  const currentYear = new Date().getFullYear()
-  const sequence = lastRecord ? parseInt(lastRecord.publicId.split('-')[2]) + 1 : 1
-
-  const publicId = generatePublicId({
-    prefix: PUBLIC_ID_PREFIXES.STATEMENT_OF_ACCOUNTS,
-    year: currentYear,
-    sequence,
-  })
-
-  // TODO: Calculate actual balances, transactions, and outstanding invoices
-  // This is a placeholder - you would query invoices and payments to build this
-
-  const zeroAmount = createZeroAmount()
-
-  const id = await ctx.db.insert('yourobcStatementOfAccounts', {
-    publicId,
-    ownerId,
-    customerId: input.customerId,
-    startDate: input.startDate,
-    endDate: input.endDate,
-    generatedDate: Date.now(),
-    openingBalance: zeroAmount,
-    totalInvoiced: zeroAmount,
-    totalPaid: zeroAmount,
-    closingBalance: zeroAmount,
-    transactions: [],
-    outstandingInvoices: [],
-    createdBy: userId,
-    createdAt: Date.now(),
-  })
-
-  return id
-}
-
-/**
- * Export statement of accounts
- */
-export async function exportStatementOfAccounts(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatementOfAccounts'>,
-  format: 'pdf' | 'excel'
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Statement of accounts not found')
-  }
-
-  await assertCanGenerateStatements(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  await ctx.db.patch(id, {
-    exportedAt: Date.now(),
-    exportedBy: userId,
-    exportFormat: format,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
-
-/**
- * Soft delete a statement of accounts
- */
-export async function deleteStatementOfAccounts(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatementOfAccounts'>
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Statement of accounts not found')
-  }
-
-  await assertCanModifyAccounting(ctx, record.ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  await ctx.db.patch(id, {
-    deletedAt: Date.now(),
-    deletedBy: userId,
-  })
-}
-
-// ============================================================================
-// Accounting Dashboard Cache Mutations
-// ============================================================================
-
-/**
- * Create or update accounting dashboard cache
- */
-export async function upsertAccountingDashboardCache(
-  ctx: MutationCtx,
-  ownerId: string,
-  input: CreateDashboardCacheInput,
-  metrics: any // TODO: Type this properly with calculated metrics
-): Promise<Id<'yourobcAccountingDashboardCache'>> {
-  await assertCanModifyAccounting(ctx, ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  // Check if cache already exists for this date
-  const existing = await ctx.db
-    .query('yourobcAccountingDashboardCache')
-    .withIndex('by_ownerId_date', (q) => q.eq('ownerId', ownerId).eq('date', input.date))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  const zeroAmount = createZeroAmount()
-  const validUntil = calculateCacheExpiry(CACHE_VALIDITY_HOURS)
-
-  const cacheData = {
-    ownerId,
-    date: input.date,
-    // TODO: Use actual metrics passed in
-    totalReceivables: zeroAmount,
-    currentReceivables: zeroAmount,
-    overdueReceivables: zeroAmount,
-    overdueBreakdown: {
-      overdue1to30: zeroAmount,
-      overdue31to60: zeroAmount,
-      overdue61to90: zeroAmount,
-      overdue90plus: zeroAmount,
-    },
-    totalPayables: zeroAmount,
-    currentPayables: zeroAmount,
-    overduePayables: zeroAmount,
-    expectedIncoming: [],
-    expectedOutgoing: [],
-    dunningLevel1Count: 0,
-    dunningLevel2Count: 0,
-    dunningLevel3Count: 0,
-    suspendedCustomersCount: 0,
-    missingInvoicesCount: 0,
-    missingInvoicesValue: zeroAmount,
-    pendingApprovalCount: 0,
-    pendingApprovalValue: zeroAmount,
-    calculatedAt: Date.now(),
-    validUntil,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  }
-
-  if (existing) {
-    await ctx.db.patch(existing._id, cacheData)
-    return existing._id
-  } else {
-    const publicId = generatePublicId({
-      prefix: PUBLIC_ID_PREFIXES.ACCOUNTING_DASHBOARD_CACHE,
-      year: new Date(input.date).getFullYear(),
-      sequence: Math.floor(input.date / 86400000), // Use day number as sequence
-    })
-
-    const id = await ctx.db.insert('yourobcAccountingDashboardCache', {
+    const entryId = await ctx.db.insert('softwareYourObcAccounting', {
       publicId,
-      ...cacheData,
-      createdBy: userId,
-      createdAt: Date.now(),
-    })
+      journalEntryNumber,
+      referenceNumber: data.referenceNumber?.trim(),
+      status: data.status || 'draft',
+      transactionType: data.transactionType,
+      transactionDate: data.transactionDate,
+      postingDate: data.postingDate,
+      debitAmount: data.debitAmount,
+      creditAmount: data.creditAmount,
+      currency: data.currency.toUpperCase(),
+      debitAccountId: data.debitAccountId?.trim(),
+      creditAccountId: data.creditAccountId?.trim(),
+      accountCode: data.accountCode?.trim(),
+      relatedInvoiceId: data.relatedInvoiceId,
+      relatedExpenseId: data.relatedExpenseId?.trim(),
+      relatedShipmentId: data.relatedShipmentId,
+      relatedCustomerId: data.relatedCustomerId,
+      relatedPartnerId: data.relatedPartnerId,
+      memo: data.memo?.trim(),
+      description: data.description?.trim(),
+      taxAmount: data.taxAmount,
+      taxRate: data.taxRate,
+      taxCategory: data.taxCategory?.trim(),
+      isTaxable: data.isTaxable,
+      attachments: data.attachments,
+      tags: data.tags?.map(tag => tag.trim()),
+      category: data.category?.trim(),
+      fiscalYear,
+      fiscalPeriod,
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-    return id
-  }
-}
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'accounting_entry.created',
+      entityType: 'system_accounting_entry',
+      entityId: publicId,
+      entityTitle: journalEntryNumber,
+      description: `Created accounting entry: ${journalEntryNumber}`,
+      metadata: {
+        status: data.status || 'draft',
+        transactionType: data.transactionType,
+        amount: data.debitAmount,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-// ============================================================================
-// Invoice Auto-Gen Log Mutations
-// ============================================================================
-
-/**
- * Create an invoice auto-gen log entry
- */
-export async function createInvoiceAutoGenLog(
-  ctx: MutationCtx,
-  ownerId: string,
-  input: CreateInvoiceAutoGenLogInput
-): Promise<Id<'yourobcInvoiceAutoGenLog'>> {
-  await assertCanModifyAccounting(ctx, ownerId)
-
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-
-  const userId = identity.subject
-
-  // Generate next sequence number
-  const lastRecord = await ctx.db
-    .query('yourobcInvoiceAutoGenLog')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .order('desc')
-    .first()
-
-  const currentYear = new Date().getFullYear()
-  const sequence = lastRecord ? parseInt(lastRecord.publicId.split('-')[2]) + 1 : 1
-
-  const publicId = generatePublicId({
-    prefix: PUBLIC_ID_PREFIXES.INVOICE_AUTO_GEN_LOG,
-    year: currentYear,
-    sequence,
-  })
-
-  const id = await ctx.db.insert('yourobcInvoiceAutoGenLog', {
-    publicId,
-    ownerId,
-    shipmentId: input.shipmentId,
-    invoiceId: input.invoiceId,
-    generatedDate: Date.now(),
-    podReceivedDate: input.podReceivedDate,
-    invoiceNumber: input.invoiceNumber,
-    notificationSent: false,
-    notificationRecipients: input.notificationRecipients,
-    status: 'generated',
-    createdBy: userId,
-    createdAt: Date.now(),
-  })
-
-  return id
-}
+    return entryId;
+  },
+});
 
 /**
- * Mark notification as sent for invoice auto-gen log
+ * Update existing accounting entry
  */
-export async function markNotificationSent(
-  ctx: MutationCtx,
-  id: Id<'yourobcInvoiceAutoGenLog'>,
-  success: boolean
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Invoice auto-gen log not found')
-  }
+export const updateAccountingEntry = mutation({
+  args: {
+    entryId: v.id('softwareYourObcAccounting'),
+    updates: v.object({
+      referenceNumber: v.optional(v.string()),
+      status: v.optional(accountingValidators.status),
+      transactionType: v.optional(accountingValidators.transactionType),
+      transactionDate: v.optional(v.number()),
+      postingDate: v.optional(v.number()),
+      debitAmount: v.optional(v.number()),
+      creditAmount: v.optional(v.number()),
+      currency: v.optional(v.string()),
+      debitAccountId: v.optional(v.string()),
+      creditAccountId: v.optional(v.string()),
+      accountCode: v.optional(v.string()),
+      memo: v.optional(v.string()),
+      description: v.optional(v.string()),
+      taxAmount: v.optional(v.number()),
+      taxRate: v.optional(v.number()),
+      taxCategory: v.optional(v.string()),
+      isTaxable: v.optional(v.boolean()),
+      reconciliationStatus: v.optional(accountingValidators.reconciliationStatus),
+      approvalStatus: v.optional(accountingValidators.approvalStatus),
+      approvalNotes: v.optional(v.string()),
+      rejectionReason: v.optional(v.string()),
+      attachments: v.optional(v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        url: v.string(),
+        type: v.string(),
+      }))),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { entryId, updates }): Promise<AccountingEntryId> => {
+    const user = await requireCurrentUser(ctx);
 
-  await assertCanModifyAccounting(ctx, record.ownerId)
+    const entry = await ctx.db.get(entryId);
+    if (!entry || entry.deletedAt) {
+      throw new Error('Accounting entry not found');
+    }
 
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
+    await requireEditAccountingEntryAccess(ctx, entry, user);
 
-  const userId = identity.subject
+    const errors = validateAccountingEntryData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  await ctx.db.patch(id, {
-    notificationSent: success,
-    notificationSentDate: success ? Date.now() : undefined,
-    status: success ? 'notification_sent' : 'notification_failed',
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (updates.referenceNumber !== undefined) updateData.referenceNumber = updates.referenceNumber?.trim();
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+      if (updates.status === 'posted' && !entry.postingDate) {
+        updateData.postingDate = now;
+      }
+    }
+    if (updates.transactionType !== undefined) updateData.transactionType = updates.transactionType;
+    if (updates.transactionDate !== undefined) updateData.transactionDate = updates.transactionDate;
+    if (updates.postingDate !== undefined) updateData.postingDate = updates.postingDate;
+    if (updates.debitAmount !== undefined) updateData.debitAmount = updates.debitAmount;
+    if (updates.creditAmount !== undefined) updateData.creditAmount = updates.creditAmount;
+    if (updates.currency !== undefined) updateData.currency = updates.currency.toUpperCase();
+    if (updates.debitAccountId !== undefined) updateData.debitAccountId = updates.debitAccountId?.trim();
+    if (updates.creditAccountId !== undefined) updateData.creditAccountId = updates.creditAccountId?.trim();
+    if (updates.accountCode !== undefined) updateData.accountCode = updates.accountCode?.trim();
+    if (updates.memo !== undefined) updateData.memo = updates.memo?.trim();
+    if (updates.description !== undefined) updateData.description = updates.description?.trim();
+    if (updates.taxAmount !== undefined) updateData.taxAmount = updates.taxAmount;
+    if (updates.taxRate !== undefined) updateData.taxRate = updates.taxRate;
+    if (updates.taxCategory !== undefined) updateData.taxCategory = updates.taxCategory?.trim();
+    if (updates.isTaxable !== undefined) updateData.isTaxable = updates.isTaxable;
+    if (updates.reconciliationStatus !== undefined) {
+      updateData.reconciliationStatus = updates.reconciliationStatus;
+      if (updates.reconciliationStatus === 'reconciled' && !entry.reconciledDate) {
+        updateData.reconciledDate = now;
+        updateData.reconciledBy = user._id;
+      }
+    }
+    if (updates.approvalStatus !== undefined) {
+      updateData.approvalStatus = updates.approvalStatus;
+      if (updates.approvalStatus === 'approved') {
+        updateData.approvedBy = user._id;
+        updateData.approvedDate = now;
+      } else if (updates.approvalStatus === 'rejected') {
+        updateData.rejectedBy = user._id;
+        updateData.rejectedDate = now;
+      }
+    }
+    if (updates.approvalNotes !== undefined) updateData.approvalNotes = updates.approvalNotes?.trim();
+    if (updates.rejectionReason !== undefined) updateData.rejectionReason = updates.rejectionReason?.trim();
+    if (updates.attachments !== undefined) updateData.attachments = updates.attachments;
+    if (updates.tags !== undefined) updateData.tags = updates.tags.map(tag => tag.trim());
+    if (updates.category !== undefined) updateData.category = updates.category?.trim();
+
+    await ctx.db.patch(entryId, updateData);
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'accounting_entry.updated',
+      entityType: 'system_accounting_entry',
+      entityId: entry.publicId,
+      entityTitle: entry.journalEntryNumber,
+      description: `Updated accounting entry: ${entry.journalEntryNumber}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return entryId;
+  },
+});
 
 /**
- * Soft delete an invoice auto-gen log
+ * Delete accounting entry (soft delete)
  */
-export async function deleteInvoiceAutoGenLog(
-  ctx: MutationCtx,
-  id: Id<'yourobcInvoiceAutoGenLog'>
-): Promise<void> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    throw new Error('Invoice auto-gen log not found')
-  }
+export const deleteAccountingEntry = mutation({
+  args: {
+    entryId: v.id('softwareYourObcAccounting'),
+  },
+  handler: async (ctx, { entryId }): Promise<AccountingEntryId> => {
+    const user = await requireCurrentUser(ctx);
 
-  await assertCanModifyAccounting(ctx, record.ownerId)
+    const entry = await ctx.db.get(entryId);
+    if (!entry || entry.deletedAt) {
+      throw new Error('Accounting entry not found');
+    }
 
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
+    await requireDeleteAccountingEntryAccess(entry, user);
 
-  const userId = identity.subject
+    const now = Date.now();
+    await ctx.db.patch(entryId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-  await ctx.db.patch(id, {
-    deletedAt: Date.now(),
-    deletedBy: userId,
-  })
-}
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'accounting_entry.deleted',
+      entityType: 'system_accounting_entry',
+      entityId: entry.publicId,
+      entityTitle: entry.journalEntryNumber,
+      description: `Deleted accounting entry: ${entry.journalEntryNumber}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return entryId;
+  },
+});
+
+/**
+ * Restore soft-deleted accounting entry
+ */
+export const restoreAccountingEntry = mutation({
+  args: {
+    entryId: v.id('softwareYourObcAccounting'),
+  },
+  handler: async (ctx, { entryId }): Promise<AccountingEntryId> => {
+    const user = await requireCurrentUser(ctx);
+
+    const entry = await ctx.db.get(entryId);
+    if (!entry) {
+      throw new Error('Accounting entry not found');
+    }
+    if (!entry.deletedAt) {
+      throw new Error('Accounting entry is not deleted');
+    }
+
+    if (
+      entry.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this accounting entry');
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(entryId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'accounting_entry.restored',
+      entityType: 'system_accounting_entry',
+      entityId: entry.publicId,
+      entityTitle: entry.journalEntryNumber,
+      description: `Restored accounting entry: ${entry.journalEntryNumber}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return entryId;
+  },
+});
+
+/**
+ * Approve accounting entry
+ */
+export const approveAccountingEntry = mutation({
+  args: {
+    entryId: v.id('softwareYourObcAccounting'),
+    approvalNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, { entryId, approvalNotes }): Promise<AccountingEntryId> => {
+    const user = await requireCurrentUser(ctx);
+
+    const entry = await ctx.db.get(entryId);
+    if (!entry || entry.deletedAt) {
+      throw new Error('Accounting entry not found');
+    }
+
+    await requireApproveAccountingEntryAccess(entry, user);
+
+    const now = Date.now();
+    await ctx.db.patch(entryId, {
+      status: 'approved',
+      approvalStatus: 'approved',
+      approvedBy: user._id,
+      approvedDate: now,
+      approvalNotes: approvalNotes?.trim(),
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'accounting_entry.approved',
+      entityType: 'system_accounting_entry',
+      entityId: entry.publicId,
+      entityTitle: entry.journalEntryNumber,
+      description: `Approved accounting entry: ${entry.journalEntryNumber}`,
+      metadata: { approvalNotes },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return entryId;
+  },
+});

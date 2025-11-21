@@ -1,32 +1,47 @@
 // convex/lib/software/yourobc/trackingMessages/index.ts
-/**
- * Tracking Messages Library Module
- *
- * Barrel export for all tracking messages library components.
- * Provides centralized access to constants, types, utilities, permissions,
- * queries, and mutations for tracking message operations.
- *
- * @module convex/lib/software/yourobc/trackingMessages
- */
-
-// ============================================================================
-// Exports
-// ============================================================================
+// Public API exports for trackingMessages module
 
 // Constants
-export * from './constants'
+export { TRACKING_MESSAGES_CONSTANTS } from './constants';
 
 // Types
-export * from './types'
+export type * from './types';
 
 // Utilities
-export * from './utils'
+export {
+  validateTrackingMessageData,
+  formatTrackingMessageDisplayName,
+  generateMessageId,
+  isTrackingMessageEditable,
+  isTrackingMessageRead,
+  calculateDeliveryTime,
+} from './utils';
 
 // Permissions
-export * from './permissions'
+export {
+  canViewTrackingMessage,
+  canEditTrackingMessage,
+  canDeleteTrackingMessage,
+  requireViewTrackingMessageAccess,
+  requireEditTrackingMessageAccess,
+  requireDeleteTrackingMessageAccess,
+  filterTrackingMessagesByAccess,
+} from './permissions';
 
-// Query helpers
-export * from './queries'
+// Queries
+export {
+  getTrackingMessages,
+  getTrackingMessage,
+  getTrackingMessageByPublicId,
+  getTrackingMessageByMessageId,
+  getTrackingMessageStats,
+} from './queries';
 
-// Mutation helpers
-export * from './mutations'
+// Mutations
+export {
+  createTrackingMessage,
+  updateTrackingMessage,
+  deleteTrackingMessage,
+  restoreTrackingMessage,
+  markTrackingMessageAsRead,
+} from './mutations';

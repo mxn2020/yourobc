@@ -1,86 +1,84 @@
 // convex/schema/software/yourobc/employeeKPIs/employeeKPIs.ts
-/**
- * Employee KPIs Table
- *
- * Tracks monthly performance metrics for sales employees.
- * Includes quote metrics, order metrics, commission metrics, and rankings.
- *
- * @module convex/schema/software/yourobc/employeeKPIs/employeeKPIs
- */
+// Table definitions for employeeKPIs module
 
-import { defineTable } from 'convex/server'
-import { v } from 'convex/values'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
 import {
-  rankByMetricValidator,
   auditFields,
   softDeleteFields,
   metadataSchema,
-} from '../../../yourobc/base'
-import { kpiTargetsValidator, kpiTargetAchievementValidator } from './validators'
+} from '@/schema/yourobc/base';
+import { employeeKPIsValidators } from './validators';
 
-/**
- * Employee KPIs Table
- * Tracks performance metrics for sales employees on a monthly basis
- */
 export const employeeKPIsTable = defineTable({
-  // Identity
-  publicId: v.string(), // Public-facing identifier (e.g., KPI-2024-001)
-  ownerId: v.string(), // authUserId who owns this KPI record
+  // Required: Main display field
+  kpiName: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
 
   // Employee Reference
   employeeId: v.id('yourobcEmployees'),
 
-  // Time Period
+  // KPI Details
+  metricType: v.string(), // e.g., "quotes_created", "revenue_generated", "conversion_rate"
+  description: v.optional(v.string()),
+
+  // Target Values
+  targetValue: v.number(),
+  currentValue: v.number(),
+  achievementPercentage: v.number(), // currentValue / targetValue * 100
+
+  // Period
+  period: employeeKPIsValidators.period,
   year: v.number(),
-  month: v.number(),
+  month: v.optional(v.number()),
+  quarter: v.optional(v.number()),
+  week: v.optional(v.number()),
+  day: v.optional(v.number()),
 
-  // Quote Metrics
-  quotesCreated: v.number(),
-  quotesConverted: v.number(), // quotes that became orders
-  quotesValue: v.number(), // total value of all quotes
-  convertedValue: v.number(), // value of converted quotes
+  // Date Range
+  startDate: v.number(),
+  endDate: v.number(),
 
-  // Order Metrics
-  ordersProcessed: v.number(),
-  ordersCompleted: v.number(),
-  ordersValue: v.number(),
-  averageOrderValue: v.number(),
+  // Status
+  status: employeeKPIsValidators.status,
 
-  // Commission Metrics
-  commissionsEarned: v.number(),
-  commissionsPaid: v.number(),
-  commissionsPending: v.number(),
+  // Historical Tracking
+  historicalData: v.optional(v.array(v.object({
+    date: v.number(),
+    value: v.number(),
+    note: v.optional(v.string()),
+  }))),
 
-  // Performance Metrics
-  conversionRate: v.number(), // quotesConverted / quotesCreated * 100
-  averageQuoteValue: v.number(),
-  customerRetentionRate: v.optional(v.number()),
+  // Additional Metrics
+  previousPeriodValue: v.optional(v.number()),
+  changePercentage: v.optional(v.number()), // (currentValue - previousPeriodValue) / previousPeriodValue * 100
 
-  // Ranking (calculated across all employees)
-  rank: v.optional(v.number()), // 1-based ranking
-  rankBy: v.optional(rankByMetricValidator),
+  // Thresholds
+  warningThreshold: v.optional(v.number()), // percentage below target for "at_risk"
+  criticalThreshold: v.optional(v.number()), // percentage below target for "behind"
 
-  // Targets (embedded for quick access)
-  targets: v.optional(kpiTargetsValidator),
+  // Notes
+  notes: v.optional(v.string()),
 
-  // Target Achievement
-  targetAchievement: v.optional(kpiTargetAchievementValidator),
-
-  // Metadata
-  calculatedAt: v.number(), // when KPIs were last calculated
-
-  // Standard fields
+  // Metadata and audit fields
   ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_publicId', ['publicId'])
-  .index('by_ownerId', ['ownerId'])
-  .index('employee', ['employeeId'])
-  .index('employee_year', ['employeeId', 'year'])
-  .index('employee_month', ['employeeId', 'year', 'month'])
-  .index('year_month', ['year', 'month'])
-  .index('rank', ['year', 'month', 'rank']) // For leaderboards
-  .searchIndex('search_metricName', {
-    searchField: 'publicId',
-  })
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_kpiName', ['kpiName'])
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_employee', ['employeeId'])
+  .index('by_status', ['status'])
+  .index('by_period', ['period'])
+  .index('by_employee_period', ['employeeId', 'period'])
+  .index('by_employee_year_month', ['employeeId', 'year', 'month'])
+  .index('by_year_month', ['year', 'month'])
+  .index('by_owner_and_status', ['ownerId', 'status']);

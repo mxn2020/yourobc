@@ -4,28 +4,26 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import {
+  partnerServiceTypeValidator,
+  currencyValidator,
   addressSchema,
   contactSchema,
   serviceCoverageSchema,
   auditFields,
   softDeleteFields,
   metadataSchema,
-} from '../../../yourobc/base';
+} from '@/schema/yourobc/base';
 import { partnersValidators } from './validators';
 
-/**
- * YourOBC Partners Table
- * Tracks logistics partners and carriers with service coverage details
- */
-export const yourobcPartnersTable = defineTable({
+export const partnersTable = defineTable({
   // Required: Main display field
   companyName: v.string(),
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId of the user who created this partner
+  ownerId: v.id('userProfiles'),
 
-  // Core Identity
+  // Partner Identity
   shortName: v.optional(v.string()),
   partnerCode: v.optional(v.string()),
 
@@ -38,19 +36,33 @@ export const yourobcPartnersTable = defineTable({
   serviceCoverage: serviceCoverageSchema,
 
   // Service Configuration
-  serviceType: partnersValidators.serviceType,
-  preferredCurrency: partnersValidators.currency,
-  paymentTerms: v.number(), // Number of days
+  serviceType: partnerServiceTypeValidator,
+  preferredCurrency: currencyValidator,
+  paymentTerms: v.number(),
 
-  // Ranking & Quality (for internal decision-making)
-  ranking: v.optional(partnersValidators.ranking), // 1-5 stars
+  // Ranking & Quality
+  ranking: v.optional(v.number()),
   rankingNotes: v.optional(v.string()),
 
-  // Internal Decision Help
+  // Internal Notes
   internalPaymentNotes: v.optional(v.string()),
 
-  // Service Capabilities (what the partner can handle)
-  serviceCapabilities: v.optional(partnersValidators.serviceCapabilities),
+  // Service Capabilities
+  serviceCapabilities: v.optional(v.object({
+    handlesCustoms: v.optional(v.boolean()),
+    handlesPickup: v.optional(v.boolean()),
+    handlesDelivery: v.optional(v.boolean()),
+    handlesNFO: v.optional(v.boolean()),
+    handlesTrucking: v.optional(v.boolean()),
+  })),
+
+  // Commission & Payment
+  commissionRate: v.optional(v.number()),
+
+  // API Integration
+  apiEnabled: v.optional(v.boolean()),
+  apiKey: v.optional(v.string()),
+  apiEndpoint: v.optional(v.string()),
 
   // Status
   status: partnersValidators.status,
@@ -58,17 +70,19 @@ export const yourobcPartnersTable = defineTable({
   // Notes
   notes: v.optional(v.string()),
 
-  // Standard metadata and audit fields
+  // Metadata and audit fields
   ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })
+  // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_company_name', ['companyName'])
+  .index('by_companyName', ['companyName'])
   .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_service_type', ['serviceType'])
+  .index('by_serviceType', ['serviceType'])
   .index('by_countries', ['serviceCoverage.countries'])
-  .index('by_ranking', ['ranking'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_owner_and_status', ['ownerId', 'status']);

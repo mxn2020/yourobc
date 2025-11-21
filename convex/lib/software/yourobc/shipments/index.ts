@@ -1,20 +1,63 @@
 // convex/lib/software/yourobc/shipments/index.ts
-// Barrel exports for shipments library module
+// Public API exports for shipments module
 
-// Export constants
-export * from './constants';
+// Constants
+export { SHIPMENTS_CONSTANTS } from './constants';
 
-// Export types
-export * from './types';
+// Types
+export type * from './types';
 
-// Export utilities
-export * from './utils';
+// Utilities
+export {
+  validateShipmentData,
+  validateDimensions,
+  validateAddress,
+  validateCurrencyAmount,
+  formatShipmentDisplayName,
+  isShipmentEditable,
+  canCancelShipment,
+  calculateChargeableWeight,
+  formatTrackingStatus,
+  trimShipmentData,
+} from './utils';
 
-// Export permissions
-export * from './permissions';
+// Permissions
+export {
+  canViewShipment,
+  canEditShipment,
+  canDeleteShipment,
+  canAssignShipment,
+  canUpdateShipmentStatus,
+  canManageAllShipments,
+  requireViewShipmentAccess,
+  requireEditShipmentAccess,
+  requireDeleteShipmentAccess,
+  requireAssignShipmentAccess,
+  requireUpdateShipmentStatusAccess,
+  requireManageAllShipmentsAccess,
+  filterShipmentsByAccess,
+} from './permissions';
 
-// Export queries
-export * from './queries';
+// Queries
+export {
+  getShipments,
+  getShipment,
+  getShipmentByPublicId,
+  getShipmentByNumber,
+  getShipmentStatusHistory,
+  getShipmentsByCustomer,
+  getShipmentsByCourier,
+  getShipmentsByEmployee,
+  getShipmentStats,
+} from './queries';
 
-// Export mutations
-export * from './mutations';
+// Mutations
+export {
+  createShipment,
+  updateShipment,
+  updateShipmentStatus,
+  deleteShipment,
+  restoreShipment,
+  bulkUpdateShipments,
+  bulkDeleteShipments,
+} from './mutations';

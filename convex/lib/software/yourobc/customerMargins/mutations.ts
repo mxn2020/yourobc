@@ -1,716 +1,393 @@
 // convex/lib/software/yourobc/customerMargins/mutations.ts
-/**
- * Customer Margins Mutation Operations
- *
- * Write operations (create, update, delete) for all 4 tables:
- * - Customer Margins
- * - Contact Log
- * - Customer Analytics
- * - Customer Dunning Config
- *
- * @module convex/lib/software/yourobc/customerMargins/mutations
- */
+// Write operations for customerMargins module
 
-import { mutation } from '../../../../_generated/server'
-import { v } from 'convex/values'
-import { generatePublicId } from '../../utils/publicId'
-import {
-  serviceMarginValidator,
-  routeMarginValidator,
-  volumeTierValidator,
-} from '../../../schema/software/yourobc/customerMargins/validators'
-import {
-  marginCalculationMethodValidator,
-  contactTypeValidator,
-  contactDirectionValidator,
-  contactOutcomeValidator,
-  contactCategoryValidator,
-  contactPriorityValidator,
-  dunningMethodValidator,
-} from '../../../schema/base'
-
-// ============================================================================
-// Customer Margins Mutations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { customerMarginsValidators } from '@/schema/software/yourobc/customerMargins/validators';
+import { CUSTOMER_MARGINS_CONSTANTS } from './constants';
+import { validateCustomerMarginData, generateMarginId } from './utils';
+import { requireEditCustomerMarginAccess, requireDeleteCustomerMarginAccess, requireApproveCustomerMarginAccess } from './permissions';
+import type { CustomerMarginId } from './types';
 
 /**
- * Create customer margin configuration
+ * Create new customer margin
  */
-export const createMargin = mutation({
+export const createCustomerMargin = mutation({
   args: {
-    ownerId: v.id('owners'),
-    customerId: v.id('yourobcCustomers'),
-    defaultMarginPercentage: v.number(),
-    defaultMinimumMarginEUR: v.number(),
-    serviceMargins: v.optional(v.array(serviceMarginValidator)),
-    routeMargins: v.optional(v.array(routeMarginValidator)),
-    volumeTiers: v.optional(v.array(volumeTierValidator)),
-    hasNegotiatedRates: v.boolean(),
-    negotiatedRatesNotes: v.optional(v.string()),
-    negotiatedRatesValidUntil: v.optional(v.number()),
-    calculationMethod: v.optional(marginCalculationMethodValidator),
-    customCalculationNotes: v.optional(v.string()),
-    isActive: v.boolean(),
-    effectiveDate: v.number(),
-    expiryDate: v.optional(v.number()),
-    lastReviewDate: v.optional(v.number()),
-    nextReviewDate: v.optional(v.number()),
-    lastModifiedBy: v.optional(v.string()),
-    notes: v.optional(v.string()),
-    internalNotes: v.optional(v.string()),
+    data: v.object({
+      name: v.string(),
+      marginId: v.optional(v.string()),
+      status: v.optional(customerMarginsValidators.status),
+      serviceType: customerMarginsValidators.serviceType,
+      marginType: customerMarginsValidators.marginType,
+      customerId: v.id('yourobcCustomers'),
+      customerName: v.optional(v.string()),
+      baseMargin: v.number(),
+      appliedMargin: v.number(),
+      minimumMargin: v.optional(v.number()),
+      maximumMargin: v.optional(v.number()),
+      effectiveFrom: v.number(),
+      effectiveTo: v.optional(v.number()),
+      pricingRules: v.optional(v.array(v.object({
+        id: v.string(),
+        condition: v.string(),
+        marginAdjustment: v.number(),
+        description: v.optional(v.string()),
+      }))),
+      volumeTiers: v.optional(v.array(v.object({
+        id: v.string(),
+        minVolume: v.number(),
+        maxVolume: v.optional(v.number()),
+        marginPercentage: v.number(),
+        description: v.optional(v.string()),
+      }))),
+      changeReason: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      isAutoApplied: v.optional(v.boolean()),
+      requiresApproval: v.optional(v.boolean()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
   },
-  handler: async (ctx, args) => {
-    const publicId = generatePublicId('MRGN')
-    const now = Date.now()
+  handler: async (ctx, { data }): Promise<CustomerMarginId> => {
+    const user = await requireCurrentUser(ctx);
 
-    const marginId = await ctx.db.insert('customerMarginsTable', {
+    await requirePermission(ctx, CUSTOMER_MARGINS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
+
+    const errors = validateCustomerMarginData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    const publicId = await generateUniquePublicId(ctx, 'softwareYourObcCustomerMargins');
+    const now = Date.now();
+
+    // Generate margin ID if not provided
+    const marginId = data.marginId?.trim() || generateMarginId(data.customerId, data.serviceType);
+
+    const customerMarginId = await ctx.db.insert('softwareYourObcCustomerMargins', {
       publicId,
-      ownerId: args.ownerId,
-      customerId: args.customerId,
-      defaultMarginPercentage: args.defaultMarginPercentage,
-      defaultMinimumMarginEUR: args.defaultMinimumMarginEUR,
-      serviceMargins: args.serviceMargins,
-      routeMargins: args.routeMargins,
-      volumeTiers: args.volumeTiers,
-      hasNegotiatedRates: args.hasNegotiatedRates,
-      negotiatedRatesNotes: args.negotiatedRatesNotes,
-      negotiatedRatesValidUntil: args.negotiatedRatesValidUntil,
-      calculationMethod: args.calculationMethod,
-      customCalculationNotes: args.customCalculationNotes,
-      isActive: args.isActive,
-      effectiveDate: args.effectiveDate,
-      expiryDate: args.expiryDate,
-      lastReviewDate: args.lastReviewDate,
-      nextReviewDate: args.nextReviewDate,
-      lastModifiedBy: args.lastModifiedBy,
-      notes: args.notes,
-      internalNotes: args.internalNotes,
+      name: data.name.trim(),
+      marginId,
+      status: data.status || 'draft',
+      serviceType: data.serviceType,
+      marginType: data.marginType,
+      customerId: data.customerId,
+      customerName: data.customerName?.trim(),
+      baseMargin: data.baseMargin,
+      appliedMargin: data.appliedMargin,
+      minimumMargin: data.minimumMargin,
+      maximumMargin: data.maximumMargin,
+      effectiveFrom: data.effectiveFrom,
+      effectiveTo: data.effectiveTo,
+      pricingRules: data.pricingRules,
+      volumeTiers: data.volumeTiers,
+      changeReason: data.changeReason?.trim(),
+      notes: data.notes?.trim(),
+      isAutoApplied: data.isAutoApplied,
+      requiresApproval: data.requiresApproval,
+      tags: data.tags?.map(tag => tag.trim()),
+      category: data.category?.trim(),
+      ownerId: user._id,
       createdAt: now,
       updatedAt: now,
-    })
+      createdBy: user._id,
+    });
 
-    return { id: marginId, publicId }
-  },
-})
-
-/**
- * Update customer margin configuration
- */
-export const updateMargin = mutation({
-  args: {
-    id: v.id('customerMarginsTable'),
-    defaultMarginPercentage: v.optional(v.number()),
-    defaultMinimumMarginEUR: v.optional(v.number()),
-    serviceMargins: v.optional(v.array(serviceMarginValidator)),
-    routeMargins: v.optional(v.array(routeMarginValidator)),
-    volumeTiers: v.optional(v.array(volumeTierValidator)),
-    hasNegotiatedRates: v.optional(v.boolean()),
-    negotiatedRatesNotes: v.optional(v.string()),
-    negotiatedRatesValidUntil: v.optional(v.number()),
-    calculationMethod: v.optional(marginCalculationMethodValidator),
-    customCalculationNotes: v.optional(v.string()),
-    isActive: v.optional(v.boolean()),
-    effectiveDate: v.optional(v.number()),
-    expiryDate: v.optional(v.number()),
-    lastReviewDate: v.optional(v.number()),
-    nextReviewDate: v.optional(v.number()),
-    lastModifiedBy: v.optional(v.string()),
-    notes: v.optional(v.string()),
-    internalNotes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args
-
-    const existing = await ctx.db.get(id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Margin configuration not found')
-    }
-
-    await ctx.db.patch(id, {
-      ...updates,
-      updatedAt: Date.now(),
-    })
-
-    return { id }
-  },
-})
-
-/**
- * Delete customer margin configuration (soft delete)
- */
-export const deleteMargin = mutation({
-  args: {
-    id: v.id('customerMarginsTable'),
-    deletedBy: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Margin configuration not found')
-    }
-
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.deletedBy,
-      updatedAt: Date.now(),
-    })
-
-    return { success: true }
-  },
-})
-
-// ============================================================================
-// Contact Log Mutations
-// ============================================================================
-
-/**
- * Create contact log entry
- */
-export const createContact = mutation({
-  args: {
-    ownerId: v.id('owners'),
-    customerId: v.id('yourobcCustomers'),
-    contactPersonId: v.optional(v.id('contactPersons')),
-    contactType: contactTypeValidator,
-    direction: contactDirectionValidator,
-    subject: v.string(),
-    summary: v.string(),
-    details: v.optional(v.string()),
-    outcome: v.optional(contactOutcomeValidator),
-    outcomeNotes: v.optional(v.string()),
-    relatedQuoteId: v.optional(v.id('yourobcQuotes')),
-    relatedShipmentId: v.optional(v.id('yourobcShipments')),
-    relatedInvoiceId: v.optional(v.id('yourobcInvoices')),
-    requiresFollowUp: v.boolean(),
-    followUpDate: v.optional(v.number()),
-    followUpAssignedTo: v.optional(v.string()),
-    followUpNotes: v.optional(v.string()),
-    contactedBy: v.string(),
-    contactDate: v.number(),
-    duration: v.optional(v.number()),
-    category: v.optional(contactCategoryValidator),
-    priority: v.optional(contactPriorityValidator),
-  },
-  handler: async (ctx, args) => {
-    const publicId = generatePublicId('CONT')
-    const now = Date.now()
-
-    const contactId = await ctx.db.insert('contactLogTable', {
-      publicId,
-      ownerId: args.ownerId,
-      customerId: args.customerId,
-      contactPersonId: args.contactPersonId,
-      contactType: args.contactType,
-      direction: args.direction,
-      subject: args.subject,
-      summary: args.summary,
-      details: args.details,
-      outcome: args.outcome,
-      outcomeNotes: args.outcomeNotes,
-      relatedQuoteId: args.relatedQuoteId,
-      relatedShipmentId: args.relatedShipmentId,
-      relatedInvoiceId: args.relatedInvoiceId,
-      requiresFollowUp: args.requiresFollowUp,
-      followUpDate: args.followUpDate,
-      followUpAssignedTo: args.followUpAssignedTo,
-      followUpCompleted: false,
-      followUpNotes: args.followUpNotes,
-      contactedBy: args.contactedBy,
-      contactDate: args.contactDate,
-      duration: args.duration,
-      category: args.category,
-      priority: args.priority,
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer_margin.created',
+      entityType: 'system_customer_margin',
+      entityId: publicId,
+      entityTitle: data.name.trim(),
+      description: `Created customer margin: ${data.name.trim()}`,
+      metadata: {
+        status: data.status || 'draft',
+        serviceType: data.serviceType,
+        baseMargin: data.baseMargin,
+      },
       createdAt: now,
+      createdBy: user._id,
       updatedAt: now,
-    })
+    });
 
-    return { id: contactId, publicId }
+    return customerMarginId;
   },
-})
+});
 
 /**
- * Update contact log entry
+ * Update existing customer margin
  */
-export const updateContact = mutation({
+export const updateCustomerMargin = mutation({
   args: {
-    id: v.id('contactLogTable'),
-    subject: v.optional(v.string()),
-    summary: v.optional(v.string()),
-    details: v.optional(v.string()),
-    outcome: v.optional(contactOutcomeValidator),
-    outcomeNotes: v.optional(v.string()),
-    requiresFollowUp: v.optional(v.boolean()),
-    followUpDate: v.optional(v.number()),
-    followUpAssignedTo: v.optional(v.string()),
-    followUpNotes: v.optional(v.string()),
-    category: v.optional(contactCategoryValidator),
-    priority: v.optional(contactPriorityValidator),
+    marginId: v.id('softwareYourObcCustomerMargins'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      status: v.optional(customerMarginsValidators.status),
+      serviceType: v.optional(customerMarginsValidators.serviceType),
+      marginType: v.optional(customerMarginsValidators.marginType),
+      baseMargin: v.optional(v.number()),
+      appliedMargin: v.optional(v.number()),
+      minimumMargin: v.optional(v.number()),
+      maximumMargin: v.optional(v.number()),
+      effectiveFrom: v.optional(v.number()),
+      effectiveTo: v.optional(v.number()),
+      pricingRules: v.optional(v.array(v.object({
+        id: v.string(),
+        condition: v.string(),
+        marginAdjustment: v.number(),
+        description: v.optional(v.string()),
+      }))),
+      volumeTiers: v.optional(v.array(v.object({
+        id: v.string(),
+        minVolume: v.number(),
+        maxVolume: v.optional(v.number()),
+        marginPercentage: v.number(),
+        description: v.optional(v.string()),
+      }))),
+      changeReason: v.optional(v.string()),
+      approvalStatus: v.optional(customerMarginsValidators.approvalStatus),
+      approvalNotes: v.optional(v.string()),
+      rejectionReason: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      isAutoApplied: v.optional(v.boolean()),
+      requiresApproval: v.optional(v.boolean()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
   },
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args
+  handler: async (ctx, { marginId, updates }): Promise<CustomerMarginId> => {
+    const user = await requireCurrentUser(ctx);
 
-    const existing = await ctx.db.get(id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Contact log not found')
+    const margin = await ctx.db.get(marginId);
+    if (!margin || margin.deletedAt) {
+      throw new Error('Customer margin not found');
     }
 
-    await ctx.db.patch(id, {
-      ...updates,
-      updatedAt: Date.now(),
-    })
+    await requireEditCustomerMarginAccess(ctx, margin, user);
 
-    return { id }
-  },
-})
-
-/**
- * Complete follow-up task
- */
-export const completeFollowUp = mutation({
-  args: {
-    id: v.id('contactLogTable'),
-    completedBy: v.string(),
-    completionNotes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Contact log not found')
+    const errors = validateCustomerMarginData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    const now = Date.now()
-    await ctx.db.patch(args.id, {
-      followUpCompleted: true,
-      followUpCompletedDate: now,
-      followUpCompletedBy: args.completedBy,
-      followUpNotes: args.completionNotes || existing.followUpNotes,
+    const now = Date.now();
+    const updateData: any = {
       updatedAt: now,
-    })
+      updatedBy: user._id,
+    };
 
-    return { success: true }
-  },
-})
+    // Track margin changes
+    if (updates.baseMargin !== undefined && updates.baseMargin !== margin.baseMargin) {
+      updateData.previousMargin = margin.baseMargin;
 
-/**
- * Delete contact log entry (soft delete)
- */
-export const deleteContact = mutation({
-  args: {
-    id: v.id('contactLogTable'),
-    deletedBy: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Contact log not found')
+      // Add to change history
+      const historyEntry = {
+        id: `${now}-${user._id}`,
+        timestamp: now,
+        changedBy: user._id,
+        oldMargin: margin.baseMargin,
+        newMargin: updates.baseMargin,
+        reason: updates.changeReason || 'Margin updated',
+      };
+
+      updateData.changeHistory = [
+        ...(margin.changeHistory || []).slice(-99), // Keep last 99 entries
+        historyEntry,
+      ];
     }
 
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.deletedBy,
-      updatedAt: Date.now(),
-    })
-
-    return { success: true }
-  },
-})
-
-// ============================================================================
-// Customer Analytics Mutations
-// ============================================================================
-
-/**
- * Create or update customer analytics
- */
-export const upsertAnalytics = mutation({
-  args: {
-    ownerId: v.id('owners'),
-    customerId: v.id('yourobcCustomers'),
-    year: v.number(),
-    month: v.optional(v.number()),
-    totalShipments: v.number(),
-    completedShipments: v.number(),
-    cancelledShipments: v.number(),
-    totalRevenue: v.number(),
-    totalCost: v.number(),
-    totalMargin: v.number(),
-    averageMargin: v.number(),
-    averageMarginPercentage: v.number(),
-    marginsByService: v.optional(v.any()),
-    topRoutes: v.optional(v.any()),
-    totalInvoiced: v.number(),
-    totalPaid: v.number(),
-    totalOutstanding: v.number(),
-    averagePaymentDays: v.number(),
-    onTimePaymentRate: v.number(),
-    latePaymentCount: v.number(),
-    overdueInvoiceCount: v.number(),
-    dunningLevel1Count: v.number(),
-    dunningLevel2Count: v.number(),
-    dunningLevel3Count: v.number(),
-    totalDunningFees: v.number(),
-    totalContacts: v.number(),
-    lastContactDate: v.optional(v.number()),
-    daysSinceLastContact: v.optional(v.number()),
-    needsFollowUpAlert: v.boolean(),
-    complaintCount: v.number(),
-    issueResolutionRate: v.number(),
-    customerSatisfactionScore: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const now = Date.now()
-
-    // Check if analytics already exists for this period
-    const existing = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_customer_period', (q) =>
-        q.eq('customerId', args.customerId)
-          .eq('year', args.year)
-          .eq('month', args.month)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-
-    if (existing) {
-      // Update existing
-      await ctx.db.patch(existing._id, {
-        totalShipments: args.totalShipments,
-        completedShipments: args.completedShipments,
-        cancelledShipments: args.cancelledShipments,
-        totalRevenue: args.totalRevenue,
-        totalCost: args.totalCost,
-        totalMargin: args.totalMargin,
-        averageMargin: args.averageMargin,
-        averageMarginPercentage: args.averageMarginPercentage,
-        marginsByService: args.marginsByService,
-        topRoutes: args.topRoutes,
-        totalInvoiced: args.totalInvoiced,
-        totalPaid: args.totalPaid,
-        totalOutstanding: args.totalOutstanding,
-        averagePaymentDays: args.averagePaymentDays,
-        onTimePaymentRate: args.onTimePaymentRate,
-        latePaymentCount: args.latePaymentCount,
-        overdueInvoiceCount: args.overdueInvoiceCount,
-        dunningLevel1Count: args.dunningLevel1Count,
-        dunningLevel2Count: args.dunningLevel2Count,
-        dunningLevel3Count: args.dunningLevel3Count,
-        totalDunningFees: args.totalDunningFees,
-        totalContacts: args.totalContacts,
-        lastContactDate: args.lastContactDate,
-        daysSinceLastContact: args.daysSinceLastContact,
-        needsFollowUpAlert: args.needsFollowUpAlert,
-        complaintCount: args.complaintCount,
-        issueResolutionRate: args.issueResolutionRate,
-        customerSatisfactionScore: args.customerSatisfactionScore,
-        calculatedAt: now,
-        updatedAt: now,
-      })
-
-      return { id: existing._id, publicId: existing.publicId }
-    } else {
-      // Create new
-      const publicId = generatePublicId('ANLT')
-      const analyticsId = await ctx.db.insert('customerAnalyticsTable', {
-        publicId,
-        ownerId: args.ownerId,
-        customerId: args.customerId,
-        year: args.year,
-        month: args.month,
-        totalShipments: args.totalShipments,
-        completedShipments: args.completedShipments,
-        cancelledShipments: args.cancelledShipments,
-        totalRevenue: args.totalRevenue,
-        totalCost: args.totalCost,
-        totalMargin: args.totalMargin,
-        averageMargin: args.averageMargin,
-        averageMarginPercentage: args.averageMarginPercentage,
-        marginsByService: args.marginsByService,
-        topRoutes: args.topRoutes,
-        totalInvoiced: args.totalInvoiced,
-        totalPaid: args.totalPaid,
-        totalOutstanding: args.totalOutstanding,
-        averagePaymentDays: args.averagePaymentDays,
-        onTimePaymentRate: args.onTimePaymentRate,
-        latePaymentCount: args.latePaymentCount,
-        overdueInvoiceCount: args.overdueInvoiceCount,
-        dunningLevel1Count: args.dunningLevel1Count,
-        dunningLevel2Count: args.dunningLevel2Count,
-        dunningLevel3Count: args.dunningLevel3Count,
-        totalDunningFees: args.totalDunningFees,
-        totalContacts: args.totalContacts,
-        lastContactDate: args.lastContactDate,
-        daysSinceLastContact: args.daysSinceLastContact,
-        needsFollowUpAlert: args.needsFollowUpAlert,
-        complaintCount: args.complaintCount,
-        issueResolutionRate: args.issueResolutionRate,
-        customerSatisfactionScore: args.customerSatisfactionScore,
-        calculatedAt: now,
-        createdAt: now,
-        updatedAt: now,
-      })
-
-      return { id: analyticsId, publicId }
+    if (updates.name !== undefined) updateData.name = updates.name.trim();
+    if (updates.status !== undefined) updateData.status = updates.status;
+    if (updates.serviceType !== undefined) updateData.serviceType = updates.serviceType;
+    if (updates.marginType !== undefined) updateData.marginType = updates.marginType;
+    if (updates.baseMargin !== undefined) updateData.baseMargin = updates.baseMargin;
+    if (updates.appliedMargin !== undefined) updateData.appliedMargin = updates.appliedMargin;
+    if (updates.minimumMargin !== undefined) updateData.minimumMargin = updates.minimumMargin;
+    if (updates.maximumMargin !== undefined) updateData.maximumMargin = updates.maximumMargin;
+    if (updates.effectiveFrom !== undefined) updateData.effectiveFrom = updates.effectiveFrom;
+    if (updates.effectiveTo !== undefined) updateData.effectiveTo = updates.effectiveTo;
+    if (updates.pricingRules !== undefined) updateData.pricingRules = updates.pricingRules;
+    if (updates.volumeTiers !== undefined) updateData.volumeTiers = updates.volumeTiers;
+    if (updates.changeReason !== undefined) updateData.changeReason = updates.changeReason?.trim();
+    if (updates.approvalStatus !== undefined) {
+      updateData.approvalStatus = updates.approvalStatus;
+      if (updates.approvalStatus === 'approved') {
+        updateData.approvedBy = user._id;
+        updateData.approvedDate = now;
+      } else if (updates.approvalStatus === 'rejected') {
+        updateData.rejectedBy = user._id;
+        updateData.rejectedDate = now;
+      }
     }
-  },
-})
+    if (updates.approvalNotes !== undefined) updateData.approvalNotes = updates.approvalNotes?.trim();
+    if (updates.rejectionReason !== undefined) updateData.rejectionReason = updates.rejectionReason?.trim();
+    if (updates.notes !== undefined) updateData.notes = updates.notes?.trim();
+    if (updates.isAutoApplied !== undefined) updateData.isAutoApplied = updates.isAutoApplied;
+    if (updates.requiresApproval !== undefined) updateData.requiresApproval = updates.requiresApproval;
+    if (updates.tags !== undefined) updateData.tags = updates.tags.map(tag => tag.trim());
+    if (updates.category !== undefined) updateData.category = updates.category?.trim();
 
-/**
- * Delete analytics (soft delete)
- */
-export const deleteAnalytics = mutation({
-  args: {
-    id: v.id('customerAnalyticsTable'),
-    deletedBy: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Analytics not found')
-    }
+    await ctx.db.patch(marginId, updateData);
 
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.deletedBy,
-      updatedAt: Date.now(),
-    })
-
-    return { success: true }
-  },
-})
-
-// ============================================================================
-// Customer Dunning Config Mutations
-// ============================================================================
-
-/**
- * Create dunning configuration
- */
-export const createDunningConfig = mutation({
-  args: {
-    ownerId: v.id('owners'),
-    customerId: v.id('yourobcCustomers'),
-    level1DaysOverdue: v.number(),
-    level1FeeEUR: v.number(),
-    level1EmailTemplate: v.optional(v.string()),
-    level1AutoSend: v.boolean(),
-    level2DaysOverdue: v.number(),
-    level2FeeEUR: v.number(),
-    level2EmailTemplate: v.optional(v.string()),
-    level2AutoSend: v.boolean(),
-    level3DaysOverdue: v.number(),
-    level3FeeEUR: v.number(),
-    level3EmailTemplate: v.optional(v.string()),
-    level3AutoSend: v.boolean(),
-    level3SuspendService: v.boolean(),
-    allowServiceWhenOverdue: v.boolean(),
-    suspensionGracePeriodDays: v.optional(v.number()),
-    autoReactivateOnPayment: v.boolean(),
-    skipDunningProcess: v.boolean(),
-    customPaymentTermsDays: v.optional(v.number()),
-    requirePrepayment: v.boolean(),
-    dunningContactEmail: v.optional(v.string()),
-    dunningContactPhone: v.optional(v.string()),
-    dunningContactName: v.optional(v.string()),
-    preferredDunningMethod: v.optional(dunningMethodValidator),
-    isActive: v.boolean(),
-    notes: v.optional(v.string()),
-    internalNotes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const publicId = generatePublicId('DUNN')
-    const now = Date.now()
-
-    const configId = await ctx.db.insert('customerDunningConfigTable', {
-      publicId,
-      ownerId: args.ownerId,
-      customerId: args.customerId,
-      level1DaysOverdue: args.level1DaysOverdue,
-      level1FeeEUR: args.level1FeeEUR,
-      level1EmailTemplate: args.level1EmailTemplate,
-      level1AutoSend: args.level1AutoSend,
-      level2DaysOverdue: args.level2DaysOverdue,
-      level2FeeEUR: args.level2FeeEUR,
-      level2EmailTemplate: args.level2EmailTemplate,
-      level2AutoSend: args.level2AutoSend,
-      level3DaysOverdue: args.level3DaysOverdue,
-      level3FeeEUR: args.level3FeeEUR,
-      level3EmailTemplate: args.level3EmailTemplate,
-      level3AutoSend: args.level3AutoSend,
-      level3SuspendService: args.level3SuspendService,
-      allowServiceWhenOverdue: args.allowServiceWhenOverdue,
-      suspensionGracePeriodDays: args.suspensionGracePeriodDays,
-      autoReactivateOnPayment: args.autoReactivateOnPayment,
-      skipDunningProcess: args.skipDunningProcess,
-      customPaymentTermsDays: args.customPaymentTermsDays,
-      requirePrepayment: args.requirePrepayment,
-      dunningContactEmail: args.dunningContactEmail,
-      dunningContactPhone: args.dunningContactPhone,
-      dunningContactName: args.dunningContactName,
-      preferredDunningMethod: args.preferredDunningMethod,
-      isActive: args.isActive,
-      notes: args.notes,
-      internalNotes: args.internalNotes,
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer_margin.updated',
+      entityType: 'system_customer_margin',
+      entityId: margin.publicId,
+      entityTitle: updateData.name || margin.name,
+      description: `Updated customer margin: ${updateData.name || margin.name}`,
+      metadata: { changes: updates },
       createdAt: now,
+      createdBy: user._id,
       updatedAt: now,
-    })
+    });
 
-    return { id: configId, publicId }
+    return marginId;
   },
-})
+});
 
 /**
- * Update dunning configuration
+ * Delete customer margin (soft delete)
  */
-export const updateDunningConfig = mutation({
+export const deleteCustomerMargin = mutation({
   args: {
-    id: v.id('customerDunningConfigTable'),
-    level1DaysOverdue: v.optional(v.number()),
-    level1FeeEUR: v.optional(v.number()),
-    level1EmailTemplate: v.optional(v.string()),
-    level1AutoSend: v.optional(v.boolean()),
-    level2DaysOverdue: v.optional(v.number()),
-    level2FeeEUR: v.optional(v.number()),
-    level2EmailTemplate: v.optional(v.string()),
-    level2AutoSend: v.optional(v.boolean()),
-    level3DaysOverdue: v.optional(v.number()),
-    level3FeeEUR: v.optional(v.number()),
-    level3EmailTemplate: v.optional(v.string()),
-    level3AutoSend: v.optional(v.boolean()),
-    level3SuspendService: v.optional(v.boolean()),
-    allowServiceWhenOverdue: v.optional(v.boolean()),
-    suspensionGracePeriodDays: v.optional(v.number()),
-    autoReactivateOnPayment: v.optional(v.boolean()),
-    skipDunningProcess: v.optional(v.boolean()),
-    customPaymentTermsDays: v.optional(v.number()),
-    requirePrepayment: v.optional(v.boolean()),
-    dunningContactEmail: v.optional(v.string()),
-    dunningContactPhone: v.optional(v.string()),
-    dunningContactName: v.optional(v.string()),
-    preferredDunningMethod: v.optional(dunningMethodValidator),
-    lastModifiedBy: v.optional(v.string()),
-    isActive: v.optional(v.boolean()),
-    notes: v.optional(v.string()),
-    internalNotes: v.optional(v.string()),
+    marginId: v.id('softwareYourObcCustomerMargins'),
   },
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args
+  handler: async (ctx, { marginId }): Promise<CustomerMarginId> => {
+    const user = await requireCurrentUser(ctx);
 
-    const existing = await ctx.db.get(id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Dunning configuration not found')
+    const margin = await ctx.db.get(marginId);
+    if (!margin || margin.deletedAt) {
+      throw new Error('Customer margin not found');
     }
 
-    await ctx.db.patch(id, {
-      ...updates,
-      updatedAt: Date.now(),
-    })
+    await requireDeleteCustomerMarginAccess(margin, user);
 
-    return { id }
-  },
-})
-
-/**
- * Suspend customer service
- */
-export const suspendService = mutation({
-  args: {
-    id: v.id('customerDunningConfigTable'),
-    suspendedBy: v.string(),
-    reason: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Dunning configuration not found')
-    }
-
-    const now = Date.now()
-    await ctx.db.patch(args.id, {
-      serviceSuspended: true,
-      serviceSuspendedDate: now,
-      serviceSuspendedBy: args.suspendedBy,
-      serviceSuspensionReason: args.reason,
+    const now = Date.now();
+    await ctx.db.patch(marginId, {
+      deletedAt: now,
+      deletedBy: user._id,
       updatedAt: now,
-    })
+      updatedBy: user._id,
+    });
 
-    return { success: true }
-  },
-})
-
-/**
- * Reactivate customer service
- */
-export const reactivateService = mutation({
-  args: {
-    id: v.id('customerDunningConfigTable'),
-    reactivatedBy: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Dunning configuration not found')
-    }
-
-    const now = Date.now()
-    await ctx.db.patch(args.id, {
-      serviceSuspended: false,
-      serviceReactivatedDate: now,
-      serviceReactivatedBy: args.reactivatedBy,
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer_margin.deleted',
+      entityType: 'system_customer_margin',
+      entityId: margin.publicId,
+      entityTitle: margin.name,
+      description: `Deleted customer margin: ${margin.name}`,
+      createdAt: now,
+      createdBy: user._id,
       updatedAt: now,
-    })
+    });
 
-    return { success: true }
+    return marginId;
   },
-})
+});
 
 /**
- * Delete dunning configuration (soft delete)
+ * Restore soft-deleted customer margin
  */
-export const deleteDunningConfig = mutation({
+export const restoreCustomerMargin = mutation({
   args: {
-    id: v.id('customerDunningConfigTable'),
-    deletedBy: v.string(),
+    marginId: v.id('softwareYourObcCustomerMargins'),
   },
-  handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.id)
-    if (!existing || existing.deletedAt) {
-      throw new Error('Dunning configuration not found')
+  handler: async (ctx, { marginId }): Promise<CustomerMarginId> => {
+    const user = await requireCurrentUser(ctx);
+
+    const margin = await ctx.db.get(marginId);
+    if (!margin) {
+      throw new Error('Customer margin not found');
+    }
+    if (!margin.deletedAt) {
+      throw new Error('Customer margin is not deleted');
     }
 
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.deletedBy,
-      updatedAt: Date.now(),
-    })
+    if (
+      margin.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this customer margin');
+    }
 
-    return { success: true }
+    const now = Date.now();
+    await ctx.db.patch(marginId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer_margin.restored',
+      entityType: 'system_customer_margin',
+      entityId: margin.publicId,
+      entityTitle: margin.name,
+      description: `Restored customer margin: ${margin.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return marginId;
   },
-})
+});
 
-// ============================================================================
-// Export All Mutations
-// ============================================================================
+/**
+ * Approve customer margin
+ */
+export const approveCustomerMargin = mutation({
+  args: {
+    marginId: v.id('softwareYourObcCustomerMargins'),
+    approvalNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, { marginId, approvalNotes }): Promise<CustomerMarginId> => {
+    const user = await requireCurrentUser(ctx);
 
-export default {
-  // Customer Margins
-  createMargin,
-  updateMargin,
-  deleteMargin,
+    const margin = await ctx.db.get(marginId);
+    if (!margin || margin.deletedAt) {
+      throw new Error('Customer margin not found');
+    }
 
-  // Contact Log
-  createContact,
-  updateContact,
-  completeFollowUp,
-  deleteContact,
+    await requireApproveCustomerMarginAccess(margin, user);
 
-  // Analytics
-  upsertAnalytics,
-  deleteAnalytics,
+    const now = Date.now();
+    await ctx.db.patch(marginId, {
+      status: 'active',
+      approvalStatus: 'approved',
+      approvedBy: user._id,
+      approvedDate: now,
+      approvalNotes: approvalNotes?.trim(),
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-  // Dunning Config
-  createDunningConfig,
-  updateDunningConfig,
-  suspendService,
-  reactivateService,
-  deleteDunningConfig,
-}
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer_margin.approved',
+      entityType: 'system_customer_margin',
+      entityId: margin.publicId,
+      entityTitle: margin.name,
+      description: `Approved customer margin: ${margin.name}`,
+      metadata: { approvalNotes },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return marginId;
+  },
+});

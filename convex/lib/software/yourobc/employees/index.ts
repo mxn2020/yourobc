@@ -1,123 +1,70 @@
 // convex/lib/software/yourobc/employees/index.ts
-/**
- * Employees Entity - Library Module
- *
- * Barrel export for all employee-related library functions including
- * constants, types, utilities, permissions, queries, and mutations.
- *
- * This module provides complete CRUD operations for both employees
- * and vacation days tables.
- *
- * @module convex/lib/software/yourobc/employees
- */
+// Public API exports for employees module
 
 // Constants
-export * from './constants'
+export { EMPLOYEES_CONSTANTS } from './constants';
 
 // Types
-export type {
-  Employee,
-  VacationDays,
-  EmployeeId,
-  VacationDaysId,
-  Office,
-  EmergencyContact,
-  CurrentVacationStatus,
-  RecentVacation,
-  VacationEntry,
-  EmployeeStatus,
-  WorkStatus,
-  VacationType,
-  VacationStatus,
-  CreateEmployeeInput,
-  UpdateEmployeeInput,
-  CreateVacationDaysInput,
-  CreateVacationEntryInput,
-  UpdateVacationEntryInput,
-  EmployeeDisplay,
-  VacationDaysDisplay,
-  EmployeeFilter,
-  VacationDaysFilter,
-  BatchVacationEntriesInput,
-  VacationCalculation,
-  EmployeeAuditLog,
-  VacationAuditLog,
-} from './types'
+export type * from './types';
 
 // Utilities
 export {
-  generateEmployeePublicId,
-  generateVacationDaysPublicId,
-  generateVacationEntryId,
-  calculateVacationStats,
-  calculateDaysBetween,
-  calculateDaysRemaining,
-  isCurrentlyOnVacation,
-  getCurrentVacationEntry,
-  calculateProRatedEntitlement,
+  validateEmployeeData,
   validateVacationRequest,
-  updateRecentVacations,
-  shouldMarkOffline,
-  formatEmployeeDisplay,
-  formatVacationDaysDisplay,
-  formatDate,
-  formatDateRange,
-} from './utils'
+  formatEmployeeDisplayName,
+  generateEmployeeNumber,
+  isEmployeeEditable,
+  canRequestVacation,
+  calculateVacationDays,
+  calculateDaysRemaining,
+  isOnVacation,
+  formatSalary,
+  sanitizeEmployeeData,
+} from './utils';
 
 // Permissions
-export type { PermissionContext } from './permissions'
 export {
   canViewEmployee,
-  canCreateEmployee,
-  canUpdateEmployee,
+  canEditEmployee,
   canDeleteEmployee,
-  canRestoreEmployee,
+  canViewSalary,
+  canEditSalary,
   canViewVacationDays,
-  canCreateVacationDays,
-  canRequestVacation,
   canApproveVacation,
-  canCancelVacation,
-  canUpdateVacationEntitlements,
-  getAllowedEmployeeUpdateFields,
-} from './permissions'
+  requireViewEmployeeAccess,
+  requireEditEmployeeAccess,
+  requireDeleteEmployeeAccess,
+  requireEditSalaryAccess,
+  requireViewVacationDaysAccess,
+  requireApproveVacationAccess,
+  filterEmployeesByAccess,
+  filterVacationDaysByAccess,
+} from './permissions';
 
 // Queries
 export {
-  getEmployeeById,
+  getEmployees,
+  getEmployee,
   getEmployeeByPublicId,
-  getEmployeeByAuthUserId,
-  getEmployeeByEmployeeNumber,
-  listEmployees,
-  getEmployeesByStatus,
+  getEmployeeByUserProfileId,
+  getEmployeeStats,
+  getEmployeesByManager,
   getEmployeesByDepartment,
-  getActiveOnlineEmployees,
-  getEmployeesOnVacation,
-  getVacationDaysById,
-  getVacationDaysByPublicId,
-  getVacationDaysByEmployeeYear,
-  listVacationDaysForEmployee,
-  listVacationDays,
-  getVacationDaysByYear,
-  getPendingVacationRequests,
-  getVacationEntry,
-  getApprovedVacationsInRange,
-} from './queries'
+  getVacationDays,
+  getAllVacationDays,
+  getVacationStats,
+} from './queries';
 
 // Mutations
 export {
   createEmployee,
   updateEmployee,
-  updateEmployeeActivity,
-  updateEmployeeVacationStatus,
-  softDeleteEmployee,
+  updateEmployeeSalary,
+  deleteEmployee,
   restoreEmployee,
   createVacationDays,
-  updateVacationEntitlements,
   requestVacation,
   approveVacation,
   rejectVacation,
   cancelVacation,
-  batchCreateVacationEntries,
-  softDeleteVacationDays,
-  restoreVacationDays,
-} from './mutations'
+} from './mutations';

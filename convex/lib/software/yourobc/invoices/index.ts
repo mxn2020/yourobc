@@ -1,20 +1,73 @@
 // convex/lib/software/yourobc/invoices/index.ts
-// Barrel export for invoices module
+// Public API exports for invoices module
 
-// Export constants
-export * from './constants';
+// Constants
+export { INVOICES_CONSTANTS } from './constants';
 
-// Export types
-export * from './types';
+// Types
+export type * from './types';
 
-// Export utilities
-export * from './utils';
+// Utilities
+export {
+  validateInvoiceData,
+  validateLineItem,
+  validateCurrencyAmount,
+  validatePaymentData,
+  calculateInvoiceTotals,
+  formatInvoiceDisplayName,
+  isInvoiceEditable,
+  isInvoiceOverdue,
+  calculateDaysUntilDue,
+  calculateDaysOverdue,
+  getDunningLevelLabel,
+  getNextDunningLevel,
+  getDunningFee,
+  formatCurrencyAmount,
+  trimInvoiceData,
+} from './utils';
 
-// Export permissions
-export * from './permissions';
+// Permissions
+export {
+  canViewInvoice,
+  canEditInvoice,
+  canDeleteInvoice,
+  canProcessPayment,
+  canManageDunning,
+  canSendInvoice,
+  canApproveInvoice,
+  requireViewInvoiceAccess,
+  requireEditInvoiceAccess,
+  requireDeleteInvoiceAccess,
+  requireProcessPaymentAccess,
+  requireManageDunningAccess,
+  requireSendInvoiceAccess,
+  requireApproveInvoiceAccess,
+  filterInvoicesByAccess,
+  isFinanceRole,
+  isViewerRole,
+  isAdmin,
+} from './permissions';
 
-// Export queries
-export * from './queries';
+// Queries
+export {
+  getInvoices,
+  getInvoice,
+  getInvoiceByPublicId,
+  getInvoiceByNumber,
+  getInvoiceStats,
+  getOverdueInvoices,
+  getInvoicesRequiringDunning,
+} from './queries';
 
-// Export mutations
-export * from './mutations';
+// Mutations
+export {
+  createInvoice,
+  updateInvoice,
+  deleteInvoice,
+  restoreInvoice,
+  sendInvoice,
+  processPayment,
+  addCollectionAttempt,
+  escalateDunning,
+  markAsOverdue,
+} from './mutations';

@@ -1,29 +1,46 @@
 // convex/lib/software/yourobc/employeeSessions/index.ts
-/**
- * Employee Sessions Library Module
- *
- * Barrel export for the employee sessions library module.
- * Provides a single entry point for importing all employee session-related
- * utilities, types, queries, mutations, and permissions for both sessions
- * and work hours summaries.
- *
- * @module convex/lib/software/yourobc/employeeSessions
- */
+// Public API exports for employeeSessions module
 
 // Constants
-export * from './constants'
+export { EMPLOYEE_SESSIONS_CONSTANTS } from './constants';
 
 // Types
-export type * from './types'
+export type * from './types';
 
 // Utilities
-export * from './utils'
+export {
+  validateEmployeeSessionData,
+  generateSessionId,
+  calculateSessionDuration,
+  calculateBreakDuration,
+  isSessionActive,
+  formatSessionDisplayName,
+} from './utils';
 
 // Permissions
-export * from './permissions'
+export {
+  canViewEmployeeSession,
+  canEditEmployeeSession,
+  canDeleteEmployeeSession,
+  requireViewEmployeeSessionAccess,
+  requireEditEmployeeSessionAccess,
+  requireDeleteEmployeeSessionAccess,
+  filterEmployeeSessionsByAccess,
+} from './permissions';
 
 // Queries
-export * from './queries'
+export {
+  getEmployeeSessions,
+  getEmployeeSession,
+  getEmployeeSessionByPublicId,
+  getActiveEmployeeSession,
+  getEmployeeSessionStats,
+} from './queries';
 
 // Mutations
-export * from './mutations'
+export {
+  createEmployeeSession,
+  updateEmployeeSession,
+  deleteEmployeeSession,
+  restoreEmployeeSession,
+} from './mutations';

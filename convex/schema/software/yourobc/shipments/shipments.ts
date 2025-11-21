@@ -1,16 +1,13 @@
 // convex/schema/software/yourobc/shipments/shipments.ts
-// Table definition for shipments module
+// Table definitions for shipments module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import {
-  shipmentStatusValidator,
-  serviceTypeValidator,
-  servicePriorityValidator,
-  communicationChannelValidator,
+  addressSchema,
+  contactSchema,
   dimensionsSchema,
   currencyAmountSchema,
-  addressSchema,
   slaSchema,
   nextTaskSchema,
   routingSchema,
@@ -20,34 +17,24 @@ import {
   metadataSchema,
   auditFields,
   softDeleteFields,
-} from './validators';
+} from '@/schema/yourobc/base';
+import { shipmentsValidators } from './validators';
 
-// ============================================================================
-// Shipments Table
-// ============================================================================
-
-/**
- * Shipments table
- * Tracks shipments including routing, documentation, and delivery details
- */
 export const shipmentsTable = defineTable({
-  // Required: Public ID for external APIs and shareable URLs
-  publicId: v.string(),
-
   // Required: Main display field
   shipmentNumber: v.string(),
 
   // Required: Core fields
-  ownerId: v.id('userProfiles'),
-  currentStatus: shipmentStatusValidator,
+  publicId: v.string(),
+  ownerId: v.string(), // authUserId - following yourobc pattern
 
-  // Identification
+  // Additional Identification
   awbNumber: v.optional(v.string()),
   customerReference: v.optional(v.string()),
 
   // Service & Classification
-  serviceType: serviceTypeValidator,
-  priority: servicePriorityValidator,
+  serviceType: shipmentsValidators.serviceType,
+  priority: shipmentsValidators.priority,
 
   // Customer & Relationships
   customerId: v.id('yourobcCustomers'),
@@ -61,13 +48,14 @@ export const shipmentsTable = defineTable({
   specialInstructions: v.optional(v.string()),
 
   // SLA & Task Management
+  currentStatus: shipmentsValidators.status,
   sla: slaSchema,
   nextTask: v.optional(nextTaskSchema),
 
   // Assignment
   assignedCourierId: v.optional(v.id('yourobcCouriers')),
   courierInstructions: v.optional(v.string()),
-  employeeId: v.optional(v.id('yourobcEmployees')),
+  employeeId: v.optional(v.id('yourobcEmployees')), // Employee tracking for KPIs
 
   // Partner Details
   partnerId: v.optional(v.id('yourobcPartners')),
@@ -77,9 +65,9 @@ export const shipmentsTable = defineTable({
   // Pricing
   agreedPrice: currencyAmountSchema,
   actualCosts: v.optional(currencyAmountSchema),
-  totalPrice: v.optional(currencyAmountSchema),
-  purchasePrice: v.optional(currencyAmountSchema),
-  commission: v.optional(currencyAmountSchema),
+  totalPrice: v.optional(currencyAmountSchema), // Total price for revenue tracking
+  purchasePrice: v.optional(currencyAmountSchema), // Cost from partner/vendor
+  commission: v.optional(currencyAmountSchema), // Employee commission
 
   // Documentation & Customs
   documentStatus: v.optional(documentStatusSchema),
@@ -91,25 +79,25 @@ export const shipmentsTable = defineTable({
 
   // Communication
   communicationChannel: v.optional(v.object({
-    type: communicationChannelValidator,
-    identifier: v.optional(v.string()),
+    type: shipmentsValidators.communicationChannel,
+    identifier: v.optional(v.string()), // email subject, WhatsApp group name, etc.
   })),
 
   // Lifecycle
   completedAt: v.optional(v.number()),
 
-  // Standard metadata and audit fields
+  // Metadata and audit fields
   ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
+  .index('by_shipmentNumber', ['shipmentNumber'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
-  .index('by_shipmentNumber', ['shipmentNumber'])
   .index('by_customer', ['customerId'])
   .index('by_status', ['currentStatus'])
   .index('by_sla_deadline', ['sla.deadline'])
@@ -119,3 +107,36 @@ export const shipmentsTable = defineTable({
   .index('by_partner', ['partnerId'])
   .index('by_serviceType', ['serviceType'])
   .index('by_created', ['createdAt']);
+
+// Shipment Status History Table
+export const shipmentStatusHistoryTable = defineTable({
+  shipmentId: v.id('yourobcShipments'),
+  status: shipmentsValidators.status,
+  timestamp: v.number(),
+  location: v.optional(v.string()),
+  notes: v.optional(v.string()),
+
+  // Event-specific metadata
+  metadata: v.optional(v.object({
+    flightNumber: v.optional(v.string()),
+    estimatedArrival: v.optional(v.number()),
+    delayReason: v.optional(v.string()),
+    podReceived: v.optional(v.boolean()),
+    customerSignature: v.optional(v.string()),
+    courierAssigned: v.optional(v.id('yourobcCouriers')),
+    courierNumber: v.optional(v.string()),
+    oldDeadline: v.optional(v.number()),
+    newDeadline: v.optional(v.number()),
+    reason: v.optional(v.string()),
+    actualCosts: v.optional(currencyAmountSchema),
+    costNotes: v.optional(v.string()),
+    cancellationReason: v.optional(v.string()),
+  })),
+
+  // Audit fields (history entries are immutable, so only creation tracking)
+  createdBy: v.string(),
+  createdAt: v.number(),
+})
+  .index('by_shipment', ['shipmentId'])
+  .index('by_timestamp', ['timestamp'])
+  .index('by_shipment_timestamp', ['shipmentId', 'timestamp']);

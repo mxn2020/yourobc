@@ -1,346 +1,368 @@
 // convex/lib/software/yourobc/couriers/queries.ts
 // Read operations for couriers module
 
-import type { QueryCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
-import type { Courier, CourierId, Commission, CommissionId } from '@/schema/software/yourobc/couriers';
-import { canViewCourier, canViewCommission } from './permissions';
-import { COURIERS_CONSTANTS, COMMISSIONS_CONSTANTS } from './constants';
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { couriersValidators } from '@/schema/software/yourobc/couriers/validators';
+import { filterCouriersByAccess, requireViewCourierAccess } from './permissions';
+import type { CourierListResponse, CourierStatsResponse } from './types';
 
 /**
- * Get current user or throw error
+ * Get paginated list of couriers with filtering
  */
-async function requireCurrentUser(ctx: QueryCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
+export const getCouriers = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(
+      v.object({
+        status: v.optional(v.array(couriersValidators.status)),
+        serviceTypes: v.optional(v.array(couriersValidators.serviceType)),
+        deliverySpeeds: v.optional(v.array(couriersValidators.deliverySpeed)),
+        pricingModel: v.optional(v.array(couriersValidators.pricingModel)),
+        search: v.optional(v.string()),
+        country: v.optional(v.string()),
+        isPreferred: v.optional(v.boolean()),
+        isActive: v.optional(v.boolean()),
+        hasApiIntegration: v.optional(v.boolean()),
+      })
+    ),
+  },
+  handler: async (ctx, args): Promise<CourierListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
+    // Query with deletedAt filter
+    let couriers = await ctx.db
+      .query('yourobcCouriers')
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  if (!user) {
-    throw new Error('User profile not found');
-  }
+    // Apply access filtering
+    couriers = await filterCouriersByAccess(ctx, couriers, user);
 
-  return user;
-}
+    // Apply status filter
+    if (filters.status?.length) {
+      couriers = couriers.filter((item) => filters.status!.includes(item.status));
+    }
 
-// ============================================================================
-// Courier Queries
-// ============================================================================
+    // Apply service types filter
+    if (filters.serviceTypes?.length) {
+      couriers = couriers.filter((item) =>
+        filters.serviceTypes!.some((st) => item.serviceTypes.includes(st))
+      );
+    }
+
+    // Apply delivery speeds filter
+    if (filters.deliverySpeeds?.length) {
+      couriers = couriers.filter((item) =>
+        filters.deliverySpeeds!.some((ds) => item.deliverySpeeds.includes(ds))
+      );
+    }
+
+    // Apply pricing model filter
+    if (filters.pricingModel?.length) {
+      couriers = couriers.filter((item) => filters.pricingModel!.includes(item.pricingModel));
+    }
+
+    // Apply preferred filter
+    if (filters.isPreferred !== undefined) {
+      couriers = couriers.filter((item) => item.isPreferred === filters.isPreferred);
+    }
+
+    // Apply active filter
+    if (filters.isActive !== undefined) {
+      couriers = couriers.filter((item) => item.isActive === filters.isActive);
+    }
+
+    // Apply API integration filter
+    if (filters.hasApiIntegration !== undefined) {
+      couriers = couriers.filter(
+        (item) => item.apiIntegration?.enabled === filters.hasApiIntegration
+      );
+    }
+
+    // Apply country filter
+    if (filters.country) {
+      const countryCode = filters.country.toUpperCase();
+      couriers = couriers.filter((item) => item.serviceCoverage.countries.includes(countryCode));
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      couriers = couriers.filter(
+        (item) =>
+          item.name.toLowerCase().includes(term) ||
+          (item.shortName && item.shortName.toLowerCase().includes(term)) ||
+          (item.email && item.email.toLowerCase().includes(term)) ||
+          (item.notes && item.notes.toLowerCase().includes(term))
+      );
+    }
+
+    // Sort by preferred, then active, then name
+    couriers.sort((a, b) => {
+      if (a.isPreferred !== b.isPreferred) {
+        return a.isPreferred ? -1 : 1;
+      }
+      if (a.isActive !== b.isActive) {
+        return a.isActive ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    // Paginate
+    const total = couriers.length;
+    const items = couriers.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get courier by ID
+ * Get single courier by ID
  */
-export async function getCourierById(
-  ctx: QueryCtx,
-  courierId: CourierId
-): Promise<Courier | null> {
-  const user = await requireCurrentUser(ctx);
-  const courier = await ctx.db.get(courierId);
+export const getCourier = query({
+  args: {
+    courierId: v.id('yourobcCouriers'),
+  },
+  handler: async (ctx, { courierId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!courier) return null;
+    const courier = await ctx.db.get(courierId);
+    if (!courier || courier.deletedAt) {
+      throw new Error('Courier not found');
+    }
 
-  if (!canViewCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
+    await requireViewCourierAccess(ctx, courier, user);
 
-  return courier;
-}
+    return courier;
+  },
+});
 
 /**
  * Get courier by public ID
  */
-export async function getCourierByPublicId(
-  ctx: QueryCtx,
-  publicId: string
-): Promise<Courier | null> {
-  const user = await requireCurrentUser(ctx);
-  const courier = await ctx.db
-    .query('yourobcCouriers')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .first();
+export const getCourierByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!courier) return null;
+    const courier = await ctx.db
+      .query('yourobcCouriers')
+      .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  if (!canViewCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return courier;
-}
-
-/**
- * Get courier by courier number
- */
-export async function getCourierByCourierNumber(
-  ctx: QueryCtx,
-  courierNumber: string
-): Promise<Courier | null> {
-  const user = await requireCurrentUser(ctx);
-  const courier = await ctx.db
-    .query('yourobcCouriers')
-    .withIndex('by_courierNumber', (q) => q.eq('courierNumber', courierNumber))
-    .first();
-
-  if (!courier) return null;
-
-  if (!canViewCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return courier;
-}
-
-/**
- * List all couriers
- */
-export async function listCouriers(
-  ctx: QueryCtx,
-  options?: {
-    status?: 'available' | 'busy' | 'offline' | 'vacation';
-    isActive?: boolean;
-    isOnline?: boolean;
-    includeDeleted?: boolean;
-  }
-): Promise<Courier[]> {
-  const user = await requireCurrentUser(ctx);
-  let query = ctx.db.query('yourobcCouriers');
-
-  // Apply filters
-  const couriers = await query.collect();
-
-  return couriers.filter((courier) => {
-    // Check permissions
-    if (!canViewCourier(courier, user)) return false;
-
-    // Filter by deleted status
-    if (!options?.includeDeleted && courier.deletedAt) return false;
-
-    // Filter by status
-    if (options?.status && courier.status !== options.status) return false;
-
-    // Filter by isActive
-    if (options?.isActive !== undefined && courier.isActive !== options.isActive) return false;
-
-    // Filter by isOnline
-    if (options?.isOnline !== undefined && courier.isOnline !== options.isOnline) return false;
-
-    return true;
-  });
-}
-
-/**
- * List couriers by owner
- */
-export async function listCouriersByOwner(
-  ctx: QueryCtx,
-  ownerId: Id<'userProfiles'>,
-  includeDeleted?: boolean
-): Promise<Courier[]> {
-  const user = await requireCurrentUser(ctx);
-
-  const couriers = await ctx.db
-    .query('yourobcCouriers')
-    .withIndex('by_owner', (q) => q.eq('ownerId', ownerId))
-    .collect();
-
-  return couriers.filter((courier) => {
-    if (!canViewCourier(courier, user)) return false;
-    if (!includeDeleted && courier.deletedAt) return false;
-    return true;
-  });
-}
-
-/**
- * Search couriers
- */
-export async function searchCouriers(
-  ctx: QueryCtx,
-  searchTerm: string
-): Promise<Courier[]> {
-  const user = await requireCurrentUser(ctx);
-  const allCouriers = await ctx.db.query('yourobcCouriers').collect();
-
-  const searchLower = searchTerm.toLowerCase();
-
-  return allCouriers.filter((courier) => {
-    if (!canViewCourier(courier, user)) return false;
-    if (courier.deletedAt) return false;
-
-    return (
-      courier.companyName.toLowerCase().includes(searchLower) ||
-      courier.courierNumber.toLowerCase().includes(searchLower) ||
-      courier.firstName.toLowerCase().includes(searchLower) ||
-      courier.lastName.toLowerCase().includes(searchLower) ||
-      courier.email?.toLowerCase().includes(searchLower) ||
-      courier.phone.includes(searchTerm)
-    );
-  });
-}
-
-// ============================================================================
-// Commission Queries
-// ============================================================================
-
-/**
- * Get commission by ID
- */
-export async function getCommissionById(
-  ctx: QueryCtx,
-  commissionId: CommissionId
-): Promise<Commission | null> {
-  const user = await requireCurrentUser(ctx);
-  const commission = await ctx.db.get(commissionId);
-
-  if (!commission) return null;
-
-  if (!canViewCommission(commission, user)) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return commission;
-}
-
-/**
- * Get commission by public ID
- */
-export async function getCommissionByPublicId(
-  ctx: QueryCtx,
-  publicId: string
-): Promise<Commission | null> {
-  const user = await requireCurrentUser(ctx);
-  const commission = await ctx.db
-    .query('yourobcCourierCommissions')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .first();
-
-  if (!commission) return null;
-
-  if (!canViewCommission(commission, user)) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return commission;
-}
-
-/**
- * List commissions by courier
- */
-export async function listCommissionsByCourier(
-  ctx: QueryCtx,
-  courierId: CourierId,
-  options?: {
-    status?: 'pending' | 'paid';
-    includeDeleted?: boolean;
-  }
-): Promise<Commission[]> {
-  const user = await requireCurrentUser(ctx);
-
-  const commissions = await ctx.db
-    .query('yourobcCourierCommissions')
-    .withIndex('by_courier', (q) => q.eq('courierId', courierId))
-    .collect();
-
-  return commissions.filter((commission) => {
-    if (!canViewCommission(commission, user)) return false;
-    if (!options?.includeDeleted && commission.deletedAt) return false;
-    if (options?.status && commission.status !== options.status) return false;
-    return true;
-  });
-}
-
-/**
- * List commissions by shipment
- */
-export async function listCommissionsByShipment(
-  ctx: QueryCtx,
-  shipmentId: Id<'yourobcShipments'>,
-  includeDeleted?: boolean
-): Promise<Commission[]> {
-  const user = await requireCurrentUser(ctx);
-
-  const commissions = await ctx.db
-    .query('yourobcCourierCommissions')
-    .withIndex('by_shipment', (q) => q.eq('shipmentId', shipmentId))
-    .collect();
-
-  return commissions.filter((commission) => {
-    if (!canViewCommission(commission, user)) return false;
-    if (!includeDeleted && commission.deletedAt) return false;
-    return true;
-  });
-}
-
-/**
- * List all commissions
- */
-export async function listCommissions(
-  ctx: QueryCtx,
-  options?: {
-    status?: 'pending' | 'paid';
-    courierId?: CourierId;
-    includeDeleted?: boolean;
-  }
-): Promise<Commission[]> {
-  const user = await requireCurrentUser(ctx);
-  const commissions = await ctx.db.query('yourobcCourierCommissions').collect();
-
-  return commissions.filter((commission) => {
-    if (!canViewCommission(commission, user)) return false;
-    if (!options?.includeDeleted && commission.deletedAt) return false;
-    if (options?.status && commission.status !== options.status) return false;
-    if (options?.courierId && commission.courierId !== options.courierId) return false;
-    return true;
-  });
-}
-
-/**
- * Get commission summary for a courier
- */
-export async function getCommissionSummaryForCourier(
-  ctx: QueryCtx,
-  courierId: CourierId
-): Promise<{
-  totalPending: number;
-  totalPaid: number;
-  pendingAmount: number;
-  paidAmount: number;
-}> {
-  const user = await requireCurrentUser(ctx);
-
-  const commissions = await ctx.db
-    .query('yourobcCourierCommissions')
-    .withIndex('by_courier', (q) => q.eq('courierId', courierId))
-    .collect();
-
-  const filteredCommissions = commissions.filter((commission) => {
-    return canViewCommission(commission, user) && !commission.deletedAt;
-  });
-
-  const summary = {
-    totalPending: 0,
-    totalPaid: 0,
-    pendingAmount: 0,
-    paidAmount: 0,
-  };
-
-  for (const commission of filteredCommissions) {
-    if (commission.status === 'pending') {
-      summary.totalPending++;
-      summary.pendingAmount += commission.commissionAmount;
-    } else if (commission.status === 'paid') {
-      summary.totalPaid++;
-      summary.paidAmount += commission.commissionAmount;
+    if (!courier) {
+      throw new Error('Courier not found');
     }
-  }
 
-  return summary;
-}
+    await requireViewCourierAccess(ctx, courier, user);
+
+    return courier;
+  },
+});
+
+/**
+ * Get courier by name
+ */
+export const getCourierByName = query({
+  args: {
+    name: v.string(),
+  },
+  handler: async (ctx, { name }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const courier = await ctx.db
+      .query('yourobcCouriers')
+      .withIndex('by_name', (q) => q.eq('name', name))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!courier) {
+      throw new Error('Courier not found');
+    }
+
+    await requireViewCourierAccess(ctx, courier, user);
+
+    return courier;
+  },
+});
+
+/**
+ * Get preferred couriers
+ */
+export const getPreferredCouriers = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
+
+    let couriers = await ctx.db
+      .query('yourobcCouriers')
+      .withIndex('by_isPreferred', (q) => q.eq('isPreferred', true))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    couriers = await filterCouriersByAccess(ctx, couriers, user);
+
+    // Filter active only
+    couriers = couriers.filter((c) => c.status === 'active' && c.isActive);
+
+    // Sort by name
+    couriers.sort((a, b) => a.name.localeCompare(b.name));
+
+    return couriers;
+  },
+});
+
+/**
+ * Get couriers by service type
+ */
+export const getCouriersByServiceType = query({
+  args: {
+    serviceType: couriersValidators.serviceType,
+  },
+  handler: async (ctx, { serviceType }) => {
+    const user = await requireCurrentUser(ctx);
+
+    let couriers = await ctx.db
+      .query('yourobcCouriers')
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    couriers = await filterCouriersByAccess(ctx, couriers, user);
+
+    // Filter by service type
+    couriers = couriers.filter((c) => c.serviceTypes.includes(serviceType));
+
+    // Filter active only
+    couriers = couriers.filter((c) => c.status === 'active' && c.isActive);
+
+    // Sort by preferred, then name
+    couriers.sort((a, b) => {
+      if (a.isPreferred !== b.isPreferred) {
+        return a.isPreferred ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    return couriers;
+  },
+});
+
+/**
+ * Get couriers covering a country
+ */
+export const getCouriersByCountry = query({
+  args: {
+    countryCode: v.string(),
+  },
+  handler: async (ctx, { countryCode }) => {
+    const user = await requireCurrentUser(ctx);
+
+    let couriers = await ctx.db
+      .query('yourobcCouriers')
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    couriers = await filterCouriersByAccess(ctx, couriers, user);
+
+    // Filter by country coverage
+    const upperCountryCode = countryCode.toUpperCase();
+    couriers = couriers.filter((c) => c.serviceCoverage.countries.includes(upperCountryCode));
+
+    // Filter active only
+    couriers = couriers.filter((c) => c.status === 'active' && c.isActive);
+
+    // Sort by preferred, then name
+    couriers.sort((a, b) => {
+      if (a.isPreferred !== b.isPreferred) {
+        return a.isPreferred ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    return couriers;
+  },
+});
+
+/**
+ * Get courier statistics
+ */
+export const getCourierStats = query({
+  args: {},
+  handler: async (ctx): Promise<CourierStatsResponse> => {
+    const user = await requireCurrentUser(ctx);
+
+    let couriers = await ctx.db
+      .query('yourobcCouriers')
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    const accessible = await filterCouriersByAccess(ctx, couriers, user);
+
+    // Calculate stats
+    const byStatus = {
+      active: accessible.filter((c) => c.status === 'active').length,
+      inactive: accessible.filter((c) => c.status === 'inactive').length,
+      archived: accessible.filter((c) => c.status === 'archived').length,
+    };
+
+    const byServiceType: Record<string, number> = {};
+    accessible.forEach((c) => {
+      c.serviceTypes.forEach((st) => {
+        byServiceType[st] = (byServiceType[st] || 0) + 1;
+      });
+    });
+
+    const byPricingModel: Record<string, number> = {};
+    accessible.forEach((c) => {
+      byPricingModel[c.pricingModel] = (byPricingModel[c.pricingModel] || 0) + 1;
+    });
+
+    const withApiIntegration = accessible.filter((c) => c.apiIntegration?.enabled).length;
+    const preferredCouriers = accessible.filter((c) => c.isPreferred).length;
+    const activeCouriers = accessible.filter((c) => c.isActive).length;
+
+    // Calculate average reliability score
+    const reliabilityScores = accessible
+      .map((c) => c.metrics?.reliabilityScore)
+      .filter((score): score is number => score !== undefined);
+    const averageReliabilityScore =
+      reliabilityScores.length > 0
+        ? reliabilityScores.reduce((sum, score) => sum + score, 0) / reliabilityScores.length
+        : 0;
+
+    // Calculate average on-time rate
+    const onTimeRates = accessible
+      .map((c) => c.metrics?.onTimeDeliveryRate)
+      .filter((rate): rate is number => rate !== undefined);
+    const averageOnTimeRate =
+      onTimeRates.length > 0
+        ? onTimeRates.reduce((sum, rate) => sum + rate, 0) / onTimeRates.length
+        : 0;
+
+    return {
+      total: accessible.length,
+      byStatus,
+      byServiceType,
+      byPricingModel,
+      withApiIntegration,
+      preferredCouriers,
+      activeCouriers,
+      averageReliabilityScore: Math.round(averageReliabilityScore * 100) / 100,
+      averageOnTimeRate: Math.round(averageOnTimeRate * 100) / 100,
+    };
+  },
+});

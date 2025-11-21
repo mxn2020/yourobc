@@ -1,168 +1,150 @@
 // convex/lib/software/yourobc/accounting/permissions.ts
-/**
- * Accounting Permissions
- *
- * Permission checks and access control for accounting operations.
- *
- * @module convex/lib/software/yourobc/accounting/permissions
- */
+// Access control and authorization logic for accounting module
 
-import { QueryCtx, MutationCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { AccountingEntry } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if user can view accounting data
- */
-export async function canViewAccounting(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// View Access
+// ============================================================================
+
+export async function canViewAccountingEntry(
   ctx: QueryCtx | MutationCtx,
-  ownerId: string
+  entry: AccountingEntry,
+  user: UserProfile
 ): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  const userId = identity.subject
-  // TODO: Implement actual permission logic based on your auth system
-  // For now, basic check that user belongs to the organization
-  return true
+  // Owner can view
+  if (entry.ownerId === user._id) return true;
+
+  // Creator can view
+  if (entry.createdBy === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can modify accounting data
- */
-export async function canModifyAccounting(
+export async function requireViewAccountingEntryAccess(
   ctx: QueryCtx | MutationCtx,
-  ownerId: string
-): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
-
-  const userId = identity.subject
-  // TODO: Implement role-based access control
-  // Only finance/accounting users should be able to modify
-  return true
-}
-
-/**
- * Check if user can approve invoices
- */
-export async function canApproveInvoices(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
-): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
-
-  const userId = identity.subject
-  // TODO: Implement role check for invoice approval
-  // Only managers or authorized approvers
-  return true
-}
-
-/**
- * Check if user can generate statements
- */
-export async function canGenerateStatements(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
-): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
-
-  const userId = identity.subject
-  // TODO: Implement role check for statement generation
-  return true
-}
-
-/**
- * Check if user can view dashboard cache
- */
-export async function canViewDashboard(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
-): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
-
-  const userId = identity.subject
-  // TODO: Implement dashboard access control
-  return true
-}
-
-/**
- * Check if user can manage invoice numbering
- */
-export async function canManageInvoiceNumbering(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
-): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    return false
-  }
-
-  const userId = identity.subject
-  // TODO: Implement admin-only check for invoice numbering
-  return true
-}
-
-/**
- * Assert user has permission to view accounting data
- */
-export async function assertCanViewAccounting(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
+  entry: AccountingEntry,
+  user: UserProfile
 ): Promise<void> {
-  const hasPermission = await canViewAccounting(ctx, ownerId)
-  if (!hasPermission) {
-    throw new Error('Permission denied: Cannot view accounting data')
+  if (!(await canViewAccountingEntry(ctx, entry, user))) {
+    throw new Error('You do not have permission to view this accounting entry');
   }
 }
 
-/**
- * Assert user has permission to modify accounting data
- */
-export async function assertCanModifyAccounting(
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+export async function canEditAccountingEntry(
   ctx: QueryCtx | MutationCtx,
-  ownerId: string
+  entry: AccountingEntry,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (entry.ownerId === user._id) return true;
+
+  // Check if entry is locked (only draft/pending can be edited)
+  if (entry.status !== 'draft' && entry.status !== 'pending') {
+    // Only admins can edit posted/reconciled entries
+    return false;
+  }
+
+  return false;
+}
+
+export async function requireEditAccountingEntryAccess(
+  ctx: QueryCtx | MutationCtx,
+  entry: AccountingEntry,
+  user: UserProfile
 ): Promise<void> {
-  const hasPermission = await canModifyAccounting(ctx, ownerId)
-  if (!hasPermission) {
-    throw new Error('Permission denied: Cannot modify accounting data')
+  if (!(await canEditAccountingEntry(ctx, entry, user))) {
+    throw new Error('You do not have permission to edit this accounting entry');
   }
 }
 
-/**
- * Assert user has permission to approve invoices
- */
-export async function assertCanApproveInvoices(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteAccountingEntry(
+  entry: AccountingEntry,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owners can only delete draft entries
+  if (entry.ownerId === user._id && entry.status === 'draft') return true;
+
+  return false;
+}
+
+export async function requireDeleteAccountingEntryAccess(
+  entry: AccountingEntry,
+  user: UserProfile
 ): Promise<void> {
-  const hasPermission = await canApproveInvoices(ctx, ownerId)
-  if (!hasPermission) {
-    throw new Error('Permission denied: Cannot approve invoices')
+  if (!(await canDeleteAccountingEntry(entry, user))) {
+    throw new Error('You do not have permission to delete this accounting entry');
   }
 }
 
-/**
- * Assert user has permission to generate statements
- */
-export async function assertCanGenerateStatements(
-  ctx: QueryCtx | MutationCtx,
-  ownerId: string
+// ============================================================================
+// Approve Access
+// ============================================================================
+
+export async function canApproveAccountingEntry(
+  entry: AccountingEntry,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins can approve
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Entry must be in pending status
+  if (entry.status !== 'pending') return false;
+
+  return false;
+}
+
+export async function requireApproveAccountingEntryAccess(
+  entry: AccountingEntry,
+  user: UserProfile
 ): Promise<void> {
-  const hasPermission = await canGenerateStatements(ctx, ownerId)
-  if (!hasPermission) {
-    throw new Error('Permission denied: Cannot generate statements')
+  if (!(await canApproveAccountingEntry(entry, user))) {
+    throw new Error('You do not have permission to approve this accounting entry');
   }
+}
+
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterAccountingEntriesByAccess(
+  ctx: QueryCtx | MutationCtx,
+  entries: AccountingEntry[],
+  user: UserProfile
+): Promise<AccountingEntry[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return entries;
+  }
+
+  const accessible: AccountingEntry[] = [];
+
+  for (const entry of entries) {
+    if (await canViewAccountingEntry(ctx, entry, user)) {
+      accessible.push(entry);
+    }
+  }
+
+  return accessible;
 }

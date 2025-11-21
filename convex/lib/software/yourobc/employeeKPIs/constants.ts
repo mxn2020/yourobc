@@ -1,75 +1,47 @@
 // convex/lib/software/yourobc/employeeKPIs/constants.ts
-/**
- * Employee KPIs Constants
- *
- * Constants and configuration values for employee KPIs and targets.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/constants
- */
+// Business constants, permissions, and limits for employeeKPIs module
 
-/**
- * Default KPI values
- */
-export const DEFAULT_KPI_VALUES = {
-  quotesCreated: 0,
-  quotesConverted: 0,
-  quotesValue: 0,
-  convertedValue: 0,
-  ordersProcessed: 0,
-  ordersCompleted: 0,
-  ordersValue: 0,
-  averageOrderValue: 0,
-  commissionsEarned: 0,
-  commissionsPaid: 0,
-  commissionsPending: 0,
-  conversionRate: 0,
-  averageQuoteValue: 0,
-} as const
+export const EMPLOYEE_KPIS_CONSTANTS = {
+  PERMISSIONS: {
+    VIEW: 'employeeKPIs:view',
+    CREATE: 'employeeKPIs:create',
+    EDIT: 'employeeKPIs:edit',
+    DELETE: 'employeeKPIs:delete',
+    BULK_EDIT: 'employeeKPIs:bulk_edit',
+    VIEW_ALL: 'employeeKPIs:view_all',
+  },
 
-/**
- * Ranking metrics
- */
-export const RANKING_METRICS = [
-  'orders',
-  'revenue',
-  'conversion',
-  'commissions',
-] as const
+  STATUS: {
+    ON_TRACK: 'on_track',
+    AT_RISK: 'at_risk',
+    BEHIND: 'behind',
+    ACHIEVED: 'achieved',
+  },
 
-/**
- * Target periods
- */
-export const TARGET_PERIODS = {
-  MONTHLY: 'monthly',
-  QUARTERLY: 'quarterly',
-  YEARLY: 'yearly',
-} as const
+  PERIOD: {
+    DAILY: 'daily',
+    WEEKLY: 'weekly',
+    MONTHLY: 'monthly',
+    QUARTERLY: 'quarterly',
+    YEARLY: 'yearly',
+  },
 
-/**
- * Quarter months mapping
- */
-export const QUARTER_MONTHS = {
-  1: [1, 2, 3],
-  2: [4, 5, 6],
-  3: [7, 8, 9],
-  4: [10, 11, 12],
-} as const
+  LIMITS: {
+    MAX_KPI_NAME_LENGTH: 200,
+    MIN_KPI_NAME_LENGTH: 3,
+    MAX_DESCRIPTION_LENGTH: 2000,
+    MAX_NOTES_LENGTH: 2000,
+    MAX_HISTORICAL_DATA_ENTRIES: 365,
+    MIN_TARGET_VALUE: 0,
+    MIN_CURRENT_VALUE: 0,
+  },
 
-/**
- * Performance thresholds
- */
-export const PERFORMANCE_THRESHOLDS = {
-  EXCELLENT: 120, // 120% of target
-  GOOD: 100, // 100% of target
-  NEEDS_IMPROVEMENT: 80, // 80% of target
-} as const
+  THRESHOLDS: {
+    DEFAULT_WARNING_THRESHOLD: 80, // 80% of target
+    DEFAULT_CRITICAL_THRESHOLD: 60, // 60% of target
+  },
 
-/**
- * Display field for KPIs
- */
-export const KPI_DISPLAY_FIELD = 'metricName' as const
-
-/**
- * Display field for targets
- */
-export const TARGET_DISPLAY_FIELD = 'period' as const
+  VALIDATION: {
+    KPI_NAME_PATTERN: /^[a-zA-Z0-9\s\-_()%]+$/,
+  },
+} as const;

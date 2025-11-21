@@ -1,117 +1,93 @@
 // convex/schema/software/yourobc/trackingMessages/trackingMessages.ts
-/**
- * Tracking Messages Table Definition
- *
- * Defines the schema for tracking message templates used in shipment notifications.
- * These templates are used to generate automated communications for different
- * shipment statuses across multiple languages and service types.
- *
- * @module convex/schema/software/yourobc/trackingMessages/trackingMessages
- */
+// Table definitions for trackingMessages module
 
-import { v } from 'convex/values'
-import { defineTable } from 'convex/server'
-import {
-  quoteServiceTypeValidator,
-  shipmentStatusValidator,
-  languageValidator,
-  messageCategoryValidator,
-  difficultyValidator,
-  visibilityValidator,
-  auditFields,
-  softDeleteFields,
-  metadataSchema,
-  statsSchema,
-} from '../../../yourobc/base'
-import { templateVariablesValidator } from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, softDeleteFields } from '@/schema/base';
+import { trackingMessagesValidators } from './validators';
 
-// ============================================================================
-// Tracking Messages Table
-// ============================================================================
-
-/**
- * Tracking messages table
- * Stores reusable message templates for shipment tracking notifications.
- * Each template can be customized per service type, status, and language.
- *
- * Key Features:
- * - Multi-language support (en, de)
- * - Service-specific templates (OBC, NFO)
- * - Status-based message templates
- * - Variable substitution for dynamic content
- * - Official vs user-created templates
- * - Usage statistics and ratings
- *
- * Display Field: subject (primary) or template preview
- */
 export const trackingMessagesTable = defineTable({
-  // Public Identity
-  publicId: v.string(), // Public-facing unique identifier (e.g., 'tmsg_abc123')
+  // Required: Main display field
+  messageId: v.string(), // Auto-generated or custom identifier
 
-  // Core Identity
-  name: v.string(), // Template name (e.g., 'OBC Booking Confirmation - EN')
-  description: v.optional(v.string()), // Template description/purpose
-  icon: v.optional(v.string()), // Icon identifier for message type
-  thumbnail: v.optional(v.string()), // Preview image if applicable
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
 
-  // Service Classification
-  serviceType: quoteServiceTypeValidator, // OBC, NFO
-  status: shipmentStatusValidator, // quoted, booked, pickup, in_transit, delivered, etc.
+  // Message details
+  status: trackingMessagesValidators.status,
+  messageType: trackingMessagesValidators.messageType,
+  priority: v.optional(trackingMessagesValidators.priority),
 
-  // Message Configuration
-  language: languageValidator, // en, de
+  // Message content
+  subject: v.optional(v.string()),
+  content: v.string(),
+  templateId: v.optional(v.string()),
 
-  // Template Content
-  subject: v.optional(v.string()), // Email subject line (main display field)
-  template: v.string(), // Message template with {variable} placeholders
-  variables: templateVariablesValidator, // List of variables used in template
+  // Shipment reference
+  shipmentId: v.optional(v.id('yourobcShipments')),
+  shipmentNumber: v.optional(v.string()),
 
-  // Status
-  isActive: v.boolean(), // Whether this template is currently active
+  // Recipients
+  recipients: v.array(v.object({
+    email: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    name: v.optional(v.string()),
+    userId: v.optional(v.id('userProfiles')),
+  })),
+
+  // Delivery tracking
+  deliveryChannel: v.optional(trackingMessagesValidators.deliveryChannel),
+  sentAt: v.optional(v.number()),
+  deliveredAt: v.optional(v.number()),
+  readAt: v.optional(v.number()),
+  readBy: v.optional(v.id('userProfiles')),
+
+  // Attachments
+  attachments: v.optional(v.array(v.object({
+    id: v.string(),
+    name: v.string(),
+    url: v.string(),
+    type: v.string(),
+    size: v.optional(v.number()),
+  }))),
+
+  // Timeline tracking
+  timelineEvents: v.optional(v.array(v.object({
+    id: v.string(),
+    timestamp: v.number(),
+    event: v.string(),
+    description: v.optional(v.string()),
+    userId: v.optional(v.id('userProfiles')),
+  }))),
+
+  // Routing info
+  routingInfo: v.optional(v.object({
+    origin: v.optional(v.string()),
+    destination: v.optional(v.string()),
+    currentLocation: v.optional(v.string()),
+    estimatedDelivery: v.optional(v.number()),
+  })),
 
   // Classification
-  ...metadataSchema, // tags, category, customFields
-  useCase: v.optional(v.string()), // Use case description
-  difficulty: v.optional(difficultyValidator), // Template complexity: beginner, intermediate, advanced
-  visibility: v.optional(visibilityValidator), // public, private, shared, organization
+  tags: v.optional(v.array(v.string())),
+  category: v.optional(v.string()),
 
-  // Ownership
-  ownerId: v.string(), // authUserId - template creator/owner
-  isOfficial: v.optional(v.boolean()), // System templates vs user-created templates
-
-  // Usage Statistics
-  stats: v.optional(statsSchema), // usageCount, rating, ratingCount - tracks template usage
-
-  // Audit & Soft Delete
-  ...auditFields, // createdAt, createdBy, updatedAt, updatedBy
-  ...softDeleteFields, // deletedAt, deletedBy
-
-  // Classification
-  category: v.optional(messageCategoryValidator), // booking, pickup, in_transit, delivery, customs, general
+  // Required: Audit fields
+  ...auditFields,
+  ...softDeleteFields,
 })
-  // Core indexes
-  .index('by_publicId', ['publicId'])
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_message_id', ['messageId'])
   .index('by_owner', ['ownerId'])
-  .index('by_deleted', ['deletedAt'])
-  .index('by_created', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt'])
 
-  // Feature indexes
-  .index('by_serviceType', ['serviceType'])
+  // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_language', ['language'])
-  .index('by_official', ['isOfficial'])
-  .index('by_active', ['isActive'])
-  .index('by_category', ['category'])
-
-  // Composite indexes for common queries
-  .index('by_serviceType_status', ['serviceType', 'status'])
-  .index('by_serviceType_status_language', ['serviceType', 'status', 'language'])
-  .index('by_owner_and_active', ['ownerId', 'isActive'])
-  .index('by_owner_deleted', ['ownerId', 'deletedAt'])
-  .index('by_active_deleted', ['isActive', 'deletedAt'])
-
-// ============================================================================
-// Export
-// ============================================================================
-
-export default trackingMessagesTable
+  .index('by_shipment', ['shipmentId'])
+  .index('by_message_type', ['messageType'])
+  .index('by_sent_at', ['sentAt'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_shipment_and_type', ['shipmentId', 'messageType'])
+  .index('by_created_at', ['createdAt']);

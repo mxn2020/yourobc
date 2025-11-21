@@ -1,568 +1,701 @@
 // convex/lib/software/yourobc/shipments/mutations.ts
 // Write operations for shipments module
 
-import type { MutationCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
-import type {
-  Shipment,
-  ShipmentId,
-  ShipmentStatusHistory,
-  ShipmentStatusHistoryId,
-  CreateShipmentInput,
-  UpdateShipmentInput,
-  CreateShipmentStatusHistoryInput,
-  UpdateShipmentStatusHistoryInput,
-  ShipmentStatus,
-} from '@/schema/software/yourobc/shipments';
-import type { StatusChangeData, SlaUpdateData, AssignmentData } from './types';
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { shipmentsValidators } from '@/schema/software/yourobc/shipments/validators';
+import { SHIPMENTS_CONSTANTS } from './constants';
+import { validateShipmentData, trimShipmentData, calculateChargeableWeight } from './utils';
 import {
+  requireEditShipmentAccess,
+  requireDeleteShipmentAccess,
+  requireUpdateShipmentStatusAccess,
   canEditShipment,
   canDeleteShipment,
-  canRestoreShipment,
-  canEditStatusHistory,
-  canDeleteStatusHistory,
-  canRestoreStatusHistory,
-  requireEditPermission,
-  requireDeletePermission,
-  requireRestorePermission,
-  requireEditStatusHistoryPermission,
-  requireDeleteStatusHistoryPermission,
-  requireRestoreStatusHistoryPermission,
-  validateShipmentExists,
-  validateStatusHistoryExists,
 } from './permissions';
-import {
-  validateShipmentData,
-  validateShipmentUpdateData,
-  validateStatusHistoryData,
-  validateStatusHistoryUpdateData,
-  validateStatusTransition,
-  generatePublicId,
-  generateStatusHistoryPublicId,
-  updateSla,
-  calculateSlaStatus,
-  calculateRemainingHours,
-} from './utils';
-import { SHIPMENTS_CONSTANTS } from './constants';
+import type { ShipmentId } from './types';
+
+// Address schema validator for args
+const addressValidator = v.object({
+  street: v.optional(v.string()),
+  city: v.string(),
+  postalCode: v.optional(v.string()),
+  country: v.string(),
+  countryCode: v.string(),
+});
+
+// Dimensions schema validator for args
+const dimensionsValidator = v.object({
+  length: v.number(),
+  width: v.number(),
+  height: v.number(),
+  weight: v.number(),
+  unit: v.union(v.literal('cm'), v.literal('inch')),
+  weightUnit: v.union(v.literal('kg'), v.literal('lb')),
+  chargeableWeight: v.optional(v.number()),
+});
+
+// Currency amount validator for args
+const currencyAmountValidator = v.object({
+  amount: v.number(),
+  currency: v.union(v.literal('EUR'), v.literal('USD')),
+  exchangeRate: v.optional(v.number()),
+  exchangeRateDate: v.optional(v.number()),
+});
+
+// SLA validator for args
+const slaValidator = v.object({
+  deadline: v.number(),
+  status: v.union(v.literal('on_time'), v.literal('warning'), v.literal('overdue')),
+  remainingHours: v.optional(v.number()),
+});
+
+// Scheduled time validator for args
+const scheduledTimeValidator = v.object({
+  utcTimestamp: v.number(),
+  timezone: v.string(),
+});
 
 /**
- * Get current user or throw error
+ * Create new shipment
  */
-async function requireCurrentUser(ctx: MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
+export const createShipment = mutation({
+  args: {
+    data: v.object({
+      shipmentNumber: v.string(),
+      awbNumber: v.optional(v.string()),
+      customerReference: v.optional(v.string()),
+      serviceType: shipmentsValidators.serviceType,
+      priority: shipmentsValidators.priority,
+      customerId: v.id('yourobcCustomers'),
+      quoteId: v.optional(v.id('yourobcQuotes')),
+      origin: addressValidator,
+      destination: addressValidator,
+      dimensions: dimensionsValidator,
+      description: v.string(),
+      specialInstructions: v.optional(v.string()),
+      currentStatus: v.optional(shipmentsValidators.status),
+      sla: slaValidator,
+      assignedCourierId: v.optional(v.id('yourobcCouriers')),
+      courierInstructions: v.optional(v.string()),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      partnerId: v.optional(v.id('yourobcPartners')),
+      partnerReference: v.optional(v.string()),
+      agreedPrice: currencyAmountValidator,
+      actualCosts: v.optional(currencyAmountValidator),
+      totalPrice: v.optional(currencyAmountValidator),
+      purchasePrice: v.optional(currencyAmountValidator),
+      commission: v.optional(currencyAmountValidator),
+      pickupTime: v.optional(scheduledTimeValidator),
+      deliveryTime: v.optional(scheduledTimeValidator),
+      communicationChannel: v.optional(v.object({
+        type: shipmentsValidators.communicationChannel,
+        identifier: v.optional(v.string()),
+      })),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.object({})),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<ShipmentId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
-
-  if (!user) {
-    throw new Error('User profile not found');
-  }
-
-  return user;
-}
-
-/**
- * Create an audit log entry
- */
-async function createAuditLog(
-  ctx: MutationCtx,
-  action: string,
-  entityType: string,
-  entityId: string,
-  entityTitle: string,
-  description: string,
-  userId: Id<'userProfiles'>,
-  userName: string,
-  metadata?: Record<string, any>
-): Promise<void> {
-  const now = Date.now();
-  await ctx.db.insert('auditLogs', {
-    userId,
-    userName,
-    action,
-    entityType,
-    entityId,
-    entityTitle,
-    description,
-    metadata: metadata || {},
-    createdAt: now,
-    createdBy: userId,
-    updatedAt: now,
-  });
-}
-
-// ============================================================================
-// Shipment Mutations
-// ============================================================================
-
-/**
- * Create shipment
- */
-export async function createShipment(
-  ctx: MutationCtx,
-  data: CreateShipmentInput
-): Promise<ShipmentId> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. VALIDATE: Check data validity
-  validateShipmentData(data);
-
-  // 3. CHECK: Verify shipment number is unique
-  const existingShipment = await ctx.db
-    .query('yourobcShipments')
-    .withIndex('by_shipmentNumber', (q) =>
-      q.eq('shipmentNumber', data.shipmentNumber)
-    )
-    .first();
-
-  if (existingShipment && !existingShipment.deletedAt) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.DUPLICATE_SHIPMENT_NUMBER);
-  }
-
-  // 4. PROCESS: Generate IDs and prepare data
-  const publicId = generatePublicId();
-  const now = Date.now();
-
-  // Update SLA with current status
-  const slaWithStatus = {
-    ...data.sla,
-    status: calculateSlaStatus(data.sla.deadline),
-    remainingHours: calculateRemainingHours(data.sla.deadline),
-  };
-
-  // 5. CREATE: Insert into database
-  const shipmentId = await ctx.db.insert('yourobcShipments', {
-    publicId,
-    shipmentNumber: data.shipmentNumber.trim(),
-    awbNumber: data.awbNumber?.trim(),
-    customerReference: data.customerReference?.trim(),
-    serviceType: data.serviceType,
-    priority: data.priority,
-    customerId: data.customerId,
-    quoteId: data.quoteId,
-    origin: data.origin,
-    destination: data.destination,
-    dimensions: data.dimensions,
-    description: data.description.trim(),
-    specialInstructions: data.specialInstructions?.trim(),
-    currentStatus: data.currentStatus,
-    sla: slaWithStatus,
-    nextTask: data.nextTask,
-    assignedCourierId: data.assignedCourierId,
-    courierInstructions: data.courierInstructions?.trim(),
-    employeeId: data.employeeId,
-    partnerId: data.partnerId,
-    partnerReference: data.partnerReference?.trim(),
-    routing: data.routing,
-    agreedPrice: data.agreedPrice,
-    actualCosts: data.actualCosts,
-    totalPrice: data.totalPrice,
-    purchasePrice: data.purchasePrice,
-    commission: data.commission,
-    documentStatus: data.documentStatus,
-    customsInfo: data.customsInfo,
-    pickupTime: data.pickupTime,
-    deliveryTime: data.deliveryTime,
-    communicationChannel: data.communicationChannel,
-    completedAt: undefined,
-    tags: data.tags || [],
-    category: data.category,
-    customFields: {},
-    ownerId: user._id,
-    createdBy: user._id,
-    createdAt: now,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
-
-  // 6. CREATE STATUS HISTORY: Create initial status history entry
-  await createShipmentStatusHistory(ctx, {
-    shipmentId,
-    status: data.currentStatus,
-    timestamp: now,
-    notes: 'Shipment created',
-  });
-
-  // 7. AUDIT: Log the creation
-  await createAuditLog(
-    ctx,
-    'create',
-    'shipment',
-    shipmentId,
-    data.shipmentNumber,
-    `Created shipment ${data.shipmentNumber}`,
-    user._id,
-    user.name || user.email || 'Unknown'
-  );
-
-  return shipmentId;
-}
-
-/**
- * Update shipment
- */
-export async function updateShipment(
-  ctx: MutationCtx,
-  shipmentId: ShipmentId,
-  data: UpdateShipmentInput
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. VALIDATE: Check data validity
-  validateShipmentUpdateData(data);
-
-  // 3. GET: Fetch existing shipment
-  const shipment = await ctx.db.get(shipmentId);
-  validateShipmentExists(shipment);
-
-  // 4. PERMISSION: Check edit permission
-  requireEditPermission(shipment, user);
-
-  // 5. CHECK: If updating shipment number, verify it's unique
-  if (data.shipmentNumber && data.shipmentNumber !== shipment.shipmentNumber) {
-    const existingShipment = await ctx.db
-      .query('yourobcShipments')
-      .withIndex('by_shipmentNumber', (q) =>
-        q.eq('shipmentNumber', data.shipmentNumber)
-      )
-      .first();
-
-    if (existingShipment && existingShipment._id !== shipmentId && !existingShipment.deletedAt) {
-      throw new Error(SHIPMENTS_CONSTANTS.ERRORS.DUPLICATE_SHIPMENT_NUMBER);
-    }
-  }
-
-  // 6. PROCESS: Prepare update data
-  const now = Date.now();
-  const updates: Partial<Shipment> = {
-    updatedBy: user._id,
-    updatedAt: now,
-  };
-
-  // Add fields that are being updated
-  if (data.shipmentNumber !== undefined) updates.shipmentNumber = data.shipmentNumber.trim();
-  if (data.awbNumber !== undefined) updates.awbNumber = data.awbNumber?.trim();
-  if (data.customerReference !== undefined) updates.customerReference = data.customerReference?.trim();
-  if (data.serviceType !== undefined) updates.serviceType = data.serviceType;
-  if (data.priority !== undefined) updates.priority = data.priority;
-  if (data.customerId !== undefined) updates.customerId = data.customerId;
-  if (data.quoteId !== undefined) updates.quoteId = data.quoteId;
-  if (data.origin !== undefined) updates.origin = data.origin;
-  if (data.destination !== undefined) updates.destination = data.destination;
-  if (data.dimensions !== undefined) updates.dimensions = data.dimensions;
-  if (data.description !== undefined) updates.description = data.description.trim();
-  if (data.specialInstructions !== undefined) updates.specialInstructions = data.specialInstructions?.trim();
-  if (data.nextTask !== undefined) updates.nextTask = data.nextTask;
-  if (data.assignedCourierId !== undefined) updates.assignedCourierId = data.assignedCourierId;
-  if (data.courierInstructions !== undefined) updates.courierInstructions = data.courierInstructions?.trim();
-  if (data.employeeId !== undefined) updates.employeeId = data.employeeId;
-  if (data.partnerId !== undefined) updates.partnerId = data.partnerId;
-  if (data.partnerReference !== undefined) updates.partnerReference = data.partnerReference?.trim();
-  if (data.routing !== undefined) updates.routing = data.routing;
-  if (data.agreedPrice !== undefined) updates.agreedPrice = data.agreedPrice;
-  if (data.actualCosts !== undefined) updates.actualCosts = data.actualCosts;
-  if (data.totalPrice !== undefined) updates.totalPrice = data.totalPrice;
-  if (data.purchasePrice !== undefined) updates.purchasePrice = data.purchasePrice;
-  if (data.commission !== undefined) updates.commission = data.commission;
-  if (data.documentStatus !== undefined) updates.documentStatus = data.documentStatus;
-  if (data.customsInfo !== undefined) updates.customsInfo = data.customsInfo;
-  if (data.pickupTime !== undefined) updates.pickupTime = data.pickupTime;
-  if (data.deliveryTime !== undefined) updates.deliveryTime = data.deliveryTime;
-  if (data.communicationChannel !== undefined) updates.communicationChannel = data.communicationChannel;
-  if (data.completedAt !== undefined) updates.completedAt = data.completedAt;
-  if (data.tags !== undefined) updates.tags = data.tags;
-  if (data.category !== undefined) updates.category = data.category;
-
-  // Handle SLA update
-  if (data.sla !== undefined) {
-    updates.sla = {
-      ...data.sla,
-      status: calculateSlaStatus(data.sla.deadline),
-      remainingHours: calculateRemainingHours(data.sla.deadline),
-    };
-  }
-
-  // Handle status change
-  if (data.currentStatus !== undefined && data.currentStatus !== shipment.currentStatus) {
-    validateStatusTransition(shipment.currentStatus, data.currentStatus);
-    updates.currentStatus = data.currentStatus;
-
-    // Create status history entry
-    await createShipmentStatusHistory(ctx, {
-      shipmentId,
-      status: data.currentStatus,
-      timestamp: now,
-      notes: 'Status changed',
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, SHIPMENTS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
     });
-  }
 
-  // 7. UPDATE: Apply updates
-  await ctx.db.patch(shipmentId, updates);
+    // 3. VALIDATE: Check data validity
+    const errors = validateShipmentData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // 8. AUDIT: Log the update
-  await createAuditLog(
-    ctx,
-    'update',
-    'shipment',
-    shipmentId,
-    updates.shipmentNumber || shipment.shipmentNumber,
-    `Updated shipment ${updates.shipmentNumber || shipment.shipmentNumber}`,
-    user._id,
-    user.name || user.email || 'Unknown',
-    { updates }
-  );
-}
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'yourobcShipments');
+    const now = Date.now();
+
+    // Calculate chargeable weight
+    const chargeableWeight = calculateChargeableWeight(data.dimensions);
+    const dimensions = {
+      ...data.dimensions,
+      chargeableWeight,
+    };
+
+    // Trim string fields
+    const trimmedData = trimShipmentData(data);
+
+    // 5. CREATE: Insert into database
+    const shipmentId = await ctx.db.insert('yourobcShipments', {
+      publicId,
+      shipmentNumber: trimmedData.shipmentNumber,
+      awbNumber: trimmedData.awbNumber,
+      customerReference: trimmedData.customerReference,
+      serviceType: trimmedData.serviceType,
+      priority: trimmedData.priority,
+      customerId: trimmedData.customerId,
+      quoteId: trimmedData.quoteId,
+      origin: trimmedData.origin,
+      destination: trimmedData.destination,
+      dimensions,
+      description: trimmedData.description,
+      specialInstructions: trimmedData.specialInstructions,
+      currentStatus: trimmedData.currentStatus || 'quoted',
+      sla: trimmedData.sla,
+      nextTask: undefined,
+      assignedCourierId: trimmedData.assignedCourierId,
+      courierInstructions: trimmedData.courierInstructions,
+      employeeId: trimmedData.employeeId,
+      partnerId: trimmedData.partnerId,
+      partnerReference: trimmedData.partnerReference,
+      routing: undefined,
+      agreedPrice: trimmedData.agreedPrice,
+      actualCosts: trimmedData.actualCosts,
+      totalPrice: trimmedData.totalPrice,
+      purchasePrice: trimmedData.purchasePrice,
+      commission: trimmedData.commission,
+      documentStatus: undefined,
+      customsInfo: undefined,
+      pickupTime: trimmedData.pickupTime,
+      deliveryTime: trimmedData.deliveryTime,
+      communicationChannel: trimmedData.communicationChannel,
+      completedAt: undefined,
+      tags: trimmedData.tags || [],
+      category: trimmedData.category,
+      customFields: trimmedData.customFields,
+      ownerId: user._id,
+      createdBy: user._id,
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Create initial status history entry
+    await ctx.db.insert('yourobcShipmentStatusHistory', {
+      shipmentId,
+      status: trimmedData.currentStatus || 'quoted',
+      timestamp: now,
+      notes: 'Shipment created',
+      createdBy: user._id,
+      createdAt: now,
+    });
+
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.created',
+      entityType: 'system_shipment',
+      entityId: publicId,
+      entityTitle: trimmedData.shipmentNumber,
+      description: `Created shipment: ${trimmedData.shipmentNumber}`,
+      metadata: {
+        status: trimmedData.currentStatus || 'quoted',
+        serviceType: trimmedData.serviceType,
+        customerId: trimmedData.customerId,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 7. RETURN: Return entity ID
+    return shipmentId;
+  },
+});
 
 /**
- * Change shipment status
+ * Update existing shipment
  */
-export async function changeShipmentStatus(
-  ctx: MutationCtx,
-  data: StatusChangeData
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
+export const updateShipment = mutation({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+    updates: v.object({
+      shipmentNumber: v.optional(v.string()),
+      awbNumber: v.optional(v.string()),
+      customerReference: v.optional(v.string()),
+      serviceType: v.optional(shipmentsValidators.serviceType),
+      priority: v.optional(shipmentsValidators.priority),
+      description: v.optional(v.string()),
+      specialInstructions: v.optional(v.string()),
+      currentStatus: v.optional(shipmentsValidators.status),
+      assignedCourierId: v.optional(v.id('yourobcCouriers')),
+      courierInstructions: v.optional(v.string()),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      partnerId: v.optional(v.id('yourobcPartners')),
+      partnerReference: v.optional(v.string()),
+      actualCosts: v.optional(currencyAmountValidator),
+      totalPrice: v.optional(currencyAmountValidator),
+      purchasePrice: v.optional(currencyAmountValidator),
+      commission: v.optional(currencyAmountValidator),
+      pickupTime: v.optional(scheduledTimeValidator),
+      deliveryTime: v.optional(scheduledTimeValidator),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { shipmentId, updates }): Promise<ShipmentId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const shipment = await ctx.db.get(data.shipmentId);
-  validateShipmentExists(shipment);
-  requireEditPermission(shipment, user);
+    // 2. CHECK: Verify entity exists
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment || shipment.deletedAt) {
+      throw new Error('Shipment not found');
+    }
 
-  // Validate status transition
-  validateStatusTransition(shipment.currentStatus, data.newStatus);
+    // 3. AUTHZ: Check edit permission
+    await requireEditShipmentAccess(ctx, shipment, user);
 
-  const now = Date.now();
+    // 4. VALIDATE: Check update data validity
+    const errors = validateShipmentData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // Update shipment status
-  await ctx.db.patch(data.shipmentId, {
-    currentStatus: data.newStatus,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const trimmedUpdates = trimShipmentData(updates);
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
 
-  // Create status history entry
-  await createShipmentStatusHistory(ctx, {
-    shipmentId: data.shipmentId,
-    status: data.newStatus,
-    timestamp: now,
-    location: data.location,
-    notes: data.notes,
-    metadata: data.metadata,
-  });
+    if (trimmedUpdates.shipmentNumber !== undefined) {
+      updateData.shipmentNumber = trimmedUpdates.shipmentNumber;
+    }
+    if (trimmedUpdates.awbNumber !== undefined) {
+      updateData.awbNumber = trimmedUpdates.awbNumber;
+    }
+    if (trimmedUpdates.customerReference !== undefined) {
+      updateData.customerReference = trimmedUpdates.customerReference;
+    }
+    if (trimmedUpdates.serviceType !== undefined) {
+      updateData.serviceType = trimmedUpdates.serviceType;
+    }
+    if (trimmedUpdates.priority !== undefined) {
+      updateData.priority = trimmedUpdates.priority;
+    }
+    if (trimmedUpdates.description !== undefined) {
+      updateData.description = trimmedUpdates.description;
+    }
+    if (trimmedUpdates.specialInstructions !== undefined) {
+      updateData.specialInstructions = trimmedUpdates.specialInstructions;
+    }
+    if (trimmedUpdates.currentStatus !== undefined) {
+      updateData.currentStatus = trimmedUpdates.currentStatus;
+    }
+    if (trimmedUpdates.assignedCourierId !== undefined) {
+      updateData.assignedCourierId = trimmedUpdates.assignedCourierId;
+    }
+    if (trimmedUpdates.courierInstructions !== undefined) {
+      updateData.courierInstructions = trimmedUpdates.courierInstructions;
+    }
+    if (trimmedUpdates.employeeId !== undefined) {
+      updateData.employeeId = trimmedUpdates.employeeId;
+    }
+    if (trimmedUpdates.partnerId !== undefined) {
+      updateData.partnerId = trimmedUpdates.partnerId;
+    }
+    if (trimmedUpdates.partnerReference !== undefined) {
+      updateData.partnerReference = trimmedUpdates.partnerReference;
+    }
+    if (trimmedUpdates.actualCosts !== undefined) {
+      updateData.actualCosts = trimmedUpdates.actualCosts;
+    }
+    if (trimmedUpdates.totalPrice !== undefined) {
+      updateData.totalPrice = trimmedUpdates.totalPrice;
+    }
+    if (trimmedUpdates.purchasePrice !== undefined) {
+      updateData.purchasePrice = trimmedUpdates.purchasePrice;
+    }
+    if (trimmedUpdates.commission !== undefined) {
+      updateData.commission = trimmedUpdates.commission;
+    }
+    if (trimmedUpdates.pickupTime !== undefined) {
+      updateData.pickupTime = trimmedUpdates.pickupTime;
+    }
+    if (trimmedUpdates.deliveryTime !== undefined) {
+      updateData.deliveryTime = trimmedUpdates.deliveryTime;
+    }
+    if (trimmedUpdates.tags !== undefined) {
+      updateData.tags = trimmedUpdates.tags;
+    }
+    if (trimmedUpdates.category !== undefined) {
+      updateData.category = trimmedUpdates.category;
+    }
 
-  // Audit log
-  await createAuditLog(
-    ctx,
-    'status_change',
-    'shipment',
-    data.shipmentId,
-    shipment.shipmentNumber,
-    `Changed status from ${shipment.currentStatus} to ${data.newStatus}`,
-    user._id,
-    user.name || user.email || 'Unknown',
-    { oldStatus: shipment.currentStatus, newStatus: data.newStatus }
-  );
-}
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(shipmentId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.updated',
+      entityType: 'system_shipment',
+      entityId: shipment.publicId,
+      entityTitle: updateData.shipmentNumber || shipment.shipmentNumber,
+      description: `Updated shipment: ${updateData.shipmentNumber || shipment.shipmentNumber}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return shipmentId;
+  },
+});
+
+/**
+ * Update shipment status
+ */
+export const updateShipmentStatus = mutation({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+    status: shipmentsValidators.status,
+    location: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    metadata: v.optional(v.object({
+      flightNumber: v.optional(v.string()),
+      estimatedArrival: v.optional(v.number()),
+      delayReason: v.optional(v.string()),
+      podReceived: v.optional(v.boolean()),
+      customerSignature: v.optional(v.string()),
+    })),
+  },
+  handler: async (ctx, { shipmentId, status, location, notes, metadata }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment || shipment.deletedAt) {
+      throw new Error('Shipment not found');
+    }
+
+    // 3. AUTHZ: Check status update permission
+    await requireUpdateShipmentStatusAccess(ctx, shipment, user);
+
+    // 4. UPDATE: Change status
+    const now = Date.now();
+    await ctx.db.patch(shipmentId, {
+      currentStatus: status,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. CREATE: Add status history entry
+    await ctx.db.insert('yourobcShipmentStatusHistory', {
+      shipmentId,
+      status,
+      timestamp: now,
+      location,
+      notes,
+      metadata,
+      createdBy: user._id,
+      createdAt: now,
+    });
+
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.status_updated',
+      entityType: 'system_shipment',
+      entityId: shipment.publicId,
+      entityTitle: shipment.shipmentNumber,
+      description: `Updated shipment status to ${status}: ${shipment.shipmentNumber}`,
+      metadata: { oldStatus: shipment.currentStatus, newStatus: status },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return shipmentId;
+  },
+});
 
 /**
  * Delete shipment (soft delete)
  */
-export async function deleteShipment(
-  ctx: MutationCtx,
-  shipmentId: ShipmentId
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
+export const deleteShipment = mutation({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+  },
+  handler: async (ctx, { shipmentId }): Promise<ShipmentId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const shipment = await ctx.db.get(shipmentId);
-  validateShipmentExists(shipment);
-  requireDeletePermission(shipment, user);
+    // 2. CHECK: Verify entity exists
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment || shipment.deletedAt) {
+      throw new Error('Shipment not found');
+    }
 
-  const now = Date.now();
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteShipmentAccess(shipment, user);
 
-  await ctx.db.patch(shipmentId, {
-    deletedAt: now,
-    deletedBy: user._id,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(shipmentId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-  await createAuditLog(
-    ctx,
-    'delete',
-    'shipment',
-    shipmentId,
-    shipment.shipmentNumber,
-    `Deleted shipment ${shipment.shipmentNumber}`,
-    user._id,
-    user.name || user.email || 'Unknown'
-  );
-}
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.deleted',
+      entityType: 'system_shipment',
+      entityId: shipment.publicId,
+      entityTitle: shipment.shipmentNumber,
+      description: `Deleted shipment: ${shipment.shipmentNumber}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-/**
- * Restore shipment
- */
-export async function restoreShipment(
-  ctx: MutationCtx,
-  shipmentId: ShipmentId
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
-
-  const shipment = await ctx.db.get(shipmentId);
-  if (!shipment) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.NOT_FOUND);
-  }
-
-  requireRestorePermission(shipment, user);
-
-  const now = Date.now();
-
-  await ctx.db.patch(shipmentId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
-
-  await createAuditLog(
-    ctx,
-    'restore',
-    'shipment',
-    shipmentId,
-    shipment.shipmentNumber,
-    `Restored shipment ${shipment.shipmentNumber}`,
-    user._id,
-    user.name || user.email || 'Unknown'
-  );
-}
-
-// ============================================================================
-// Shipment Status History Mutations
-// ============================================================================
+    // 6. RETURN: Return entity ID
+    return shipmentId;
+  },
+});
 
 /**
- * Create shipment status history entry
+ * Restore soft-deleted shipment
  */
-export async function createShipmentStatusHistory(
-  ctx: MutationCtx,
-  data: CreateShipmentStatusHistoryInput
-): Promise<ShipmentStatusHistoryId> {
-  const user = await requireCurrentUser(ctx);
+export const restoreShipment = mutation({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+  },
+  handler: async (ctx, { shipmentId }): Promise<ShipmentId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Validate data
-  validateStatusHistoryData(data);
+    // 2. CHECK: Verify entity exists and is deleted
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment) {
+      throw new Error('Shipment not found');
+    }
+    if (!shipment.deletedAt) {
+      throw new Error('Shipment is not deleted');
+    }
 
-  // Verify shipment exists
-  const shipment = await ctx.db.get(data.shipmentId);
-  validateShipmentExists(shipment);
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      shipment.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this shipment');
+    }
 
-  // Generate public ID and timestamp
-  const publicId = generateStatusHistoryPublicId();
-  const now = Date.now();
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(shipmentId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-  // Create status history entry
-  const statusHistoryId = await ctx.db.insert('yourobcShipmentStatusHistory', {
-    publicId,
-    shipmentId: data.shipmentId,
-    status: data.status,
-    timestamp: data.timestamp,
-    location: data.location,
-    notes: data.notes,
-    metadata: data.metadata,
-    ownerId: user._id,
-    createdBy: user._id,
-    createdAt: now,
-  });
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.restored',
+      entityType: 'system_shipment',
+      entityId: shipment.publicId,
+      entityTitle: shipment.shipmentNumber,
+      description: `Restored shipment: ${shipment.shipmentNumber}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  return statusHistoryId;
-}
+    // 6. RETURN: Return entity ID
+    return shipmentId;
+  },
+});
 
 /**
- * Update shipment status history entry
+ * Bulk update multiple shipments
  */
-export async function updateShipmentStatusHistory(
-  ctx: MutationCtx,
-  statusHistoryId: ShipmentStatusHistoryId,
-  data: UpdateShipmentStatusHistoryInput
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
+export const bulkUpdateShipments = mutation({
+  args: {
+    shipmentIds: v.array(v.id('yourobcShipments')),
+    updates: v.object({
+      currentStatus: v.optional(shipmentsValidators.status),
+      priority: v.optional(shipmentsValidators.priority),
+      assignedCourierId: v.optional(v.id('yourobcCouriers')),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      tags: v.optional(v.array(v.string())),
+    }),
+  },
+  handler: async (ctx, { shipmentIds, updates }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Validate data
-  validateStatusHistoryUpdateData(data);
+    // 2. AUTHZ: Check bulk edit permission
+    await requirePermission(ctx, SHIPMENTS_CONSTANTS.PERMISSIONS.BULK_EDIT, {
+      allowAdmin: true,
+    });
 
-  // Get existing entry
-  const statusHistory = await ctx.db.get(statusHistoryId);
-  validateStatusHistoryExists(statusHistory);
+    // 3. VALIDATE: Check update data
+    const errors = validateShipmentData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // Check permission
-  requireEditStatusHistoryPermission(statusHistory, user);
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-  // Prepare updates
-  const now = Date.now();
-  const updates: Partial<ShipmentStatusHistory> = {
-    updatedBy: user._id,
-    updatedAt: now,
-  };
+    // 4. PROCESS: Update each entity
+    for (const shipmentId of shipmentIds) {
+      try {
+        const shipment = await ctx.db.get(shipmentId);
+        if (!shipment || shipment.deletedAt) {
+          failed.push({ id: shipmentId, reason: 'Not found' });
+          continue;
+        }
 
-  if (data.status !== undefined) updates.status = data.status;
-  if (data.timestamp !== undefined) updates.timestamp = data.timestamp;
-  if (data.location !== undefined) updates.location = data.location;
-  if (data.notes !== undefined) updates.notes = data.notes;
-  if (data.metadata !== undefined) updates.metadata = data.metadata;
+        // Check individual edit access
+        const canEdit = await canEditShipment(ctx, shipment, user);
+        if (!canEdit) {
+          failed.push({ id: shipmentId, reason: 'No permission' });
+          continue;
+        }
 
-  // Apply updates
-  await ctx.db.patch(statusHistoryId, updates);
-}
+        // Apply updates
+        const updateData: any = {
+          updatedAt: now,
+          updatedBy: user._id,
+        };
+
+        if (updates.currentStatus !== undefined) updateData.currentStatus = updates.currentStatus;
+        if (updates.priority !== undefined) updateData.priority = updates.priority;
+        if (updates.assignedCourierId !== undefined) updateData.assignedCourierId = updates.assignedCourierId;
+        if (updates.employeeId !== undefined) updateData.employeeId = updates.employeeId;
+        if (updates.tags !== undefined) {
+          updateData.tags = updates.tags.map(tag => tag.trim());
+        }
+
+        await ctx.db.patch(shipmentId, updateData);
+        results.push({ id: shipmentId, success: true });
+      } catch (error: any) {
+        failed.push({ id: shipmentId, reason: error.message });
+      }
+    }
+
+    // 5. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.bulk_updated',
+      entityType: 'system_shipment',
+      entityId: 'bulk',
+      entityTitle: `${results.length} shipments`,
+      description: `Bulk updated ${results.length} shipments`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+        updates,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return results summary
+    return {
+      updated: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});
 
 /**
- * Delete shipment status history entry (soft delete)
+ * Bulk delete multiple shipments (soft delete)
  */
-export async function deleteShipmentStatusHistory(
-  ctx: MutationCtx,
-  statusHistoryId: ShipmentStatusHistoryId
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
+export const bulkDeleteShipments = mutation({
+  args: {
+    shipmentIds: v.array(v.id('yourobcShipments')),
+  },
+  handler: async (ctx, { shipmentIds }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const statusHistory = await ctx.db.get(statusHistoryId);
-  validateStatusHistoryExists(statusHistory);
-  requireDeleteStatusHistoryPermission(statusHistory, user);
+    // 2. AUTHZ: Check delete permission
+    await requirePermission(ctx, SHIPMENTS_CONSTANTS.PERMISSIONS.DELETE, {
+      allowAdmin: true,
+    });
 
-  const now = Date.now();
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-  await ctx.db.patch(statusHistoryId, {
-    deletedAt: now,
-    deletedBy: user._id,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
-}
+    // 3. PROCESS: Delete each entity
+    for (const shipmentId of shipmentIds) {
+      try {
+        const shipment = await ctx.db.get(shipmentId);
+        if (!shipment || shipment.deletedAt) {
+          failed.push({ id: shipmentId, reason: 'Not found' });
+          continue;
+        }
 
-/**
- * Restore shipment status history entry
- */
-export async function restoreShipmentStatusHistory(
-  ctx: MutationCtx,
-  statusHistoryId: ShipmentStatusHistoryId
-): Promise<void> {
-  const user = await requireCurrentUser(ctx);
+        // Check individual delete access
+        const canDelete = await canDeleteShipment(shipment, user);
+        if (!canDelete) {
+          failed.push({ id: shipmentId, reason: 'No permission' });
+          continue;
+        }
 
-  const statusHistory = await ctx.db.get(statusHistoryId);
-  if (!statusHistory) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.STATUS_HISTORY_NOT_FOUND);
-  }
+        // Soft delete
+        await ctx.db.patch(shipmentId, {
+          deletedAt: now,
+          deletedBy: user._id,
+          updatedAt: now,
+          updatedBy: user._id,
+        });
 
-  requireRestoreStatusHistoryPermission(statusHistory, user);
+        results.push({ id: shipmentId, success: true });
+      } catch (error: any) {
+        failed.push({ id: shipmentId, reason: error.message });
+      }
+    }
 
-  const now = Date.now();
+    // 4. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'shipment.bulk_deleted',
+      entityType: 'system_shipment',
+      entityId: 'bulk',
+      entityTitle: `${results.length} shipments`,
+      description: `Bulk deleted ${results.length} shipments`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  await ctx.db.patch(statusHistoryId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedBy: user._id,
-    updatedAt: now,
-  });
-}
+    // 5. RETURN: Return results summary
+    return {
+      deleted: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});

@@ -2,107 +2,97 @@
 // Table definitions for invoices module
 
 import { defineTable } from 'convex/server';
-import { auditFields, softDeleteFields } from '@/schema/base';
+import { v } from 'convex/values';
+import {
+  currencyAmountSchema,
+  addressSchema,
+  lineItemSchema,
+  collectionAttemptSchema,
+  metadataSchema,
+  auditFields,
+  softDeleteFields,
+} from '@/schema/yourobc/base';
 import { invoicesValidators } from './validators';
 
-/**
- * Invoices Table
- *
- * Manages customer and partner invoices with payment tracking and collection details.
- * Supports both incoming and outgoing invoices with full audit trail.
- *
- * Features:
- * - Invoice generation and tracking
- * - Payment status and history
- * - Dunning process management
- * - Collection attempt tracking
- * - Multi-currency support
- * - Soft delete support
- *
- * Display Field: invoiceNumber
- */
 export const invoicesTable = defineTable({
-  // Identification
-  publicId: invoicesValidators.publicId,
-  invoiceNumber: invoicesValidators.invoiceNumber,
-  externalInvoiceNumber: invoicesValidators.externalInvoiceNumber,
+  // Required: Main display field
+  invoiceNumber: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.string(), // authUserId - user who owns/manages this invoice
+
+  // Invoice identification
+  externalInvoiceNumber: v.optional(v.string()),
 
   // Invoice Type & Classification
   type: invoicesValidators.type,
 
-  // Ownership
-  ownerId: invoicesValidators.ownerId,
-
   // References
-  shipmentId: invoicesValidators.shipmentId,
-  customerId: invoicesValidators.customerId,
-  partnerId: invoicesValidators.partnerId,
+  shipmentId: v.optional(v.id('yourobcShipments')),
+  customerId: v.optional(v.id('yourobcCustomers')),
+  partnerId: v.optional(v.id('yourobcPartners')),
 
   // Timeline
-  issueDate: invoicesValidators.issueDate,
-  dueDate: invoicesValidators.dueDate,
-  sentAt: invoicesValidators.sentAt,
+  issueDate: v.number(),
+  dueDate: v.number(),
+  sentAt: v.optional(v.number()),
 
   // Invoice Content
-  description: invoicesValidators.description,
-  lineItems: invoicesValidators.lineItems,
-  billingAddress: invoicesValidators.billingAddress,
+  description: v.string(),
+  lineItems: v.array(lineItemSchema),
+  billingAddress: v.optional(addressSchema),
 
   // Pricing
-  subtotal: invoicesValidators.subtotal,
-  taxRate: invoicesValidators.taxRate,
-  taxAmount: invoicesValidators.taxAmount,
-  totalAmount: invoicesValidators.totalAmount,
+  subtotal: currencyAmountSchema,
+  taxRate: v.optional(v.number()),
+  taxAmount: v.optional(currencyAmountSchema),
+  totalAmount: currencyAmountSchema,
 
   // Payment Terms
-  paymentTerms: invoicesValidators.paymentTerms,
-  purchaseOrderNumber: invoicesValidators.purchaseOrderNumber,
+  paymentTerms: v.number(),
+  purchaseOrderNumber: v.optional(v.string()),
 
   // Payment Tracking
   status: invoicesValidators.status,
-  paymentMethod: invoicesValidators.paymentMethod,
-  paymentDate: invoicesValidators.paymentDate,
-  paidDate: invoicesValidators.paidDate,
-  paymentReference: invoicesValidators.paymentReference,
-  paidAmount: invoicesValidators.paidAmount,
+  paymentMethod: v.optional(invoicesValidators.paymentMethod),
+  paymentDate: v.optional(v.number()),
+  paidDate: v.optional(v.number()), // Alias for paymentDate (used in some parts of code)
+  paymentReference: v.optional(v.string()),
+  paidAmount: v.optional(currencyAmountSchema),
 
   // Collection
-  collectionAttempts: invoicesValidators.collectionAttempts,
+  collectionAttempts: v.array(collectionAttemptSchema),
 
   // Dunning Process
-  dunningLevel: invoicesValidators.dunningLevel,
-  dunningFee: invoicesValidators.dunningFee,
-  lastDunningDate: invoicesValidators.lastDunningDate,
+  dunningLevel: v.optional(v.number()), // Escalation level (0-3: none, level1, level2, level3)
+  dunningFee: v.optional(v.number()), // Accumulated dunning fees
+  lastDunningDate: v.optional(v.number()), // Last dunning action timestamp
 
   // Notes
-  notes: invoicesValidators.notes,
+  notes: v.optional(v.string()),
 
-  // Standard metadata and audit fields
-  metadata: invoicesValidators.metadata,
+  // Metadata
+  ...metadataSchema,
+
+  // Audit & Soft Delete
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_deleted_at', ['deletedAt'])
+  .index('by_invoiceNumber', ['invoiceNumber'])
   .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
 
-  // Display field index
-  .index('by_invoice_number', ['invoiceNumber'])
-
-  // Module-specific indexes
+  // Additional useful indexes
   .index('by_type', ['type'])
   .index('by_status', ['status'])
   .index('by_customer', ['customerId'])
   .index('by_partner', ['partnerId'])
   .index('by_shipment', ['shipmentId'])
-  .index('by_due_date', ['dueDate'])
-  .index('by_issue_date', ['issueDate'])
+  .index('by_dueDate', ['dueDate'])
+  .index('by_issueDate', ['issueDate'])
   .index('by_type_status', ['type', 'status'])
-  .index('by_created_at', ['createdAt'])
-  .index('by_updated_at', ['updatedAt'])
-
-  // Custom business logic indexes
-  .index('by_owner_type', ['ownerId', 'type'])
   .index('by_owner_status', ['ownerId', 'status'])
-  .index('by_overdue', ['dueDate', 'status']);
+  .index('by_created', ['createdAt']);

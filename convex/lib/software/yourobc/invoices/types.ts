@@ -1,177 +1,166 @@
 // convex/lib/software/yourobc/invoices/types.ts
-// Library types for invoices module
+// TypeScript type definitions for invoices module
 
-import { Doc, Id } from '@/dataModel';
+import type { Doc, Id } from '@/generated/dataModel';
+import type { InvoiceStatus, InvoiceType, PaymentMethod } from '@/schema/software/yourobc/invoices/types';
+import type { CurrencyAmount } from '@/schema/yourobc/base';
+
+// Entity types
+export type Invoice = Doc<'yourobcInvoices'>;
+export type InvoiceId = Id<'yourobcInvoices'>;
 
 // Re-export schema types
-export type {
-  InvoiceStatus,
-  InvoiceType,
-  PaymentMethod,
-  CollectionMethod,
-} from '@/schema/software/yourobc/invoices/types';
+export type { InvoiceStatus, InvoiceType, PaymentMethod };
 
-// Database document types
-export type Invoice = Doc<'yourobcInvoices'>;
-
-// Input types for creating/updating invoices
-export interface CreateInvoiceInput {
-  invoiceNumber: string;
-  type: 'incoming' | 'outgoing';
+// Line item interface
+export interface LineItem {
   description: string;
-  customerId?: Id<'yourobcCustomers'>;
-  partnerId?: Id<'yourobcPartners'>;
-  shipmentId?: Id<'yourobcShipments'>;
-  issueDate: number;
-  dueDate: number;
-  lineItems: Array<{
-    description: string;
-    quantity: number;
-    unitPrice: {
-      amount: number;
-      currency: 'EUR' | 'USD';
-      exchangeRate?: number;
-      exchangeRateDate?: number;
-    };
-    totalPrice: {
-      amount: number;
-      currency: 'EUR' | 'USD';
-      exchangeRate?: number;
-      exchangeRateDate?: number;
-    };
-  }>;
-  subtotal: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  totalAmount: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  taxRate?: number;
-  taxAmount?: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  paymentTerms?: number;
-  billingAddress?: {
-    street?: string;
-    city: string;
-    postalCode?: string;
-    country: string;
-    countryCode: string;
-  };
-  externalInvoiceNumber?: string;
-  purchaseOrderNumber?: string;
-  notes?: string;
-  tags?: string[];
+  quantity: number;
+  unitPrice: CurrencyAmount;
+  totalPrice: CurrencyAmount;
 }
 
-export interface UpdateInvoiceInput {
-  invoiceNumber?: string;
-  description?: string;
-  status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
-  lineItems?: Array<{
-    description: string;
-    quantity: number;
-    unitPrice: {
-      amount: number;
-      currency: 'EUR' | 'USD';
-      exchangeRate?: number;
-      exchangeRateDate?: number;
-    };
-    totalPrice: {
-      amount: number;
-      currency: 'EUR' | 'USD';
-      exchangeRate?: number;
-      exchangeRateDate?: number;
-    };
-  }>;
-  subtotal?: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  totalAmount?: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  taxRate?: number;
-  taxAmount?: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-  dueDate?: number;
-  issueDate?: number;
-  sentAt?: number;
-  paymentTerms?: number;
-  billingAddress?: {
-    street?: string;
-    city: string;
-    postalCode?: string;
-    country: string;
-    countryCode: string;
-  };
-  externalInvoiceNumber?: string;
-  purchaseOrderNumber?: string;
-  notes?: string;
-  tags?: string[];
+// Address interface
+export interface Address {
+  street?: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  countryCode: string;
 }
 
-export interface ProcessPaymentInput {
-  paymentMethod: 'bank_transfer' | 'credit_card' | 'cash' | 'check' | 'paypal' | 'wire_transfer' | 'other';
-  paymentDate: number;
-  paymentReference?: string;
-  paidAmount: {
-    amount: number;
-    currency: 'EUR' | 'USD';
-    exchangeRate?: number;
-    exchangeRateDate?: number;
-  };
-}
-
-export interface AddCollectionAttemptInput {
+// Collection attempt interface
+export interface CollectionAttempt {
+  date: number;
   method: 'email' | 'phone' | 'letter' | 'legal_notice' | 'debt_collection';
   result: string;
+  createdBy: string;
 }
 
-export interface UpdateDunningLevelInput {
-  dunningLevel: number;
-  dunningFee?: number;
+// Currency amount interface
+export interface CurrencyAmount {
+  amount: number;
+  currency: 'EUR' | 'USD';
+  exchangeRate?: number;
+  exchangeRateDate?: number;
 }
 
-// Query filter types
+// Data interfaces for mutations
+export interface CreateInvoiceData {
+  invoiceNumber: string;
+  externalInvoiceNumber?: string;
+  type: InvoiceType;
+  shipmentId?: Id<'yourobcShipments'>;
+  customerId?: Id<'yourobcCustomers'>;
+  partnerId?: Id<'yourobcPartners'>;
+  issueDate: number;
+  dueDate: number;
+  description: string;
+  lineItems: LineItem[];
+  billingAddress?: Address;
+  subtotal: CurrencyAmount;
+  taxRate?: number;
+  taxAmount?: CurrencyAmount;
+  totalAmount: CurrencyAmount;
+  paymentTerms: number;
+  purchaseOrderNumber?: string;
+  status?: InvoiceStatus;
+  notes?: string;
+  tags?: string[];
+}
+
+export interface UpdateInvoiceData {
+  invoiceNumber?: string;
+  externalInvoiceNumber?: string;
+  type?: InvoiceType;
+  shipmentId?: Id<'yourobcShipments'>;
+  customerId?: Id<'yourobcCustomers'>;
+  partnerId?: Id<'yourobcPartners'>;
+  issueDate?: number;
+  dueDate?: number;
+  description?: string;
+  lineItems?: LineItem[];
+  billingAddress?: Address;
+  subtotal?: CurrencyAmount;
+  taxRate?: number;
+  taxAmount?: CurrencyAmount;
+  totalAmount?: CurrencyAmount;
+  paymentTerms?: number;
+  purchaseOrderNumber?: string;
+  status?: InvoiceStatus;
+  notes?: string;
+  tags?: string[];
+}
+
+export interface ProcessPaymentData {
+  paymentMethod: PaymentMethod;
+  paymentDate: number;
+  paymentReference?: string;
+  paidAmount: CurrencyAmount;
+  notes?: string;
+}
+
+export interface AddCollectionAttemptData {
+  method: 'email' | 'phone' | 'letter' | 'legal_notice' | 'debt_collection';
+  result: string;
+  notes?: string;
+}
+
+// Response types
+export interface InvoiceWithRelations extends Invoice {
+  customer?: Doc<'yourobcCustomers'> | null;
+  partner?: Doc<'yourobcPartners'> | null;
+  shipment?: Doc<'yourobcShipments'> | null;
+}
+
+export interface InvoiceListResponse {
+  items: Invoice[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
 export interface InvoiceFilters {
-  type?: 'incoming' | 'outgoing';
-  status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status?: InvoiceStatus[];
+  type?: InvoiceType[];
   customerId?: Id<'yourobcCustomers'>;
   partnerId?: Id<'yourobcPartners'>;
   shipmentId?: Id<'yourobcShipments'>;
+  search?: string;
   fromDate?: number;
   toDate?: number;
-  overdue?: boolean;
-  searchText?: string;
+  isOverdue?: boolean;
+  minAmount?: number;
+  maxAmount?: number;
 }
 
 // Statistics types
 export interface InvoiceStats {
-  totalInvoices: number;
-  draftInvoices: number;
-  sentInvoices: number;
-  paidInvoices: number;
-  overdueInvoices: number;
-  totalRevenue: number;
-  totalOutstanding: number;
-  averagePaymentDays: number;
+  total: number;
+  byStatus: {
+    draft: number;
+    sent: number;
+    pending_payment: number;
+    paid: number;
+    overdue: number;
+    cancelled: number;
+  };
+  byType: {
+    incoming: number;
+    outgoing: number;
+  };
+  totalAmount: CurrencyAmount;
+  totalPaid: CurrencyAmount;
+  totalOutstanding: CurrencyAmount;
+  totalOverdue: CurrencyAmount;
+  averagePaymentTerms: number;
+}
+
+// Dunning types
+export interface DunningInfo {
+  level: number;
+  levelLabel: string;
+  fee: number;
+  lastDate?: number;
+  nextActionDate?: number;
 }

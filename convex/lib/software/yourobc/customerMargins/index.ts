@@ -1,37 +1,51 @@
 // convex/lib/software/yourobc/customerMargins/index.ts
-/**
- * Customer Margins Library - Main Export
- *
- * Comprehensive library for managing customer margins module with 4 related tables:
- * - Customer Margins: Margin rules and pricing
- * - Contact Log: Customer interaction tracking
- * - Customer Analytics: Performance metrics
- * - Customer Dunning Config: Payment enforcement
- *
- * @module convex/lib/software/yourobc/customerMargins
- */
+// Public API exports for customerMargins module
 
-// Export all constants
-export * from './constants'
+// Constants
+export { CUSTOMER_MARGINS_CONSTANTS } from './constants';
 
-// Export all types
-export * from './types'
+// Types
+export type * from './types';
 
-// Export all utilities
-export * from './utils'
+// Utilities
+export {
+  validateCustomerMarginData,
+  formatCustomerMarginDisplayName,
+  generateMarginId,
+  isCustomerMarginEditable,
+  isCustomerMarginActive,
+  calculateMarginAmount,
+  calculatePriceWithMargin,
+  getApplicableVolumeTier,
+} from './utils';
 
-// Export all permissions
-export * from './permissions'
+// Permissions
+export {
+  canViewCustomerMargin,
+  canEditCustomerMargin,
+  canDeleteCustomerMargin,
+  canApproveCustomerMargin,
+  requireViewCustomerMarginAccess,
+  requireEditCustomerMarginAccess,
+  requireDeleteCustomerMarginAccess,
+  requireApproveCustomerMarginAccess,
+  filterCustomerMarginsByAccess,
+} from './permissions';
 
-// Export all queries
-export * as queries from './queries'
+// Queries
+export {
+  getCustomerMargins,
+  getCustomerMargin,
+  getCustomerMarginByPublicId,
+  getCustomerMarginByMarginId,
+  getCustomerMarginStats,
+} from './queries';
 
-// Export all mutations
-export * as mutations from './mutations'
-
-// Default export with everything
-export { default as constants } from './constants'
-export { default as utils } from './utils'
-export { default as permissions } from './permissions'
-export { default as queries } from './queries'
-export { default as mutations } from './mutations'
+// Mutations
+export {
+  createCustomerMargin,
+  updateCustomerMargin,
+  deleteCustomerMargin,
+  restoreCustomerMargin,
+  approveCustomerMargin,
+} from './mutations';

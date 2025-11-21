@@ -1,26 +1,45 @@
 // convex/lib/software/yourobc/employeeKPIs/index.ts
-/**
- * Employee KPIs Library Barrel Export
- *
- * Central export point for all employeeKPIs library components.
- *
- * @module convex/lib/software/yourobc/employeeKPIs
- */
+// Public API exports for employeeKPIs module
 
 // Constants
-export * from './constants'
+export { EMPLOYEE_KPIS_CONSTANTS } from './constants';
 
 // Types
-export * from './types'
+export type * from './types';
 
 // Utilities
-export * from './utils'
+export {
+  validateEmployeeKPIData,
+  calculateAchievementPercentage,
+  calculateChangePercentage,
+  determineKPIStatus,
+  formatKPIDisplayName,
+  isKPIEditable,
+} from './utils';
 
 // Permissions
-export * from './permissions'
+export {
+  canViewEmployeeKPI,
+  canEditEmployeeKPI,
+  canDeleteEmployeeKPI,
+  requireViewEmployeeKPIAccess,
+  requireEditEmployeeKPIAccess,
+  requireDeleteEmployeeKPIAccess,
+  filterEmployeeKPIsByAccess,
+} from './permissions';
 
 // Queries
-export * from './queries'
+export {
+  getEmployeeKPIs,
+  getEmployeeKPI,
+  getEmployeeKPIByPublicId,
+  getEmployeeKPIStats,
+} from './queries';
 
 // Mutations
-export * from './mutations'
+export {
+  createEmployeeKPI,
+  updateEmployeeKPI,
+  deleteEmployeeKPI,
+  restoreEmployeeKPI,
+} from './mutations';

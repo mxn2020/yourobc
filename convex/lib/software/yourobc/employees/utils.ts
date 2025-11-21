@@ -1,326 +1,290 @@
 // convex/lib/software/yourobc/employees/utils.ts
-/**
- * Utility Functions for Employees Entity
- *
- * Provides helper functions for employee and vacation management including
- * calculations, validations, and data transformations.
- *
- * @module convex/lib/software/yourobc/employees/utils
- */
+// Validation functions and utility helpers for employees module
 
-import { Id } from '../../../_generated/dataModel'
-import type {
-  Employee,
-  VacationDays,
-  VacationEntry,
-  EmployeeDisplay,
-  VacationDaysDisplay,
-} from './types'
-import {
-  VACATION_SETTINGS,
-  MAX_RECENT_VACATIONS,
-  AUTO_OFFLINE_TIMEOUT,
-} from './constants'
-
-// ============================================================================
-// ID Generation
-// ============================================================================
+import { EMPLOYEES_CONSTANTS } from './constants';
+import type { CreateEmployeeData, UpdateEmployeeData, VacationRequest } from './types';
 
 /**
- * Generate a unique public ID for employees
+ * Validate employee data for creation/update
  */
-export function generateEmployeePublicId(): string {
-  return `emp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-}
+export function validateEmployeeData(
+  data: Partial<CreateEmployeeData | UpdateEmployeeData>
+): string[] {
+  const errors: string[] = [];
 
-/**
- * Generate a unique public ID for vacation days records
- */
-export function generateVacationDaysPublicId(): string {
-  return `vac_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-}
+  // Validate name (main display field)
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim();
 
-/**
- * Generate a unique entry ID for vacation entries
- */
-export function generateVacationEntryId(): string {
-  return `entry_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-}
-
-// ============================================================================
-// Vacation Calculations
-// ============================================================================
-
-/**
- * Calculate vacation days statistics
- */
-export function calculateVacationStats(
-  annualEntitlement: number,
-  carryoverDays: number,
-  entries: VacationEntry[]
-): {
-  available: number
-  used: number
-  pending: number
-  remaining: number
-} {
-  const used = entries
-    .filter((e) => e.status === 'approved')
-    .reduce((sum, e) => sum + e.days, 0)
-
-  const pending = entries
-    .filter((e) => e.status === 'pending')
-    .reduce((sum, e) => sum + e.days, 0)
-
-  const available = annualEntitlement + carryoverDays
-  const remaining = available - used - pending
-
-  return {
-    available,
-    used,
-    pending,
-    remaining,
+    if (!trimmed) {
+      errors.push('Name is required');
+    } else if (trimmed.length < EMPLOYEES_CONSTANTS.LIMITS.MIN_NAME_LENGTH) {
+      errors.push(`Name must be at least ${EMPLOYEES_CONSTANTS.LIMITS.MIN_NAME_LENGTH} characters`);
+    } else if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_NAME_LENGTH) {
+      errors.push(`Name cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_NAME_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.NAME_PATTERN.test(trimmed)) {
+      errors.push('Name contains invalid characters. Only letters, spaces, hyphens, apostrophes, and periods are allowed');
+    }
   }
+
+  // Validate employee number
+  if ('employeeNumber' in data && data.employeeNumber !== undefined) {
+    const trimmed = data.employeeNumber.trim();
+    if (!trimmed) {
+      errors.push('Employee number is required');
+    } else if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_EMPLOYEE_NUMBER_LENGTH) {
+      errors.push(`Employee number cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_EMPLOYEE_NUMBER_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.EMPLOYEE_NUMBER_PATTERN.test(trimmed)) {
+      errors.push('Employee number must contain only uppercase letters, numbers, and hyphens');
+    }
+  }
+
+  // Validate email
+  if (data.email !== undefined && data.email.trim()) {
+    const trimmed = data.email.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_EMAIL_LENGTH) {
+      errors.push(`Email cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_EMAIL_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.EMAIL_PATTERN.test(trimmed)) {
+      errors.push('Invalid email format');
+    }
+  }
+
+  // Validate work email
+  if (data.workEmail !== undefined && data.workEmail.trim()) {
+    const trimmed = data.workEmail.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_EMAIL_LENGTH) {
+      errors.push(`Work email cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_EMAIL_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.EMAIL_PATTERN.test(trimmed)) {
+      errors.push('Invalid work email format');
+    }
+  }
+
+  // Validate phone
+  if (data.phone !== undefined && data.phone.trim()) {
+    const trimmed = data.phone.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_PHONE_LENGTH) {
+      errors.push(`Phone cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_PHONE_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.PHONE_PATTERN.test(trimmed)) {
+      errors.push('Invalid phone format');
+    }
+  }
+
+  // Validate work phone
+  if (data.workPhone !== undefined && data.workPhone.trim()) {
+    const trimmed = data.workPhone.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_PHONE_LENGTH) {
+      errors.push(`Work phone cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_PHONE_LENGTH} characters`);
+    } else if (!EMPLOYEES_CONSTANTS.VALIDATION.PHONE_PATTERN.test(trimmed)) {
+      errors.push('Invalid work phone format');
+    }
+  }
+
+  // Validate department
+  if (data.department !== undefined && data.department.trim()) {
+    const trimmed = data.department.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_DEPARTMENT_LENGTH) {
+      errors.push(`Department cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_DEPARTMENT_LENGTH} characters`);
+    }
+  }
+
+  // Validate position
+  if (data.position !== undefined && data.position.trim()) {
+    const trimmed = data.position.trim();
+    if (trimmed.length > EMPLOYEES_CONSTANTS.LIMITS.MAX_POSITION_LENGTH) {
+      errors.push(`Position cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_POSITION_LENGTH} characters`);
+    }
+  }
+
+  // Validate salary
+  if (data.salary !== undefined) {
+    if (data.salary < EMPLOYEES_CONSTANTS.LIMITS.MIN_SALARY) {
+      errors.push(`Salary cannot be negative`);
+    } else if (data.salary > EMPLOYEES_CONSTANTS.LIMITS.MAX_SALARY) {
+      errors.push(`Salary cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_SALARY}`);
+    }
+  }
+
+  // Validate dates
+  if (data.startDate !== undefined && data.endDate !== undefined) {
+    if (data.endDate < data.startDate) {
+      errors.push('End date cannot be before start date');
+    }
+  }
+
+  // Validate office (required for creation)
+  if ('office' in data && data.office) {
+    if (!data.office.location || !data.office.location.trim()) {
+      errors.push('Office location is required');
+    }
+    if (!data.office.country || !data.office.country.trim()) {
+      errors.push('Office country is required');
+    }
+    if (!data.office.countryCode || !data.office.countryCode.trim()) {
+      errors.push('Office country code is required');
+    }
+  }
+
+  return errors;
 }
 
 /**
- * Calculate days between two dates
+ * Validate vacation request data
  */
-export function calculateDaysBetween(startDate: number, endDate: number): number {
-  const msPerDay = 24 * 60 * 60 * 1000
-  return Math.ceil((endDate - startDate) / msPerDay) + 1
+export function validateVacationRequest(data: VacationRequest): string[] {
+  const errors: string[] = [];
+
+  // Validate dates
+  if (!data.startDate) {
+    errors.push('Start date is required');
+  }
+  if (!data.endDate) {
+    errors.push('End date is required');
+  }
+  if (data.endDate < data.startDate) {
+    errors.push('End date cannot be before start date');
+  }
+
+  // Validate days
+  if (!data.days || data.days < EMPLOYEES_CONSTANTS.LIMITS.MIN_VACATION_DAYS) {
+    errors.push('Days must be greater than 0');
+  } else if (data.days > EMPLOYEES_CONSTANTS.LIMITS.MAX_VACATION_DAYS) {
+    errors.push(`Vacation days cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_VACATION_DAYS}`);
+  }
+
+  // Validate type
+  if (!data.type) {
+    errors.push('Vacation type is required');
+  }
+
+  // Validate reason length
+  if (data.reason && data.reason.trim().length > EMPLOYEES_CONSTANTS.LIMITS.MAX_REASON_LENGTH) {
+    errors.push(`Reason cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_REASON_LENGTH} characters`);
+  }
+
+  // Validate notes length
+  if (data.notes && data.notes.trim().length > EMPLOYEES_CONSTANTS.LIMITS.MAX_NOTES_LENGTH) {
+    errors.push(`Notes cannot exceed ${EMPLOYEES_CONSTANTS.LIMITS.MAX_NOTES_LENGTH} characters`);
+  }
+
+  return errors;
 }
 
 /**
- * Calculate remaining days until end date
+ * Format employee display name
  */
-export function calculateDaysRemaining(endDate: number, fromDate: number = Date.now()): number {
-  const msPerDay = 24 * 60 * 60 * 1000
-  const days = Math.ceil((endDate - fromDate) / msPerDay)
-  return Math.max(0, days)
+export function formatEmployeeDisplayName(employee: { name: string; status?: string; position?: string }): string {
+  const parts = [employee.name];
+
+  if (employee.position) {
+    parts.push(`(${employee.position})`);
+  }
+
+  if (employee.status && employee.status !== 'active') {
+    parts.push(`[${employee.status}]`);
+  }
+
+  return parts.join(' ');
+}
+
+/**
+ * Generate employee number
+ */
+export function generateEmployeeNumber(prefix: string = 'EMP', sequence: number): string {
+  const paddedSequence = sequence.toString().padStart(6, '0');
+  return `${prefix}-${paddedSequence}`;
+}
+
+/**
+ * Check if employee is editable
+ */
+export function isEmployeeEditable(employee: { status: string; deletedAt?: number }): boolean {
+  if (employee.deletedAt) return false;
+  return employee.status !== 'terminated';
+}
+
+/**
+ * Check if employee can request vacation
+ */
+export function canRequestVacation(employee: { status: string; isActive: boolean }): boolean {
+  return employee.isActive && (employee.status === 'active' || employee.status === 'probation');
+}
+
+/**
+ * Calculate vacation days between two dates
+ */
+export function calculateVacationDays(startDate: number, endDate: number, isHalfDay?: boolean): number {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const daysDiff = Math.ceil((endDate - startDate) / millisecondsPerDay) + 1; // +1 to include both start and end dates
+
+  if (isHalfDay) {
+    return 0.5;
+  }
+
+  return daysDiff;
+}
+
+/**
+ * Calculate days remaining until date
+ */
+export function calculateDaysRemaining(endDate: number): number {
+  const now = Date.now();
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const daysRemaining = Math.ceil((endDate - now) / millisecondsPerDay);
+  return Math.max(0, daysRemaining);
 }
 
 /**
  * Check if employee is currently on vacation
  */
-export function isCurrentlyOnVacation(entries: VacationEntry[], now: number = Date.now()): boolean {
-  return entries.some(
-    (entry) =>
-      entry.status === 'approved' &&
-      entry.startDate <= now &&
-      entry.endDate >= now
-  )
+export function isOnVacation(employee: { currentVacationStatus?: { isOnVacation: boolean; endDate: number } }): boolean {
+  if (!employee.currentVacationStatus) return false;
+  if (!employee.currentVacationStatus.isOnVacation) return false;
+
+  const now = Date.now();
+  return employee.currentVacationStatus.endDate > now;
 }
 
 /**
- * Get current vacation entry
+ * Format salary display
  */
-export function getCurrentVacationEntry(
-  entries: VacationEntry[],
-  now: number = Date.now()
-): VacationEntry | undefined {
-  return entries.find(
-    (entry) =>
-      entry.status === 'approved' &&
-      entry.startDate <= now &&
-      entry.endDate >= now
-  )
+export function formatSalary(amount: number, currency: string = 'USD', frequency?: string): string {
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
+
+  if (frequency) {
+    const frequencyDisplay = {
+      hourly: '/hr',
+      weekly: '/week',
+      bi_weekly: '/2 weeks',
+      monthly: '/month',
+      annually: '/year',
+    }[frequency] || '';
+
+    return `${formatted}${frequencyDisplay}`;
+  }
+
+  return formatted;
 }
 
 /**
- * Calculate pro-rated annual entitlement based on hire date
+ * Sanitize and trim string fields
  */
-export function calculateProRatedEntitlement(
-  hireDate: number,
-  year: number,
-  baseEntitlement: number
-): number {
-  const hireDateObj = new Date(hireDate)
-  const hireYear = hireDateObj.getFullYear()
+export function sanitizeEmployeeData<T extends Record<string, any>>(data: T): T {
+  const sanitized = { ...data };
 
-  // If hired before the year, return full entitlement
-  if (hireYear < year) {
-    return baseEntitlement
-  }
+  // Trim string fields
+  if (sanitized.name) sanitized.name = sanitized.name.trim();
+  if (sanitized.employeeNumber) sanitized.employeeNumber = sanitized.employeeNumber.trim();
+  if (sanitized.email) sanitized.email = sanitized.email.trim().toLowerCase();
+  if (sanitized.workEmail) sanitized.workEmail = sanitized.workEmail.trim().toLowerCase();
+  if (sanitized.phone) sanitized.phone = sanitized.phone.trim();
+  if (sanitized.workPhone) sanitized.workPhone = sanitized.workPhone.trim();
+  if (sanitized.department) sanitized.department = sanitized.department.trim();
+  if (sanitized.position) sanitized.position = sanitized.position.trim();
 
-  // If hired in the year, pro-rate based on remaining months
-  if (hireYear === year) {
-    const hireMonth = hireDateObj.getMonth() + 1 // 1-12
-    const remainingMonths = 13 - hireMonth // Months remaining including hire month
-    return Math.round((baseEntitlement * remainingMonths) / 12)
-  }
-
-  // If hired after the year, return 0
-  return 0
-}
-
-/**
- * Validate vacation request
- */
-export function validateVacationRequest(
-  startDate: number,
-  endDate: number,
-  days: number,
-  available: number,
-  pending: number,
-  used: number
-): { valid: boolean; error?: string } {
-  // Check date order
-  if (startDate > endDate) {
-    return { valid: false, error: 'Start date must be before end date' }
-  }
-
-  // Check past dates
-  const now = Date.now()
-  if (startDate < now) {
-    return { valid: false, error: 'Cannot request vacation for past dates' }
-  }
-
-  // Check notice period
-  const noticeMs = VACATION_SETTINGS.MIN_NOTICE_DAYS * 24 * 60 * 60 * 1000
-  if (startDate - now < noticeMs) {
-    return {
-      valid: false,
-      error: `Vacation must be requested at least ${VACATION_SETTINGS.MIN_NOTICE_DAYS} days in advance`,
-    }
-  }
-
-  // Check consecutive days limit
-  if (days > VACATION_SETTINGS.MAX_CONSECUTIVE_DAYS) {
-    return {
-      valid: false,
-      error: `Cannot request more than ${VACATION_SETTINGS.MAX_CONSECUTIVE_DAYS} consecutive days`,
-    }
-  }
-
-  // Check available days
-  const remaining = available - used - pending
-  if (days > remaining) {
-    return {
-      valid: false,
-      error: `Insufficient vacation days. Available: ${remaining}, Requested: ${days}`,
-    }
-  }
-
-  return { valid: true }
-}
-
-// ============================================================================
-// Recent Vacations Management
-// ============================================================================
-
-/**
- * Update recent vacations list
- */
-export function updateRecentVacations(
-  currentRecent: VacationEntry[] | undefined,
-  completedEntry: VacationEntry,
-  completedAt: number
-): Array<{
-  entryId: string
-  startDate: number
-  endDate: number
-  days: number
-  type: string
-  completedAt: number
-}> {
-  const recent = currentRecent || []
-  const newEntry = {
-    entryId: completedEntry.entryId,
-    startDate: completedEntry.startDate,
-    endDate: completedEntry.endDate,
-    days: completedEntry.days,
-    type: completedEntry.type,
-    completedAt,
-  }
-
-  // Add to beginning and keep only last MAX_RECENT_VACATIONS
-  return [newEntry, ...recent].slice(0, MAX_RECENT_VACATIONS)
-}
-
-// ============================================================================
-// Activity Tracking
-// ============================================================================
-
-/**
- * Check if employee should be marked as offline based on last activity
- */
-export function shouldMarkOffline(lastActivity: number | undefined): boolean {
-  if (!lastActivity) return true
-  const now = Date.now()
-  return now - lastActivity > AUTO_OFFLINE_TIMEOUT
-}
-
-// ============================================================================
-// Display Formatting
-// ============================================================================
-
-/**
- * Format employee for display
- */
-export function formatEmployeeDisplay(
-  employee: Employee,
-  userName: string
-): EmployeeDisplay {
-  return {
-    _id: employee._id,
-    publicId: employee.publicId,
-    name: userName,
-    employeeNumber: employee.employeeNumber,
-    department: employee.department,
-    position: employee.position,
-    status: employee.status,
-    isActive: employee.isActive,
-    isOnline: employee.isOnline,
-    office: employee.office,
-  }
-}
-
-/**
- * Format vacation days for display
- */
-export function formatVacationDaysDisplay(
-  vacationDays: VacationDays,
-  employeeName: string
-): VacationDaysDisplay {
-  // Format dates from entries
-  const approvedEntries = vacationDays.entries.filter((e) => e.status === 'approved')
-  const dateRanges = approvedEntries
-    .slice(0, 3)
-    .map((e) => `${formatDate(e.startDate)}-${formatDate(e.endDate)}`)
-  const dates = approvedEntries.length > 3
-    ? `${dateRanges.join(', ')} +${approvedEntries.length - 3} more`
-    : dateRanges.join(', ') || 'No approved vacations'
-
-  return {
-    _id: vacationDays._id,
-    publicId: vacationDays.publicId,
-    employeeId: vacationDays.employeeId,
-    employeeName,
-    year: vacationDays.year,
-    dates,
-    available: vacationDays.available,
-    used: vacationDays.used,
-    pending: vacationDays.pending,
-    remaining: vacationDays.remaining,
-  }
-}
-
-/**
- * Format date for display
- */
-export function formatDate(timestamp: number): string {
-  const date = new Date(timestamp)
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-/**
- * Format date range
- */
-export function formatDateRange(startDate: number, endDate: number): string {
-  return `${formatDate(startDate)} - ${formatDate(endDate)}`
+  return sanitized;
 }

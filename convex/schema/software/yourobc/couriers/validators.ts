@@ -1,81 +1,47 @@
 // convex/schema/software/yourobc/couriers/validators.ts
-// Validators for couriers module
+// Grouped validators for couriers module
 
 import { v } from 'convex/values';
 
-// Re-export validators from base
-export {
-  courierStatusValidator,
-  commissionTypeValidator,
-  commissionSimpleStatusValidator,
-  currencyValidator,
-  paymentMethodValidator,
-  timeEntryTypeValidator,
-  quoteServiceTypeValidator,
-  auditFields,
-  softDeleteFields,
-  metadataSchema,
-} from '../../../yourobc/base';
+export const couriersValidators = {
+  status: v.union(
+    v.literal('active'),
+    v.literal('inactive'),
+    v.literal('archived')
+  ),
 
-// Re-export types from base
-export type {
-  CourierStatus,
-  CommissionType,
-  CommissionSimpleStatus,
-  Currency,
-  PaymentMethod,
-  TimeEntryType,
-  QuoteServiceType,
-} from '../../../yourobc/base';
+  serviceType: v.union(
+    v.literal('OBC'),
+    v.literal('NFO'),
+    v.literal('express'),
+    v.literal('standard'),
+    v.literal('freight'),
+    v.literal('international'),
+    v.literal('domestic')
+  ),
 
-// ============================================================================
-// Reusable Schemas
-// ============================================================================
+  deliverySpeed: v.union(
+    v.literal('same_day'),
+    v.literal('next_day'),
+    v.literal('2_3_days'),
+    v.literal('3_5_days'),
+    v.literal('5_7_days'),
+    v.literal('7_14_days')
+  ),
 
-/**
- * Time entry schema validator
- */
-export const timeEntrySchema = v.object({
-  type: v.union(v.literal('login'), v.literal('logout')),
-  timestamp: v.number(),
-  location: v.optional(v.string()),
-  notes: v.optional(v.string()),
-});
+  pricingModel: v.union(
+    v.literal('weight_based'),
+    v.literal('zone_based'),
+    v.literal('flat_rate'),
+    v.literal('volumetric'),
+    v.literal('custom')
+  ),
 
-/**
- * Skills schema validator
- */
-export const skillsSchema = v.object({
-  languages: v.array(v.string()),
-  maxCarryWeight: v.optional(v.number()),
-  availableServices: v.array(v.union(v.literal('OBC'), v.literal('NFO'))),
-  certifications: v.optional(v.array(v.string())),
-});
-
-/**
- * Cost profile schema validator
- */
-export const costProfileSchema = v.object({
-  baseRate: v.optional(v.number()),
-  overtimeRate: v.optional(v.number()),
-  currency: v.optional(v.union(v.literal('EUR'), v.literal('USD'))),
-  notes: v.optional(v.string()),
-});
-
-/**
- * Service coverage schema validator
- */
-export const serviceCoverageSchema = v.object({
-  countries: v.optional(v.array(v.string())),
-  airports: v.optional(v.array(v.string())),
-  cities: v.optional(v.array(v.string())),
-});
-
-/**
- * Current location schema validator
- */
-export const currentLocationSchema = v.object({
-  country: v.string(),
-  countryCode: v.string(),
-  city: v.optional(v.string()),
-});
+  apiType: v.union(
+    v.literal('rest'),
+    v.literal('soap'),
+    v.literal('graphql'),
+    v.literal('xml'),
+    v.literal('none')
+  ),
+} as const;

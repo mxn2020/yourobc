@@ -1,20 +1,49 @@
 // convex/lib/software/yourobc/customers/index.ts
-// Barrel exports for customers library module
+// Public API exports for customers module
 
-// Export constants
-export * from './constants';
+// Constants
+export { CUSTOMERS_CONSTANTS } from './constants';
 
-// Export types
-export * from './types';
+// Types
+export type * from './types';
 
-// Export utilities
-export * from './utils';
+// Utilities
+export {
+  validateCustomerData,
+  validateContact,
+  validateAddress,
+  formatCustomerDisplayName,
+  isCustomerEditable,
+  calculateAverageMargin,
+  calculateAveragePaymentTerms,
+} from './utils';
 
-// Export permissions
-export * from './permissions';
+// Permissions
+export {
+  canViewCustomer,
+  canEditCustomer,
+  canDeleteCustomer,
+  requireViewCustomerAccess,
+  requireEditCustomerAccess,
+  requireDeleteCustomerAccess,
+  filterCustomersByAccess,
+} from './permissions';
 
-// Export queries
-export * from './queries';
+// Queries
+export {
+  getCustomers,
+  getCustomer,
+  getCustomerByPublicId,
+  getCustomerStats,
+} from './queries';
 
-// Export mutations
-export * from './mutations';
+// Mutations
+export {
+  createCustomer,
+  updateCustomer,
+  deleteCustomer,
+  restoreCustomer,
+  archiveCustomer,
+  bulkUpdateCustomers,
+  bulkDeleteCustomers,
+} from './mutations';

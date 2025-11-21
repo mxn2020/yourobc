@@ -1,442 +1,167 @@
 // convex/lib/software/yourobc/employeeCommissions/queries.ts
-/**
- * Employee Commissions Query Functions
- *
- * Query functions for retrieving employee commissions and rules.
- *
- * @module convex/lib/software/yourobc/employeeCommissions/queries
- */
+// Read operations for employeeCommissions module
 
-import { QueryCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
-import { EMPLOYEE_COMMISSIONS_TABLE, EMPLOYEE_COMMISSION_RULES_TABLE } from './constants'
-import type {
-  EmployeeCommission,
-  EmployeeCommissionRule,
-  CommissionSearchFilters,
-  RuleSearchFilters,
-  CommissionTotalsByPeriod,
-  CommissionTotalsByEmployee,
-} from './types'
-import { calculateTotalCommissions } from './utils'
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { employeeCommissionsValidators } from '@/schema/software/yourobc/employeeCommissions/validators';
+import { filterEmployeeCommissionsByAccess, requireViewEmployeeCommissionAccess } from './permissions';
+import type { EmployeeCommissionListResponse } from './types';
 
 /**
- * Get commission by ID
+ * Get paginated list of employee commissions with filtering
  */
-export async function getCommissionById(
-  ctx: QueryCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>
-): Promise<EmployeeCommission | null> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission || commission.deletedAt) return null
-  return commission
-}
+export const getEmployeeCommissions = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(employeeCommissionsValidators.status)),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      period: v.optional(v.string()),
+      startDate: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+    })),
+  },
+  handler: async (ctx, args): Promise<EmployeeCommissionListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
+
+    // Query with index
+    let commissions = await ctx.db
+      .query('yourobcEmployeeCommissions')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    commissions = await filterEmployeeCommissionsByAccess(ctx, commissions, user);
+
+    // Apply status filter
+    if (filters.status?.length) {
+      commissions = commissions.filter(item =>
+        filters.status!.includes(item.status)
+      );
+    }
+
+    // Apply employee filter
+    if (filters.employeeId) {
+      commissions = commissions.filter(item => item.employeeId === filters.employeeId);
+    }
+
+    // Apply period filter
+    if (filters.period) {
+      commissions = commissions.filter(item => item.period === filters.period);
+    }
+
+    // Apply date range filter
+    if (filters.startDate) {
+      commissions = commissions.filter(item => item.periodStartDate >= filters.startDate!);
+    }
+    if (filters.endDate) {
+      commissions = commissions.filter(item => item.periodEndDate <= filters.endDate!);
+    }
+
+    // Paginate
+    const total = commissions.length;
+    const items = commissions.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get commission by public ID
+ * Get single employee commission by ID
  */
-export async function getCommissionByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  ownerId: string
-): Promise<EmployeeCommission | null> {
-  const commission = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
+export const getEmployeeCommission = query({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+  },
+  handler: async (ctx, { commissionId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  return commission
-}
+    const commission = await ctx.db.get(commissionId);
+    if (!commission || commission.deletedAt) {
+      throw new Error('Commission not found');
+    }
+
+    await requireViewEmployeeCommissionAccess(ctx, commission, user);
+
+    return commission;
+  },
+});
 
 /**
- * List commissions by employee
+ * Get employee commission by public ID
  */
-export async function listCommissionsByEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_employee', (q) => q.eq('employeeId', employeeId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit)
+export const getEmployeeCommissionByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  return commissions
-}
+    const commission = await ctx.db
+      .query('yourobcEmployeeCommissions')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!commission) {
+      throw new Error('Commission not found');
+    }
+
+    await requireViewEmployeeCommissionAccess(ctx, commission, user);
+
+    return commission;
+  },
+});
 
 /**
- * List commissions by period
+ * Get employee commission statistics
  */
-export async function listCommissionsByPeriod(
-  ctx: QueryCtx,
-  period: string,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_period', (q) => q.eq('period', period))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit)
+export const getEmployeeCommissionStats = query({
+  args: {
+    employeeId: v.optional(v.id('yourobcEmployees')),
+    period: v.optional(v.string()),
+  },
+  handler: async (ctx, { employeeId, period }) => {
+    const user = await requireCurrentUser(ctx);
 
-  return commissions
-}
+    let commissions = await ctx.db
+      .query('yourobcEmployeeCommissions')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-/**
- * List commissions by status
- */
-export async function listCommissionsByStatus(
-  ctx: QueryCtx,
-  status: string,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_status', (q) => q.eq('status', status))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit)
+    if (employeeId) {
+      commissions = commissions.filter(c => c.employeeId === employeeId);
+    }
 
-  return commissions
-}
+    if (period) {
+      commissions = commissions.filter(c => c.period === period);
+    }
 
-/**
- * List commissions by employee and status
- */
-export async function listCommissionsByEmployeeAndStatus(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  status: string,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_employee_status', (q) =>
-      q.eq('employeeId', employeeId).eq('status', status)
-    )
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit)
+    const accessible = await filterEmployeeCommissionsByAccess(ctx, commissions, user);
 
-  return commissions
-}
+    const totalAmount = accessible.reduce((sum, c) => sum + c.totalAmount, 0);
 
-/**
- * List commissions by employee and period
- */
-export async function listCommissionsByEmployeeAndPeriod(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  period: string,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_employee_period', (q) =>
-      q.eq('employeeId', employeeId).eq('period', period)
-    )
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit)
-
-  return commissions
-}
-
-/**
- * Search commissions
- */
-export async function searchCommissions(
-  ctx: QueryCtx,
-  filters: CommissionSearchFilters,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  let query = ctx.db.query(EMPLOYEE_COMMISSIONS_TABLE)
-
-  // Apply index-based filters
-  if (filters.employeeId && filters.status) {
-    query = query
-      .withIndex('by_employee_status', (q) =>
-        q.eq('employeeId', filters.employeeId!).eq('status', filters.status!)
-      )
-  } else if (filters.employeeId && filters.period) {
-    query = query
-      .withIndex('by_employee_period', (q) =>
-        q.eq('employeeId', filters.employeeId!).eq('period', filters.period!)
-      )
-  } else if (filters.employeeId) {
-    query = query
-      .withIndex('by_employee', (q) => q.eq('employeeId', filters.employeeId!))
-  } else if (filters.status) {
-    query = query
-      .withIndex('by_status', (q) => q.eq('status', filters.status!))
-  } else if (filters.period) {
-    query = query
-      .withIndex('by_period', (q) => q.eq('period', filters.period!))
-  } else {
-    query = query.withIndex('by_created')
-  }
-
-  // Apply additional filters
-  let results = await query
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit * 2) // Take extra to account for additional filtering
-
-  // Apply non-indexed filters
-  if (filters.startDate) {
-    results = results.filter((c) => c.createdAt >= filters.startDate!)
-  }
-  if (filters.endDate) {
-    results = results.filter((c) => c.createdAt <= filters.endDate!)
-  }
-  if (filters.minAmount) {
-    results = results.filter((c) => c.commissionAmount >= filters.minAmount!)
-  }
-  if (filters.maxAmount) {
-    results = results.filter((c) => c.commissionAmount <= filters.maxAmount!)
-  }
-
-  return results.slice(0, limit)
-}
-
-/**
- * Get commission totals by period
- */
-export async function getCommissionTotalsByPeriod(
-  ctx: QueryCtx,
-  period: string,
-  ownerId: string
-): Promise<CommissionTotalsByPeriod> {
-  const commissions = await listCommissionsByPeriod(ctx, period, ownerId, 1000)
-
-  const totals = calculateTotalCommissions(commissions)
-
-  return {
-    period,
-    totalCommissions: totals.total,
-    totalPaid: totals.paid,
-    totalPending: totals.pending,
-    totalApproved: totals.approved,
-    count: totals.count,
-    currency: commissions[0]?.currency || 'EUR',
-  }
-}
-
-/**
- * Get commission totals by employee
- */
-export async function getCommissionTotalsByEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  ownerId: string
-): Promise<CommissionTotalsByEmployee> {
-  const commissions = await listCommissionsByEmployee(ctx, employeeId, ownerId, 1000)
-  const employee = await ctx.db.get(employeeId)
-
-  const totals = calculateTotalCommissions(commissions)
-
-  return {
-    employeeId,
-    employeeName: employee?.name || 'Unknown',
-    totalCommissions: totals.total,
-    totalPaid: totals.paid,
-    totalPending: totals.pending,
-    totalApproved: totals.approved,
-    count: totals.count,
-    currency: commissions[0]?.currency || 'EUR',
-  }
-}
-
-/**
- * Get pending commissions for auto-approval
- */
-export async function getPendingCommissionsForAutoApproval(
-  ctx: QueryCtx,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommission[]> {
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_approval_pending', (q) => q.eq('status', 'pending'))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .filter((q) => q.neq(q.field('invoicePaidDate'), undefined))
-    .take(limit)
-
-  return commissions
-}
-
-// ============================================================================
-// Commission Rules Queries
-// ============================================================================
-
-/**
- * Get rule by ID
- */
-export async function getRuleById(
-  ctx: QueryCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>
-): Promise<EmployeeCommissionRule | null> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule || rule.deletedAt) return null
-  return rule
-}
-
-/**
- * Get rule by public ID
- */
-export async function getRuleByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  ownerId: string
-): Promise<EmployeeCommissionRule | null> {
-  const rule = await ctx.db
-    .query(EMPLOYEE_COMMISSION_RULES_TABLE)
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  return rule
-}
-
-/**
- * List rules by employee
- */
-export async function listRulesByEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  ownerId: string,
-  activeOnly = false,
-  limit = 100
-): Promise<EmployeeCommissionRule[]> {
-  let query = ctx.db
-    .query(EMPLOYEE_COMMISSION_RULES_TABLE)
-    .withIndex('by_employee', (q) => q.eq('employeeId', employeeId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-
-  if (activeOnly) {
-    const results = await query.take(limit)
-    return results.filter((r) => r.isActive)
-  }
-
-  return query.take(limit)
-}
-
-/**
- * List active rules for employee
- */
-export async function listActiveRulesByEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  ownerId: string,
-  effectiveDate?: number,
-  limit = 100
-): Promise<EmployeeCommissionRule[]> {
-  const rules = await ctx.db
-    .query(EMPLOYEE_COMMISSION_RULES_TABLE)
-    .withIndex('by_employee_active', (q) =>
-      q.eq('employeeId', employeeId).eq('isActive', true)
-    )
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .take(limit)
-
-  // Filter by effective date if provided
-  if (effectiveDate) {
-    return rules.filter(
-      (rule) =>
-        rule.effectiveFrom <= effectiveDate &&
-        (!rule.effectiveTo || rule.effectiveTo >= effectiveDate)
-    )
-  }
-
-  return rules
-}
-
-/**
- * Search rules
- */
-export async function searchRules(
-  ctx: QueryCtx,
-  filters: RuleSearchFilters,
-  ownerId: string,
-  limit = 100
-): Promise<EmployeeCommissionRule[]> {
-  let query = ctx.db.query(EMPLOYEE_COMMISSION_RULES_TABLE)
-
-  // Apply index-based filters
-  if (filters.employeeId && filters.isActive !== undefined) {
-    query = query
-      .withIndex('by_employee_active', (q) =>
-        q.eq('employeeId', filters.employeeId!).eq('isActive', filters.isActive!)
-      )
-  } else if (filters.employeeId) {
-    query = query
-      .withIndex('by_employee', (q) => q.eq('employeeId', filters.employeeId!))
-  } else if (filters.isActive !== undefined) {
-    query = query
-      .withIndex('by_isActive', (q) => q.eq('isActive', filters.isActive!))
-  } else {
-    query = query.withIndex('by_created')
-  }
-
-  // Apply additional filters
-  let results = await query
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .take(limit * 2) // Take extra to account for additional filtering
-
-  // Apply non-indexed filters
-  if (filters.type) {
-    results = results.filter((r) => r.type === filters.type)
-  }
-  if (filters.effectiveDate) {
-    results = results.filter(
-      (r) =>
-        r.effectiveFrom <= filters.effectiveDate! &&
-        (!r.effectiveTo || r.effectiveTo >= filters.effectiveDate!)
-    )
-  }
-
-  return results.slice(0, limit)
-}
-
-/**
- * Find matching rules for commission calculation
- */
-export async function findMatchingRulesForEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  ownerId: string,
-  effectiveDate = Date.now()
-): Promise<EmployeeCommissionRule[]> {
-  const rules = await listActiveRulesByEmployee(
-    ctx,
-    employeeId,
-    ownerId,
-    effectiveDate,
-    100
-  )
-
-  // Sort by priority (highest first)
-  return rules.sort((a, b) => (b.priority || 0) - (a.priority || 0))
-}
+    return {
+      total: accessible.length,
+      byStatus: {
+        pending: accessible.filter(item => item.status === 'pending').length,
+        approved: accessible.filter(item => item.status === 'approved').length,
+        paid: accessible.filter(item => item.status === 'paid').length,
+        cancelled: accessible.filter(item => item.status === 'cancelled').length,
+      },
+      totalAmount: Math.round(totalAmount * 100) / 100,
+      pendingAmount: Math.round(accessible.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.totalAmount, 0) * 100) / 100,
+      approvedAmount: Math.round(accessible.filter(c => c.status === 'approved').reduce((sum, c) => sum + c.totalAmount, 0) * 100) / 100,
+      paidAmount: Math.round(accessible.filter(c => c.status === 'paid').reduce((sum, c) => sum + c.totalAmount, 0) * 100) / 100,
+    };
+  },
+});

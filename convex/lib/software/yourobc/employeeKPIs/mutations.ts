@@ -1,521 +1,343 @@
-// convex/lib/software/yourobc/convex/lib/software/yourobc/employeeKPIs/mutations.ts
-/**
- * Employee KPIs Mutations
- *
- * Mutation operations for employee KPIs and targets.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/mutations
- */
+// convex/lib/software/yourobc/employeeKPIs/mutations.ts
+// Write operations for employeeKPIs module
 
-import { mutation } from '../../../_generated/server'
-import { v } from 'convex/values'
-import { rankByMetricValidator } from '../../../schema/yourobc/base'
-import {
-  canCreateKPI,
-  canUpdateKPI,
-  canDeleteKPI,
-  canCreateTarget,
-  canUpdateTarget,
-  canDeleteTarget,
-} from './permissions'
-import {
-  calculateKPIMetrics,
-  calculateTargetAchievements,
-  generateKPIPublicId,
-  generateTargetPublicId,
-  formatPeriod,
-} from './utils'
-
-// ============================================================================
-// KPI Mutations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { employeeKPIsValidators } from '@/schema/software/yourobc/employeeKPIs/validators';
+import { EMPLOYEE_KPIS_CONSTANTS } from './constants';
+import { validateEmployeeKPIData, calculateAchievementPercentage, calculateChangePercentage, determineKPIStatus } from './utils';
+import { requireEditEmployeeKPIAccess, requireDeleteEmployeeKPIAccess } from './permissions';
+import type { EmployeeKPIId } from './types';
 
 /**
- * Create KPI
+ * Create new employee KPI
  */
-export const createKPI = mutation({
+export const createEmployeeKPI = mutation({
   args: {
-    publicId: v.optional(v.string()),
-    ownerId: v.string(),
-    employeeId: v.id('yourobcEmployees'),
-    year: v.number(),
-    month: v.number(),
-    quotesCreated: v.number(),
-    quotesConverted: v.number(),
-    quotesValue: v.number(),
-    convertedValue: v.number(),
-    ordersProcessed: v.number(),
-    ordersCompleted: v.number(),
-    ordersValue: v.number(),
-    commissionsEarned: v.number(),
-    commissionsPaid: v.number(),
-    commissionsPending: v.number(),
-    customerRetentionRate: v.optional(v.number()),
-    rank: v.optional(v.number()),
-    rankBy: v.optional(rankByMetricValidator),
-    tags: v.optional(v.array(v.string())),
-    category: v.optional(v.string()),
+    data: v.object({
+      employeeId: v.id('yourobcEmployees'),
+      kpiName: v.string(),
+      metricType: v.string(),
+      description: v.optional(v.string()),
+      targetValue: v.number(),
+      currentValue: v.number(),
+      period: employeeKPIsValidators.period,
+      year: v.number(),
+      month: v.optional(v.number()),
+      quarter: v.optional(v.number()),
+      week: v.optional(v.number()),
+      day: v.optional(v.number()),
+      startDate: v.number(),
+      endDate: v.number(),
+      warningThreshold: v.optional(v.number()),
+      criticalThreshold: v.optional(v.number()),
+      status: v.optional(employeeKPIsValidators.status),
+      notes: v.optional(v.string()),
+    }),
   },
-  handler: async (ctx, args) => {
-    // Check permissions
-    const hasPermission = await canCreateKPI(ctx, args.ownerId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to create KPI')
+  handler: async (ctx, { data }): Promise<EmployeeKPIId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, EMPLOYEE_KPIS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
+
+    // 3. VALIDATE: Check data validity
+    const errors = validateEmployeeKPIData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // Calculate metrics
-    const metrics = calculateKPIMetrics(
-      args.quotesCreated,
-      args.quotesConverted,
-      args.quotesValue,
-      args.ordersProcessed,
-      args.ordersValue
-    )
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'yourobcEmployeeKPIs');
+    const now = Date.now();
 
-    // Generate publicId if not provided
-    const publicId =
-      args.publicId ||
-      generateKPIPublicId(args.employeeId, args.year, args.month)
+    // Calculate achievement percentage and status
+    const achievementPercentage = calculateAchievementPercentage(data.currentValue, data.targetValue);
+    const status = data.status || determineKPIStatus(
+      achievementPercentage,
+      data.warningThreshold,
+      data.criticalThreshold
+    );
 
-    // Create KPI
+    // 5. CREATE: Insert into database
     const kpiId = await ctx.db.insert('yourobcEmployeeKPIs', {
       publicId,
-      ownerId: args.ownerId,
-      employeeId: args.employeeId,
-      year: args.year,
-      month: args.month,
-      quotesCreated: args.quotesCreated,
-      quotesConverted: args.quotesConverted,
-      quotesValue: args.quotesValue,
-      convertedValue: args.convertedValue,
-      ordersProcessed: args.ordersProcessed,
-      ordersCompleted: args.ordersCompleted,
-      ordersValue: args.ordersValue,
-      averageOrderValue: metrics.averageOrderValue,
-      commissionsEarned: args.commissionsEarned,
-      commissionsPaid: args.commissionsPaid,
-      commissionsPending: args.commissionsPending,
-      conversionRate: metrics.conversionRate,
-      averageQuoteValue: metrics.averageQuoteValue,
-      customerRetentionRate: args.customerRetentionRate,
-      rank: args.rank,
-      rankBy: args.rankBy,
-      calculatedAt: Date.now(),
-      tags: args.tags || [],
-      category: args.category,
-      createdBy: args.ownerId,
-      createdAt: Date.now(),
-    })
+      employeeId: data.employeeId,
+      kpiName: data.kpiName.trim(),
+      metricType: data.metricType.trim(),
+      description: data.description?.trim(),
+      targetValue: data.targetValue,
+      currentValue: data.currentValue,
+      achievementPercentage,
+      period: data.period,
+      year: data.year,
+      month: data.month,
+      quarter: data.quarter,
+      week: data.week,
+      day: data.day,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      warningThreshold: data.warningThreshold || EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_WARNING_THRESHOLD,
+      criticalThreshold: data.criticalThreshold || EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_CRITICAL_THRESHOLD,
+      status,
+      notes: data.notes?.trim(),
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-    return kpiId
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeKPIs.created',
+      entityType: 'system_employeeKPIs',
+      entityId: publicId,
+      entityTitle: data.kpiName.trim(),
+      description: `Created employee KPI: ${data.kpiName.trim()}`,
+      metadata: {
+        status,
+        period: data.period,
+        achievementPercentage,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 7. RETURN: Return entity ID
+    return kpiId;
   },
-})
+});
 
 /**
- * Update KPI
+ * Update existing employee KPI
  */
-export const updateKPI = mutation({
-  args: {
-    id: v.id('yourobcEmployeeKPIs'),
-    quotesCreated: v.optional(v.number()),
-    quotesConverted: v.optional(v.number()),
-    quotesValue: v.optional(v.number()),
-    convertedValue: v.optional(v.number()),
-    ordersProcessed: v.optional(v.number()),
-    ordersCompleted: v.optional(v.number()),
-    ordersValue: v.optional(v.number()),
-    commissionsEarned: v.optional(v.number()),
-    commissionsPaid: v.optional(v.number()),
-    commissionsPending: v.optional(v.number()),
-    customerRetentionRate: v.optional(v.number()),
-    rank: v.optional(v.number()),
-    rankBy: v.optional(rankByMetricValidator),
-    tags: v.optional(v.array(v.string())),
-    category: v.optional(v.string()),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db.get(args.id)
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canUpdateKPI(ctx, kpi, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to update this KPI')
-    }
-
-    // Prepare updates
-    const updates: any = {
-      updatedBy: args.userId,
-      updatedAt: Date.now(),
-    }
-
-    // Update numeric fields if provided
-    if (args.quotesCreated !== undefined) updates.quotesCreated = args.quotesCreated
-    if (args.quotesConverted !== undefined) updates.quotesConverted = args.quotesConverted
-    if (args.quotesValue !== undefined) updates.quotesValue = args.quotesValue
-    if (args.convertedValue !== undefined) updates.convertedValue = args.convertedValue
-    if (args.ordersProcessed !== undefined) updates.ordersProcessed = args.ordersProcessed
-    if (args.ordersCompleted !== undefined) updates.ordersCompleted = args.ordersCompleted
-    if (args.ordersValue !== undefined) updates.ordersValue = args.ordersValue
-    if (args.commissionsEarned !== undefined) updates.commissionsEarned = args.commissionsEarned
-    if (args.commissionsPaid !== undefined) updates.commissionsPaid = args.commissionsPaid
-    if (args.commissionsPending !== undefined) updates.commissionsPending = args.commissionsPending
-    if (args.customerRetentionRate !== undefined) updates.customerRetentionRate = args.customerRetentionRate
-    if (args.rank !== undefined) updates.rank = args.rank
-    if (args.rankBy !== undefined) updates.rankBy = args.rankBy
-    if (args.tags !== undefined) updates.tags = args.tags
-    if (args.category !== undefined) updates.category = args.category
-
-    // Recalculate metrics if relevant fields changed
-    const needsRecalculation =
-      args.quotesCreated !== undefined ||
-      args.quotesConverted !== undefined ||
-      args.quotesValue !== undefined ||
-      args.ordersProcessed !== undefined ||
-      args.ordersValue !== undefined
-
-    if (needsRecalculation) {
-      const metrics = calculateKPIMetrics(
-        args.quotesCreated ?? kpi.quotesCreated,
-        args.quotesConverted ?? kpi.quotesConverted,
-        args.quotesValue ?? kpi.quotesValue,
-        args.ordersProcessed ?? kpi.ordersProcessed,
-        args.ordersValue ?? kpi.ordersValue
-      )
-      updates.conversionRate = metrics.conversionRate
-      updates.averageQuoteValue = metrics.averageQuoteValue
-      updates.averageOrderValue = metrics.averageOrderValue
-      updates.calculatedAt = Date.now()
-    }
-
-    await ctx.db.patch(args.id, updates)
-
-    return args.id
-  },
-})
-
-/**
- * Delete KPI (soft delete)
- */
-export const deleteKPI = mutation({
-  args: {
-    id: v.id('yourobcEmployeeKPIs'),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db.get(args.id)
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canDeleteKPI(ctx, kpi, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to delete this KPI')
-    }
-
-    // Soft delete
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.userId,
-    })
-
-    return args.id
-  },
-})
-
-/**
- * Recalculate KPI metrics
- */
-export const recalculateKPIMetrics = mutation({
-  args: {
-    id: v.id('yourobcEmployeeKPIs'),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db.get(args.id)
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canUpdateKPI(ctx, kpi, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to update this KPI')
-    }
-
-    // Recalculate all metrics
-    const metrics = calculateKPIMetrics(
-      kpi.quotesCreated,
-      kpi.quotesConverted,
-      kpi.quotesValue,
-      kpi.ordersProcessed,
-      kpi.ordersValue
-    )
-
-    // Update with recalculated values
-    await ctx.db.patch(args.id, {
-      conversionRate: metrics.conversionRate,
-      averageQuoteValue: metrics.averageQuoteValue,
-      averageOrderValue: metrics.averageOrderValue,
-      calculatedAt: Date.now(),
-      updatedBy: args.userId,
-      updatedAt: Date.now(),
-    })
-
-    return args.id
-  },
-})
-
-// ============================================================================
-// Target Mutations
-// ============================================================================
-
-/**
- * Create target
- */
-export const createTarget = mutation({
-  args: {
-    publicId: v.optional(v.string()),
-    ownerId: v.string(),
-    employeeId: v.id('yourobcEmployees'),
-    kpiId: v.optional(v.id('yourobcEmployeeKPIs')),
-    year: v.number(),
-    month: v.optional(v.number()),
-    quarter: v.optional(v.number()),
-    quotesTarget: v.optional(v.number()),
-    ordersTarget: v.optional(v.number()),
-    revenueTarget: v.optional(v.number()),
-    conversionTarget: v.optional(v.number()),
-    commissionsTarget: v.optional(v.number()),
-    setBy: v.string(),
-    notes: v.optional(v.string()),
-    tags: v.optional(v.array(v.string())),
-    category: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    // Check permissions
-    const hasPermission = await canCreateTarget(ctx, args.setBy)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to create target')
-    }
-
-    // Generate publicId if not provided
-    const publicId =
-      args.publicId ||
-      generateTargetPublicId(
-        args.employeeId,
-        args.year,
-        args.month,
-        args.quarter
-      )
-
-    // Format period
-    const period = formatPeriod(args.year, args.month, args.quarter)
-
-    // Create target
-    const targetId = await ctx.db.insert('yourobcEmployeeTargets', {
-      publicId,
-      ownerId: args.ownerId,
-      employeeId: args.employeeId,
-      kpiId: args.kpiId,
-      year: args.year,
-      month: args.month,
-      quarter: args.quarter,
-      period,
-      quotesTarget: args.quotesTarget,
-      ordersTarget: args.ordersTarget,
-      revenueTarget: args.revenueTarget,
-      conversionTarget: args.conversionTarget,
-      commissionsTarget: args.commissionsTarget,
-      setBy: args.setBy,
-      setDate: Date.now(),
-      notes: args.notes,
-      tags: args.tags || [],
-      category: args.category,
-      createdBy: args.setBy,
-      createdAt: Date.now(),
-    })
-
-    return targetId
-  },
-})
-
-/**
- * Update target
- */
-export const updateTarget = mutation({
-  args: {
-    id: v.id('yourobcEmployeeTargets'),
-    kpiId: v.optional(v.id('yourobcEmployeeKPIs')),
-    quotesTarget: v.optional(v.number()),
-    ordersTarget: v.optional(v.number()),
-    revenueTarget: v.optional(v.number()),
-    conversionTarget: v.optional(v.number()),
-    commissionsTarget: v.optional(v.number()),
-    notes: v.optional(v.string()),
-    tags: v.optional(v.array(v.string())),
-    category: v.optional(v.string()),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const target = await ctx.db.get(args.id)
-    if (!target) {
-      throw new Error('Target not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canUpdateTarget(ctx, target, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to update this target')
-    }
-
-    // Prepare updates
-    const updates: any = {
-      updatedBy: args.userId,
-      updatedAt: Date.now(),
-    }
-
-    if (args.kpiId !== undefined) updates.kpiId = args.kpiId
-    if (args.quotesTarget !== undefined) updates.quotesTarget = args.quotesTarget
-    if (args.ordersTarget !== undefined) updates.ordersTarget = args.ordersTarget
-    if (args.revenueTarget !== undefined) updates.revenueTarget = args.revenueTarget
-    if (args.conversionTarget !== undefined) updates.conversionTarget = args.conversionTarget
-    if (args.commissionsTarget !== undefined) updates.commissionsTarget = args.commissionsTarget
-    if (args.notes !== undefined) updates.notes = args.notes
-    if (args.tags !== undefined) updates.tags = args.tags
-    if (args.category !== undefined) updates.category = args.category
-
-    await ctx.db.patch(args.id, updates)
-
-    return args.id
-  },
-})
-
-/**
- * Delete target (soft delete)
- */
-export const deleteTarget = mutation({
-  args: {
-    id: v.id('yourobcEmployeeTargets'),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const target = await ctx.db.get(args.id)
-    if (!target) {
-      throw new Error('Target not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canDeleteTarget(ctx, target, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to delete this target')
-    }
-
-    // Soft delete
-    await ctx.db.patch(args.id, {
-      deletedAt: Date.now(),
-      deletedBy: args.userId,
-    })
-
-    return args.id
-  },
-})
-
-/**
- * Link target to KPI
- */
-export const linkTargetToKPI = mutation({
-  args: {
-    targetId: v.id('yourobcEmployeeTargets'),
-    kpiId: v.id('yourobcEmployeeKPIs'),
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const target = await ctx.db.get(args.targetId)
-    if (!target) {
-      throw new Error('Target not found')
-    }
-
-    const kpi = await ctx.db.get(args.kpiId)
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // Check permissions
-    const hasPermission = await canUpdateTarget(ctx, target, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to update this target')
-    }
-
-    // Link target to KPI
-    await ctx.db.patch(args.targetId, {
-      kpiId: args.kpiId,
-      updatedBy: args.userId,
-      updatedAt: Date.now(),
-    })
-
-    return args.targetId
-  },
-})
-
-/**
- * Update KPI with target achievements
- */
-export const updateKPITargetAchievements = mutation({
+export const updateEmployeeKPI = mutation({
   args: {
     kpiId: v.id('yourobcEmployeeKPIs'),
-    userId: v.string(),
+    updates: v.object({
+      kpiName: v.optional(v.string()),
+      metricType: v.optional(v.string()),
+      description: v.optional(v.string()),
+      targetValue: v.optional(v.number()),
+      currentValue: v.optional(v.number()),
+      historicalData: v.optional(v.array(v.object({
+        date: v.number(),
+        value: v.number(),
+        note: v.optional(v.string()),
+      }))),
+      previousPeriodValue: v.optional(v.number()),
+      warningThreshold: v.optional(v.number()),
+      criticalThreshold: v.optional(v.number()),
+      status: v.optional(employeeKPIsValidators.status),
+      notes: v.optional(v.string()),
+    }),
   },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db.get(args.kpiId)
+  handler: async (ctx, { kpiId, updates }): Promise<EmployeeKPIId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const kpi = await ctx.db.get(kpiId);
+    if (!kpi || kpi.deletedAt) {
+      throw new Error('KPI not found');
+    }
+
+    // 3. AUTHZ: Check edit permission
+    await requireEditEmployeeKPIAccess(ctx, kpi, user);
+
+    // 4. VALIDATE: Check update data validity
+    const errors = validateEmployeeKPIData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (updates.kpiName !== undefined) {
+      updateData.kpiName = updates.kpiName.trim();
+    }
+    if (updates.metricType !== undefined) {
+      updateData.metricType = updates.metricType.trim();
+    }
+    if (updates.description !== undefined) {
+      updateData.description = updates.description?.trim();
+    }
+    if (updates.targetValue !== undefined) {
+      updateData.targetValue = updates.targetValue;
+    }
+    if (updates.currentValue !== undefined) {
+      updateData.currentValue = updates.currentValue;
+    }
+    if (updates.historicalData !== undefined) {
+      updateData.historicalData = updates.historicalData;
+    }
+    if (updates.previousPeriodValue !== undefined) {
+      updateData.previousPeriodValue = updates.previousPeriodValue;
+      // Calculate change percentage
+      const currentValue = updates.currentValue ?? kpi.currentValue;
+      updateData.changePercentage = calculateChangePercentage(currentValue, updates.previousPeriodValue);
+    }
+    if (updates.warningThreshold !== undefined) {
+      updateData.warningThreshold = updates.warningThreshold;
+    }
+    if (updates.criticalThreshold !== undefined) {
+      updateData.criticalThreshold = updates.criticalThreshold;
+    }
+    if (updates.notes !== undefined) {
+      updateData.notes = updates.notes?.trim();
+    }
+
+    // Recalculate achievement percentage if values changed
+    const targetValue = updateData.targetValue ?? kpi.targetValue;
+    const currentValue = updateData.currentValue ?? kpi.currentValue;
+    const achievementPercentage = calculateAchievementPercentage(currentValue, targetValue);
+    updateData.achievementPercentage = achievementPercentage;
+
+    // Update status if not explicitly provided
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+    } else {
+      const warningThreshold = updateData.warningThreshold ?? kpi.warningThreshold ?? EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_WARNING_THRESHOLD;
+      const criticalThreshold = updateData.criticalThreshold ?? kpi.criticalThreshold ?? EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_CRITICAL_THRESHOLD;
+      updateData.status = determineKPIStatus(achievementPercentage, warningThreshold, criticalThreshold);
+    }
+
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(kpiId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeKPIs.updated',
+      entityType: 'system_employeeKPIs',
+      entityId: kpi.publicId,
+      entityTitle: updateData.kpiName || kpi.kpiName,
+      description: `Updated employee KPI: ${updateData.kpiName || kpi.kpiName}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return kpiId;
+  },
+});
+
+/**
+ * Delete employee KPI (soft delete)
+ */
+export const deleteEmployeeKPI = mutation({
+  args: {
+    kpiId: v.id('yourobcEmployeeKPIs'),
+  },
+  handler: async (ctx, { kpiId }): Promise<EmployeeKPIId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const kpi = await ctx.db.get(kpiId);
+    if (!kpi || kpi.deletedAt) {
+      throw new Error('KPI not found');
+    }
+
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteEmployeeKPIAccess(kpi, user);
+
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(kpiId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeKPIs.deleted',
+      entityType: 'system_employeeKPIs',
+      entityId: kpi.publicId,
+      entityTitle: kpi.kpiName,
+      description: `Deleted employee KPI: ${kpi.kpiName}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return kpiId;
+  },
+});
+
+/**
+ * Restore soft-deleted employee KPI
+ */
+export const restoreEmployeeKPI = mutation({
+  args: {
+    kpiId: v.id('yourobcEmployeeKPIs'),
+  },
+  handler: async (ctx, { kpiId }): Promise<EmployeeKPIId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists and is deleted
+    const kpi = await ctx.db.get(kpiId);
     if (!kpi) {
-      throw new Error('KPI not found')
+      throw new Error('KPI not found');
+    }
+    if (!kpi.deletedAt) {
+      throw new Error('KPI is not deleted');
     }
 
-    // Check permissions
-    const hasPermission = await canUpdateKPI(ctx, kpi, args.userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to update this KPI')
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      kpi.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this KPI');
     }
 
-    // Get targets for this KPI
-    const targets = await ctx.db
-      .query('yourobcEmployeeTargets')
-      .withIndex('by_kpiId', (q) => q.eq('kpiId', args.kpiId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(kpiId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-    if (!targets || !kpi.targets) {
-      throw new Error('No targets found for this KPI')
-    }
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeKPIs.restored',
+      entityType: 'system_employeeKPIs',
+      entityId: kpi.publicId,
+      entityTitle: kpi.kpiName,
+      description: `Restored employee KPI: ${kpi.kpiName}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-    // Calculate achievements
-    const achievements = calculateTargetAchievements(
-      {
-        quotesCreated: kpi.quotesCreated,
-        ordersProcessed: kpi.ordersProcessed,
-        ordersValue: kpi.ordersValue,
-        conversionRate: kpi.conversionRate,
-      },
-      kpi.targets
-    )
-
-    // Update KPI with achievements
-    await ctx.db.patch(args.kpiId, {
-      targetAchievement: {
-        quotesAchievement: achievements.quotesAchievement,
-        ordersAchievement: achievements.ordersAchievement,
-        revenueAchievement: achievements.revenueAchievement,
-        conversionAchievement: achievements.conversionAchievement,
-      },
-      updatedBy: args.userId,
-      updatedAt: Date.now(),
-    })
-
-    return args.kpiId
+    // 6. RETURN: Return entity ID
+    return kpiId;
   },
-})
+});

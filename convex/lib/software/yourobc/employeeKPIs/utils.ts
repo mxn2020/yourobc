@@ -1,214 +1,114 @@
 // convex/lib/software/yourobc/employeeKPIs/utils.ts
-/**
- * Employee KPIs Utilities
- *
- * Utility functions for KPI calculations and formatting.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/utils
- */
+// Validation functions and utility helpers for employeeKPIs module
 
-import type { RankByMetric } from '../../../schema/yourobc/base'
-import type { KPICalculationResult, TargetAchievementResult } from './types'
-import { QUARTER_MONTHS } from './constants'
+import { EMPLOYEE_KPIS_CONSTANTS } from './constants';
+import type { CreateEmployeeKPIData, UpdateEmployeeKPIData } from './types';
 
 /**
- * Calculate conversion rate
+ * Validate employee KPI data for creation/update
  */
-export function calculateConversionRate(
-  quotesConverted: number,
-  quotesCreated: number
-): number {
-  if (quotesCreated === 0) return 0
-  return (quotesConverted / quotesCreated) * 100
-}
+export function validateEmployeeKPIData(
+  data: Partial<CreateEmployeeKPIData | UpdateEmployeeKPIData>
+): string[] {
+  const errors: string[] = [];
 
-/**
- * Calculate average quote value
- */
-export function calculateAverageQuoteValue(
-  quotesValue: number,
-  quotesCreated: number
-): number {
-  if (quotesCreated === 0) return 0
-  return quotesValue / quotesCreated
-}
+  // Validate KPI name (main display field)
+  if (data.kpiName !== undefined) {
+    const trimmed = data.kpiName.trim();
 
-/**
- * Calculate average order value
- */
-export function calculateAverageOrderValue(
-  ordersValue: number,
-  ordersProcessed: number
-): number {
-  if (ordersProcessed === 0) return 0
-  return ordersValue / ordersProcessed
-}
-
-/**
- * Calculate all KPI metrics
- */
-export function calculateKPIMetrics(
-  quotesCreated: number,
-  quotesConverted: number,
-  quotesValue: number,
-  ordersProcessed: number,
-  ordersValue: number
-): KPICalculationResult {
-  return {
-    conversionRate: calculateConversionRate(quotesConverted, quotesCreated),
-    averageQuoteValue: calculateAverageQuoteValue(quotesValue, quotesCreated),
-    averageOrderValue: calculateAverageOrderValue(ordersValue, ordersProcessed),
+    if (!trimmed) {
+      errors.push('KPI name is required');
+    } else if (trimmed.length < EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_KPI_NAME_LENGTH) {
+      errors.push(`KPI name must be at least ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_KPI_NAME_LENGTH} characters`);
+    } else if (trimmed.length > EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_KPI_NAME_LENGTH) {
+      errors.push(`KPI name cannot exceed ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_KPI_NAME_LENGTH} characters`);
+    } else if (!EMPLOYEE_KPIS_CONSTANTS.VALIDATION.KPI_NAME_PATTERN.test(trimmed)) {
+      errors.push('KPI name contains invalid characters');
+    }
   }
-}
 
-/**
- * Calculate target achievement percentage
- */
-export function calculateAchievement(actual: number, target: number): number {
-  if (target === 0) return 0
-  return (actual / target) * 100
-}
-
-/**
- * Calculate target achievements
- */
-export function calculateTargetAchievements(
-  kpi: {
-    quotesCreated: number
-    ordersProcessed: number
-    ordersValue: number
-    conversionRate: number
-  },
-  targets: {
-    quotesTarget?: number
-    ordersTarget?: number
-    revenueTarget?: number
-    conversionTarget?: number
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH) {
+      errors.push(`Description cannot exceed ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH} characters`);
+    }
   }
-): TargetAchievementResult {
-  const quotesAchievement = targets.quotesTarget
-    ? calculateAchievement(kpi.quotesCreated, targets.quotesTarget)
-    : 0
 
-  const ordersAchievement = targets.ordersTarget
-    ? calculateAchievement(kpi.ordersProcessed, targets.ordersTarget)
-    : 0
-
-  const revenueAchievement = targets.revenueTarget
-    ? calculateAchievement(kpi.ordersValue, targets.revenueTarget)
-    : 0
-
-  const conversionAchievement = targets.conversionTarget
-    ? calculateAchievement(kpi.conversionRate, targets.conversionTarget)
-    : 0
-
-  // Calculate overall achievement (average of all non-zero achievements)
-  const achievements = [
-    quotesAchievement,
-    ordersAchievement,
-    revenueAchievement,
-    conversionAchievement,
-  ].filter((a) => a > 0)
-
-  const overallAchievement =
-    achievements.length > 0
-      ? achievements.reduce((sum, a) => sum + a, 0) / achievements.length
-      : 0
-
-  return {
-    quotesAchievement,
-    ordersAchievement,
-    revenueAchievement,
-    conversionAchievement,
-    overallAchievement,
+  // Validate notes
+  if (data.notes !== undefined && data.notes.trim()) {
+    const trimmed = data.notes.trim();
+    if (trimmed.length > EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_NOTES_LENGTH) {
+      errors.push(`Notes cannot exceed ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_NOTES_LENGTH} characters`);
+    }
   }
+
+  // Validate target value
+  if ('targetValue' in data && data.targetValue !== undefined) {
+    if (data.targetValue < EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_TARGET_VALUE) {
+      errors.push(`Target value must be at least ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_TARGET_VALUE}`);
+    }
+  }
+
+  // Validate current value
+  if ('currentValue' in data && data.currentValue !== undefined) {
+    if (data.currentValue < EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_CURRENT_VALUE) {
+      errors.push(`Current value must be at least ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MIN_CURRENT_VALUE}`);
+    }
+  }
+
+  // Validate historical data
+  if ('historicalData' in data && data.historicalData) {
+    if (data.historicalData.length > EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_HISTORICAL_DATA_ENTRIES) {
+      errors.push(`Historical data cannot exceed ${EMPLOYEE_KPIS_CONSTANTS.LIMITS.MAX_HISTORICAL_DATA_ENTRIES} entries`);
+    }
+  }
+
+  return errors;
 }
 
 /**
- * Format period string
+ * Calculate achievement percentage
  */
-export function formatPeriod(
-  year: number,
-  month?: number,
-  quarter?: number
-): string {
-  if (quarter) {
-    return `${year}-Q${quarter}`
-  }
-  if (month) {
-    return `${year}-${String(month).padStart(2, '0')}`
-  }
-  return `${year}`
+export function calculateAchievementPercentage(currentValue: number, targetValue: number): number {
+  if (targetValue === 0) return 0;
+  return Math.round((currentValue / targetValue) * 100);
 }
 
 /**
- * Get quarter from month
+ * Calculate change percentage from previous period
  */
-export function getQuarterFromMonth(month: number): number {
-  if (month >= 1 && month <= 3) return 1
-  if (month >= 4 && month <= 6) return 2
-  if (month >= 7 && month <= 9) return 3
-  return 4
+export function calculateChangePercentage(currentValue: number, previousValue: number): number {
+  if (previousValue === 0) return 0;
+  return Math.round(((currentValue - previousValue) / previousValue) * 100);
 }
 
 /**
- * Get months in quarter
+ * Determine KPI status based on achievement and thresholds
  */
-export function getMonthsInQuarter(quarter: number): number[] {
-  return QUARTER_MONTHS[quarter as keyof typeof QUARTER_MONTHS] || []
+export function determineKPIStatus(
+  achievementPercentage: number,
+  warningThreshold: number = EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_WARNING_THRESHOLD,
+  criticalThreshold: number = EMPLOYEE_KPIS_CONSTANTS.THRESHOLDS.DEFAULT_CRITICAL_THRESHOLD
+): 'on_track' | 'at_risk' | 'behind' | 'achieved' {
+  if (achievementPercentage >= 100) return 'achieved';
+  if (achievementPercentage >= warningThreshold) return 'on_track';
+  if (achievementPercentage >= criticalThreshold) return 'at_risk';
+  return 'behind';
 }
 
 /**
- * Generate public ID for KPI
+ * Format KPI display name
  */
-export function generateKPIPublicId(
-  employeeId: string,
-  year: number,
-  month: number
-): string {
-  return `KPI-${year}-${String(month).padStart(2, '0')}-${employeeId.slice(-6)}`
+export function formatKPIDisplayName(kpi: { kpiName: string; status?: string }): string {
+  const statusBadge = kpi.status ? ` [${kpi.status}]` : '';
+  return `${kpi.kpiName}${statusBadge}`;
 }
 
 /**
- * Generate public ID for target
+ * Check if KPI is editable
  */
-export function generateTargetPublicId(
-  employeeId: string,
-  year: number,
-  month?: number,
-  quarter?: number
-): string {
-  if (quarter) {
-    return `TARGET-${year}-Q${quarter}-${employeeId.slice(-6)}`
-  }
-  if (month) {
-    return `TARGET-${year}-${String(month).padStart(2, '0')}-${employeeId.slice(-6)}`
-  }
-  return `TARGET-${year}-${employeeId.slice(-6)}`
-}
-
-/**
- * Get metric value for ranking
- */
-export function getMetricValueForRanking(
-  kpi: {
-    ordersProcessed: number
-    ordersValue: number
-    conversionRate: number
-    commissionsEarned: number
-  },
-  rankBy: RankByMetric
-): number {
-  switch (rankBy) {
-    case 'orders':
-      return kpi.ordersProcessed
-    case 'revenue':
-      return kpi.ordersValue
-    case 'conversion':
-      return kpi.conversionRate
-    case 'commissions':
-      return kpi.commissionsEarned
-    default:
-      return 0
-  }
+export function isKPIEditable(kpi: { status: string; deletedAt?: number }): boolean {
+  if (kpi.deletedAt) return false;
+  return kpi.status !== 'achieved';
 }

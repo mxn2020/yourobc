@@ -1,48 +1,43 @@
 // convex/lib/software/yourobc/quotes/index.ts
-/**
- * Quote Module Public API
- *
- * Barrel export file for clean imports of quote module components.
- *
- * @module convex/lib/software/yourobc/quotes
- */
+// Public API exports for quotes module
 
 // Constants
-export { QUOTES_CONSTANTS } from './constants'
+export { QUOTES_CONSTANTS } from './constants';
 
 // Types
-export type * from './types'
+export type * from './types';
 
 // Utilities
 export {
   validateQuoteData,
   formatQuoteDisplayName,
+  calculateTotalPrice,
+  calculateValidityPeriodDays,
   isQuoteEditable,
   isQuoteExpired,
-  isQuoteExpiringSoon,
-  calculateValidUntil,
-  calculateTotalPrice,
-  formatCurrencyAmount,
-  canConvertToShipment,
   canSendQuote,
   canAcceptQuote,
   canRejectQuote,
-} from './utils'
+  canConvertToShipment,
+  trimQuoteData,
+} from './utils';
 
 // Permissions
 export {
   canViewQuote,
   canEditQuote,
   canDeleteQuote,
+  canSendQuote as canSendQuotePermission,
+  canAcceptOrRejectQuote,
+  canConvertQuote,
   requireViewQuoteAccess,
   requireEditQuoteAccess,
   requireDeleteQuoteAccess,
   requireSendQuoteAccess,
-  requireAcceptQuoteAccess,
-  requireRejectQuoteAccess,
-  requireConvertToShipmentAccess,
+  requireAcceptOrRejectQuoteAccess,
+  requireConvertQuoteAccess,
   filterQuotesByAccess,
-} from './permissions'
+} from './permissions';
 
 // Queries
 export {
@@ -51,11 +46,9 @@ export {
   getQuoteByPublicId,
   getQuoteByQuoteNumber,
   getQuotesByCustomer,
-  getQuotesByEmployee,
-  getExpiringQuotes,
-  getExpiredQuotes,
   getQuoteStats,
-} from './queries'
+  getExpiringQuotes,
+} from './queries';
 
 // Mutations
 export {
@@ -66,6 +59,5 @@ export {
   sendQuote,
   acceptQuote,
   rejectQuote,
-  expireQuote,
   convertQuoteToShipment,
-} from './mutations'
+} from './mutations';

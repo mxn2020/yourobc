@@ -1,329 +1,169 @@
 // convex/lib/software/yourobc/employeeKPIs/queries.ts
-/**
- * Employee KPIs Queries
- *
- * Query operations for employee KPIs and targets.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/queries
- */
+// Read operations for employeeKPIs module
 
-import { query } from '../../../_generated/server'
-import { v } from 'convex/values'
-import { Id } from '../../../_generated/dataModel'
-import { canViewKPI, canViewTarget } from './permissions'
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { employeeKPIsValidators } from '@/schema/software/yourobc/employeeKPIs/validators';
+import { filterEmployeeKPIsByAccess, requireViewEmployeeKPIAccess } from './permissions';
+import type { EmployeeKPIListResponse } from './types';
 
 /**
- * Get KPI by ID
+ * Get paginated list of employee KPIs with filtering
  */
-export const getKPIById = query({
+export const getEmployeeKPIs = query({
   args: {
-    id: v.id('yourobcEmployeeKPIs'),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db.get(args.id)
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // TODO: Get actual userId from auth
-    const userId = kpi.ownerId
-
-    const hasPermission = await canViewKPI(ctx, kpi, userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to view this KPI')
-    }
-
-    return kpi
-  },
-})
-
-/**
- * Get KPI by public ID
- */
-export const getKPIByPublicId = query({
-  args: {
-    publicId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db
-      .query('yourobcEmployeeKPIs')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-
-    if (!kpi) {
-      throw new Error('KPI not found')
-    }
-
-    // TODO: Get actual userId from auth
-    const userId = kpi.ownerId
-
-    const hasPermission = await canViewKPI(ctx, kpi, userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to view this KPI')
-    }
-
-    return kpi
-  },
-})
-
-/**
- * List KPIs for employee
- */
-export const listKPIsByEmployee = query({
-  args: {
-    employeeId: v.id('yourobcEmployees'),
-    year: v.optional(v.number()),
     limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(employeeKPIsValidators.status)),
+      period: v.optional(v.array(employeeKPIsValidators.period)),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      year: v.optional(v.number()),
+      month: v.optional(v.number()),
+      metricType: v.optional(v.string()),
+    })),
   },
-  handler: async (ctx, args) => {
-    const limit = args.limit ?? 50
+  handler: async (ctx, args): Promise<EmployeeKPIListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-    let query = ctx.db
+    // Query with index
+    let kpis = await ctx.db
       .query('yourobcEmployeeKPIs')
-      .withIndex('employee', (q) => q.eq('employeeId', args.employeeId))
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-    if (args.year) {
-      query = query.filter((q) => q.eq(q.field('year'), args.year))
+    // Apply access filtering
+    kpis = await filterEmployeeKPIsByAccess(ctx, kpis, user);
+
+    // Apply status filter
+    if (filters.status?.length) {
+      kpis = kpis.filter(item =>
+        filters.status!.includes(item.status)
+      );
     }
 
-    const kpis = await query
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .take(limit)
-
-    return kpis
-  },
-})
-
-/**
- * Get KPI for specific month
- */
-export const getKPIForMonth = query({
-  args: {
-    employeeId: v.id('yourobcEmployees'),
-    year: v.number(),
-    month: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const kpi = await ctx.db
-      .query('yourobcEmployeeKPIs')
-      .withIndex('employee_month', (q) =>
-        q
-          .eq('employeeId', args.employeeId)
-          .eq('year', args.year)
-          .eq('month', args.month)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-
-    return kpi
-  },
-})
-
-/**
- * Get leaderboard for month
- */
-export const getLeaderboard = query({
-  args: {
-    year: v.number(),
-    month: v.number(),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const limit = args.limit ?? 10
-
-    const kpis = await ctx.db
-      .query('yourobcEmployeeKPIs')
-      .withIndex('rank', (q) =>
-        q.eq('year', args.year).eq('month', args.month)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('asc')
-      .take(limit)
-
-    return kpis
-  },
-})
-
-/**
- * Get target by ID
- */
-export const getTargetById = query({
-  args: {
-    id: v.id('yourobcEmployeeTargets'),
-  },
-  handler: async (ctx, args) => {
-    const target = await ctx.db.get(args.id)
-    if (!target) {
-      throw new Error('Target not found')
+    // Apply period filter
+    if (filters.period?.length) {
+      kpis = kpis.filter(item =>
+        filters.period!.includes(item.period)
+      );
     }
 
-    // TODO: Get actual userId from auth
-    const userId = target.ownerId
-
-    const hasPermission = await canViewTarget(ctx, target, userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to view this target')
+    // Apply employee filter
+    if (filters.employeeId) {
+      kpis = kpis.filter(item => item.employeeId === filters.employeeId);
     }
 
-    return target
-  },
-})
-
-/**
- * Get target by public ID
- */
-export const getTargetByPublicId = query({
-  args: {
-    publicId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const target = await ctx.db
-      .query('yourobcEmployeeTargets')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-
-    if (!target) {
-      throw new Error('Target not found')
+    // Apply year filter
+    if (filters.year) {
+      kpis = kpis.filter(item => item.year === filters.year);
     }
 
-    // TODO: Get actual userId from auth
-    const userId = target.ownerId
-
-    const hasPermission = await canViewTarget(ctx, target, userId)
-    if (!hasPermission) {
-      throw new Error('Unauthorized to view this target')
+    // Apply month filter
+    if (filters.month !== undefined) {
+      kpis = kpis.filter(item => item.month === filters.month);
     }
 
-    return target
-  },
-})
-
-/**
- * List targets for employee
- */
-export const listTargetsByEmployee = query({
-  args: {
-    employeeId: v.id('yourobcEmployees'),
-    year: v.optional(v.number()),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const limit = args.limit ?? 50
-
-    let query = ctx.db
-      .query('yourobcEmployeeTargets')
-      .withIndex('employee', (q) => q.eq('employeeId', args.employeeId))
-
-    if (args.year) {
-      query = query.filter((q) => q.eq(q.field('year'), args.year))
+    // Apply metric type filter
+    if (filters.metricType) {
+      kpis = kpis.filter(item => item.metricType === filters.metricType);
     }
 
-    const targets = await query
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .take(limit)
+    // Paginate
+    const total = kpis.length;
+    const items = kpis.slice(offset, offset + limit);
 
-    return targets
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
   },
-})
+});
 
 /**
- * Get target for specific period
+ * Get single employee KPI by ID
  */
-export const getTargetForPeriod = query({
-  args: {
-    employeeId: v.id('yourobcEmployees'),
-    year: v.number(),
-    month: v.optional(v.number()),
-    quarter: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const targets = await ctx.db
-      .query('yourobcEmployeeTargets')
-      .withIndex('employee', (q) => q.eq('employeeId', args.employeeId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .filter((q) => q.eq(q.field('year'), args.year))
-      .collect()
-
-    // Find matching target based on period
-    const target = targets.find((t) => {
-      if (args.month) {
-        return t.month === args.month
-      }
-      if (args.quarter) {
-        return t.quarter === args.quarter
-      }
-      // Yearly target
-      return !t.month && !t.quarter
-    })
-
-    return target
-  },
-})
-
-/**
- * Get targets for KPI
- */
-export const getTargetsForKPI = query({
+export const getEmployeeKPI = query({
   args: {
     kpiId: v.id('yourobcEmployeeKPIs'),
   },
-  handler: async (ctx, args) => {
-    const targets = await ctx.db
-      .query('yourobcEmployeeTargets')
-      .withIndex('by_kpiId', (q) => q.eq('kpiId', args.kpiId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect()
+  handler: async (ctx, { kpiId }) => {
+    const user = await requireCurrentUser(ctx);
 
-    return targets
+    const kpi = await ctx.db.get(kpiId);
+    if (!kpi || kpi.deletedAt) {
+      throw new Error('KPI not found');
+    }
+
+    await requireViewEmployeeKPIAccess(ctx, kpi, user);
+
+    return kpi;
   },
-})
+});
 
 /**
- * Search KPIs
+ * Get employee KPI by public ID
  */
-export const searchKPIs = query({
+export const getEmployeeKPIByPublicId = query({
   args: {
-    searchTerm: v.string(),
-    limit: v.optional(v.number()),
+    publicId: v.string(),
   },
-  handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-    const results = await ctx.db
+    const kpi = await ctx.db
       .query('yourobcEmployeeKPIs')
-      .withSearchIndex('search_metricName', (q) =>
-        q.search('publicId', args.searchTerm)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .take(limit)
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-    return results
+    if (!kpi) {
+      throw new Error('KPI not found');
+    }
+
+    await requireViewEmployeeKPIAccess(ctx, kpi, user);
+
+    return kpi;
   },
-})
+});
 
 /**
- * Search targets
+ * Get employee KPI statistics
  */
-export const searchTargets = query({
+export const getEmployeeKPIStats = query({
   args: {
-    searchTerm: v.string(),
-    limit: v.optional(v.number()),
+    employeeId: v.optional(v.id('yourobcEmployees')),
   },
-  handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+  handler: async (ctx, { employeeId }) => {
+    const user = await requireCurrentUser(ctx);
 
-    const results = await ctx.db
-      .query('yourobcEmployeeTargets')
-      .withSearchIndex('search_period', (q) =>
-        q.search('period', args.searchTerm)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .take(limit)
+    let kpis = await ctx.db
+      .query('yourobcEmployeeKPIs')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-    return results
+    if (employeeId) {
+      kpis = kpis.filter(k => k.employeeId === employeeId);
+    }
+
+    const accessible = await filterEmployeeKPIsByAccess(ctx, kpis, user);
+
+    return {
+      total: accessible.length,
+      byStatus: {
+        on_track: accessible.filter(item => item.status === 'on_track').length,
+        at_risk: accessible.filter(item => item.status === 'at_risk').length,
+        behind: accessible.filter(item => item.status === 'behind').length,
+        achieved: accessible.filter(item => item.status === 'achieved').length,
+      },
+      averageAchievement: accessible.length > 0
+        ? Math.round(accessible.reduce((sum, kpi) => sum + kpi.achievementPercentage, 0) / accessible.length)
+        : 0,
+    };
   },
-})
+});

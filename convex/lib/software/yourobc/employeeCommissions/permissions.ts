@@ -1,272 +1,168 @@
 // convex/lib/software/yourobc/employeeCommissions/permissions.ts
-/**
- * Employee Commissions Permissions
- *
- * Permission checks for employee commission operations.
- *
- * @module convex/lib/software/yourobc/employeeCommissions/permissions
- */
+// Access control and authorization logic for employeeCommissions module
 
-import { QueryCtx, MutationCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { EmployeeCommission } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if user can view commission
- */
-export async function canViewCommission(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// View Access
+// ============================================================================
+
+export async function canViewEmployeeCommission(
   ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
+  commission: EmployeeCommission,
+  user: UserProfile
 ): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Owner can always view
-  if (commission.ownerId === userId) return true
+  // Owner can view
+  if (commission.ownerId === user._id) return true;
 
-  // TODO: Add role-based permission checks
-  // - Admins can view all
-  // - Managers can view their team's commissions
-  // - Employees can view their own commissions
+  // Creator can view
+  if (commission.createdBy === user._id) return true;
 
-  return false
+  // Employee can view their own commissions
+  const employee = await ctx.db.get(commission.employeeId);
+  if (employee && employee.userProfileId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can create commission
- */
-export async function canCreateCommission(
+export async function requireViewEmployeeCommissionAccess(
   ctx: QueryCtx | MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  userId: string
-): Promise<boolean> {
-  // Check if employee exists and user has access
-  const employee = await ctx.db.get(employeeId)
-  if (!employee) return false
-
-  // TODO: Add role-based permission checks
-  // - Admins can create for any employee
-  // - Managers can create for their team
-  // - System can auto-create based on rules
-
-  return true // Temporary - allow all authenticated users
+  commission: EmployeeCommission,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewEmployeeCommission(ctx, commission, user))) {
+    throw new Error('You do not have permission to view this commission');
+  }
 }
 
-/**
- * Check if user can update commission
- */
-export async function canUpdateCommission(
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+export async function canEditEmployeeCommission(
   ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
+  commission: EmployeeCommission,
+  user: UserProfile
 ): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Can't update deleted commissions
-  if (commission.deletedAt) return false
+  // Owner can edit
+  if (commission.ownerId === user._id) return true;
 
-  // Can't update paid commissions
-  if (commission.status === 'paid') return false
+  // Only pending commissions can be edited
+  if (commission.status !== 'pending') {
+    return false;
+  }
 
-  // Owner can update
-  if (commission.ownerId === userId) return true
-
-  // TODO: Add role-based permission checks
-  // - Admins can update any commission
-  // - Managers can update their team's commissions
-
-  return false
+  return false;
 }
 
-/**
- * Check if user can delete commission
- */
-export async function canDeleteCommission(
+export async function requireEditEmployeeCommissionAccess(
   ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
-): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
-
-  // Can't delete already deleted commissions
-  if (commission.deletedAt) return false
-
-  // Can't delete paid commissions
-  if (commission.status === 'paid') return false
-
-  // Owner can delete
-  if (commission.ownerId === userId) return true
-
-  // TODO: Add role-based permission checks
-  // - Admins can delete any commission
-  // - Managers can delete their team's commissions
-
-  return false
+  commission: EmployeeCommission,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditEmployeeCommission(ctx, commission, user))) {
+    throw new Error('You do not have permission to edit this commission');
+  }
 }
 
-/**
- * Check if user can approve commission
- */
-export async function canApproveCommission(
-  ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteEmployeeCommission(
+  commission: EmployeeCommission,
+  user: UserProfile
 ): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
-
-  // Can only approve pending commissions
-  if (commission.status !== 'pending') return false
-
-  // Can't approve deleted commissions
-  if (commission.deletedAt) return false
-
-  // TODO: Add role-based permission checks
-  // - Admins can approve any commission
-  // - Managers can approve their team's commissions
-  // - System can auto-approve based on rules
-
-  return true // Temporary - allow all authenticated users
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (commission.ownerId === user._id) return true;
+  return false;
 }
 
-/**
- * Check if user can pay commission
- */
-export async function canPayCommission(
-  ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
-): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
-
-  // Can only pay approved commissions
-  if (commission.status !== 'approved') return false
-
-  // Can't pay deleted commissions
-  if (commission.deletedAt) return false
-
-  // TODO: Add role-based permission checks
-  // - Only finance team can pay commissions
-  // - Admins can pay any commission
-
-  return true // Temporary - allow all authenticated users
+export async function requireDeleteEmployeeCommissionAccess(
+  commission: EmployeeCommission,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteEmployeeCommission(commission, user))) {
+    throw new Error('You do not have permission to delete this commission');
+  }
 }
 
-/**
- * Check if user can cancel commission
- */
-export async function canCancelCommission(
-  ctx: QueryCtx | MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
+// ============================================================================
+// Approve Access
+// ============================================================================
+
+export async function canApproveEmployeeCommission(
+  commission: EmployeeCommission,
+  user: UserProfile
 ): Promise<boolean> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) return false
-
-  // Can't cancel paid commissions
-  if (commission.status === 'paid') return false
-
-  // Can't cancel deleted commissions
-  if (commission.deletedAt) return false
-
-  // Owner can cancel
-  if (commission.ownerId === userId) return true
-
-  // TODO: Add role-based permission checks
-  // - Admins can cancel any commission
-  // - Managers can cancel their team's commissions
-
-  return false
+  // Only admins can approve
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  return false;
 }
 
-/**
- * Check if user can view commission rule
- */
-export async function canViewRule(
-  ctx: QueryCtx | MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<boolean> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) return false
-
-  // Owner can always view
-  if (rule.ownerId === userId) return true
-
-  // TODO: Add role-based permission checks
-  // - Admins can view all rules
-  // - Managers can view their team's rules
-  // - Employees can view their own rules
-
-  return false
+export async function requireApproveEmployeeCommissionAccess(
+  commission: EmployeeCommission,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canApproveEmployeeCommission(commission, user))) {
+    throw new Error('You do not have permission to approve this commission');
+  }
 }
 
-/**
- * Check if user can create commission rule
- */
-export async function canCreateRule(
-  ctx: QueryCtx | MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  userId: string
+// ============================================================================
+// Pay Access
+// ============================================================================
+
+export async function canPayEmployeeCommission(
+  commission: EmployeeCommission,
+  user: UserProfile
 ): Promise<boolean> {
-  // Check if employee exists
-  const employee = await ctx.db.get(employeeId)
-  if (!employee) return false
-
-  // TODO: Add role-based permission checks
-  // - Admins can create rules for any employee
-  // - Managers can create rules for their team
-
-  return true // Temporary - allow all authenticated users
+  // Only admins can process payments
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  return false;
 }
 
-/**
- * Check if user can update commission rule
- */
-export async function canUpdateRule(
-  ctx: QueryCtx | MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<boolean> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) return false
-
-  // Can't update deleted rules
-  if (rule.deletedAt) return false
-
-  // Owner can update
-  if (rule.ownerId === userId) return true
-
-  // TODO: Add role-based permission checks
-  // - Admins can update any rule
-  // - Managers can update their team's rules
-
-  return false
+export async function requirePayEmployeeCommissionAccess(
+  commission: EmployeeCommission,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canPayEmployeeCommission(commission, user))) {
+    throw new Error('You do not have permission to pay this commission');
+  }
 }
 
-/**
- * Check if user can delete commission rule
- */
-export async function canDeleteRule(
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterEmployeeCommissionsByAccess(
   ctx: QueryCtx | MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<boolean> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) return false
+  commissions: EmployeeCommission[],
+  user: UserProfile
+): Promise<EmployeeCommission[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return commissions;
+  }
 
-  // Can't delete already deleted rules
-  if (rule.deletedAt) return false
+  const accessible: EmployeeCommission[] = [];
 
-  // Owner can delete
-  if (rule.ownerId === userId) return true
+  for (const commission of commissions) {
+    if (await canViewEmployeeCommission(ctx, commission, user)) {
+      accessible.push(commission);
+    }
+  }
 
-  // TODO: Add role-based permission checks
-  // - Admins can delete any rule
-  // - Managers can delete their team's rules
-
-  return false
+  return accessible;
 }

@@ -1,519 +1,337 @@
 // convex/lib/software/yourobc/shipments/queries.ts
 // Read operations for shipments module
 
-import type { QueryCtx } from '@/generated/server';
-import type {
-  Shipment,
-  ShipmentId,
-  ShipmentStatusHistory,
-  ShipmentStatusHistoryId,
-} from '@/schema/software/yourobc/shipments';
-import type {
-  ShipmentListOptions,
-  ShipmentStatusHistoryListOptions,
-  ShipmentStatsSummary,
-} from './types';
-import {
-  canViewShipment,
-  canViewStatusHistory,
-  validateShipmentExists,
-  validateStatusHistoryExists,
-} from './permissions';
-import { matchesSearchTerm, updateSla } from './utils';
-import { SHIPMENTS_CONSTANTS } from './constants';
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/shared/auth.helper';
+import { shipmentsValidators } from '@/schema/software/yourobc/shipments/validators';
+import { filterShipmentsByAccess, requireViewShipmentAccess } from './permissions';
+import type { ShipmentListResponse, ShipmentFilters } from './types';
 
 /**
- * Get current user or throw error
+ * Get paginated list of shipments with filtering
  */
-async function requireCurrentUser(ctx: QueryCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
+export const getShipments = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(shipmentsValidators.status)),
+      serviceType: v.optional(v.array(shipmentsValidators.serviceType)),
+      priority: v.optional(v.array(shipmentsValidators.priority)),
+      customerId: v.optional(v.id('yourobcCustomers')),
+      assignedCourierId: v.optional(v.id('yourobcCouriers')),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      partnerId: v.optional(v.id('yourobcPartners')),
+      search: v.optional(v.string()),
+      dateFrom: v.optional(v.number()),
+      dateTo: v.optional(v.number()),
+    })),
+  },
+  handler: async (ctx, args): Promise<ShipmentListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
+    // Query with index
+    let shipments = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  if (!user) {
-    throw new Error('User profile not found');
-  }
+    // Apply access filtering
+    shipments = await filterShipmentsByAccess(ctx, shipments, user);
 
-  return user;
-}
+    // Apply status filter
+    if (filters.status?.length) {
+      shipments = shipments.filter(item =>
+        filters.status!.includes(item.currentStatus)
+      );
+    }
 
-// ============================================================================
-// Shipment Queries
-// ============================================================================
+    // Apply service type filter
+    if (filters.serviceType?.length) {
+      shipments = shipments.filter(item =>
+        filters.serviceType!.includes(item.serviceType)
+      );
+    }
+
+    // Apply priority filter
+    if (filters.priority?.length) {
+      shipments = shipments.filter(item =>
+        filters.priority!.includes(item.priority)
+      );
+    }
+
+    // Apply customer filter
+    if (filters.customerId) {
+      shipments = shipments.filter(item => item.customerId === filters.customerId);
+    }
+
+    // Apply courier filter
+    if (filters.assignedCourierId) {
+      shipments = shipments.filter(item => item.assignedCourierId === filters.assignedCourierId);
+    }
+
+    // Apply employee filter
+    if (filters.employeeId) {
+      shipments = shipments.filter(item => item.employeeId === filters.employeeId);
+    }
+
+    // Apply partner filter
+    if (filters.partnerId) {
+      shipments = shipments.filter(item => item.partnerId === filters.partnerId);
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      shipments = shipments.filter(item =>
+        item.shipmentNumber.toLowerCase().includes(term) ||
+        item.awbNumber?.toLowerCase().includes(term) ||
+        item.customerReference?.toLowerCase().includes(term) ||
+        item.description.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply date filters
+    if (filters.dateFrom) {
+      shipments = shipments.filter(item => item.createdAt >= filters.dateFrom!);
+    }
+    if (filters.dateTo) {
+      shipments = shipments.filter(item => item.createdAt <= filters.dateTo!);
+    }
+
+    // Sort by creation date (newest first)
+    shipments.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Paginate
+    const total = shipments.length;
+    const items = shipments.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get shipment by ID
+ * Get single shipment by ID
  */
-export async function getShipmentById(
-  ctx: QueryCtx,
-  shipmentId: ShipmentId,
-  includeDeleted: boolean = false
-): Promise<Shipment | null> {
-  const user = await requireCurrentUser(ctx);
-  const shipment = await ctx.db.get(shipmentId);
+export const getShipment = query({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+  },
+  handler: async (ctx, { shipmentId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!shipment) {
-    return null;
-  }
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment || shipment.deletedAt) {
+      throw new Error('Shipment not found');
+    }
 
-  validateShipmentExists(shipment, includeDeleted);
+    await requireViewShipmentAccess(ctx, shipment, user);
 
-  // Check view permission
-  if (!canViewShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  // Update SLA status
-  return {
-    ...shipment,
-    sla: updateSla(shipment.sla),
-  };
-}
+    return shipment;
+  },
+});
 
 /**
  * Get shipment by public ID
  */
-export async function getShipmentByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  includeDeleted: boolean = false
-): Promise<Shipment | null> {
-  const user = await requireCurrentUser(ctx);
-  const shipment = await ctx.db
-    .query('yourobcShipments')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .first();
+export const getShipmentByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!shipment) {
-    return null;
-  }
+    const shipment = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  validateShipmentExists(shipment, includeDeleted);
+    if (!shipment) {
+      throw new Error('Shipment not found');
+    }
 
-  // Check view permission
-  if (!canViewShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
+    await requireViewShipmentAccess(ctx, shipment, user);
 
-  // Update SLA status
-  return {
-    ...shipment,
-    sla: updateSla(shipment.sla),
-  };
-}
+    return shipment;
+  },
+});
 
 /**
  * Get shipment by shipment number
  */
-export async function getShipmentByNumber(
-  ctx: QueryCtx,
-  shipmentNumber: string,
-  includeDeleted: boolean = false
-): Promise<Shipment | null> {
-  const user = await requireCurrentUser(ctx);
-  const shipment = await ctx.db
-    .query('yourobcShipments')
-    .withIndex('by_shipmentNumber', (q) => q.eq('shipmentNumber', shipmentNumber))
-    .first();
+export const getShipmentByNumber = query({
+  args: {
+    shipmentNumber: v.string(),
+  },
+  handler: async (ctx, { shipmentNumber }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!shipment) {
-    return null;
-  }
+    const shipment = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_shipmentNumber', q => q.eq('shipmentNumber', shipmentNumber))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  validateShipmentExists(shipment, includeDeleted);
+    if (!shipment) {
+      throw new Error('Shipment not found');
+    }
 
-  // Check view permission
-  if (!canViewShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
+    await requireViewShipmentAccess(ctx, shipment, user);
 
-  // Update SLA status
-  return {
-    ...shipment,
-    sla: updateSla(shipment.sla),
-  };
-}
+    return shipment;
+  },
+});
 
 /**
- * List shipments with filters and pagination
+ * Get shipment status history
  */
-export async function listShipments(
-  ctx: QueryCtx,
-  options: ShipmentListOptions = {}
-): Promise<Shipment[]> {
-  const user = await requireCurrentUser(ctx);
-  const {
-    filters = {},
-    limit = SHIPMENTS_CONSTANTS.DEFAULT_PAGE_SIZE,
-    offset = 0,
-    sortBy = 'createdAt',
-    sortOrder = 'desc',
-  } = options;
+export const getShipmentStatusHistory = query({
+  args: {
+    shipmentId: v.id('yourobcShipments'),
+  },
+  handler: async (ctx, { shipmentId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // Start with base query by owner
-  let query = ctx.db.query('yourobcShipments').withIndex('by_owner', (q) =>
-    q.eq('ownerId', user._id)
-  );
-
-  // Collect and filter results
-  let results = await query.collect();
-
-  // Apply filters
-  results = results.filter((shipment) => {
-    // Filter by deleted status
-    if (!filters.includeDeleted && shipment.deletedAt) {
-      return false;
+    // Verify access to shipment
+    const shipment = await ctx.db.get(shipmentId);
+    if (!shipment || shipment.deletedAt) {
+      throw new Error('Shipment not found');
     }
 
-    // Filter by status
-    if (filters.status && shipment.currentStatus !== filters.status) {
-      return false;
-    }
+    await requireViewShipmentAccess(ctx, shipment, user);
 
-    // Filter by service type
-    if (filters.serviceType && shipment.serviceType !== filters.serviceType) {
-      return false;
-    }
+    // Get status history
+    const history = await ctx.db
+      .query('yourobcShipmentStatusHistory')
+      .withIndex('by_shipment_timestamp', q => q.eq('shipmentId', shipmentId))
+      .collect();
 
-    // Filter by priority
-    if (filters.priority && shipment.priority !== filters.priority) {
-      return false;
-    }
+    // Sort by timestamp (newest first)
+    history.sort((a, b) => b.timestamp - a.timestamp);
 
-    // Filter by customer
-    if (filters.customerId && shipment.customerId !== filters.customerId) {
-      return false;
-    }
-
-    // Filter by employee
-    if (filters.employeeId && shipment.employeeId !== filters.employeeId) {
-      return false;
-    }
-
-    // Filter by partner
-    if (filters.partnerId && shipment.partnerId !== filters.partnerId) {
-      return false;
-    }
-
-    // Filter by courier
-    if (filters.assignedCourierId && shipment.assignedCourierId !== filters.assignedCourierId) {
-      return false;
-    }
-
-    // Filter by SLA status
-    if (filters.slaStatus) {
-      const updatedSla = updateSla(shipment.sla);
-      if (updatedSla.status !== filters.slaStatus) {
-        return false;
-      }
-    }
-
-    // Filter by search term
-    if (filters.searchTerm && !matchesSearchTerm(shipment, filters.searchTerm)) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Update SLA status for all results
-  results = results.map((shipment) => ({
-    ...shipment,
-    sla: updateSla(shipment.sla),
-  }));
-
-  // Sort results
-  results.sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
-
-    switch (sortBy) {
-      case 'shipmentNumber':
-        aValue = a.shipmentNumber;
-        bValue = b.shipmentNumber;
-        break;
-      case 'sla.deadline':
-        aValue = a.sla.deadline;
-        bValue = b.sla.deadline;
-        break;
-      case 'currentStatus':
-        aValue = a.currentStatus;
-        bValue = b.currentStatus;
-        break;
-      case 'createdAt':
-      default:
-        aValue = a.createdAt;
-        bValue = b.createdAt;
-        break;
-    }
-
-    if (sortOrder === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  });
-
-  // Apply pagination
-  return results.slice(offset, offset + limit);
-}
+    return history;
+  },
+});
 
 /**
  * Get shipments by customer
  */
-export async function getShipmentsByCustomer(
-  ctx: QueryCtx,
-  customerId: string,
-  includeDeleted: boolean = false
-): Promise<Shipment[]> {
-  const user = await requireCurrentUser(ctx);
+export const getShipmentsByCustomer = query({
+  args: {
+    customerId: v.id('yourobcCustomers'),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { customerId, limit = 50 }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const shipments = await ctx.db
-    .query('yourobcShipments')
-    .withIndex('by_customer', (q) => q.eq('customerId', customerId as any))
-    .collect();
+    let shipments = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_customer', q => q.eq('customerId', customerId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  return shipments
-    .filter((shipment) => {
-      if (!includeDeleted && shipment.deletedAt) return false;
-      return canViewShipment(shipment, user);
-    })
-    .map((shipment) => ({
-      ...shipment,
-      sla: updateSla(shipment.sla),
-    }));
-}
+    // Apply access filtering
+    shipments = await filterShipmentsByAccess(ctx, shipments, user);
 
-/**
- * Get shipment statistics summary
- */
-export async function getShipmentStatsSummary(
-  ctx: QueryCtx
-): Promise<ShipmentStatsSummary> {
-  const user = await requireCurrentUser(ctx);
+    // Sort by creation date (newest first)
+    shipments.sort((a, b) => b.createdAt - a.createdAt);
 
-  const shipments = await ctx.db
-    .query('yourobcShipments')
-    .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect();
-
-  const totalShipments = shipments.length;
-  const activeShipments = shipments.filter(
-    (s) => !['delivered', 'invoiced', 'cancelled'].includes(s.currentStatus)
-  ).length;
-  const completedShipments = shipments.filter(
-    (s) => s.currentStatus === 'invoiced'
-  ).length;
-  const cancelledShipments = shipments.filter(
-    (s) => s.currentStatus === 'cancelled'
-  ).length;
-
-  // Calculate SLA stats
-  const shipmentsWithUpdatedSla = shipments.map((s) => ({
-    ...s,
-    sla: updateSla(s.sla),
-  }));
-
-  const onTimeShipments = shipmentsWithUpdatedSla.filter(
-    (s) => s.sla.status === 'on_time'
-  ).length;
-  const overdueShipments = shipmentsWithUpdatedSla.filter(
-    (s) => s.sla.status === 'overdue'
-  ).length;
-
-  // Calculate total revenue
-  const totalRevenue = shipments.reduce(
-    (sum, s) => sum + (s.totalPrice?.amount || s.agreedPrice.amount),
-    0
-  );
-
-  // Calculate average delivery time (for completed shipments)
-  const completedWithTimes = shipments.filter(
-    (s) => s.completedAt && s.createdAt
-  );
-  const averageDeliveryTime =
-    completedWithTimes.length > 0
-      ? completedWithTimes.reduce(
-          (sum, s) => sum + (s.completedAt! - s.createdAt),
-          0
-        ) / completedWithTimes.length
-      : 0;
-
-  return {
-    totalShipments,
-    activeShipments,
-    completedShipments,
-    cancelledShipments,
-    onTimeShipments,
-    overdueShipments,
-    totalRevenue,
-    averageDeliveryTime,
-  };
-}
-
-// ============================================================================
-// Shipment Status History Queries
-// ============================================================================
+    return shipments.slice(0, limit);
+  },
+});
 
 /**
- * Get status history by ID
+ * Get shipments assigned to courier
  */
-export async function getStatusHistoryById(
-  ctx: QueryCtx,
-  statusHistoryId: ShipmentStatusHistoryId,
-  includeDeleted: boolean = false
-): Promise<ShipmentStatusHistory | null> {
-  const user = await requireCurrentUser(ctx);
-  const statusHistory = await ctx.db.get(statusHistoryId);
+export const getShipmentsByCourier = query({
+  args: {
+    courierId: v.id('yourobcCouriers'),
+  },
+  handler: async (ctx, { courierId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!statusHistory) {
-    return null;
-  }
+    let shipments = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_assignedCourier', q => q.eq('assignedCourierId', courierId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  validateStatusHistoryExists(statusHistory, includeDeleted);
+    // Apply access filtering
+    shipments = await filterShipmentsByAccess(ctx, shipments, user);
 
-  // Check view permission
-  if (!canViewStatusHistory(statusHistory, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return statusHistory;
-}
+    return shipments;
+  },
+});
 
 /**
- * Get status history by public ID
+ * Get shipments assigned to employee
  */
-export async function getStatusHistoryByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  includeDeleted: boolean = false
-): Promise<ShipmentStatusHistory | null> {
-  const user = await requireCurrentUser(ctx);
-  const statusHistory = await ctx.db
-    .query('yourobcShipmentStatusHistory')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .first();
+export const getShipmentsByEmployee = query({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+  },
+  handler: async (ctx, { employeeId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!statusHistory) {
-    return null;
-  }
+    let shipments = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_employee', q => q.eq('employeeId', employeeId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  validateStatusHistoryExists(statusHistory, includeDeleted);
+    // Apply access filtering
+    shipments = await filterShipmentsByAccess(ctx, shipments, user);
 
-  // Check view permission
-  if (!canViewStatusHistory(statusHistory, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_VIEW);
-  }
-
-  return statusHistory;
-}
+    return shipments;
+  },
+});
 
 /**
- * Get status history for a shipment
+ * Get shipment statistics
  */
-export async function getStatusHistoryForShipment(
-  ctx: QueryCtx,
-  shipmentId: ShipmentId,
-  includeDeleted: boolean = false
-): Promise<ShipmentStatusHistory[]> {
-  const user = await requireCurrentUser(ctx);
+export const getShipmentStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
 
-  const statusHistory = await ctx.db
-    .query('yourobcShipmentStatusHistory')
-    .withIndex('by_shipment', (q) => q.eq('shipmentId', shipmentId))
-    .collect();
+    const shipments = await ctx.db
+      .query('yourobcShipments')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  return statusHistory
-    .filter((entry) => {
-      if (!includeDeleted && entry.deletedAt) return false;
-      return canViewStatusHistory(entry, user);
-    })
-    .sort((a, b) => b.timestamp - a.timestamp);
-}
+    const accessible = await filterShipmentsByAccess(ctx, shipments, user);
 
-/**
- * List status history with filters and pagination
- */
-export async function listStatusHistory(
-  ctx: QueryCtx,
-  options: ShipmentStatusHistoryListOptions = {}
-): Promise<ShipmentStatusHistory[]> {
-  const user = await requireCurrentUser(ctx);
-  const {
-    filters = {},
-    limit = SHIPMENTS_CONSTANTS.DEFAULT_PAGE_SIZE,
-    offset = 0,
-    sortBy = 'timestamp',
-    sortOrder = 'desc',
-  } = options;
-
-  // Start with base query by owner
-  let query = ctx.db
-    .query('yourobcShipmentStatusHistory')
-    .withIndex('by_owner', (q) => q.eq('ownerId', user._id));
-
-  // Collect and filter results
-  let results = await query.collect();
-
-  // Apply filters
-  results = results.filter((entry) => {
-    // Filter by deleted status
-    if (!filters.includeDeleted && entry.deletedAt) {
-      return false;
-    }
-
-    // Filter by shipment
-    if (filters.shipmentId && entry.shipmentId !== filters.shipmentId) {
-      return false;
-    }
-
-    // Filter by status
-    if (filters.status && entry.status !== filters.status) {
-      return false;
-    }
-
-    // Filter by date range
-    if (filters.startDate && entry.timestamp < filters.startDate) {
-      return false;
-    }
-    if (filters.endDate && entry.timestamp > filters.endDate) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Sort results
-  results.sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
-
-    switch (sortBy) {
-      case 'timestamp':
-        aValue = a.timestamp;
-        bValue = b.timestamp;
-        break;
-      case 'createdAt':
-      default:
-        aValue = a.createdAt;
-        bValue = b.createdAt;
-        break;
-    }
-
-    if (sortOrder === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  });
-
-  // Apply pagination
-  return results.slice(offset, offset + limit);
-}
+    return {
+      total: accessible.length,
+      byStatus: {
+        quoted: accessible.filter(item => item.currentStatus === 'quoted').length,
+        booked: accessible.filter(item => item.currentStatus === 'booked').length,
+        pickup: accessible.filter(item => item.currentStatus === 'pickup').length,
+        in_transit: accessible.filter(item => item.currentStatus === 'in_transit').length,
+        delivered: accessible.filter(item => item.currentStatus === 'delivered').length,
+        customs: accessible.filter(item => item.currentStatus === 'customs').length,
+        document: accessible.filter(item => item.currentStatus === 'document').length,
+        invoiced: accessible.filter(item => item.currentStatus === 'invoiced').length,
+        cancelled: accessible.filter(item => item.currentStatus === 'cancelled').length,
+      },
+      byServiceType: {
+        OBC: accessible.filter(item => item.serviceType === 'OBC').length,
+        NFO: accessible.filter(item => item.serviceType === 'NFO').length,
+      },
+      byPriority: {
+        standard: accessible.filter(item => item.priority === 'standard').length,
+        urgent: accessible.filter(item => item.priority === 'urgent').length,
+        critical: accessible.filter(item => item.priority === 'critical').length,
+      },
+    };
+  },
+});

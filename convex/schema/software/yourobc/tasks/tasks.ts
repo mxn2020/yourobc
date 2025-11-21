@@ -1,67 +1,24 @@
 // convex/schema/software/yourobc/tasks/tasks.ts
-/**
- * Tasks Table Definition
- *
- * Defines the schema for task management in the YouROBC system.
- * Tasks are work items associated with shipments that need to be completed.
- * This table supports both manual and automated task creation with comprehensive
- * tracking of assignment, completion, and cancellation workflows.
- *
- * @module convex/schema/software/yourobc/tasks/tasks
- */
+// Table definitions for tasks module
 
-import { v } from 'convex/values'
-import { defineTable } from 'convex/server'
-import {
-  auditFields,
-  softDeleteFields,
-} from '../../../yourobc/base'
-import {
-  taskStatusValidator,
-  taskTypeValidator,
-  taskPriorityValidator,
-  taskVisibilityValidator,
-} from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, softDeleteFields } from '@/schema/base';
+import { tasksValidators } from './validators';
 
-// ============================================================================
-// Tasks Table
-// ============================================================================
-
-/**
- * Tasks table
- * Manages work items and action items associated with shipments.
- * Each task can be assigned to users, tracked through various states,
- * and includes comprehensive metadata for workflow management.
- *
- * Key Features:
- * - Multi-state workflow (pending, in_progress, completed, archived)
- * - Priority-based organization (low, medium, high, critical)
- * - Assignment tracking with timestamps
- * - Completion and cancellation workflows
- * - Flexible metadata and categorization
- * - Soft delete support
- *
- * Display Field: title (primary task identifier)
- */
 export const tasksTable = defineTable({
-  // Public Identity
-  publicId: v.string(), // Public-facing unique identifier (e.g., 'task_abc123')
+  // Required: Main display field
+  title: v.string(),
 
-  // Core Identity
-  title: v.string(), // Task title (main display field)
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
+  // Task details
   description: v.optional(v.string()),
-
-  // Entity Reference
-  shipmentId: v.id('yourobcShipments'),
-
-  // Task Management
-  type: taskTypeValidator, // manual, automatic
-  status: taskStatusValidator, // pending, in_progress, completed, archived
-  priority: taskPriorityValidator, // low, medium, high, critical
-  visibility: v.optional(taskVisibilityValidator), // public, private, shared, organization
-
-  // Ownership
-  ownerId: v.string(), // authUserId - task creator/owner
+  status: tasksValidators.status,
+  priority: v.optional(tasksValidators.priority),
+  taskType: v.optional(tasksValidators.taskType),
 
   // Assignment
   assignedTo: v.optional(v.id('userProfiles')),
@@ -73,52 +30,52 @@ export const tasksTable = defineTable({
   startedAt: v.optional(v.number()),
   completedAt: v.optional(v.number()),
 
-  // Completion Info
+  // Completion info
   completedBy: v.optional(v.id('userProfiles')),
   completionNotes: v.optional(v.string()),
 
-  // Cancellation Info
+  // Cancellation info
   cancelledAt: v.optional(v.number()),
   cancelledBy: v.optional(v.id('userProfiles')),
   cancellationReason: v.optional(v.string()),
 
-  // Classification & Metadata
-  tags: v.array(v.string()),
-  category: v.optional(v.string()),
-  metadata: v.optional(v.any()), // Flexible metadata for automation-specific data
+  // Related entity references
+  relatedShipmentId: v.optional(v.id('yourobcShipments')),
+  relatedQuoteId: v.optional(v.id('yourobcQuotes')),
+  relatedCustomerId: v.optional(v.id('yourobcCustomers')),
+  relatedPartnerId: v.optional(v.id('yourobcPartners')),
 
-  // Audit & Soft Delete
-  ...auditFields, // createdAt, createdBy, updatedAt, updatedBy
-  ...softDeleteFields, // deletedAt, deletedBy
+  // Checklist items
+  checklist: v.optional(v.array(v.object({
+    id: v.string(),
+    text: v.string(),
+    completed: v.boolean(),
+    completedAt: v.optional(v.number()),
+    completedBy: v.optional(v.id('userProfiles')),
+  }))),
+
+  // Classification
+  tags: v.optional(v.array(v.string())),
+  category: v.optional(v.string()),
+
+  // Required: Audit fields
+  ...auditFields,
+  ...softDeleteFields,
 })
-  // Core indexes
+  // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_title', ['title'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
-  .index('by_created', ['createdAt'])
 
-  // Status and priority indexes
+  // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_priority', ['priority'])
-
-  // Feature indexes
-  .index('by_shipment', ['shipmentId'])
   .index('by_assigned_to', ['assignedTo'])
   .index('by_due_date', ['dueDate'])
-  .index('by_category', ['category'])
-  .index('by_creator', ['createdBy'])
-
-  // Composite indexes for common queries
-  .index('by_shipment_and_status', ['shipmentId', 'status'])
+  .index('by_priority', ['priority'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
   .index('by_assigned_and_status', ['assignedTo', 'status'])
-  .index('by_creator_and_status', ['createdBy', 'status'])
-  .index('by_owner_deleted', ['ownerId', 'deletedAt'])
-  .index('by_status_deleted', ['status', 'deletedAt'])
-  .index('by_priority_deleted', ['priority', 'deletedAt'])
-
-// ============================================================================
-// Export
-// ============================================================================
-
-export default tasksTable
+  .index('by_related_shipment', ['relatedShipmentId'])
+  .index('by_related_quote', ['relatedQuoteId'])
+  .index('by_related_customer', ['relatedCustomerId'])
+  .index('by_created_at', ['createdAt']);

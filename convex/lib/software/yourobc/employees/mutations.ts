@@ -1,689 +1,926 @@
 // convex/lib/software/yourobc/employees/mutations.ts
-/**
- * Mutation Operations for Employees Entity
- *
- * Provides mutation functions for creating, updating, and deleting
- * employees and vacation data with validation and audit trails.
- *
- * @module convex/lib/software/yourobc/employees/mutations
- */
+// Write operations for employees module
 
-import { MutationCtx } from '../../../_generated/server'
-import { Id } from '../../../_generated/dataModel'
-import type {
-  CreateEmployeeInput,
-  UpdateEmployeeInput,
-  CreateVacationDaysInput,
-  CreateVacationEntryInput,
-  UpdateVacationEntryInput,
-  VacationEntry,
-  BatchVacationEntriesInput,
-} from './types'
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { employeesValidators } from '@/schema/software/yourobc/employees/validators';
+import { EMPLOYEES_CONSTANTS } from './constants';
+import { validateEmployeeData, validateVacationRequest, sanitizeEmployeeData } from './utils';
 import {
-  generateEmployeePublicId,
-  generateVacationDaysPublicId,
-  generateVacationEntryId,
-  calculateVacationStats,
-  calculateDaysBetween,
-  validateVacationRequest,
-  getCurrentVacationEntry,
-  calculateDaysRemaining,
-  updateRecentVacations,
-} from './utils'
-import { EMPLOYEE_DEFAULTS, VACATION_DEFAULTS } from './constants'
-import {
-  getEmployeeById,
-  getVacationDaysByEmployeeYear,
-  getVacationDaysById,
-} from './queries'
+  requireEditEmployeeAccess,
+  requireDeleteEmployeeAccess,
+  requireEditSalaryAccess,
+  requireApproveVacationAccess,
+  canEditEmployee,
+  canDeleteEmployee,
+} from './permissions';
+import type { EmployeeId, VacationDaysId } from './types';
 
 // ============================================================================
-// Employee Mutations
+// Employee Operations
 // ============================================================================
 
 /**
- * Create a new employee
+ * Create new employee
  */
-export async function createEmployee(
-  ctx: MutationCtx,
-  input: CreateEmployeeInput,
-  ownerId: string
-): Promise<Id<'yourobcEmployees'>> {
-  const now = Date.now()
-  const publicId = generateEmployeePublicId()
+export const createEmployee = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      userProfileId: v.id('userProfiles'),
+      authUserId: v.string(),
+      employeeNumber: v.string(),
+      type: v.optional(v.literal('office')),
+      department: v.optional(v.string()),
+      position: v.optional(v.string()),
+      managerId: v.optional(v.id('yourobcEmployees')),
+      employmentType: v.optional(employeesValidators.employmentType),
+      office: v.object({
+        location: v.string(),
+        country: v.string(),
+        countryCode: v.string(),
+        address: v.optional(v.string()),
+      }),
+      hireDate: v.optional(v.number()),
+      startDate: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+      salary: v.optional(v.number()),
+      currency: v.optional(v.string()),
+      paymentFrequency: v.optional(v.union(
+        v.literal('hourly'),
+        v.literal('weekly'),
+        v.literal('bi_weekly'),
+        v.literal('monthly'),
+        v.literal('annually')
+      )),
+      email: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      workPhone: v.optional(v.string()),
+      workEmail: v.optional(v.string()),
+      emergencyContact: v.optional(v.object({
+        name: v.string(),
+        phone: v.string(),
+        relationship: v.string(),
+      })),
+      status: v.optional(employeesValidators.status),
+      workStatus: v.optional(employeesValidators.workStatus),
+      timezone: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<EmployeeId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const employeeId = await ctx.db.insert('yourobcEmployees', {
-    publicId,
-    ownerId,
-    userProfileId: input.userProfileId,
-    authUserId: input.authUserId,
-    employeeNumber: input.employeeNumber,
-    type: input.type || EMPLOYEE_DEFAULTS.TYPE,
-    department: input.department,
-    position: input.position,
-    managerId: input.managerId,
-    office: input.office,
-    hireDate: input.hireDate,
-    workPhone: input.workPhone,
-    workEmail: input.workEmail,
-    emergencyContact: input.emergencyContact,
-    status: input.status,
-    workStatus: input.workStatus,
-    isActive: input.isActive,
-    isOnline: input.isOnline || EMPLOYEE_DEFAULTS.IS_ONLINE,
-    timeEntries: EMPLOYEE_DEFAULTS.TIME_ENTRIES,
-    timezone: input.timezone,
-    metadata: input.metadata || {},
-    createdAt: now,
-    createdBy: ownerId,
-    updatedAt: now,
-    updatedBy: ownerId,
-  })
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, EMPLOYEES_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  return employeeId
-}
+    // 3. VALIDATE: Check data validity
+    const errors = validateEmployeeData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-/**
- * Update an employee
- */
-export async function updateEmployee(
-  ctx: MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  input: UpdateEmployeeInput,
-  updatedBy: string
-): Promise<void> {
-  const employee = await getEmployeeById(ctx, employeeId)
-  if (!employee) {
-    throw new Error('Employee not found')
-  }
+    // 4. PROCESS: Sanitize and prepare data
+    const sanitized = sanitizeEmployeeData(data);
+    const publicId = await generateUniquePublicId(ctx, 'yourobcEmployees');
+    const now = Date.now();
 
-  const now = Date.now()
-  const updates: any = {
-    updatedAt: now,
-    updatedBy,
-  }
+    // 5. CREATE: Insert into database
+    const employeeId = await ctx.db.insert('yourobcEmployees', {
+      publicId,
+      name: sanitized.name,
+      userProfileId: sanitized.userProfileId,
+      authUserId: sanitized.authUserId,
+      employeeNumber: sanitized.employeeNumber,
+      type: sanitized.type || 'office',
+      department: sanitized.department,
+      position: sanitized.position,
+      managerId: sanitized.managerId,
+      employmentType: sanitized.employmentType,
+      office: sanitized.office,
+      hireDate: sanitized.hireDate,
+      startDate: sanitized.startDate,
+      endDate: sanitized.endDate,
+      salary: sanitized.salary,
+      currency: sanitized.currency || 'USD',
+      paymentFrequency: sanitized.paymentFrequency,
+      email: sanitized.email,
+      phone: sanitized.phone,
+      workPhone: sanitized.workPhone,
+      workEmail: sanitized.workEmail,
+      emergencyContact: sanitized.emergencyContact,
+      status: sanitized.status || EMPLOYEES_CONSTANTS.STATUS.ACTIVE,
+      workStatus: sanitized.workStatus,
+      isActive: true,
+      isOnline: false,
+      timezone: sanitized.timezone || EMPLOYEES_CONSTANTS.DEFAULT_TIMEZONE,
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  // Apply updates
-  if (input.department !== undefined) updates.department = input.department
-  if (input.position !== undefined) updates.position = input.position
-  if (input.managerId !== undefined) updates.managerId = input.managerId
-  if (input.office !== undefined) updates.office = input.office
-  if (input.hireDate !== undefined) updates.hireDate = input.hireDate
-  if (input.workPhone !== undefined) updates.workPhone = input.workPhone
-  if (input.workEmail !== undefined) updates.workEmail = input.workEmail
-  if (input.emergencyContact !== undefined)
-    updates.emergencyContact = input.emergencyContact
-  if (input.status !== undefined) updates.status = input.status
-  if (input.workStatus !== undefined) updates.workStatus = input.workStatus
-  if (input.isActive !== undefined) updates.isActive = input.isActive
-  if (input.isOnline !== undefined) updates.isOnline = input.isOnline
-  if (input.timezone !== undefined) updates.timezone = input.timezone
-  if (input.metadata !== undefined)
-    updates.metadata = { ...employee.metadata, ...input.metadata }
-
-  await ctx.db.patch(employeeId, updates)
-}
-
-/**
- * Update employee activity
- */
-export async function updateEmployeeActivity(
-  ctx: MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  isOnline: boolean,
-  workStatus?: string
-): Promise<void> {
-  const now = Date.now()
-  const updates: any = {
-    isOnline,
-    lastActivity: now,
-    updatedAt: now,
-  }
-
-  if (workStatus !== undefined) {
-    updates.workStatus = workStatus
-  }
-
-  await ctx.db.patch(employeeId, updates)
-}
-
-/**
- * Update employee vacation status (denormalized)
- */
-export async function updateEmployeeVacationStatus(
-  ctx: MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  vacationEntry: VacationEntry | null
-): Promise<void> {
-  const now = Date.now()
-
-  if (vacationEntry) {
-    const daysRemaining = calculateDaysRemaining(vacationEntry.endDate)
-    await ctx.db.patch(employeeId, {
-      currentVacationStatus: {
-        isOnVacation: true,
-        vacationEntryId: vacationEntry.entryId,
-        startDate: vacationEntry.startDate,
-        endDate: vacationEntry.endDate,
-        type: vacationEntry.type,
-        reason: vacationEntry.reason,
-        daysRemaining,
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employee.created',
+      entityType: 'system_employee',
+      entityId: publicId,
+      entityTitle: sanitized.name,
+      description: `Created employee: ${sanitized.name}`,
+      metadata: {
+        status: sanitized.status || EMPLOYEES_CONSTANTS.STATUS.ACTIVE,
+        department: sanitized.department,
+        position: sanitized.position,
       },
+      createdAt: now,
+      createdBy: user._id,
       updatedAt: now,
-    })
-  } else {
+    });
+
+    // 7. RETURN: Return entity ID
+    return employeeId;
+  },
+});
+
+/**
+ * Update existing employee
+ */
+export const updateEmployee = mutation({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      department: v.optional(v.string()),
+      position: v.optional(v.string()),
+      managerId: v.optional(v.id('yourobcEmployees')),
+      employmentType: v.optional(employeesValidators.employmentType),
+      office: v.optional(v.object({
+        location: v.string(),
+        country: v.string(),
+        countryCode: v.string(),
+        address: v.optional(v.string()),
+      })),
+      hireDate: v.optional(v.number()),
+      startDate: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+      email: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      workPhone: v.optional(v.string()),
+      workEmail: v.optional(v.string()),
+      emergencyContact: v.optional(v.object({
+        name: v.string(),
+        phone: v.string(),
+        relationship: v.string(),
+      })),
+      status: v.optional(employeesValidators.status),
+      workStatus: v.optional(employeesValidators.workStatus),
+      isActive: v.optional(v.boolean()),
+      timezone: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { employeeId, updates }): Promise<EmployeeId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const employee = await ctx.db.get(employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
+
+    // 3. AUTHZ: Check edit permission
+    await requireEditEmployeeAccess(ctx, employee, user);
+
+    // 4. VALIDATE: Check update data validity
+    const errors = validateEmployeeData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Sanitize and prepare update data
+    const sanitized = sanitizeEmployeeData(updates);
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (sanitized.name !== undefined) updateData.name = sanitized.name;
+    if (sanitized.department !== undefined) updateData.department = sanitized.department;
+    if (sanitized.position !== undefined) updateData.position = sanitized.position;
+    if (sanitized.managerId !== undefined) updateData.managerId = sanitized.managerId;
+    if (sanitized.employmentType !== undefined) updateData.employmentType = sanitized.employmentType;
+    if (sanitized.office !== undefined) updateData.office = sanitized.office;
+    if (sanitized.hireDate !== undefined) updateData.hireDate = sanitized.hireDate;
+    if (sanitized.startDate !== undefined) updateData.startDate = sanitized.startDate;
+    if (sanitized.endDate !== undefined) updateData.endDate = sanitized.endDate;
+    if (sanitized.email !== undefined) updateData.email = sanitized.email;
+    if (sanitized.phone !== undefined) updateData.phone = sanitized.phone;
+    if (sanitized.workPhone !== undefined) updateData.workPhone = sanitized.workPhone;
+    if (sanitized.workEmail !== undefined) updateData.workEmail = sanitized.workEmail;
+    if (sanitized.emergencyContact !== undefined) updateData.emergencyContact = sanitized.emergencyContact;
+    if (sanitized.status !== undefined) updateData.status = sanitized.status;
+    if (sanitized.workStatus !== undefined) updateData.workStatus = sanitized.workStatus;
+    if (sanitized.isActive !== undefined) updateData.isActive = sanitized.isActive;
+    if (sanitized.timezone !== undefined) updateData.timezone = sanitized.timezone;
+
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(employeeId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employee.updated',
+      entityType: 'system_employee',
+      entityId: employee.publicId,
+      entityTitle: updateData.name || employee.name,
+      description: `Updated employee: ${updateData.name || employee.name}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return employeeId;
+  },
+});
+
+/**
+ * Update employee salary
+ */
+export const updateEmployeeSalary = mutation({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+    salary: v.number(),
+    currency: v.optional(v.string()),
+    paymentFrequency: v.optional(v.union(
+      v.literal('hourly'),
+      v.literal('weekly'),
+      v.literal('bi_weekly'),
+      v.literal('monthly'),
+      v.literal('annually')
+    )),
+  },
+  handler: async (ctx, { employeeId, salary, currency, paymentFrequency }): Promise<EmployeeId> => {
+    const user = await requireCurrentUser(ctx);
+
+    const employee = await ctx.db.get(employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
+
+    // Check salary edit permission (more restrictive)
+    await requireEditSalaryAccess(employee, user);
+
+    // Validate salary
+    if (salary < EMPLOYEES_CONSTANTS.LIMITS.MIN_SALARY || salary > EMPLOYEES_CONSTANTS.LIMITS.MAX_SALARY) {
+      throw new Error('Invalid salary amount');
+    }
+
+    const now = Date.now();
     await ctx.db.patch(employeeId, {
-      currentVacationStatus: undefined,
+      salary,
+      currency: currency || employee.currency || 'USD',
+      paymentFrequency: paymentFrequency || employee.paymentFrequency,
       updatedAt: now,
-    })
-  }
-}
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employee.salary_updated',
+      entityType: 'system_employee',
+      entityId: employee.publicId,
+      entityTitle: employee.name,
+      description: `Updated salary for employee: ${employee.name}`,
+      metadata: { salary, currency, paymentFrequency },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return employeeId;
+  },
+});
 
 /**
- * Soft delete an employee
+ * Delete employee (soft delete)
  */
-export async function softDeleteEmployee(
-  ctx: MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  deletedBy: string
-): Promise<void> {
-  const employee = await getEmployeeById(ctx, employeeId)
-  if (!employee) {
-    throw new Error('Employee not found')
-  }
+export const deleteEmployee = mutation({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+  },
+  handler: async (ctx, { employeeId }): Promise<EmployeeId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const now = Date.now()
-  await ctx.db.patch(employeeId, {
-    deletedAt: now,
-    deletedBy,
-    updatedAt: now,
-    updatedBy: deletedBy,
-  })
-}
+    // 2. CHECK: Verify entity exists
+    const employee = await ctx.db.get(employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
+
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteEmployeeAccess(employee, user);
+
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(employeeId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employee.deleted',
+      entityType: 'system_employee',
+      entityId: employee.publicId,
+      entityTitle: employee.name,
+      description: `Deleted employee: ${employee.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return employeeId;
+  },
+});
 
 /**
- * Restore a soft-deleted employee
+ * Restore soft-deleted employee
  */
-export async function restoreEmployee(
-  ctx: MutationCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  restoredBy: string
-): Promise<void> {
-  const employee = await ctx.db.get(employeeId)
-  if (!employee) {
-    throw new Error('Employee not found')
-  }
+export const restoreEmployee = mutation({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+  },
+  handler: async (ctx, { employeeId }): Promise<EmployeeId> => {
+    const user = await requireCurrentUser(ctx);
 
-  const now = Date.now()
-  await ctx.db.patch(employeeId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: now,
-    updatedBy: restoredBy,
-  })
-}
+    const employee = await ctx.db.get(employeeId);
+    if (!employee) {
+      throw new Error('Employee not found');
+    }
+    if (!employee.deletedAt) {
+      throw new Error('Employee is not deleted');
+    }
+
+    // Check permission
+    if (
+      employee.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this employee');
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(employeeId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employee.restored',
+      entityType: 'system_employee',
+      entityId: employee.publicId,
+      entityTitle: employee.name,
+      description: `Restored employee: ${employee.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return employeeId;
+  },
+});
 
 // ============================================================================
-// Vacation Days Mutations
+// Vacation Days Operations
 // ============================================================================
 
 /**
- * Create vacation days record
+ * Create vacation days record for employee
  */
-export async function createVacationDays(
-  ctx: MutationCtx,
-  input: CreateVacationDaysInput,
-  ownerId: string,
-  createdBy: string
-): Promise<Id<'yourobcVacationDays'>> {
-  // Check if record already exists for this employee and year
-  const existing = await getVacationDaysByEmployeeYear(
-    ctx,
-    input.employeeId,
-    input.year
-  )
-  if (existing) {
-    throw new Error(
-      `Vacation days record already exists for employee ${input.employeeId} and year ${input.year}`
-    )
-  }
+export const createVacationDays = mutation({
+  args: {
+    data: v.object({
+      employeeId: v.id('yourobcEmployees'),
+      year: v.number(),
+      annualEntitlement: v.number(),
+      carryoverDays: v.optional(v.number()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<VacationDaysId> => {
+    const user = await requireCurrentUser(ctx);
 
-  const now = Date.now()
-  const publicId = generateVacationDaysPublicId()
+    await requirePermission(ctx, EMPLOYEES_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  const carryoverDays = input.carryoverDays || VACATION_DEFAULTS.CARRYOVER_DAYS
-  const available = input.annualEntitlement + carryoverDays
+    // Check if employee exists
+    const employee = await ctx.db.get(data.employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
 
-  const vacationDaysId = await ctx.db.insert('yourobcVacationDays', {
-    publicId,
-    ownerId,
-    employeeId: input.employeeId,
-    year: input.year,
-    annualEntitlement: input.annualEntitlement,
-    carryoverDays,
-    carryoverApprovedBy: input.carryoverApprovedBy,
-    carryoverApprovedAt: input.carryoverApprovedAt,
-    available,
-    used: VACATION_DEFAULTS.USED,
-    pending: VACATION_DEFAULTS.PENDING,
-    remaining: available,
-    entries: [],
-    calculationDate: now,
-    createdAt: now,
-    createdBy,
-    updatedAt: now,
-    updatedBy: createdBy,
-  })
+    // Check if record already exists for this year
+    const existing = await ctx.db
+      .query('yourobcVacationDays')
+      .withIndex('by_employee_year', q => q.eq('employeeId', data.employeeId).eq('year', data.year))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  return vacationDaysId
-}
+    if (existing) {
+      throw new Error('Vacation days record already exists for this employee and year');
+    }
 
-/**
- * Update vacation entitlements
- */
-export async function updateVacationEntitlements(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  annualEntitlement?: number,
-  carryoverDays?: number,
-  updatedBy?: string
-): Promise<void> {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
+    const publicId = await generateUniquePublicId(ctx, 'yourobcVacationDays');
+    const now = Date.now();
 
-  const now = Date.now()
-  const newAnnual = annualEntitlement ?? vacationDays.annualEntitlement
-  const newCarryover = carryoverDays ?? vacationDays.carryoverDays
+    const carryoverDays = data.carryoverDays || 0;
+    const available = data.annualEntitlement + carryoverDays;
 
-  const stats = calculateVacationStats(newAnnual, newCarryover, vacationDays.entries)
+    const vacationDaysId = await ctx.db.insert('yourobcVacationDays', {
+      publicId,
+      name: `${employee.name} - ${data.year}`,
+      employeeId: data.employeeId,
+      year: data.year,
+      annualEntitlement: data.annualEntitlement,
+      carryoverDays,
+      available,
+      used: 0,
+      pending: 0,
+      remaining: available,
+      entries: [],
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  await ctx.db.patch(vacationDaysId, {
-    annualEntitlement: newAnnual,
-    carryoverDays: newCarryover,
-    available: stats.available,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    calculationDate: now,
-    updatedAt: now,
-    updatedBy,
-  })
-}
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'vacation_days.created',
+      entityType: 'system_vacation_days',
+      entityId: publicId,
+      entityTitle: `${employee.name} - ${data.year}`,
+      description: `Created vacation days record for ${employee.name}`,
+      metadata: {
+        year: data.year,
+        annualEntitlement: data.annualEntitlement,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return vacationDaysId;
+  },
+});
 
 /**
  * Request vacation
  */
-export async function requestVacation(
-  ctx: MutationCtx,
-  input: CreateVacationEntryInput,
-  requestedBy: string
-): Promise<{ vacationDaysId: Id<'yourobcVacationDays'>; entryId: string }> {
-  // Get or create vacation days record for the year
-  let vacationDays = await getVacationDaysByEmployeeYear(
-    ctx,
-    input.employeeId,
-    input.year
-  )
+export const requestVacation = mutation({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+    data: v.object({
+      startDate: v.number(),
+      endDate: v.number(),
+      days: v.number(),
+      type: employeesValidators.vacationType,
+      reason: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      isHalfDay: v.optional(v.boolean()),
+      emergencyContact: v.optional(v.object({
+        name: v.string(),
+        phone: v.string(),
+        relationship: v.string(),
+      })),
+    }),
+  },
+  handler: async (ctx, { employeeId, data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!vacationDays) {
-    throw new Error(
-      `No vacation days record found for year ${input.year}. Please create one first.`
-    )
-  }
+    // Validate vacation request
+    const errors = validateVacationRequest(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // Validate vacation request
-  const validation = validateVacationRequest(
-    input.startDate,
-    input.endDate,
-    input.days,
-    vacationDays.available,
-    vacationDays.pending,
-    vacationDays.used
-  )
+    // Check employee exists
+    const employee = await ctx.db.get(employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
 
-  if (!validation.valid) {
-    throw new Error(validation.error)
-  }
+    // Check permission (employee can request their own vacation)
+    if (
+      employee.userProfileId !== user._id &&
+      employee.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to request vacation for this employee');
+    }
 
-  // Create vacation entry
-  const now = Date.now()
-  const entryId = generateVacationEntryId()
+    const year = new Date(data.startDate).getFullYear();
 
-  const newEntry: VacationEntry = {
-    entryId,
-    startDate: input.startDate,
-    endDate: input.endDate,
-    days: input.days,
-    type: input.type,
-    status: 'pending',
-    requestedDate: now,
-    requestedBy,
-    reason: input.reason,
-    emergencyContact: input.emergencyContact,
-    notes: input.notes,
-    isHalfDay: input.isHalfDay,
-  }
+    // Get or create vacation days record
+    let vacationDays = await ctx.db
+      .query('yourobcVacationDays')
+      .withIndex('by_employee_year', q => q.eq('employeeId', employeeId).eq('year', year))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  // Update vacation days record
-  const updatedEntries = [...vacationDays.entries, newEntry]
-  const stats = calculateVacationStats(
-    vacationDays.annualEntitlement,
-    vacationDays.carryoverDays,
-    updatedEntries
-  )
+    if (!vacationDays) {
+      // Create new vacation days record with default entitlement
+      const publicId = await generateUniquePublicId(ctx, 'yourobcVacationDays');
+      const now = Date.now();
 
-  await ctx.db.patch(vacationDays._id, {
-    entries: updatedEntries,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    updatedAt: now,
-    updatedBy: requestedBy,
-  })
+      const vacationDaysId = await ctx.db.insert('yourobcVacationDays', {
+        publicId,
+        name: `${employee.name} - ${year}`,
+        employeeId,
+        year,
+        annualEntitlement: EMPLOYEES_CONSTANTS.DEFAULT_ANNUAL_VACATION_DAYS,
+        carryoverDays: 0,
+        available: EMPLOYEES_CONSTANTS.DEFAULT_ANNUAL_VACATION_DAYS,
+        used: 0,
+        pending: 0,
+        remaining: EMPLOYEES_CONSTANTS.DEFAULT_ANNUAL_VACATION_DAYS,
+        entries: [],
+        ownerId: user._id,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: user._id,
+      });
 
-  return { vacationDaysId: vacationDays._id, entryId }
-}
+      vacationDays = await ctx.db.get(vacationDaysId);
+      if (!vacationDays) throw new Error('Failed to create vacation days record');
+    }
+
+    // Check if enough days available
+    if (vacationDays.remaining < data.days) {
+      throw new Error(`Insufficient vacation days. Available: ${vacationDays.remaining}, Requested: ${data.days}`);
+    }
+
+    // Create vacation entry
+    const entryId = `vacation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = Date.now();
+
+    const newEntry = {
+      entryId,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      days: data.days,
+      type: data.type,
+      status: EMPLOYEES_CONSTANTS.VACATION_STATUS.PENDING as any,
+      requestedDate: now,
+      requestedBy: user.authUserId || user._id,
+      reason: data.reason?.trim(),
+      notes: data.notes?.trim(),
+      isHalfDay: data.isHalfDay,
+      emergencyContact: data.emergencyContact,
+    };
+
+    // Update vacation days record
+    const updatedEntries = [...vacationDays.entries, newEntry];
+    const newPending = vacationDays.pending + data.days;
+    const newRemaining = vacationDays.available - vacationDays.used - newPending;
+
+    await ctx.db.patch(vacationDays._id, {
+      entries: updatedEntries,
+      pending: newPending,
+      remaining: newRemaining,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'vacation.requested',
+      entityType: 'system_vacation',
+      entityId: entryId,
+      entityTitle: `${employee.name} - Vacation Request`,
+      description: `Requested ${data.days} days of ${data.type} vacation`,
+      metadata: {
+        startDate: data.startDate,
+        endDate: data.endDate,
+        days: data.days,
+        type: data.type,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return vacationDays._id;
+  },
+});
 
 /**
  * Approve vacation request
  */
-export async function approveVacation(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  entryId: string,
-  approvedBy: string,
-  approvalNotes?: string
-): Promise<void> {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
+export const approveVacation = mutation({
+  args: {
+    vacationDaysId: v.id('yourobcVacationDays'),
+    entryId: v.string(),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, { vacationDaysId, entryId, notes }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const entryIndex = vacationDays.entries.findIndex((e) => e.entryId === entryId)
-  if (entryIndex === -1) {
-    throw new Error('Vacation entry not found')
-  }
+    const vacationDays = await ctx.db.get(vacationDaysId);
+    if (!vacationDays || vacationDays.deletedAt) {
+      throw new Error('Vacation days record not found');
+    }
 
-  const entry = vacationDays.entries[entryIndex]
-  if (entry.status !== 'pending') {
-    throw new Error(`Cannot approve vacation with status: ${entry.status}`)
-  }
+    const employee = await ctx.db.get(vacationDays.employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
 
-  const now = Date.now()
-  const updatedEntry: VacationEntry = {
-    ...entry,
-    status: 'approved',
-    approvedBy,
-    approvedDate: now,
-    approvalNotes,
-  }
+    // Check approval permission
+    await requireApproveVacationAccess(ctx, employee, user);
 
-  const updatedEntries = [...vacationDays.entries]
-  updatedEntries[entryIndex] = updatedEntry
+    // Find entry
+    const entryIndex = vacationDays.entries.findIndex(e => e.entryId === entryId);
+    if (entryIndex === -1) {
+      throw new Error('Vacation entry not found');
+    }
 
-  const stats = calculateVacationStats(
-    vacationDays.annualEntitlement,
-    vacationDays.carryoverDays,
-    updatedEntries
-  )
+    const entry = vacationDays.entries[entryIndex];
 
-  await ctx.db.patch(vacationDaysId, {
-    entries: updatedEntries,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    updatedAt: now,
-    updatedBy: approvedBy,
-  })
+    if (entry.status !== EMPLOYEES_CONSTANTS.VACATION_STATUS.PENDING) {
+      throw new Error('Only pending vacation requests can be approved');
+    }
 
-  // Update employee's current vacation status if applicable
-  const currentEntry = getCurrentVacationEntry(updatedEntries, now)
-  if (currentEntry && currentEntry.entryId === entryId) {
-    await updateEmployeeVacationStatus(ctx, vacationDays.employeeId, currentEntry)
-  }
-}
+    const now = Date.now();
+
+    // Update entry
+    const updatedEntries = [...vacationDays.entries];
+    updatedEntries[entryIndex] = {
+      ...entry,
+      status: EMPLOYEES_CONSTANTS.VACATION_STATUS.APPROVED as any,
+      approvedBy: user.authUserId || user._id,
+      approvedDate: now,
+      approvalNotes: notes?.trim(),
+    };
+
+    // Update calculations
+    const newUsed = vacationDays.used + entry.days;
+    const newPending = vacationDays.pending - entry.days;
+    const newRemaining = vacationDays.available - newUsed - newPending;
+
+    await ctx.db.patch(vacationDaysId, {
+      entries: updatedEntries,
+      used: newUsed,
+      pending: newPending,
+      remaining: newRemaining,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'vacation.approved',
+      entityType: 'system_vacation',
+      entityId: entryId,
+      entityTitle: `${employee.name} - Vacation Approved`,
+      description: `Approved ${entry.days} days of ${entry.type} vacation`,
+      metadata: {
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        days: entry.days,
+        type: entry.type,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return vacationDaysId;
+  },
+});
 
 /**
  * Reject vacation request
  */
-export async function rejectVacation(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  entryId: string,
-  rejectedBy: string,
-  rejectionReason?: string
-): Promise<void> {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
+export const rejectVacation = mutation({
+  args: {
+    vacationDaysId: v.id('yourobcVacationDays'),
+    entryId: v.string(),
+    reason: v.string(),
+  },
+  handler: async (ctx, { vacationDaysId, entryId, reason }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const entryIndex = vacationDays.entries.findIndex((e) => e.entryId === entryId)
-  if (entryIndex === -1) {
-    throw new Error('Vacation entry not found')
-  }
-
-  const entry = vacationDays.entries[entryIndex]
-  if (entry.status !== 'pending') {
-    throw new Error(`Cannot reject vacation with status: ${entry.status}`)
-  }
-
-  const now = Date.now()
-  const updatedEntry: VacationEntry = {
-    ...entry,
-    status: 'rejected',
-    rejectedBy,
-    rejectedDate: now,
-    rejectionReason,
-  }
-
-  const updatedEntries = [...vacationDays.entries]
-  updatedEntries[entryIndex] = updatedEntry
-
-  const stats = calculateVacationStats(
-    vacationDays.annualEntitlement,
-    vacationDays.carryoverDays,
-    updatedEntries
-  )
-
-  await ctx.db.patch(vacationDaysId, {
-    entries: updatedEntries,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    updatedAt: now,
-    updatedBy: rejectedBy,
-  })
-}
-
-/**
- * Cancel vacation
- */
-export async function cancelVacation(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  entryId: string,
-  cancelledBy: string,
-  cancellationReason?: string
-): Promise<void> {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
-
-  const entryIndex = vacationDays.entries.findIndex((e) => e.entryId === entryId)
-  if (entryIndex === -1) {
-    throw new Error('Vacation entry not found')
-  }
-
-  const entry = vacationDays.entries[entryIndex]
-  if (entry.status !== 'approved' && entry.status !== 'pending') {
-    throw new Error(`Cannot cancel vacation with status: ${entry.status}`)
-  }
-
-  const now = Date.now()
-  const updatedEntry: VacationEntry = {
-    ...entry,
-    status: 'cancelled',
-    cancelledBy,
-    cancelledDate: now,
-    cancellationReason,
-  }
-
-  const updatedEntries = [...vacationDays.entries]
-  updatedEntries[entryIndex] = updatedEntry
-
-  const stats = calculateVacationStats(
-    vacationDays.annualEntitlement,
-    vacationDays.carryoverDays,
-    updatedEntries
-  )
-
-  await ctx.db.patch(vacationDaysId, {
-    entries: updatedEntries,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    updatedAt: now,
-    updatedBy: cancelledBy,
-  })
-
-  // Update employee's current vacation status if this was the active vacation
-  const currentEntry = getCurrentVacationEntry(updatedEntries, now)
-  await updateEmployeeVacationStatus(ctx, vacationDays.employeeId, currentEntry || null)
-
-  // If vacation was completed, add to recent vacations
-  if (entry.status === 'approved' && entry.endDate < now) {
-    const employee = await getEmployeeById(ctx, vacationDays.employeeId)
-    if (employee) {
-      const recentVacations = updateRecentVacations(
-        employee.recentVacations,
-        entry,
-        now
-      )
-      await ctx.db.patch(vacationDays.employeeId, {
-        recentVacations,
-        updatedAt: now,
-      })
-    }
-  }
-}
-
-/**
- * Batch create vacation entries
- */
-export async function batchCreateVacationEntries(
-  ctx: MutationCtx,
-  input: BatchVacationEntriesInput,
-  requestedBy: string
-): Promise<{ vacationDaysId: Id<'yourobcVacationDays'>; entryIds: string[] }> {
-  const vacationDays = await getVacationDaysByEmployeeYear(
-    ctx,
-    input.employeeId as Id<'yourobcEmployees'>,
-    input.year
-  )
-
-  if (!vacationDays) {
-    throw new Error(
-      `No vacation days record found for year ${input.year}. Please create one first.`
-    )
-  }
-
-  const now = Date.now()
-  const newEntries: VacationEntry[] = []
-  const entryIds: string[] = []
-
-  for (const entryInput of input.entries) {
-    const entryId = generateVacationEntryId()
-    entryIds.push(entryId)
-
-    const newEntry: VacationEntry = {
-      entryId,
-      startDate: entryInput.startDate,
-      endDate: entryInput.endDate,
-      days: entryInput.days,
-      type: entryInput.type,
-      status: 'pending',
-      requestedDate: now,
-      requestedBy,
-      reason: entryInput.reason,
-      emergencyContact: entryInput.emergencyContact,
-      notes: entryInput.notes,
-      isHalfDay: entryInput.isHalfDay,
+    const vacationDays = await ctx.db.get(vacationDaysId);
+    if (!vacationDays || vacationDays.deletedAt) {
+      throw new Error('Vacation days record not found');
     }
 
-    newEntries.push(newEntry)
-  }
+    const employee = await ctx.db.get(vacationDays.employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
 
-  // Update vacation days record
-  const updatedEntries = [...vacationDays.entries, ...newEntries]
-  const stats = calculateVacationStats(
-    vacationDays.annualEntitlement,
-    vacationDays.carryoverDays,
-    updatedEntries
-  )
+    // Check approval permission
+    await requireApproveVacationAccess(ctx, employee, user);
 
-  // Validate total days
-  if (stats.remaining < 0) {
-    throw new Error(
-      `Insufficient vacation days. Available: ${stats.available}, Total requested: ${stats.used + stats.pending}`
-    )
-  }
+    // Find entry
+    const entryIndex = vacationDays.entries.findIndex(e => e.entryId === entryId);
+    if (entryIndex === -1) {
+      throw new Error('Vacation entry not found');
+    }
 
-  await ctx.db.patch(vacationDays._id, {
-    entries: updatedEntries,
-    used: stats.used,
-    pending: stats.pending,
-    remaining: stats.remaining,
-    updatedAt: now,
-    updatedBy: requestedBy,
-  })
+    const entry = vacationDays.entries[entryIndex];
 
-  return { vacationDaysId: vacationDays._id, entryIds }
-}
+    if (entry.status !== EMPLOYEES_CONSTANTS.VACATION_STATUS.PENDING) {
+      throw new Error('Only pending vacation requests can be rejected');
+    }
+
+    const now = Date.now();
+
+    // Update entry
+    const updatedEntries = [...vacationDays.entries];
+    updatedEntries[entryIndex] = {
+      ...entry,
+      status: EMPLOYEES_CONSTANTS.VACATION_STATUS.REJECTED as any,
+      rejectedBy: user.authUserId || user._id,
+      rejectedDate: now,
+      rejectionReason: reason.trim(),
+    };
+
+    // Update calculations
+    const newPending = vacationDays.pending - entry.days;
+    const newRemaining = vacationDays.available - vacationDays.used - newPending;
+
+    await ctx.db.patch(vacationDaysId, {
+      entries: updatedEntries,
+      pending: newPending,
+      remaining: newRemaining,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'vacation.rejected',
+      entityType: 'system_vacation',
+      entityId: entryId,
+      entityTitle: `${employee.name} - Vacation Rejected`,
+      description: `Rejected ${entry.days} days of ${entry.type} vacation`,
+      metadata: {
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        days: entry.days,
+        type: entry.type,
+        reason,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return vacationDaysId;
+  },
+});
 
 /**
- * Soft delete vacation days record
+ * Cancel vacation request
  */
-export async function softDeleteVacationDays(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  deletedBy: string
-): Promise<void> {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
+export const cancelVacation = mutation({
+  args: {
+    vacationDaysId: v.id('yourobcVacationDays'),
+    entryId: v.string(),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, { vacationDaysId, entryId, reason }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const now = Date.now()
-  await ctx.db.patch(vacationDaysId, {
-    deletedAt: now,
-    deletedBy,
-    updatedAt: now,
-    updatedBy: deletedBy,
-  })
-}
+    const vacationDays = await ctx.db.get(vacationDaysId);
+    if (!vacationDays || vacationDays.deletedAt) {
+      throw new Error('Vacation days record not found');
+    }
 
-/**
- * Restore soft-deleted vacation days record
- */
-export async function restoreVacationDays(
-  ctx: MutationCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  restoredBy: string
-): Promise<void> {
-  const vacationDays = await ctx.db.get(vacationDaysId)
-  if (!vacationDays) {
-    throw new Error('Vacation days record not found')
-  }
+    const employee = await ctx.db.get(vacationDays.employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
 
-  const now = Date.now()
-  await ctx.db.patch(vacationDaysId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: now,
-    updatedBy: restoredBy,
-  })
-}
+    // Check permission (employee can cancel their own, manager/admin can cancel any)
+    const canCancel =
+      employee.userProfileId === user._id ||
+      employee.ownerId === user._id ||
+      user.role === 'admin' ||
+      user.role === 'superadmin';
+
+    if (!canCancel) {
+      const userEmployee = await ctx.db
+        .query('yourobcEmployees')
+        .withIndex('by_userProfile', q => q.eq('userProfileId', user._id))
+        .filter(q => q.eq(q.field('deletedAt'), undefined))
+        .first();
+
+      if (!userEmployee || employee.managerId !== userEmployee._id) {
+        throw new Error('You do not have permission to cancel this vacation request');
+      }
+    }
+
+    // Find entry
+    const entryIndex = vacationDays.entries.findIndex(e => e.entryId === entryId);
+    if (entryIndex === -1) {
+      throw new Error('Vacation entry not found');
+    }
+
+    const entry = vacationDays.entries[entryIndex];
+
+    if (entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.CANCELLED ||
+        entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.COMPLETED) {
+      throw new Error('This vacation request cannot be cancelled');
+    }
+
+    const now = Date.now();
+
+    // Update entry
+    const updatedEntries = [...vacationDays.entries];
+    updatedEntries[entryIndex] = {
+      ...entry,
+      status: EMPLOYEES_CONSTANTS.VACATION_STATUS.CANCELLED as any,
+      cancelledBy: user.authUserId || user._id,
+      cancelledDate: now,
+      cancellationReason: reason?.trim(),
+    };
+
+    // Update calculations based on previous status
+    let newUsed = vacationDays.used;
+    let newPending = vacationDays.pending;
+
+    if (entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.APPROVED) {
+      newUsed = vacationDays.used - entry.days;
+    } else if (entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.PENDING) {
+      newPending = vacationDays.pending - entry.days;
+    }
+
+    const newRemaining = vacationDays.available - newUsed - newPending;
+
+    await ctx.db.patch(vacationDaysId, {
+      entries: updatedEntries,
+      used: newUsed,
+      pending: newPending,
+      remaining: newRemaining,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'vacation.cancelled',
+      entityType: 'system_vacation',
+      entityId: entryId,
+      entityTitle: `${employee.name} - Vacation Cancelled`,
+      description: `Cancelled ${entry.days} days of ${entry.type} vacation`,
+      metadata: {
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        days: entry.days,
+        type: entry.type,
+        reason,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return vacationDaysId;
+  },
+});

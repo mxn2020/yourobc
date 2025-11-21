@@ -1,436 +1,392 @@
 // convex/lib/software/yourobc/invoices/queries.ts
 // Read operations for invoices module
 
+import { query } from '@/generated/server';
 import { v } from 'convex/values';
-import type { QueryCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
-import { INVOICE_CONSTANTS } from './constants';
-import {
-  canViewInvoice,
-  canViewAllInvoices,
-  requireAccess,
-} from './permissions';
-import {
-  isInvoiceOverdue,
-  calculateDaysOverdue,
-} from './utils';
-import type { Invoice, InvoiceFilters } from './types';
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
+import { invoicesValidators } from '@/schema/software/yourobc/invoices/validators';
+import { filterInvoicesByAccess, requireViewInvoiceAccess } from './permissions';
+import type { InvoiceListResponse, InvoiceFilters, InvoiceStats } from './types';
+import { INVOICES_CONSTANTS } from './constants';
+import { isInvoiceOverdue, calculateDaysOverdue } from './utils';
 
 /**
- * Get current user or throw error
+ * Get current user - helper function for authentication
  */
-async function requireCurrentUser(ctx: QueryCtx) {
+async function requireCurrentUser(ctx: any) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     throw new Error('Authentication required');
   }
-
-  // Get user profile by auth subject
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
-
-  if (!user) {
-    throw new Error('User profile not found');
-  }
-
-  return user;
+  return {
+    authUserId: identity.subject,
+    email: identity.email,
+    name: identity.name,
+    role: identity.role,
+  };
 }
 
 /**
- * Apply filters to invoice query
+ * Get paginated list of invoices with filtering
  */
-function applyFilters(invoices: Invoice[], filters: InvoiceFilters): Invoice[] {
-  let filtered = invoices;
+export const getInvoices = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(
+      v.object({
+        status: v.optional(v.array(invoicesValidators.status)),
+        type: v.optional(v.array(invoicesValidators.type)),
+        customerId: v.optional(v.id('yourobcCustomers')),
+        partnerId: v.optional(v.id('yourobcPartners')),
+        shipmentId: v.optional(v.id('yourobcShipments')),
+        search: v.optional(v.string()),
+        fromDate: v.optional(v.number()),
+        toDate: v.optional(v.number()),
+        isOverdue: v.optional(v.boolean()),
+        minAmount: v.optional(v.number()),
+        maxAmount: v.optional(v.number()),
+      })
+    ),
+  },
+  handler: async (ctx, args): Promise<InvoiceListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-  if (filters.type) {
-    filtered = filtered.filter((inv) => inv.type === filters.type);
-  }
+    // Query with index - start with owner index for better performance
+    let invoices = await ctx.db
+      .query('yourobcInvoices')
+      .withIndex('by_owner', (q) => q.eq('ownerId', user.authUserId))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  if (filters.status) {
-    filtered = filtered.filter((inv) => inv.status === filters.status);
-  }
+    // Apply access filtering
+    invoices = await filterInvoicesByAccess(ctx, invoices, user);
 
-  if (filters.customerId) {
-    filtered = filtered.filter((inv) => inv.customerId === filters.customerId);
-  }
+    // Apply status filter
+    if (filters.status?.length) {
+      invoices = invoices.filter((item) => filters.status!.includes(item.status));
+    }
 
-  if (filters.partnerId) {
-    filtered = filtered.filter((inv) => inv.partnerId === filters.partnerId);
-  }
+    // Apply type filter
+    if (filters.type?.length) {
+      invoices = invoices.filter((item) => filters.type!.includes(item.type));
+    }
 
-  if (filters.shipmentId) {
-    filtered = filtered.filter((inv) => inv.shipmentId === filters.shipmentId);
-  }
+    // Apply customer filter
+    if (filters.customerId) {
+      invoices = invoices.filter((item) => item.customerId === filters.customerId);
+    }
 
-  if (filters.fromDate) {
-    filtered = filtered.filter((inv) => inv.issueDate >= filters.fromDate!);
-  }
+    // Apply partner filter
+    if (filters.partnerId) {
+      invoices = invoices.filter((item) => item.partnerId === filters.partnerId);
+    }
 
-  if (filters.toDate) {
-    filtered = filtered.filter((inv) => inv.issueDate <= filters.toDate!);
-  }
+    // Apply shipment filter
+    if (filters.shipmentId) {
+      invoices = invoices.filter((item) => item.shipmentId === filters.shipmentId);
+    }
 
-  if (filters.overdue === true) {
-    filtered = filtered.filter((inv) => isInvoiceOverdue(inv));
-  }
+    // Apply date range filters
+    if (filters.fromDate) {
+      invoices = invoices.filter((item) => item.issueDate >= filters.fromDate!);
+    }
 
-  if (filters.searchText) {
-    const searchLower = filters.searchText.toLowerCase();
-    filtered = filtered.filter(
-      (inv) =>
-        inv.invoiceNumber.toLowerCase().includes(searchLower) ||
-        inv.description.toLowerCase().includes(searchLower) ||
-        (inv.externalInvoiceNumber &&
-          inv.externalInvoiceNumber.toLowerCase().includes(searchLower)) ||
-        (inv.purchaseOrderNumber &&
-          inv.purchaseOrderNumber.toLowerCase().includes(searchLower))
-    );
-  }
+    if (filters.toDate) {
+      invoices = invoices.filter((item) => item.issueDate <= filters.toDate!);
+    }
 
-  return filtered;
-}
+    // Apply overdue filter
+    if (filters.isOverdue !== undefined) {
+      invoices = invoices.filter((item) => isInvoiceOverdue(item) === filters.isOverdue);
+    }
 
-// ============================================================================
-// Query Functions
-// ============================================================================
+    // Apply amount filters
+    if (filters.minAmount !== undefined) {
+      invoices = invoices.filter((item) => item.totalAmount.amount >= filters.minAmount!);
+    }
+
+    if (filters.maxAmount !== undefined) {
+      invoices = invoices.filter((item) => item.totalAmount.amount <= filters.maxAmount!);
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      invoices = invoices.filter(
+        (item) =>
+          item.invoiceNumber.toLowerCase().includes(term) ||
+          (item.externalInvoiceNumber && item.externalInvoiceNumber.toLowerCase().includes(term)) ||
+          (item.description && item.description.toLowerCase().includes(term)) ||
+          (item.notes && item.notes.toLowerCase().includes(term))
+      );
+    }
+
+    // Sort by issue date (newest first)
+    invoices.sort((a, b) => b.issueDate - a.issueDate);
+
+    // Paginate
+    const total = invoices.length;
+    const items = invoices.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get invoice by ID
+ * Get single invoice by ID
  */
-export async function getInvoiceById(
-  ctx: QueryCtx,
-  invoiceId: Id<'yourobcInvoices'>
-): Promise<Invoice | null> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const getInvoice = query({
+  args: {
+    invoiceId: v.id('yourobcInvoices'),
+  },
+  handler: async (ctx, { invoiceId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get invoice
-  const invoice = await ctx.db.get(invoiceId);
-  if (!invoice) {
-    return null;
-  }
+    const invoice = await ctx.db.get(invoiceId);
+    if (!invoice || invoice.deletedAt) {
+      throw new Error('Invoice not found');
+    }
 
-  // 3. AUTHORIZE: Check view permission
-  const canView = await canViewInvoice(ctx, invoice, user);
-  await requireAccess(canView, 'You do not have permission to view this invoice');
+    await requireViewInvoiceAccess(ctx, invoice, user);
 
-  return invoice;
-}
+    return invoice;
+  },
+});
 
 /**
  * Get invoice by public ID
  */
-export async function getInvoiceByPublicId(
-  ctx: QueryCtx,
-  publicId: string
-): Promise<Invoice | null> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const getInvoiceByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get invoice by public ID
-  const invoice = await ctx.db
-    .query('yourobcInvoices')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .first();
+    const invoice = await ctx.db
+      .query('yourobcInvoices')
+      .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  if (!invoice) {
-    return null;
-  }
+    if (!invoice) {
+      throw new Error('Invoice not found');
+    }
 
-  // 3. AUTHORIZE: Check view permission
-  const canView = await canViewInvoice(ctx, invoice, user);
-  await requireAccess(canView, 'You do not have permission to view this invoice');
+    await requireViewInvoiceAccess(ctx, invoice, user);
 
-  return invoice;
-}
+    return invoice;
+  },
+});
 
 /**
  * Get invoice by invoice number
  */
-export async function getInvoiceByNumber(
-  ctx: QueryCtx,
-  invoiceNumber: string
-): Promise<Invoice | null> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const getInvoiceByNumber = query({
+  args: {
+    invoiceNumber: v.string(),
+  },
+  handler: async (ctx, { invoiceNumber }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get invoice by invoice number
-  const invoice = await ctx.db
-    .query('yourobcInvoices')
-    .withIndex('by_invoice_number', (q) => q.eq('invoiceNumber', invoiceNumber))
-    .first();
-
-  if (!invoice) {
-    return null;
-  }
-
-  // 3. AUTHORIZE: Check view permission
-  const canView = await canViewInvoice(ctx, invoice, user);
-  await requireAccess(canView, 'You do not have permission to view this invoice');
-
-  return invoice;
-}
-
-/**
- * List invoices with filters
- */
-export async function listInvoices(
-  ctx: QueryCtx,
-  filters: InvoiceFilters = {},
-  limit: number = 50,
-  offset: number = 0
-): Promise<{ invoices: Invoice[]; total: number }> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. AUTHORIZE: Check if user can view all invoices
-  const canViewAll = await canViewAllInvoices(user);
-
-  // 3. FETCH: Get invoices
-  let invoices: Invoice[];
-
-  if (canViewAll) {
-    // Admin can view all invoices
-    invoices = await ctx.db
+    const invoice = await ctx.db
       .query('yourobcInvoices')
+      .withIndex('by_invoiceNumber', (q) => q.eq('invoiceNumber', invoiceNumber))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
-  } else {
-    // Regular users can only view their own invoices
-    invoices = await ctx.db
-      .query('yourobcInvoices')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
-  }
+      .first();
 
-  // 4. FILTER: Apply filters
-  invoices = applyFilters(invoices, filters);
-
-  // 5. SORT: By issue date (newest first)
-  invoices.sort((a, b) => b.issueDate - a.issueDate);
-
-  // 6. PAGINATE: Apply limit and offset
-  const total = invoices.length;
-  const paginated = invoices.slice(offset, offset + limit);
-
-  return {
-    invoices: paginated,
-    total,
-  };
-}
-
-/**
- * List invoices by customer
- */
-export async function listInvoicesByCustomer(
-  ctx: QueryCtx,
-  customerId: Id<'yourobcCustomers'>,
-  limit: number = 50
-): Promise<Invoice[]> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get invoices by customer
-  const invoices = await ctx.db
-    .query('yourobcInvoices')
-    .withIndex('by_customer', (q) => q.eq('customerId', customerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .take(limit);
-
-  // 3. FILTER: Check view permissions for each invoice
-  const viewableInvoices: Invoice[] = [];
-  for (const invoice of invoices) {
-    const canView = await canViewInvoice(ctx, invoice, user);
-    if (canView) {
-      viewableInvoices.push(invoice);
+    if (!invoice) {
+      throw new Error('Invoice not found');
     }
-  }
 
-  return viewableInvoices;
-}
+    await requireViewInvoiceAccess(ctx, invoice, user);
 
-/**
- * List invoices by partner
- */
-export async function listInvoicesByPartner(
-  ctx: QueryCtx,
-  partnerId: Id<'yourobcPartners'>,
-  limit: number = 50
-): Promise<Invoice[]> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get invoices by partner
-  const invoices = await ctx.db
-    .query('yourobcInvoices')
-    .withIndex('by_partner', (q) => q.eq('partnerId', partnerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .take(limit);
-
-  // 3. FILTER: Check view permissions for each invoice
-  const viewableInvoices: Invoice[] = [];
-  for (const invoice of invoices) {
-    const canView = await canViewInvoice(ctx, invoice, user);
-    if (canView) {
-      viewableInvoices.push(invoice);
-    }
-  }
-
-  return viewableInvoices;
-}
-
-/**
- * List invoices by shipment
- */
-export async function listInvoicesByShipment(
-  ctx: QueryCtx,
-  shipmentId: Id<'yourobcShipments'>
-): Promise<Invoice[]> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get invoices by shipment
-  const invoices = await ctx.db
-    .query('yourobcInvoices')
-    .withIndex('by_shipment', (q) => q.eq('shipmentId', shipmentId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect();
-
-  // 3. FILTER: Check view permissions for each invoice
-  const viewableInvoices: Invoice[] = [];
-  for (const invoice of invoices) {
-    const canView = await canViewInvoice(ctx, invoice, user);
-    if (canView) {
-      viewableInvoices.push(invoice);
-    }
-  }
-
-  return viewableInvoices;
-}
-
-/**
- * List overdue invoices
- */
-export async function listOverdueInvoices(
-  ctx: QueryCtx,
-  limit: number = 50
-): Promise<Invoice[]> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. AUTHORIZE: Check if user can view all invoices
-  const canViewAll = await canViewAllInvoices(user);
-
-  // 3. FETCH: Get invoices
-  let invoices: Invoice[];
-
-  if (canViewAll) {
-    invoices = await ctx.db
-      .query('yourobcInvoices')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
-  } else {
-    invoices = await ctx.db
-      .query('yourobcInvoices')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
-  }
-
-  // 4. FILTER: Get overdue invoices
-  const overdueInvoices = invoices.filter((inv) => isInvoiceOverdue(inv));
-
-  // 5. SORT: By days overdue (most overdue first)
-  overdueInvoices.sort((a, b) => {
-    const aDays = calculateDaysOverdue(a.dueDate);
-    const bDays = calculateDaysOverdue(b.dueDate);
-    return bDays - aDays;
-  });
-
-  // 6. LIMIT: Return limited results
-  return overdueInvoices.slice(0, limit);
-}
+    return invoice;
+  },
+});
 
 /**
  * Get invoice statistics
  */
-export async function getInvoiceStats(
-  ctx: QueryCtx,
-  filters: InvoiceFilters = {}
-): Promise<{
-  totalInvoices: number;
-  draftInvoices: number;
-  sentInvoices: number;
-  paidInvoices: number;
-  overdueInvoices: number;
-  totalRevenue: number;
-  totalOutstanding: number;
-}> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const getInvoiceStats = query({
+  args: {
+    filters: v.optional(
+      v.object({
+        type: v.optional(v.array(invoicesValidators.type)),
+        customerId: v.optional(v.id('yourobcCustomers')),
+        partnerId: v.optional(v.id('yourobcPartners')),
+        fromDate: v.optional(v.number()),
+        toDate: v.optional(v.number()),
+      })
+    ),
+  },
+  handler: async (ctx, { filters = {} }): Promise<InvoiceStats> => {
+    const user = await requireCurrentUser(ctx);
 
-  // 2. AUTHORIZE: Check if user can view all invoices
-  const canViewAll = await canViewAllInvoices(user);
-
-  // 3. FETCH: Get invoices
-  let invoices: Invoice[];
-
-  if (canViewAll) {
-    invoices = await ctx.db
+    // Get all invoices
+    let invoices = await ctx.db
       .query('yourobcInvoices')
+      .withIndex('by_owner', (q) => q.eq('ownerId', user.authUserId))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
-  } else {
-    invoices = await ctx.db
+
+    // Apply access filtering
+    invoices = await filterInvoicesByAccess(ctx, invoices, user);
+
+    // Apply type filter
+    if (filters.type?.length) {
+      invoices = invoices.filter((item) => filters.type!.includes(item.type));
+    }
+
+    // Apply customer filter
+    if (filters.customerId) {
+      invoices = invoices.filter((item) => item.customerId === filters.customerId);
+    }
+
+    // Apply partner filter
+    if (filters.partnerId) {
+      invoices = invoices.filter((item) => item.partnerId === filters.partnerId);
+    }
+
+    // Apply date range
+    if (filters.fromDate) {
+      invoices = invoices.filter((item) => item.issueDate >= filters.fromDate!);
+    }
+
+    if (filters.toDate) {
+      invoices = invoices.filter((item) => item.issueDate <= filters.toDate!);
+    }
+
+    // Calculate statistics
+    const byStatus = {
+      draft: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.DRAFT).length,
+      sent: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.SENT).length,
+      pending_payment: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.PENDING_PAYMENT).length,
+      paid: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.PAID).length,
+      overdue: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.OVERDUE || isInvoiceOverdue(i)).length,
+      cancelled: invoices.filter((i) => i.status === INVOICES_CONSTANTS.STATUS.CANCELLED).length,
+    };
+
+    const byType = {
+      incoming: invoices.filter((i) => i.type === INVOICES_CONSTANTS.TYPE.INCOMING).length,
+      outgoing: invoices.filter((i) => i.type === INVOICES_CONSTANTS.TYPE.OUTGOING).length,
+    };
+
+    // Calculate financial totals (assuming EUR for consistency)
+    const totalAmount = invoices.reduce((sum, i) => sum + i.totalAmount.amount, 0);
+    const totalPaid = invoices
+      .filter((i) => i.status === INVOICES_CONSTANTS.STATUS.PAID && i.paidAmount)
+      .reduce((sum, i) => sum + (i.paidAmount?.amount || 0), 0);
+    const totalOutstanding = invoices
+      .filter((i) => i.status !== INVOICES_CONSTANTS.STATUS.PAID && i.status !== INVOICES_CONSTANTS.STATUS.CANCELLED)
+      .reduce((sum, i) => sum + i.totalAmount.amount, 0);
+    const totalOverdue = invoices
+      .filter((i) => isInvoiceOverdue(i))
+      .reduce((sum, i) => sum + i.totalAmount.amount, 0);
+
+    // Calculate average payment terms
+    const averagePaymentTerms =
+      invoices.length > 0 ? invoices.reduce((sum, i) => sum + i.paymentTerms, 0) / invoices.length : 0;
+
+    return {
+      total: invoices.length,
+      byStatus,
+      byType,
+      totalAmount: {
+        amount: totalAmount,
+        currency: 'EUR',
+      },
+      totalPaid: {
+        amount: totalPaid,
+        currency: 'EUR',
+      },
+      totalOutstanding: {
+        amount: totalOutstanding,
+        currency: 'EUR',
+      },
+      totalOverdue: {
+        amount: totalOverdue,
+        currency: 'EUR',
+      },
+      averagePaymentTerms,
+    };
+  },
+});
+
+/**
+ * Get overdue invoices
+ */
+export const getOverdueInvoices = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { limit = 50 }) => {
+    const user = await requireCurrentUser(ctx);
+
+    // Get all non-deleted invoices
+    let invoices = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+      .withIndex('by_status', (q) => q.eq('status', INVOICES_CONSTANTS.STATUS.SENT))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
-  }
 
-  // 4. FILTER: Apply filters
-  invoices = applyFilters(invoices, filters);
+    // Also get pending_payment invoices
+    const pendingInvoices = await ctx.db
+      .query('yourobcInvoices')
+      .withIndex('by_status', (q) => q.eq('status', INVOICES_CONSTANTS.STATUS.PENDING_PAYMENT))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  // 5. CALCULATE: Statistics
-  const stats = {
-    totalInvoices: invoices.length,
-    draftInvoices: 0,
-    sentInvoices: 0,
-    paidInvoices: 0,
-    overdueInvoices: 0,
-    totalRevenue: 0,
-    totalOutstanding: 0,
-  };
+    invoices = [...invoices, ...pendingInvoices];
 
-  for (const invoice of invoices) {
-    // Count by status
-    if (invoice.status === INVOICE_CONSTANTS.STATUS.DRAFT) {
-      stats.draftInvoices++;
-    } else if (invoice.status === INVOICE_CONSTANTS.STATUS.SENT) {
-      stats.sentInvoices++;
-    } else if (invoice.status === INVOICE_CONSTANTS.STATUS.PAID) {
-      stats.paidInvoices++;
-      stats.totalRevenue += invoice.totalAmount.amount;
-    }
+    // Apply access filtering
+    invoices = await filterInvoicesByAccess(ctx, invoices, user);
 
-    // Count overdue
-    if (isInvoiceOverdue(invoice)) {
-      stats.overdueInvoices++;
-      stats.totalOutstanding += invoice.totalAmount.amount;
-    } else if (
-      invoice.status !== INVOICE_CONSTANTS.STATUS.PAID &&
-      invoice.status !== INVOICE_CONSTANTS.STATUS.CANCELLED
-    ) {
-      stats.totalOutstanding += invoice.totalAmount.amount;
-    }
-  }
+    // Filter to overdue only
+    invoices = invoices.filter((invoice) => isInvoiceOverdue(invoice));
 
-  return stats;
-}
+    // Sort by days overdue (most overdue first)
+    invoices.sort((a, b) => calculateDaysOverdue(a.dueDate) - calculateDaysOverdue(b.dueDate));
+
+    // Limit results
+    return invoices.slice(0, limit);
+  },
+});
+
+/**
+ * Get invoices requiring dunning
+ */
+export const getInvoicesRequiringDunning = query({
+  args: {
+    minDaysOverdue: v.optional(v.number()),
+  },
+  handler: async (ctx, { minDaysOverdue = 7 }) => {
+    const user = await requireCurrentUser(ctx);
+
+    // Get overdue invoices
+    let invoices = await ctx.db
+      .query('yourobcInvoices')
+      .withIndex('by_status', (q) => q.eq('status', INVOICES_CONSTANTS.STATUS.OVERDUE))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    invoices = await filterInvoicesByAccess(ctx, invoices, user);
+
+    // Filter to invoices overdue by minimum days
+    invoices = invoices.filter((invoice) => {
+      const daysOverdue = calculateDaysOverdue(invoice.dueDate);
+      return daysOverdue >= minDaysOverdue;
+    });
+
+    // Sort by days overdue (most overdue first)
+    invoices.sort((a, b) => b.dueDate - a.dueDate);
+
+    return invoices;
+  },
+});

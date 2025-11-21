@@ -3,9 +3,6 @@
 
 import { customersTable } from './customers';
 
-/**
- * Customers module schema export
- */
-export const customersSchemas = {
+export const softwareYourObcCustomersSchemas = {
   yourobcCustomers: customersTable,
 };

@@ -1,363 +1,127 @@
 // convex/lib/software/yourobc/tasks/permissions.ts
-/**
- * Tasks Permissions
- *
- * Defines permission logic for task operations.
- * Controls who can view, create, update, delete, and manage tasks.
- *
- * @module convex/lib/software/yourobc/tasks/permissions
- */
+// Access control and authorization logic for tasks module
 
-import type { Task, PermissionCheckResult, PermissionContext } from './types'
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { Task } from './types';
+import type { Doc } from '@/generated/dataModel';
+
+type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
-// Permission Checks
+// View Access
 // ============================================================================
 
-/**
- * Checks if a user can read a task
- *
- * Rules:
- * - Owner can always read
- * - Assigned user can always read
- * - Creator can always read
- * - Public tasks can be read by anyone
- * - Organization tasks can be read by anyone in the org
- * - Shared tasks can be read by specific users (additional logic needed)
- */
-export function canReadTask(userId: string, task: Task): PermissionCheckResult {
-  // Owner can always read
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
+export async function canViewTask(
+  ctx: QueryCtx | MutationCtx,
+  task: Task,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Creator can always read
-  if (task.createdBy === userId) {
-    return { allowed: true }
-  }
+  // Owner can view
+  if (task.ownerId === user._id) return true;
 
-  // Assigned user can always read
-  if (task.assignedTo && task.assignedTo === userId) {
-    return { allowed: true }
-  }
+  // Creator can view
+  if (task.createdBy === user._id) return true;
 
-  // Check visibility
-  if (task.visibility === 'public') {
-    return { allowed: true }
-  }
+  // Assigned user can view
+  if (task.assignedTo === user._id) return true;
 
-  if (task.visibility === 'organization') {
-    // TODO: Add organization membership check
-    return { allowed: true }
-  }
+  return false;
+}
 
-  if (task.visibility === 'shared') {
-    // TODO: Add shared user list check
-    return { allowed: true }
-  }
-
-  // Private task - only owner and assignee can read
-  return {
-    allowed: false,
-    reason: 'You do not have permission to view this task',
+export async function requireViewTaskAccess(
+  ctx: QueryCtx | MutationCtx,
+  task: Task,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewTask(ctx, task, user))) {
+    throw new Error('You do not have permission to view this task');
   }
 }
 
-/**
- * Checks if a user can create a task
- *
- * Rules:
- * - Any authenticated user can create tasks
- * - Must have valid shipment access (additional check needed)
- */
-export function canCreateTask(userId: string): PermissionCheckResult {
-  if (!userId) {
-    return {
-      allowed: false,
-      reason: 'You must be authenticated to create tasks',
-    }
-  }
+// ============================================================================
+// Edit Access
+// ============================================================================
 
-  return { allowed: true }
-}
+export async function canEditTask(
+  ctx: QueryCtx | MutationCtx,
+  task: Task,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-/**
- * Checks if a user can update a task
- *
- * Rules:
- * - Owner can always update
- * - Creator can update their own tasks
- * - Assigned user can update status and completion info
- * - Cannot update completed or archived tasks (unless owner)
- */
-export function canUpdateTask(userId: string, task: Task, isStatusChange: boolean = false): PermissionCheckResult {
-  // Deleted tasks cannot be updated
-  if (task.deletedAt) {
-    return {
-      allowed: false,
-      reason: 'Cannot update a deleted task',
-    }
-  }
+  // Owner can edit
+  if (task.ownerId === user._id) return true;
 
-  // Owner can always update
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
+  // Assigned user can edit
+  if (task.assignedTo === user._id) return true;
 
-  // Creator can update their own tasks
-  if (task.createdBy === userId) {
-    return { allowed: true }
-  }
-
-  // Assigned user can update status and completion info
-  if (task.assignedTo === userId) {
-    // Allow status changes for assigned user
-    if (isStatusChange || task.status !== 'completed' && task.status !== 'archived') {
-      return { allowed: true }
-    }
-    return {
-      allowed: false,
-      reason: 'Cannot modify completed or archived tasks',
-    }
-  }
-
-  return {
-    allowed: false,
-    reason: 'You do not have permission to update this task',
-  }
-}
-
-/**
- * Checks if a user can delete a task
- *
- * Rules:
- * - Only owner can delete
- * - Only creator can delete
- * - Cannot delete already deleted tasks
- */
-export function canDeleteTask(userId: string, task: Task): PermissionCheckResult {
-  // Already deleted tasks cannot be deleted again
-  if (task.deletedAt) {
-    return {
-      allowed: false,
-      reason: 'Task is already deleted',
-    }
-  }
-
-  // Owner can delete
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
-
-  // Creator can delete
-  if (task.createdBy === userId) {
-    return { allowed: true }
-  }
-
-  return {
-    allowed: false,
-    reason: 'You do not have permission to delete this task',
-  }
-}
-
-/**
- * Checks if a user can assign a task
- *
- * Rules:
- * - Owner can assign
- * - Creator can assign
- * - Cannot assign completed or archived tasks
- */
-export function canAssignTask(userId: string, task: Task): PermissionCheckResult {
-  // Cannot assign deleted tasks
-  if (task.deletedAt) {
-    return {
-      allowed: false,
-      reason: 'Cannot assign a deleted task',
-    }
-  }
-
-  // Cannot reassign completed or archived tasks
+  // Check if task is locked/completed
   if (task.status === 'completed' || task.status === 'archived') {
-    return {
-      allowed: false,
-      reason: 'Cannot assign completed or archived tasks',
-    }
+    // Only admins can edit completed/archived items
+    return false;
   }
 
-  // Owner can assign
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
-
-  // Creator can assign
-  if (task.createdBy === userId) {
-    return { allowed: true }
-  }
-
-  return {
-    allowed: false,
-    reason: 'You do not have permission to assign this task',
-  }
+  return false;
 }
 
-/**
- * Checks if a user can complete a task
- *
- * Rules:
- * - Owner can complete
- * - Assigned user can complete
- * - Cannot complete already completed tasks
- * - Cannot complete archived tasks
- */
-export function canCompleteTask(userId: string, task: Task): PermissionCheckResult {
-  // Cannot complete deleted tasks
-  if (task.deletedAt) {
-    return {
-      allowed: false,
-      reason: 'Cannot complete a deleted task',
-    }
-  }
-
-  // Cannot complete already completed tasks
-  if (task.status === 'completed') {
-    return {
-      allowed: false,
-      reason: 'Task is already completed',
-    }
-  }
-
-  // Cannot complete archived tasks
-  if (task.status === 'archived') {
-    return {
-      allowed: false,
-      reason: 'Cannot complete an archived task',
-    }
-  }
-
-  // Owner can complete
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
-
-  // Assigned user can complete
-  if (task.assignedTo === userId) {
-    return { allowed: true }
-  }
-
-  return {
-    allowed: false,
-    reason: 'You do not have permission to complete this task',
-  }
-}
-
-/**
- * Checks if a user can cancel a task
- *
- * Rules:
- * - Owner can cancel
- * - Creator can cancel
- * - Cannot cancel completed tasks
- * - Cannot cancel already archived tasks
- */
-export function canCancelTask(userId: string, task: Task): PermissionCheckResult {
-  // Cannot cancel deleted tasks
-  if (task.deletedAt) {
-    return {
-      allowed: false,
-      reason: 'Cannot cancel a deleted task',
-    }
-  }
-
-  // Cannot cancel completed tasks
-  if (task.status === 'completed') {
-    return {
-      allowed: false,
-      reason: 'Cannot cancel a completed task',
-    }
-  }
-
-  // Cannot cancel already archived tasks
-  if (task.status === 'archived') {
-    return {
-      allowed: false,
-      reason: 'Task is already archived',
-    }
-  }
-
-  // Owner can cancel
-  if (task.ownerId === userId) {
-    return { allowed: true }
-  }
-
-  // Creator can cancel
-  if (task.createdBy === userId) {
-    return { allowed: true }
-  }
-
-  return {
-    allowed: false,
-    reason: 'You do not have permission to cancel this task',
+export async function requireEditTaskAccess(
+  ctx: QueryCtx | MutationCtx,
+  task: Task,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditTask(ctx, task, user))) {
+    throw new Error('You do not have permission to edit this task');
   }
 }
 
 // ============================================================================
-// Permission Helpers
+// Delete Access
 // ============================================================================
 
-/**
- * Checks permissions based on context
- */
-export function checkPermission(context: PermissionContext): PermissionCheckResult {
-  const { userId, task, action } = context
+export async function canDeleteTask(
+  task: Task,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (task.ownerId === user._id) return true;
+  return false;
+}
 
-  if (!task) {
-    return {
-      allowed: false,
-      reason: 'Task not found',
-    }
-  }
-
-  switch (action) {
-    case 'read':
-      return canReadTask(userId, task)
-    case 'create':
-      return canCreateTask(userId)
-    case 'update':
-      return canUpdateTask(userId, task)
-    case 'delete':
-      return canDeleteTask(userId, task)
-    case 'assign':
-      return canAssignTask(userId, task)
-    case 'complete':
-      return canCompleteTask(userId, task)
-    default:
-      return {
-        allowed: false,
-        reason: `Unknown action: ${action}`,
-      }
+export async function requireDeleteTaskAccess(
+  task: Task,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteTask(task, user))) {
+    throw new Error('You do not have permission to delete this task');
   }
 }
 
-/**
- * Gets the permission level for a user on a task
- */
-export function getUserPermissionLevel(
-  userId: string,
-  task: Task
-): 'owner' | 'assigned' | 'viewer' | 'none' {
-  if (task.ownerId === userId || task.createdBy === userId) {
-    return 'owner'
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterTasksByAccess(
+  ctx: QueryCtx | MutationCtx,
+  tasks: Task[],
+  user: UserProfile
+): Promise<Task[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return tasks;
   }
 
-  if (task.assignedTo === userId) {
-    return 'assigned'
+  const accessible: Task[] = [];
+
+  for (const task of tasks) {
+    if (await canViewTask(ctx, task, user)) {
+      accessible.push(task);
+    }
   }
 
-  const readPermission = canReadTask(userId, task)
-  if (readPermission.allowed) {
-    return 'viewer'
-  }
-
-  return 'none'
+  return accessible;
 }

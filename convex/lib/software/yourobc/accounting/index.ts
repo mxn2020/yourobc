@@ -1,27 +1,50 @@
 // convex/lib/software/yourobc/accounting/index.ts
-/**
- * Accounting Library Module
- *
- * Barrel export for all accounting library functions, types, and constants.
- * This is the single entry point for importing accounting business logic.
- *
- * @module convex/lib/software/yourobc/accounting
- */
+// Public API exports for accounting module
 
-// Export constants
-export * from './constants'
+// Constants
+export { ACCOUNTING_CONSTANTS } from './constants';
 
-// Export types
-export * from './types'
+// Types
+export type * from './types';
 
-// Export utilities
-export * from './utils'
+// Utilities
+export {
+  validateAccountingEntryData,
+  formatAccountingEntryDisplayName,
+  generateJournalEntryNumber,
+  isAccountingEntryEditable,
+  calculateFiscalPeriod,
+  calculateFiscalYear,
+  isEntryBalanced,
+} from './utils';
 
-// Export permissions
-export * from './permissions'
+// Permissions
+export {
+  canViewAccountingEntry,
+  canEditAccountingEntry,
+  canDeleteAccountingEntry,
+  canApproveAccountingEntry,
+  requireViewAccountingEntryAccess,
+  requireEditAccountingEntryAccess,
+  requireDeleteAccountingEntryAccess,
+  requireApproveAccountingEntryAccess,
+  filterAccountingEntriesByAccess,
+} from './permissions';
 
-// Export queries
-export * from './queries'
+// Queries
+export {
+  getAccountingEntries,
+  getAccountingEntry,
+  getAccountingEntryByPublicId,
+  getAccountingEntryByJournalEntryNumber,
+  getAccountingStats,
+} from './queries';
 
-// Export mutations
-export * from './mutations'
+// Mutations
+export {
+  createAccountingEntry,
+  updateAccountingEntry,
+  deleteAccountingEntry,
+  restoreAccountingEntry,
+  approveAccountingEntry,
+} from './mutations';

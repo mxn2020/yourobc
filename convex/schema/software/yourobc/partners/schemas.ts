@@ -1,8 +1,8 @@
 // convex/schema/software/yourobc/partners/schemas.ts
 // Schema exports for partners module
 
-import { yourobcPartnersTable } from './partners';
+import { partnersTable } from './partners';
 
-export const softwareYourobcPartnersSchemas = {
-  yourobcPartners: yourobcPartnersTable,
+export const softwareYourObcPartnersSchemas = {
+  yourobcPartners: partnersTable,
 };

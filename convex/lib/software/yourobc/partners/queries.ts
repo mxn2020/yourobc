@@ -1,365 +1,146 @@
 // convex/lib/software/yourobc/partners/queries.ts
-// Query operations for partners module
+// Read operations for partners module
 
-import type { QueryCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
-import { canViewPartner, canViewInternalNotes } from './permissions';
-import type { Partner, PartnerListFilters } from './types';
-
-// ============================================================================
-// Partner Queries
-// ============================================================================
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { partnersValidators } from '@/schema/software/yourobc/partners/validators';
+import { filterPartnersByAccess, requireViewPartnerAccess } from './permissions';
+import type { PartnerListResponse } from './types';
 
 /**
- * Get partner by ID
+ * Get paginated list of partners with filtering
  */
-export async function getPartner(
-  ctx: QueryCtx,
-  partnerId: Id<'yourobcPartners'>,
-  userId: string
-): Promise<Partner | null> {
-  const partner = await ctx.db.get(partnerId);
+export const getPartners = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(partnersValidators.status)),
+      search: v.optional(v.string()),
+      country: v.optional(v.string()),
+    })),
+  },
+  handler: async (ctx, args): Promise<PartnerListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-  if (!partner || partner.deletedAt) {
-    return null;
-  }
+    // Query with index
+    let partners = await ctx.db
+      .query('yourobcPartners')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
+    // Apply access filtering
+    partners = await filterPartnersByAccess(ctx, partners, user);
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+    // Apply status filter
+    if (filters.status?.length) {
+      partners = partners.filter(item =>
+        filters.status!.includes(item.status)
+      );
+    }
 
-  const hasAccess = await canViewPartner(ctx, partner, user);
-  if (!hasAccess) {
-    throw new Error('You do not have permission to view this partner');
-  }
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      partners = partners.filter(item =>
+        item.companyName.toLowerCase().includes(term) ||
+        (item.shortName && item.shortName.toLowerCase().includes(term)) ||
+        (item.notes && item.notes.toLowerCase().includes(term))
+      );
+    }
 
-  return partner;
-}
+    // Apply country filter
+    if (filters.country) {
+      partners = partners.filter(item =>
+        item.serviceCoverage.countries.includes(filters.country!)
+      );
+    }
+
+    // Paginate
+    const total = partners.length;
+    const items = partners.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
+
+/**
+ * Get single partner by ID
+ */
+export const getPartner = query({
+  args: {
+    partnerId: v.id('yourobcPartners'),
+  },
+  handler: async (ctx, { partnerId }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const partner = await ctx.db.get(partnerId);
+    if (!partner || partner.deletedAt) {
+      throw new Error('Partner not found');
+    }
+
+    await requireViewPartnerAccess(ctx, partner, user);
+
+    return partner;
+  },
+});
 
 /**
  * Get partner by public ID
  */
-export async function getPartnerByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  userId: string
-): Promise<Partner | null> {
-  const partner = await ctx.db
-    .query('yourobcPartners')
-    .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first();
+export const getPartnerByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!partner) {
-    return null;
-  }
+    const partner = await ctx.db
+      .query('yourobcPartners')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  const hasAccess = await canViewPartner(ctx, partner, user);
-  if (!hasAccess) {
-    throw new Error('You do not have permission to view this partner');
-  }
-
-  return partner;
-}
-
-/**
- * Get partner by company name
- */
-export async function getPartnerByCompanyName(
-  ctx: QueryCtx,
-  companyName: string,
-  userId: string
-): Promise<Partner | null> {
-  const partner = await ctx.db
-    .query('yourobcPartners')
-    .withIndex('by_company_name', (q) => q.eq('companyName', companyName))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first();
-
-  if (!partner) {
-    return null;
-  }
-
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  const hasAccess = await canViewPartner(ctx, partner, user);
-  if (!hasAccess) {
-    throw new Error('You do not have permission to view this partner');
-  }
-
-  return partner;
-}
-
-/**
- * List partners with access control and filtering
- */
-export async function listPartners(
-  ctx: QueryCtx,
-  userId: string,
-  filters?: PartnerListFilters,
-  options?: { limit?: number; includeDeleted?: boolean }
-): Promise<Partner[]> {
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  let query = ctx.db.query('yourobcPartners');
-
-  // Apply filters
-  if (filters?.status) {
-    query = query.withIndex('by_status', (q) => q.eq('status', filters.status!));
-  }
-
-  // Get all partners (we'll filter in memory for complex queries)
-  let partners = await query.collect();
-
-  // Filter out deleted unless explicitly requested
-  if (!options?.includeDeleted) {
-    partners = partners.filter((p) => !p.deletedAt);
-  }
-
-  // Apply additional filters
-  if (filters?.serviceType) {
-    partners = partners.filter((p) => p.serviceType === filters.serviceType);
-  }
-
-  if (filters?.country) {
-    partners = partners.filter((p) => p.serviceCoverage.countries.includes(filters.country!));
-  }
-
-  if (filters?.city) {
-    partners = partners.filter((p) => p.serviceCoverage.cities.includes(filters.city!));
-  }
-
-  if (filters?.airport) {
-    partners = partners.filter((p) => p.serviceCoverage.airports.includes(filters.airport!));
-  }
-
-  if (filters?.ranking) {
-    partners = partners.filter((p) => p.ranking === filters.ranking);
-  }
-
-  if (filters?.minRanking) {
-    partners = partners.filter((p) => p.ranking && p.ranking >= filters.minRanking!);
-  }
-
-  if (filters?.searchQuery) {
-    const query = filters.searchQuery.toLowerCase();
-    partners = partners.filter(
-      (p) =>
-        p.companyName.toLowerCase().includes(query) ||
-        p.shortName?.toLowerCase().includes(query) ||
-        p.partnerCode?.toLowerCase().includes(query)
-    );
-  }
-
-  if (filters?.tags && filters.tags.length > 0) {
-    partners = partners.filter((p) => filters.tags!.some((tag) => p.tags.includes(tag)));
-  }
-
-  // Filter by access control
-  const accessiblePartners: Partner[] = [];
-  for (const partner of partners) {
-    const hasAccess = await canViewPartner(ctx, partner, user);
-    if (hasAccess) {
-      accessiblePartners.push(partner);
+    if (!partner) {
+      throw new Error('Partner not found');
     }
-  }
 
-  // Apply limit
-  if (options?.limit) {
-    return accessiblePartners.slice(0, options.limit);
-  }
+    await requireViewPartnerAccess(ctx, partner, user);
 
-  return accessiblePartners;
-}
+    return partner;
+  },
+});
 
 /**
- * List partners by owner
+ * Get partner statistics
  */
-export async function listPartnersByOwner(
-  ctx: QueryCtx,
-  ownerId: string,
-  userId: string,
-  options?: { limit?: number; includeDeleted?: boolean }
-): Promise<Partner[]> {
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
+export const getPartnerStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+    const partners = await ctx.db
+      .query('yourobcPartners')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  let partners = await ctx.db
-    .query('yourobcPartners')
-    .withIndex('by_owner', (q) => q.eq('ownerId', ownerId))
-    .collect();
+    const accessible = await filterPartnersByAccess(ctx, partners, user);
 
-  // Filter out deleted unless explicitly requested
-  if (!options?.includeDeleted) {
-    partners = partners.filter((p) => !p.deletedAt);
-  }
-
-  // Filter by access control
-  const accessiblePartners: Partner[] = [];
-  for (const partner of partners) {
-    const hasAccess = await canViewPartner(ctx, partner, user);
-    if (hasAccess) {
-      accessiblePartners.push(partner);
-    }
-  }
-
-  // Apply limit
-  if (options?.limit) {
-    return accessiblePartners.slice(0, options.limit);
-  }
-
-  return accessiblePartners;
-}
-
-/**
- * List active partners
- */
-export async function listActivePartners(
-  ctx: QueryCtx,
-  userId: string,
-  options?: { limit?: number }
-): Promise<Partner[]> {
-  return listPartners(ctx, userId, { status: 'active' }, options);
-}
-
-/**
- * Search partners by service coverage
- */
-export async function searchPartnersByLocation(
-  ctx: QueryCtx,
-  userId: string,
-  location: { country?: string; city?: string; airport?: string },
-  options?: { serviceType?: 'OBC' | 'NFO' | 'both'; limit?: number }
-): Promise<Partner[]> {
-  const filters: PartnerListFilters = {
-    status: 'active',
-    ...location,
-    serviceType: options?.serviceType,
-  };
-
-  return listPartners(ctx, userId, filters, { limit: options?.limit });
-}
-
-/**
- * Get partners count by status
- */
-export async function getPartnersCountByStatus(
-  ctx: QueryCtx,
-  userId: string
-): Promise<{ active: number; inactive: number; suspended: number; total: number }> {
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), userId))
-    .first();
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  const allPartners = await ctx.db.query('yourobcPartners').collect();
-
-  const nonDeletedPartners = allPartners.filter((p) => !p.deletedAt);
-
-  // Filter by access control
-  const accessiblePartners: Partner[] = [];
-  for (const partner of nonDeletedPartners) {
-    const hasAccess = await canViewPartner(ctx, partner, user);
-    if (hasAccess) {
-      accessiblePartners.push(partner);
-    }
-  }
-
-  return {
-    active: accessiblePartners.filter((p) => p.status === 'active').length,
-    inactive: accessiblePartners.filter((p) => p.status === 'inactive').length,
-    suspended: accessiblePartners.filter((p) => p.status === 'suspended').length,
-    total: accessiblePartners.length,
-  };
-}
-
-/**
- * Get top rated partners
- */
-export async function getTopRatedPartners(
-  ctx: QueryCtx,
-  userId: string,
-  options?: { limit?: number; serviceType?: 'OBC' | 'NFO' | 'both' }
-): Promise<Partner[]> {
-  const partners = await listPartners(
-    ctx,
-    userId,
-    {
-      status: 'active',
-      serviceType: options?.serviceType,
-      minRanking: 4, // 4+ stars
-    },
-    { limit: options?.limit || 10 }
-  );
-
-  // Sort by ranking (descending)
-  return partners.sort((a, b) => {
-    const rankA = a.ranking || 0;
-    const rankB = b.ranking || 0;
-    return rankB - rankA;
-  });
-}
-
-/**
- * Check if partner exists by company name
- */
-export async function partnerExistsByCompanyName(
-  ctx: QueryCtx,
-  companyName: string,
-  excludePartnerId?: Id<'yourobcPartners'>
-): Promise<boolean> {
-  const partner = await ctx.db
-    .query('yourobcPartners')
-    .withIndex('by_company_name', (q) => q.eq('companyName', companyName))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first();
-
-  if (!partner) {
-    return false;
-  }
-
-  // If we're checking for update, exclude the current partner
-  if (excludePartnerId && partner._id === excludePartnerId) {
-    return false;
-  }
-
-  return true;
-}
+    return {
+      total: accessible.length,
+      byStatus: {
+        active: accessible.filter(item => item.status === 'active').length,
+        inactive: accessible.filter(item => item.status === 'inactive').length,
+        archived: accessible.filter(item => item.status === 'archived').length,
+      },
+    };
+  },
+});

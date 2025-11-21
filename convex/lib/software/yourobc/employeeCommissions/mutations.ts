@@ -1,604 +1,415 @@
 // convex/lib/software/yourobc/employeeCommissions/mutations.ts
-/**
- * Employee Commissions Mutation Functions
- *
- * Mutation functions for creating, updating, and deleting employee commissions and rules.
- *
- * @module convex/lib/software/yourobc/employeeCommissions/mutations
- */
+// Write operations for employeeCommissions module
 
-import { MutationCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
-import {
-  EMPLOYEE_COMMISSIONS_TABLE,
-  EMPLOYEE_COMMISSION_RULES_TABLE,
-  COMMISSION_STATUS,
-} from './constants'
-import type {
-  CreateEmployeeCommissionInput,
-  UpdateEmployeeCommissionInput,
-  CreateEmployeeCommissionRuleInput,
-  UpdateEmployeeCommissionRuleInput,
-  ApproveCommissionInput,
-  PayCommissionInput,
-  CancelCommissionInput,
-  EmployeeCommission,
-  EmployeeCommissionRule,
-} from './types'
-import {
-  generateCommissionPublicId,
-  generateRulePublicId,
-  formatPeriod,
-  formatRuleType,
-} from './utils'
-
-// ============================================================================
-// Commission Mutations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { employeeCommissionsValidators } from '@/schema/software/yourobc/employeeCommissions/validators';
+import { employeeCommissionTypeValidator, currencyValidator, paymentMethodValidator } from '@/schema/yourobc/base';
+import { EMPLOYEE_COMMISSIONS_CONSTANTS } from './constants';
+import { validateEmployeeCommissionData, generateCommissionId } from './utils';
+import { requireEditEmployeeCommissionAccess, requireDeleteEmployeeCommissionAccess, requireApproveEmployeeCommissionAccess, requirePayEmployeeCommissionAccess } from './permissions';
+import type { EmployeeCommissionId } from './types';
 
 /**
- * Create a new employee commission
+ * Create new employee commission
  */
-export async function createCommission(
-  ctx: MutationCtx,
-  input: CreateEmployeeCommissionInput,
-  ownerId: string
-): Promise<Id<'yourobcEmployeeCommissions'>> {
-  const now = Date.now()
+export const createEmployeeCommission = mutation({
+  args: {
+    data: v.object({
+      employeeId: v.id('yourobcEmployees'),
+      shipmentId: v.optional(v.id('yourobcShipments')),
+      quoteId: v.optional(v.id('yourobcQuotes')),
+      invoiceId: v.optional(v.id('yourobcInvoices')),
+      period: v.string(),
+      periodStartDate: v.number(),
+      periodEndDate: v.number(),
+      baseAmount: v.number(),
+      margin: v.optional(v.number()),
+      marginPercentage: v.optional(v.number()),
+      commissionPercentage: v.number(),
+      totalAmount: v.number(),
+      currency: currencyValidator,
+      type: employeeCommissionTypeValidator,
+      ruleId: v.optional(v.id('yourobcEmployeeCommissionRules')),
+      ruleName: v.optional(v.string()),
+      calculationBreakdown: v.optional(v.object({
+        baseAmount: v.number(),
+        rate: v.number(),
+        adjustments: v.optional(v.array(v.object({
+          type: v.string(),
+          amount: v.number(),
+          reason: v.string(),
+        }))),
+        finalAmount: v.number(),
+      })),
+      relatedShipments: v.optional(v.array(v.id('yourobcShipments'))),
+      relatedQuotes: v.optional(v.array(v.id('yourobcQuotes'))),
+      status: v.optional(employeeCommissionsValidators.status),
+      description: v.optional(v.string()),
+      notes: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<EmployeeCommissionId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Ensure period is set
-  const period = input.period || formatPeriod()
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, EMPLOYEE_COMMISSIONS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  const commissionId = await ctx.db.insert(EMPLOYEE_COMMISSIONS_TABLE, {
-    publicId: generateCommissionPublicId(),
-    ownerId,
-    employeeId: input.employeeId,
-    shipmentId: input.shipmentId,
-    quoteId: input.quoteId,
-    invoiceId: input.invoiceId,
-    type: input.type,
-    ruleId: input.ruleId,
-    ruleName: input.ruleName,
-    baseAmount: input.baseAmount,
-    margin: input.margin,
-    marginPercentage: input.marginPercentage,
-    commissionRate: input.commissionRate,
-    commissionAmount: input.commissionAmount,
-    currency: input.currency,
-    appliedTier: input.appliedTier,
-    calculatedAt: input.calculatedAt || now,
-    status: input.status,
-    invoicePaymentStatus: input.invoicePaymentStatus,
-    invoicePaidDate: input.invoicePaidDate,
-    period,
-    description: input.description,
-    notes: input.notes,
-    createdAt: now,
-    updatedAt: now,
-    createdBy: ownerId,
-    updatedBy: ownerId,
-  })
-
-  return commissionId
-}
-
-/**
- * Update an existing employee commission
- */
-export async function updateCommission(
-  ctx: MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  input: UpdateEmployeeCommissionInput,
-  userId: string
-): Promise<void> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (commission.deletedAt) {
-    throw new Error('Cannot update deleted commission')
-  }
-
-  if (commission.status === 'paid') {
-    throw new Error('Cannot update paid commission')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(commissionId, {
-    ...input,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Approve a commission
- */
-export async function approveCommission(
-  ctx: MutationCtx,
-  input: ApproveCommissionInput
-): Promise<void> {
-  const commission = await ctx.db.get(input.commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (commission.status !== COMMISSION_STATUS.PENDING) {
-    throw new Error('Can only approve pending commissions')
-  }
-
-  if (commission.deletedAt) {
-    throw new Error('Cannot approve deleted commission')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(input.commissionId, {
-    status: COMMISSION_STATUS.APPROVED,
-    approvedBy: input.approvedBy,
-    approvedDate: now,
-    approvalNotes: input.approvalNotes,
-    updatedAt: now,
-    updatedBy: input.approvedBy,
-  })
-}
-
-/**
- * Pay a commission
- */
-export async function payCommission(
-  ctx: MutationCtx,
-  input: PayCommissionInput
-): Promise<void> {
-  const commission = await ctx.db.get(input.commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (commission.status !== COMMISSION_STATUS.APPROVED) {
-    throw new Error('Can only pay approved commissions')
-  }
-
-  if (commission.deletedAt) {
-    throw new Error('Cannot pay deleted commission')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(input.commissionId, {
-    status: COMMISSION_STATUS.PAID,
-    paidDate: input.paymentDate,
-    paymentReference: input.paymentReference,
-    paymentMethod: input.paymentMethod,
-    paymentNotes: input.paymentNotes,
-    paidBy: input.paidBy,
-    updatedAt: now,
-    updatedBy: input.paidBy,
-  })
-}
-
-/**
- * Cancel a commission
- */
-export async function cancelCommission(
-  ctx: MutationCtx,
-  input: CancelCommissionInput
-): Promise<void> {
-  const commission = await ctx.db.get(input.commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (commission.status === COMMISSION_STATUS.PAID) {
-    throw new Error('Cannot cancel paid commission')
-  }
-
-  if (commission.deletedAt) {
-    throw new Error('Cannot cancel deleted commission')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(input.commissionId, {
-    status: COMMISSION_STATUS.CANCELLED,
-    cancelledBy: input.cancelledBy,
-    cancelledDate: now,
-    cancellationReason: input.cancellationReason,
-    updatedAt: now,
-    updatedBy: input.cancelledBy,
-  })
-}
-
-/**
- * Soft delete a commission
- */
-export async function deleteCommission(
-  ctx: MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
-): Promise<void> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (commission.deletedAt) {
-    throw new Error('Commission already deleted')
-  }
-
-  if (commission.status === COMMISSION_STATUS.PAID) {
-    throw new Error('Cannot delete paid commission')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(commissionId, {
-    deletedAt: now,
-    deletedBy: userId,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Restore a soft-deleted commission
- */
-export async function restoreCommission(
-  ctx: MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
-): Promise<void> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
-
-  if (!commission.deletedAt) {
-    throw new Error('Commission is not deleted')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(commissionId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Auto-approve commissions when invoice is paid
- */
-export async function autoApproveCommissionsForInvoice(
-  ctx: MutationCtx,
-  invoiceId: Id<'yourobcInvoices'>,
-  ownerId: string
-): Promise<number> {
-  // Find pending commissions for this invoice with auto-approve rules
-  const commissions = await ctx.db
-    .query(EMPLOYEE_COMMISSIONS_TABLE)
-    .withIndex('by_invoice', (q) => q.eq('invoiceId', invoiceId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('status'), COMMISSION_STATUS.PENDING))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
-
-  let approvedCount = 0
-  const now = Date.now()
-
-  for (const commission of commissions) {
-    // Check if the rule has auto-approve enabled
-    if (commission.ruleId) {
-      const rule = await ctx.db.get(commission.ruleId)
-      if (rule?.autoApprove) {
-        await ctx.db.patch(commission._id, {
-          status: COMMISSION_STATUS.APPROVED,
-          approvedBy: 'system:auto-approve',
-          approvedDate: now,
-          approvalNotes: 'Auto-approved when invoice was paid',
-          invoicePaymentStatus: 'paid',
-          invoicePaidDate: now,
-          updatedAt: now,
-          updatedBy: 'system:auto-approve',
-        })
-        approvedCount++
-      }
+    // 3. VALIDATE: Check data validity
+    const errors = validateEmployeeCommissionData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
-  }
 
-  return approvedCount
-}
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'yourobcEmployeeCommissions');
+    const now = Date.now();
+    const year = new Date(now).getFullYear();
 
-// ============================================================================
-// Commission Rules Mutations
-// ============================================================================
+    // Get next sequence number for commission ID
+    const existingCommissions = await ctx.db
+      .query('yourobcEmployeeCommissions')
+      .withIndex('by_period', q => q.eq('period', data.period))
+      .collect();
+    const sequence = existingCommissions.length + 1;
+    const commissionId = generateCommissionId(year, sequence);
 
-/**
- * Create a new commission rule
- */
-export async function createRule(
-  ctx: MutationCtx,
-  input: CreateEmployeeCommissionRuleInput,
-  ownerId: string
-): Promise<Id<'yourobcEmployeeCommissionRules'>> {
-  const now = Date.now()
+    // 5. CREATE: Insert into database
+    const commissionDbId = await ctx.db.insert('yourobcEmployeeCommissions', {
+      publicId,
+      commissionId,
+      employeeId: data.employeeId,
+      shipmentId: data.shipmentId,
+      quoteId: data.quoteId,
+      invoiceId: data.invoiceId,
+      period: data.period,
+      periodStartDate: data.periodStartDate,
+      periodEndDate: data.periodEndDate,
+      baseAmount: data.baseAmount,
+      margin: data.margin,
+      marginPercentage: data.marginPercentage,
+      commissionPercentage: data.commissionPercentage,
+      totalAmount: data.totalAmount,
+      currency: data.currency,
+      type: data.type,
+      ruleId: data.ruleId,
+      ruleName: data.ruleName?.trim(),
+      calculationBreakdown: data.calculationBreakdown,
+      relatedShipments: data.relatedShipments,
+      relatedQuotes: data.relatedQuotes,
+      status: data.status || 'pending',
+      description: data.description?.trim(),
+      notes: data.notes?.trim(),
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  // Generate ruleType display field
-  const ruleType = formatRuleType(input.type, input.rate, input.tiers)
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.created',
+      entityType: 'system_employeeCommissions',
+      entityId: publicId,
+      entityTitle: commissionId,
+      description: `Created employee commission: ${commissionId}`,
+      metadata: {
+        status: data.status || 'pending',
+        totalAmount: data.totalAmount,
+        currency: data.currency,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  const ruleId = await ctx.db.insert(EMPLOYEE_COMMISSION_RULES_TABLE, {
-    publicId: generateRulePublicId(),
-    ownerId,
-    employeeId: input.employeeId,
-    name: input.name,
-    description: input.description,
-    type: input.type,
-    ruleType,
-    rate: input.rate,
-    tiers: input.tiers,
-    serviceTypes: input.serviceTypes,
-    applicableCategories: input.applicableCategories,
-    applicableProducts: input.applicableProducts,
-    minMarginPercentage: input.minMarginPercentage,
-    minOrderValue: input.minOrderValue,
-    minCommissionAmount: input.minCommissionAmount,
-    autoApprove: input.autoApprove,
-    priority: input.priority,
-    startDate: input.startDate,
-    endDate: input.endDate,
-    effectiveFrom: input.effectiveFrom,
-    effectiveTo: input.effectiveTo,
-    isActive: input.isActive,
-    notes: input.notes,
-    createdAt: now,
-    updatedAt: now,
-    createdBy: ownerId,
-    updatedBy: ownerId,
-  })
-
-  return ruleId
-}
-
-/**
- * Update an existing commission rule
- */
-export async function updateRule(
-  ctx: MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  input: UpdateEmployeeCommissionRuleInput,
-  userId: string
-): Promise<void> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) {
-    throw new Error('Rule not found')
-  }
-
-  if (rule.deletedAt) {
-    throw new Error('Cannot update deleted rule')
-  }
-
-  const now = Date.now()
-
-  // Regenerate ruleType if type, rate, or tiers changed
-  const updatedType = input.type || rule.type
-  const updatedRate = input.rate !== undefined ? input.rate : rule.rate
-  const updatedTiers = input.tiers || rule.tiers
-  const ruleType = formatRuleType(updatedType, updatedRate, updatedTiers)
-
-  await ctx.db.patch(ruleId, {
-    ...input,
-    ruleType,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
+    // 7. RETURN: Return entity ID
+    return commissionDbId;
+  },
+});
 
 /**
- * Soft delete a commission rule
+ * Update existing employee commission
  */
-export async function deleteRule(
-  ctx: MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<void> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) {
-    throw new Error('Rule not found')
-  }
+export const updateEmployeeCommission = mutation({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+    updates: v.object({
+      baseAmount: v.optional(v.number()),
+      margin: v.optional(v.number()),
+      marginPercentage: v.optional(v.number()),
+      commissionPercentage: v.optional(v.number()),
+      totalAmount: v.optional(v.number()),
+      calculationBreakdown: v.optional(v.object({
+        baseAmount: v.number(),
+        rate: v.number(),
+        adjustments: v.optional(v.array(v.object({
+          type: v.string(),
+          amount: v.number(),
+          reason: v.string(),
+        }))),
+        finalAmount: v.number(),
+      })),
+      status: v.optional(employeeCommissionsValidators.status),
+      description: v.optional(v.string()),
+      notes: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { commissionId, updates }): Promise<EmployeeCommissionId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  if (rule.deletedAt) {
-    throw new Error('Rule already deleted')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(ruleId, {
-    deletedAt: now,
-    deletedBy: userId,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Restore a soft-deleted commission rule
- */
-export async function restoreRule(
-  ctx: MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<void> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) {
-    throw new Error('Rule not found')
-  }
-
-  if (!rule.deletedAt) {
-    throw new Error('Rule is not deleted')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(ruleId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Activate a commission rule
- */
-export async function activateRule(
-  ctx: MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<void> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) {
-    throw new Error('Rule not found')
-  }
-
-  if (rule.deletedAt) {
-    throw new Error('Cannot activate deleted rule')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(ruleId, {
-    isActive: true,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Deactivate a commission rule
- */
-export async function deactivateRule(
-  ctx: MutationCtx,
-  ruleId: Id<'yourobcEmployeeCommissionRules'>,
-  userId: string
-): Promise<void> {
-  const rule = await ctx.db.get(ruleId)
-  if (!rule) {
-    throw new Error('Rule not found')
-  }
-
-  if (rule.deletedAt) {
-    throw new Error('Cannot deactivate deleted rule')
-  }
-
-  const now = Date.now()
-
-  await ctx.db.patch(ruleId, {
-    isActive: false,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
-
-/**
- * Bulk update commission status
- */
-export async function bulkUpdateCommissionStatus(
-  ctx: MutationCtx,
-  commissionIds: Id<'yourobcEmployeeCommissions'>[],
-  status: string,
-  userId: string
-): Promise<number> {
-  let updatedCount = 0
-  const now = Date.now()
-
-  for (const commissionId of commissionIds) {
-    const commission = await ctx.db.get(commissionId)
-    if (commission && !commission.deletedAt && commission.status !== 'paid') {
-      await ctx.db.patch(commissionId, {
-        status,
-        updatedAt: now,
-        updatedBy: userId,
-      })
-      updatedCount++
+    // 2. CHECK: Verify entity exists
+    const commission = await ctx.db.get(commissionId);
+    if (!commission || commission.deletedAt) {
+      throw new Error('Commission not found');
     }
-  }
 
-  return updatedCount
-}
+    // 3. AUTHZ: Check edit permission
+    await requireEditEmployeeCommissionAccess(ctx, commission, user);
+
+    // 4. VALIDATE: Check update data validity
+    const errors = validateEmployeeCommissionData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (updates.baseAmount !== undefined) updateData.baseAmount = updates.baseAmount;
+    if (updates.margin !== undefined) updateData.margin = updates.margin;
+    if (updates.marginPercentage !== undefined) updateData.marginPercentage = updates.marginPercentage;
+    if (updates.commissionPercentage !== undefined) updateData.commissionPercentage = updates.commissionPercentage;
+    if (updates.totalAmount !== undefined) updateData.totalAmount = updates.totalAmount;
+    if (updates.calculationBreakdown !== undefined) updateData.calculationBreakdown = updates.calculationBreakdown;
+    if (updates.status !== undefined) updateData.status = updates.status;
+    if (updates.description !== undefined) updateData.description = updates.description?.trim();
+    if (updates.notes !== undefined) updateData.notes = updates.notes?.trim();
+
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(commissionId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.updated',
+      entityType: 'system_employeeCommissions',
+      entityId: commission.publicId,
+      entityTitle: commission.commissionId,
+      description: `Updated employee commission: ${commission.commissionId}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return commissionId;
+  },
+});
 
 /**
- * Recalculate commission amount
+ * Approve employee commission
  */
-export async function recalculateCommission(
-  ctx: MutationCtx,
-  commissionId: Id<'yourobcEmployeeCommissions'>,
-  userId: string
-): Promise<void> {
-  const commission = await ctx.db.get(commissionId)
-  if (!commission) {
-    throw new Error('Commission not found')
-  }
+export const approveEmployeeCommission = mutation({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+    approvalNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, { commissionId, approvalNotes }): Promise<EmployeeCommissionId> => {
+    const user = await requireCurrentUser(ctx);
+    const commission = await ctx.db.get(commissionId);
 
-  if (commission.deletedAt) {
-    throw new Error('Cannot recalculate deleted commission')
-  }
-
-  if (commission.status === COMMISSION_STATUS.PAID) {
-    throw new Error('Cannot recalculate paid commission')
-  }
-
-  // Get the rule if it exists
-  if (!commission.ruleId) {
-    throw new Error('Cannot recalculate commission without rule')
-  }
-
-  const rule = await ctx.db.get(commission.ruleId)
-  if (!rule) {
-    throw new Error('Commission rule not found')
-  }
-
-  const now = Date.now()
-
-  // Recalculate based on rule type
-  let newCommissionAmount = commission.commissionAmount
-  let newCommissionRate = commission.commissionRate
-  let newAppliedTier = commission.appliedTier
-
-  if (rule.type === 'margin_percentage' && commission.margin !== undefined) {
-    newCommissionRate = rule.rate || 0
-    newCommissionAmount = (commission.margin * newCommissionRate) / 100
-  } else if (rule.type === 'revenue_percentage') {
-    newCommissionRate = rule.rate || 0
-    newCommissionAmount = (commission.baseAmount * newCommissionRate) / 100
-  } else if (rule.type === 'fixed_amount') {
-    newCommissionRate = rule.rate || 0
-    newCommissionAmount = rule.rate || 0
-  } else if (rule.type === 'tiered' && rule.tiers) {
-    // Find matching tier
-    const sortedTiers = [...rule.tiers].sort((a, b) => a.minAmount - b.minAmount)
-    for (let i = sortedTiers.length - 1; i >= 0; i--) {
-      const tier = sortedTiers[i]
-      if (
-        commission.baseAmount >= tier.minAmount &&
-        (tier.maxAmount === undefined || commission.baseAmount <= tier.maxAmount)
-      ) {
-        newCommissionRate = tier.rate
-        newCommissionAmount = (commission.baseAmount * tier.rate) / 100
-        newAppliedTier = tier
-        break
-      }
+    if (!commission || commission.deletedAt) {
+      throw new Error('Commission not found');
     }
-  }
 
-  await ctx.db.patch(commissionId, {
-    commissionRate: newCommissionRate,
-    commissionAmount: newCommissionAmount,
-    appliedTier: newAppliedTier,
-    calculatedAt: now,
-    updatedAt: now,
-    updatedBy: userId,
-  })
-}
+    await requireApproveEmployeeCommissionAccess(commission, user);
+
+    if (commission.status !== 'pending') {
+      throw new Error('Only pending commissions can be approved');
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(commissionId, {
+      status: 'approved',
+      approvedBy: user._id,
+      approvedDate: now,
+      approvalNotes: approvalNotes?.trim(),
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.approved',
+      entityType: 'system_employeeCommissions',
+      entityId: commission.publicId,
+      entityTitle: commission.commissionId,
+      description: `Approved employee commission: ${commission.commissionId}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return commissionId;
+  },
+});
+
+/**
+ * Pay employee commission
+ */
+export const payEmployeeCommission = mutation({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+    paymentReference: v.string(),
+    paymentMethod: paymentMethodValidator,
+  },
+  handler: async (ctx, { commissionId, paymentReference, paymentMethod }): Promise<EmployeeCommissionId> => {
+    const user = await requireCurrentUser(ctx);
+    const commission = await ctx.db.get(commissionId);
+
+    if (!commission || commission.deletedAt) {
+      throw new Error('Commission not found');
+    }
+
+    await requirePayEmployeeCommissionAccess(commission, user);
+
+    if (commission.status !== 'approved') {
+      throw new Error('Only approved commissions can be paid');
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(commissionId, {
+      status: 'paid',
+      paidDate: now,
+      paymentReference: paymentReference.trim(),
+      paymentMethod,
+      paidBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.paid',
+      entityType: 'system_employeeCommissions',
+      entityId: commission.publicId,
+      entityTitle: commission.commissionId,
+      description: `Paid employee commission: ${commission.commissionId}`,
+      metadata: { paymentReference, paymentMethod },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return commissionId;
+  },
+});
+
+/**
+ * Delete employee commission (soft delete)
+ */
+export const deleteEmployeeCommission = mutation({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+  },
+  handler: async (ctx, { commissionId }): Promise<EmployeeCommissionId> => {
+    const user = await requireCurrentUser(ctx);
+    const commission = await ctx.db.get(commissionId);
+
+    if (!commission || commission.deletedAt) {
+      throw new Error('Commission not found');
+    }
+
+    await requireDeleteEmployeeCommissionAccess(commission, user);
+
+    const now = Date.now();
+    await ctx.db.patch(commissionId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.deleted',
+      entityType: 'system_employeeCommissions',
+      entityId: commission.publicId,
+      entityTitle: commission.commissionId,
+      description: `Deleted employee commission: ${commission.commissionId}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return commissionId;
+  },
+});
+
+/**
+ * Restore soft-deleted employee commission
+ */
+export const restoreEmployeeCommission = mutation({
+  args: {
+    commissionId: v.id('yourobcEmployeeCommissions'),
+  },
+  handler: async (ctx, { commissionId }): Promise<EmployeeCommissionId> => {
+    const user = await requireCurrentUser(ctx);
+    const commission = await ctx.db.get(commissionId);
+
+    if (!commission) {
+      throw new Error('Commission not found');
+    }
+    if (!commission.deletedAt) {
+      throw new Error('Commission is not deleted');
+    }
+
+    if (
+      commission.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this commission');
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(commissionId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'employeeCommissions.restored',
+      entityType: 'system_employeeCommissions',
+      entityId: commission.publicId,
+      entityTitle: commission.commissionId,
+      description: `Restored employee commission: ${commission.commissionId}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return commissionId;
+  },
+});

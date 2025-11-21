@@ -1,280 +1,261 @@
 // convex/lib/software/yourobc/shipments/permissions.ts
-// Permission checks for shipments module
+// Access control and authorization logic for shipments module
 
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { Shipment } from './types';
 import type { Doc } from '@/generated/dataModel';
-import type {
-  Shipment,
-  ShipmentStatusHistory,
-} from '@/schema/software/yourobc/shipments';
-import { SHIPMENTS_CONSTANTS } from './constants';
+
+type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
-// Shipment Permissions
+// View Access
 // ============================================================================
 
 /**
- * Check if user can view a shipment
+ * Check if user can view shipment
+ * - Admins and managers can view all shipments
+ * - Employees can view shipments they created or are assigned to
+ * - Owners can view their own shipments
  */
-export function canViewShipment(
+export async function canViewShipment(
+  ctx: QueryCtx | MutationCtx,
   shipment: Shipment,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Owner can always view
-  if (shipment.ownerId === user._id) {
-    return true;
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view
+  if (shipment.ownerId === user._id) return true;
+
+  // Creator can view
+  if (shipment.createdBy === user._id) return true;
+
+  // Assigned employee can view
+  if (shipment.employeeId === user._id) return true;
+
+  // Check if user is the assigned courier
+  if (shipment.assignedCourierId) {
+    const courier = await ctx.db.get(shipment.assignedCourierId);
+    if (courier && courier.userId === user._id) return true;
   }
 
-  // TODO: Add role-based permissions (admin, team members, etc.)
-  // For now, only owner can view
+  // Check if user has access through customer relationship
+  if (shipment.customerId) {
+    const customer = await ctx.db.get(shipment.customerId);
+    if (customer && customer.ownerId === user._id) return true;
+  }
+
   return false;
 }
 
-/**
- * Check if user can edit a shipment
- */
-export function canEditShipment(
+export async function requireViewShipmentAccess(
+  ctx: QueryCtx | MutationCtx,
   shipment: Shipment,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Cannot edit deleted shipments
-  if (shipment.deletedAt) {
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewShipment(ctx, shipment, user))) {
+    throw new Error('You do not have permission to view this shipment');
+  }
+}
+
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+/**
+ * Check if user can edit shipment
+ * - Admins and managers can edit all shipments
+ * - Employees can edit shipments they created or are assigned to
+ * - Cannot edit invoiced or cancelled shipments (unless admin)
+ */
+export async function canEditShipment(
+  ctx: QueryCtx | MutationCtx,
+  shipment: Shipment,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all (including invoiced/cancelled)
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Cannot edit invoiced or cancelled shipments
+  if (shipment.currentStatus === 'invoiced' || shipment.currentStatus === 'cancelled') {
     return false;
   }
 
   // Owner can edit
-  if (shipment.ownerId === user._id) {
-    return true;
-  }
+  if (shipment.ownerId === user._id) return true;
 
-  // TODO: Add role-based permissions (admin, team members, etc.)
+  // Creator can edit
+  if (shipment.createdBy === user._id) return true;
+
+  // Assigned employee can edit
+  if (shipment.employeeId === user._id) return true;
+
   return false;
 }
 
-/**
- * Check if user can delete a shipment
- */
-export function canDeleteShipment(
+export async function requireEditShipmentAccess(
+  ctx: QueryCtx | MutationCtx,
   shipment: Shipment,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Cannot delete already deleted shipments
-  if (shipment.deletedAt) {
-    return false;
-  }
-
-  // Owner can delete
-  if (shipment.ownerId === user._id) {
-    return true;
-  }
-
-  // TODO: Add role-based permissions (admin only, etc.)
-  return false;
-}
-
-/**
- * Check if user can restore a shipment
- */
-export function canRestoreShipment(
-  shipment: Shipment,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Can only restore deleted shipments
-  if (!shipment.deletedAt) {
-    return false;
-  }
-
-  // Owner can restore
-  if (shipment.ownerId === user._id) {
-    return true;
-  }
-
-  // TODO: Add role-based permissions (admin only, etc.)
-  return false;
-}
-
-/**
- * Require edit permission or throw error
- */
-export function requireEditPermission(
-  shipment: Shipment,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canEditShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_EDIT);
-  }
-}
-
-/**
- * Require delete permission or throw error
- */
-export function requireDeletePermission(
-  shipment: Shipment,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canDeleteShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_DELETE);
-  }
-}
-
-/**
- * Require restore permission or throw error
- */
-export function requireRestorePermission(
-  shipment: Shipment,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canRestoreShipment(shipment, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_RESTORE);
-  }
-}
-
-/**
- * Validate shipment exists and is not deleted (unless includeDeleted is true)
- */
-export function validateShipmentExists(
-  shipment: Shipment | null,
-  includeDeleted: boolean = false
-): asserts shipment is Shipment {
-  if (!shipment) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.NOT_FOUND);
-  }
-
-  if (shipment.deletedAt && !includeDeleted) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.NOT_FOUND);
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditShipment(ctx, shipment, user))) {
+    throw new Error('You do not have permission to edit this shipment');
   }
 }
 
 // ============================================================================
-// Shipment Status History Permissions
+// Delete Access
 // ============================================================================
 
 /**
- * Check if user can view a shipment status history entry
+ * Check if user can delete shipment
+ * - Only admins and shipment owners can delete
+ * - Cannot delete invoiced shipments (unless superadmin)
  */
-export function canViewStatusHistory(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Owner can always view
-  if (statusHistory.ownerId === user._id) {
-    return true;
-  }
+export async function canDeleteShipment(
+  shipment: Shipment,
+  user: UserProfile
+): Promise<boolean> {
+  // Superadmins can delete anything
+  if (user.role === 'superadmin') return true;
 
-  // TODO: Add role-based permissions
-  return false;
-}
+  // Cannot delete invoiced shipments
+  if (shipment.currentStatus === 'invoiced') return false;
 
-/**
- * Check if user can edit a shipment status history entry
- */
-export function canEditStatusHistory(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Cannot edit deleted entries
-  if (statusHistory.deletedAt) {
-    return false;
-  }
-
-  // Owner can edit
-  if (statusHistory.ownerId === user._id) {
-    return true;
-  }
-
-  // TODO: Add role-based permissions
-  return false;
-}
-
-/**
- * Check if user can delete a shipment status history entry
- */
-export function canDeleteStatusHistory(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Cannot delete already deleted entries
-  if (statusHistory.deletedAt) {
-    return false;
-  }
+  // Admins can delete
+  if (user.role === 'admin') return true;
 
   // Owner can delete
-  if (statusHistory.ownerId === user._id) {
-    return true;
-  }
+  if (shipment.ownerId === user._id) return true;
 
-  // TODO: Add role-based permissions
   return false;
 }
 
+export async function requireDeleteShipmentAccess(
+  shipment: Shipment,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteShipment(shipment, user))) {
+    throw new Error('You do not have permission to delete this shipment');
+  }
+}
+
+// ============================================================================
+// Assign Access
+// ============================================================================
+
 /**
- * Check if user can restore a shipment status history entry
+ * Check if user can assign shipment to courier/employee
+ * - Admins and managers can assign shipments
+ * - Owners can assign their own shipments
  */
-export function canRestoreStatusHistory(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): boolean {
-  // Can only restore deleted entries
-  if (!statusHistory.deletedAt) {
-    return false;
-  }
+export async function canAssignShipment(
+  shipment: Shipment,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can assign
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Owner can restore
-  if (statusHistory.ownerId === user._id) {
-    return true;
-  }
+  // Owner can assign
+  if (shipment.ownerId === user._id) return true;
 
-  // TODO: Add role-based permissions
   return false;
 }
 
-/**
- * Require edit permission for status history or throw error
- */
-export function requireEditStatusHistoryPermission(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canEditStatusHistory(statusHistory, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_EDIT);
+export async function requireAssignShipmentAccess(
+  shipment: Shipment,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canAssignShipment(shipment, user))) {
+    throw new Error('You do not have permission to assign this shipment');
   }
 }
 
+// ============================================================================
+// Update Status Access
+// ============================================================================
+
 /**
- * Require delete permission for status history or throw error
+ * Check if user can update shipment status
+ * - Admins and managers can update status
+ * - Assigned courier can update status
+ * - Assigned employee can update status
  */
-export function requireDeleteStatusHistoryPermission(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canDeleteStatusHistory(statusHistory, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_DELETE);
+export async function canUpdateShipmentStatus(
+  ctx: QueryCtx | MutationCtx,
+  shipment: Shipment,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can update
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Assigned employee can update
+  if (shipment.employeeId === user._id) return true;
+
+  // Check if user is the assigned courier
+  if (shipment.assignedCourierId) {
+    const courier = await ctx.db.get(shipment.assignedCourierId);
+    if (courier && courier.userId === user._id) return true;
+  }
+
+  // Owner can update
+  if (shipment.ownerId === user._id) return true;
+
+  return false;
+}
+
+export async function requireUpdateShipmentStatusAccess(
+  ctx: QueryCtx | MutationCtx,
+  shipment: Shipment,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canUpdateShipmentStatus(ctx, shipment, user))) {
+    throw new Error('You do not have permission to update this shipment status');
   }
 }
 
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
 /**
- * Require restore permission for status history or throw error
+ * Filter shipments by access permissions
  */
-export function requireRestoreStatusHistoryPermission(
-  statusHistory: ShipmentStatusHistory,
-  user: Doc<'userProfiles'>
-): void {
-  if (!canRestoreStatusHistory(statusHistory, user)) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.UNAUTHORIZED_RESTORE);
+export async function filterShipmentsByAccess(
+  ctx: QueryCtx | MutationCtx,
+  shipments: Shipment[],
+  user: UserProfile
+): Promise<Shipment[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return shipments;
   }
+
+  const accessible: Shipment[] = [];
+
+  for (const shipment of shipments) {
+    if (await canViewShipment(ctx, shipment, user)) {
+      accessible.push(shipment);
+    }
+  }
+
+  return accessible;
 }
 
-/**
- * Validate status history exists and is not deleted (unless includeDeleted is true)
- */
-export function validateStatusHistoryExists(
-  statusHistory: ShipmentStatusHistory | null,
-  includeDeleted: boolean = false
-): asserts statusHistory is ShipmentStatusHistory {
-  if (!statusHistory) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.STATUS_HISTORY_NOT_FOUND);
-  }
+// ============================================================================
+// Manage All Access
+// ============================================================================
 
-  if (statusHistory.deletedAt && !includeDeleted) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.STATUS_HISTORY_NOT_FOUND);
+/**
+ * Check if user can manage all shipments (admin feature)
+ */
+export function canManageAllShipments(user: UserProfile): boolean {
+  return user.role === 'admin' || user.role === 'superadmin';
+}
+
+export function requireManageAllShipmentsAccess(user: UserProfile): void {
+  if (!canManageAllShipments(user)) {
+    throw new Error('You do not have permission to manage all shipments');
   }
 }

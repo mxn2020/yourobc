@@ -1,159 +1,192 @@
 // convex/lib/software/yourobc/quotes/types.ts
-/**
- * Quote TypeScript Types
- *
- * TypeScript type definitions for quote entities and operations.
- *
- * @module convex/lib/software/yourobc/quotes/types
- */
+// TypeScript type definitions for quotes module
 
-import type { Doc, Id } from '@/generated/dataModel'
-import type {
-  QuoteStatus,
-  QuoteServiceType,
-  ServicePriority,
-  ShipmentType,
-  Address,
-  Dimensions,
-  CurrencyAmount,
-  FlightDetails,
-  PartnerQuote,
-  AirlineRules,
-} from '@/schema/software/yourobc/quotes/types'
+import type { Doc, Id } from '@/generated/dataModel';
+import type { QuoteStatus, QuoteServiceType, QuotePriority } from '@/schema/software/yourobc/quotes/types';
 
-// ============================================================================
-// Entity Types
-// ============================================================================
+// Entity types
+export type Quote = Doc<'yourobcQuotes'>;
+export type QuoteId = Id<'yourobcQuotes'>;
 
-export type Quote = Doc<'yourobcQuotes'>
-export type QuoteId = Id<'yourobcQuotes'>
-
-// ============================================================================
-// Create Quote Data Interface
-// ============================================================================
-
-export interface CreateQuoteData {
-  // Required fields
-  quoteNumber: string
-  serviceType: QuoteServiceType
-  priority: ServicePriority
-  customerId: Id<'yourobcCustomers'>
-  origin: Address
-  destination: Address
-  dimensions: Dimensions
-  description: string
-  deadline: number
-  validUntil: number
-  status?: QuoteStatus
-
-  // Optional fields
-  customerReference?: string
-  inquirySourceId?: Id<'yourobcInquirySources'>
-  specialInstructions?: string
-  baseCost?: CurrencyAmount
-  markup?: number
-  totalPrice?: CurrencyAmount
-  partnerQuotes?: PartnerQuote[]
-  selectedPartnerQuote?: Id<'yourobcPartners'>
-  flightDetails?: FlightDetails
-  shipmentType?: ShipmentType
-  incoterms?: string
-  appliedAirlineRules?: AirlineRules
-  assignedCourierId?: Id<'yourobcCouriers'>
-  employeeId?: Id<'yourobcEmployees'>
-  quoteText?: string
-  notes?: string
-  tags?: string[]
-  category?: string
+// Address interface (matching schema)
+export interface AddressData {
+  street?: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  countryCode: string;
 }
 
-// ============================================================================
-// Update Quote Data Interface
-// ============================================================================
+// Dimensions interface (matching schema)
+export interface DimensionsData {
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+  unit: 'cm' | 'inch';
+  weightUnit: 'kg' | 'lb';
+  chargeableWeight?: number;
+}
+
+// Currency amount interface (matching schema)
+export interface CurrencyAmountData {
+  amount: number;
+  currency: 'EUR' | 'USD';
+  exchangeRate?: number;
+  exchangeRateDate?: number;
+}
+
+// Flight details interface (matching schema)
+export interface FlightDetailsData {
+  flightNumber?: string;
+  airline?: string;
+  airlineCode?: string;
+  departureTime?: number;
+  arrivalTime?: number;
+  departureAirport?: string;
+  arrivalAirport?: string;
+}
+
+// Partner quote interface (matching schema)
+export interface PartnerQuoteData {
+  partnerId: Id<'yourobcPartners'>;
+  partnerName: string;
+  quotedPrice: CurrencyAmountData;
+  transitTime?: number;
+  validUntil?: number;
+  receivedAt: number;
+  notes?: string;
+  isSelected?: boolean;
+}
+
+// Airline rules interface (matching schema)
+export interface AirlineRulesData {
+  airlineCode: string;
+  airlineName: string;
+  maxBaggageWeight: number;
+  maxBaggagePieces: number;
+  excessBaggageFee?: number;
+  couriersRequired?: number;
+}
+
+// Data interfaces
+export interface CreateQuoteData {
+  quoteNumber: string;
+  customerReference?: string;
+  serviceType: QuoteServiceType;
+  priority: QuotePriority;
+  customerId: Id<'yourobcCustomers'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
+  origin: AddressData;
+  destination: AddressData;
+  dimensions: DimensionsData;
+  description: string;
+  specialInstructions?: string;
+  deadline: number;
+  validUntil: number;
+  baseCost?: CurrencyAmountData;
+  markup?: number;
+  totalPrice?: CurrencyAmountData;
+  partnerQuotes?: PartnerQuoteData[];
+  selectedPartnerQuote?: Id<'yourobcPartners'>;
+  flightDetails?: FlightDetailsData;
+  shipmentType?: 'door-door' | 'door-airport' | 'airport-door' | 'airport-airport';
+  incoterms?: string;
+  appliedAirlineRules?: AirlineRulesData;
+  assignedCourierId?: Id<'yourobcCouriers'>;
+  employeeId?: Id<'yourobcEmployees'>;
+  status?: QuoteStatus;
+  quoteText?: string;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+}
 
 export interface UpdateQuoteData {
-  quoteNumber?: string
-  customerReference?: string
-  serviceType?: QuoteServiceType
-  priority?: ServicePriority
-  customerId?: Id<'yourobcCustomers'>
-  inquirySourceId?: Id<'yourobcInquirySources'>
-  origin?: Address
-  destination?: Address
-  dimensions?: Dimensions
-  description?: string
-  specialInstructions?: string
-  deadline?: number
-  validUntil?: number
-  baseCost?: CurrencyAmount
-  markup?: number
-  totalPrice?: CurrencyAmount
-  partnerQuotes?: PartnerQuote[]
-  selectedPartnerQuote?: Id<'yourobcPartners'>
-  flightDetails?: FlightDetails
-  shipmentType?: ShipmentType
-  incoterms?: string
-  appliedAirlineRules?: AirlineRules
-  assignedCourierId?: Id<'yourobcCouriers'>
-  employeeId?: Id<'yourobcEmployees'>
-  status?: QuoteStatus
-  convertedToShipmentId?: Id<'yourobcShipments'>
-  rejectionReason?: string
-  quoteText?: string
-  notes?: string
-  tags?: string[]
-  category?: string
+  customerReference?: string;
+  serviceType?: QuoteServiceType;
+  priority?: QuotePriority;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
+  origin?: AddressData;
+  destination?: AddressData;
+  dimensions?: DimensionsData;
+  description?: string;
+  specialInstructions?: string;
+  deadline?: number;
+  validUntil?: number;
+  sentAt?: number;
+  baseCost?: CurrencyAmountData;
+  markup?: number;
+  totalPrice?: CurrencyAmountData;
+  partnerQuotes?: PartnerQuoteData[];
+  selectedPartnerQuote?: Id<'yourobcPartners'>;
+  flightDetails?: FlightDetailsData;
+  shipmentType?: 'door-door' | 'door-airport' | 'airport-door' | 'airport-airport';
+  incoterms?: string;
+  appliedAirlineRules?: AirlineRulesData;
+  assignedCourierId?: Id<'yourobcCouriers'>;
+  employeeId?: Id<'yourobcEmployees'>;
+  status?: QuoteStatus;
+  convertedToShipmentId?: Id<'yourobcShipments'>;
+  rejectionReason?: string;
+  quoteText?: string;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
 }
 
-// ============================================================================
-// Response Types
-// ============================================================================
-
+// Response types
 export interface QuoteWithRelations extends Quote {
-  customer?: Doc<'yourobcCustomers'> | null
-  inquirySource?: Doc<'yourobcInquirySources'> | null
-  assignedCourier?: Doc<'yourobcCouriers'> | null
-  employee?: Doc<'yourobcEmployees'> | null
-  convertedShipment?: Doc<'yourobcShipments'> | null
+  customer?: Doc<'yourobcCustomers'> | null;
+  inquirySource?: Doc<'yourobcInquirySources'> | null;
+  assignedCourier?: Doc<'yourobcCouriers'> | null;
+  employee?: Doc<'yourobcEmployees'> | null;
+  convertedShipment?: Doc<'yourobcShipments'> | null;
 }
 
 export interface QuoteListResponse {
-  items: Quote[]
-  total: number
-  hasMore: boolean
+  items: Quote[];
+  total: number;
+  hasMore: boolean;
 }
 
-// ============================================================================
-// Filter Types
-// ============================================================================
-
+// Filter types
 export interface QuoteFilters {
-  status?: QuoteStatus[]
-  serviceType?: QuoteServiceType[]
-  priority?: ServicePriority[]
-  customerId?: Id<'yourobcCustomers'>
-  employeeId?: Id<'yourobcEmployees'>
-  assignedCourierId?: Id<'yourobcCouriers'>
-  search?: string
-  dateFrom?: number
-  dateTo?: number
-  validUntilFrom?: number
-  validUntilTo?: number
-  deadlineFrom?: number
-  deadlineTo?: number
+  status?: QuoteStatus[];
+  serviceType?: QuoteServiceType[];
+  priority?: QuotePriority[];
+  search?: string;
+  customerId?: Id<'yourobcCustomers'>;
+  employeeId?: Id<'yourobcEmployees'>;
+  assignedCourierId?: Id<'yourobcCouriers'>;
+  deadlineFrom?: number;
+  deadlineTo?: number;
+  validUntilFrom?: number;
+  validUntilTo?: number;
 }
 
-// ============================================================================
-// Statistics Types
-// ============================================================================
-
-export interface QuoteStats {
-  total: number
-  byStatus: Record<QuoteStatus, number>
-  byServiceType: Record<QuoteServiceType, number>
-  byPriority: Record<ServicePriority, number>
-  expiringQuotes: number
-  totalValue: number
-  averageValue: number
-  conversionRate: number
+// Stats response type
+export interface QuoteStatsResponse {
+  total: number;
+  byStatus: {
+    draft: number;
+    sent: number;
+    pending: number;
+    accepted: number;
+    rejected: number;
+    expired: number;
+  };
+  byServiceType: {
+    OBC: number;
+    NFO: number;
+  };
+  byPriority: {
+    standard: number;
+    urgent: number;
+    critical: number;
+  };
+  conversionRate: number;
+  averageResponseTime: number;
 }

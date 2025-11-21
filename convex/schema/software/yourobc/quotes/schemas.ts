@@ -1,14 +1,8 @@
 // convex/schema/software/yourobc/quotes/schemas.ts
-/**
- * Quote Schema Exports
- *
- * Exports schema objects for registration in the main Convex schema.
- *
- * @module convex/schema/software/yourobc/quotes/schemas
- */
+// Schema exports for quotes module
 
-import { quotesTable } from './quotes'
+import { quotesTable } from './quotes';
 
-export const softwareYourobcQuotesSchemas = {
+export const softwareYourObcQuotesSchemas = {
   yourobcQuotes: quotesTable,
-}
+};

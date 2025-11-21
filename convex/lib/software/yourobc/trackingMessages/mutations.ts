@@ -1,480 +1,381 @@
 // convex/lib/software/yourobc/trackingMessages/mutations.ts
-/**
- * Tracking Messages Mutation Helpers
- *
- * Reusable mutation functions for tracking messages.
- * These helpers can be used in Convex mutations to create, update, and delete tracking messages.
- *
- * @module convex/lib/software/yourobc/trackingMessages/mutations
- */
+// Write operations for trackingMessages module
 
-import { MutationCtx } from '../../../../_generated/server'
-import type {
-  TrackingMessage,
-  TrackingMessageId,
-  CreateTrackingMessageInput,
-  UpdateTrackingMessageInput,
-} from './types'
-import {
-  generateTrackingMessagePublicId,
-  extractTemplateVariables,
-  validateTrackingMessageData,
-} from './utils'
-import { TRACKING_MESSAGE_DEFAULTS } from './constants'
-
-// ============================================================================
-// Create Operations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { trackingMessagesValidators } from '@/schema/software/yourobc/trackingMessages/validators';
+import { TRACKING_MESSAGES_CONSTANTS } from './constants';
+import { validateTrackingMessageData, generateMessageId } from './utils';
+import { requireEditTrackingMessageAccess, requireDeleteTrackingMessageAccess } from './permissions';
+import type { TrackingMessageId } from './types';
 
 /**
- * Creates a new tracking message
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {CreateTrackingMessageInput} input - Tracking message data
- * @returns {Promise<TrackingMessageId>} The created tracking message ID
- * @throws {Error} If validation fails
- *
- * @example
- * const messageId = await createTrackingMessage(ctx, userId, {
- *   name: 'Booking Confirmation',
- *   template: 'Hello {customerName}',
- *   serviceType: 'OBC',
- *   status: 'booked',
- *   language: 'en'
- * })
+ * Create new tracking message
  */
-export async function createTrackingMessage(
-  ctx: MutationCtx,
-  userId: string,
-  input: CreateTrackingMessageInput
-): Promise<TrackingMessageId> {
-  // Validate input
-  const validation = validateTrackingMessageData({
-    name: input.name,
-    description: input.description,
-    subject: input.subject,
-    template: input.template,
-  })
+export const createTrackingMessage = mutation({
+  args: {
+    data: v.object({
+      messageId: v.optional(v.string()),
+      subject: v.optional(v.string()),
+      content: v.string(),
+      status: v.optional(trackingMessagesValidators.status),
+      messageType: trackingMessagesValidators.messageType,
+      priority: v.optional(trackingMessagesValidators.priority),
+      templateId: v.optional(v.string()),
+      shipmentId: v.optional(v.id('yourobcShipments')),
+      shipmentNumber: v.optional(v.string()),
+      recipients: v.array(v.object({
+        email: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        name: v.optional(v.string()),
+        userId: v.optional(v.id('userProfiles')),
+      })),
+      deliveryChannel: v.optional(trackingMessagesValidators.deliveryChannel),
+      attachments: v.optional(v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        url: v.string(),
+        type: v.string(),
+        size: v.optional(v.number()),
+      }))),
+      routingInfo: v.optional(v.object({
+        origin: v.optional(v.string()),
+        destination: v.optional(v.string()),
+        currentLocation: v.optional(v.string()),
+        estimatedDelivery: v.optional(v.number()),
+      })),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<TrackingMessageId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  if (!validation.valid) {
-    throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
-  }
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, TRACKING_MESSAGES_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  // Generate public ID
-  const publicId = generateTrackingMessagePublicId()
-
-  // Extract variables from template
-  const extractedVariables = extractTemplateVariables(input.template)
-  const variables = input.variables || extractedVariables
-
-  // Get current timestamp
-  const now = Date.now()
-
-  // Create the tracking message
-  const messageId = await ctx.db.insert('trackingMessages', {
-    // Public identity
-    publicId,
-
-    // Core identity
-    name: input.name,
-    description: input.description,
-    icon: input.icon,
-    thumbnail: input.thumbnail,
-
-    // Service classification
-    serviceType: input.serviceType,
-    status: input.status,
-
-    // Message configuration
-    language: input.language,
-
-    // Template content
-    subject: input.subject,
-    template: input.template,
-    variables,
-
-    // Status
-    isActive: input.isActive ?? TRACKING_MESSAGE_DEFAULTS.isActive,
-
-    // Classification
-    tags: input.tags,
-    category: input.category,
-    customFields: input.customFields,
-    useCase: input.useCase,
-    difficulty: input.difficulty ?? TRACKING_MESSAGE_DEFAULTS.difficulty,
-    visibility: input.visibility ?? TRACKING_MESSAGE_DEFAULTS.visibility,
-
-    // Ownership
-    ownerId: userId,
-    isOfficial: input.isOfficial ?? TRACKING_MESSAGE_DEFAULTS.isOfficial,
-
-    // Usage statistics
-    stats: {
-      usageCount: 0,
-      rating: 0,
-      ratingCount: 0,
-    },
-
-    // Audit fields
-    createdAt: now,
-    createdBy: userId,
-    updatedAt: now,
-    updatedBy: userId,
-
-    // Soft delete (not deleted initially)
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
-
-  return messageId
-}
-
-// ============================================================================
-// Update Operations
-// ============================================================================
-
-/**
- * Updates an existing tracking message
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @param {UpdateTrackingMessageInput} updates - Fields to update
- * @returns {Promise<void>}
- * @throws {Error} If message not found or validation fails
- *
- * @example
- * await updateTrackingMessage(ctx, userId, messageId, {
- *   name: 'Updated Name',
- *   isActive: false
- * })
- */
-export async function updateTrackingMessage(
-  ctx: MutationCtx,
-  userId: string,
-  messageId: TrackingMessageId,
-  updates: UpdateTrackingMessageInput
-): Promise<void> {
-  // Get existing message
-  const existingMessage = await ctx.db.get(messageId)
-  if (!existingMessage) {
-    throw new Error('Tracking message not found')
-  }
-
-  // Validate updates if provided
-  if (updates.name || updates.template) {
-    const validation = validateTrackingMessageData({
-      name: updates.name ?? existingMessage.name,
-      description: updates.description ?? existingMessage.description,
-      subject: updates.subject ?? existingMessage.subject,
-      template: updates.template ?? existingMessage.template,
-    })
-
-    if (!validation.valid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
+    // 3. VALIDATE: Check data validity
+    const errors = validateTrackingMessageData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
-  }
 
-  // If template is updated, extract new variables
-  let variables = updates.variables
-  if (updates.template && !updates.variables) {
-    variables = extractTemplateVariables(updates.template)
-  }
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'softwareYourObcTrackingMessages');
+    const messageId = data.messageId?.trim() || generateMessageId();
+    const now = Date.now();
 
-  // Build update object
-  const updateData: Partial<TrackingMessage> = {
-    ...updates,
-    variables: variables ?? existingMessage.variables,
-    updatedAt: Date.now(),
-    updatedBy: userId,
-  }
+    // 5. CREATE: Insert into database
+    const trackingMessageId = await ctx.db.insert('softwareYourObcTrackingMessages', {
+      publicId,
+      messageId,
+      subject: data.subject?.trim(),
+      content: data.content.trim(),
+      status: data.status || 'draft',
+      messageType: data.messageType,
+      priority: data.priority,
+      templateId: data.templateId?.trim(),
+      shipmentId: data.shipmentId,
+      shipmentNumber: data.shipmentNumber?.trim(),
+      recipients: data.recipients,
+      deliveryChannel: data.deliveryChannel,
+      attachments: data.attachments,
+      routingInfo: data.routingInfo,
+      tags: data.tags?.map(tag => tag.trim()),
+      category: data.category?.trim(),
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  // Remove undefined values
-  Object.keys(updateData).forEach((key) => {
-    if (updateData[key as keyof typeof updateData] === undefined) {
-      delete updateData[key as keyof typeof updateData]
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'tracking_message.created',
+      entityType: 'system_tracking_message',
+      entityId: publicId,
+      entityTitle: messageId,
+      description: `Created tracking message: ${messageId}`,
+      metadata: {
+        status: data.status || 'draft',
+        messageType: data.messageType,
+        recipientCount: data.recipients.length,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 7. RETURN: Return entity ID
+    return trackingMessageId;
+  },
+});
+
+/**
+ * Update existing tracking message
+ */
+export const updateTrackingMessage = mutation({
+  args: {
+    messageId: v.id('softwareYourObcTrackingMessages'),
+    updates: v.object({
+      subject: v.optional(v.string()),
+      content: v.optional(v.string()),
+      status: v.optional(trackingMessagesValidators.status),
+      messageType: v.optional(trackingMessagesValidators.messageType),
+      priority: v.optional(trackingMessagesValidators.priority),
+      recipients: v.optional(v.array(v.object({
+        email: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        name: v.optional(v.string()),
+        userId: v.optional(v.id('userProfiles')),
+      }))),
+      deliveryChannel: v.optional(trackingMessagesValidators.deliveryChannel),
+      attachments: v.optional(v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        url: v.string(),
+        type: v.string(),
+        size: v.optional(v.number()),
+      }))),
+      routingInfo: v.optional(v.object({
+        origin: v.optional(v.string()),
+        destination: v.optional(v.string()),
+        currentLocation: v.optional(v.string()),
+        estimatedDelivery: v.optional(v.number()),
+      })),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { messageId, updates }): Promise<TrackingMessageId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const message = await ctx.db.get(messageId);
+    if (!message || message.deletedAt) {
+      throw new Error('Tracking message not found');
     }
-  })
 
-  // Update the message
-  await ctx.db.patch(messageId, updateData)
-}
+    // 3. AUTHZ: Check edit permission
+    await requireEditTrackingMessageAccess(ctx, message, user);
 
-/**
- * Updates the template content and auto-extracts variables
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @param {string} template - New template content
- * @param {string} subject - Optional new subject
- * @returns {Promise<string[]>} Extracted variables
- *
- * @example
- * const variables = await updateTrackingMessageTemplate(ctx, userId, messageId, 'Hello {name}')
- */
-export async function updateTrackingMessageTemplate(
-  ctx: MutationCtx,
-  userId: string,
-  messageId: TrackingMessageId,
-  template: string,
-  subject?: string
-): Promise<string[]> {
-  // Extract variables
-  const variables = extractTemplateVariables(template)
+    // 4. VALIDATE: Check update data validity
+    const errors = validateTrackingMessageData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // Update the message
-  await updateTrackingMessage(ctx, userId, messageId, {
-    template,
-    subject,
-    variables,
-  })
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
 
-  return variables
-}
+    if (updates.subject !== undefined) {
+      updateData.subject = updates.subject?.trim();
+    }
+    if (updates.content !== undefined) {
+      updateData.content = updates.content.trim();
+    }
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+      // Auto-track status changes
+      if (updates.status === 'sent' && !message.sentAt) {
+        updateData.sentAt = now;
+      }
+      if (updates.status === 'delivered' && !message.deliveredAt) {
+        updateData.deliveredAt = now;
+      }
+      if (updates.status === 'read' && !message.readAt) {
+        updateData.readAt = now;
+        updateData.readBy = user._id;
+      }
+    }
+    if (updates.messageType !== undefined) {
+      updateData.messageType = updates.messageType;
+    }
+    if (updates.priority !== undefined) {
+      updateData.priority = updates.priority;
+    }
+    if (updates.recipients !== undefined) {
+      updateData.recipients = updates.recipients;
+    }
+    if (updates.deliveryChannel !== undefined) {
+      updateData.deliveryChannel = updates.deliveryChannel;
+    }
+    if (updates.attachments !== undefined) {
+      updateData.attachments = updates.attachments;
+    }
+    if (updates.routingInfo !== undefined) {
+      updateData.routingInfo = updates.routingInfo;
+    }
+    if (updates.tags !== undefined) {
+      updateData.tags = updates.tags.map(tag => tag.trim());
+    }
+    if (updates.category !== undefined) {
+      updateData.category = updates.category?.trim();
+    }
 
-/**
- * Toggles the active status of a tracking message
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @returns {Promise<boolean>} New active status
- *
- * @example
- * const newStatus = await toggleTrackingMessageActive(ctx, userId, messageId)
- */
-export async function toggleTrackingMessageActive(
-  ctx: MutationCtx,
-  userId: string,
-  messageId: TrackingMessageId
-): Promise<boolean> {
-  const message = await ctx.db.get(messageId)
-  if (!message) {
-    throw new Error('Tracking message not found')
-  }
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(messageId, updateData);
 
-  const newStatus = !message.isActive
-  await updateTrackingMessage(ctx, userId, messageId, {
-    isActive: newStatus,
-  })
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'tracking_message.updated',
+      entityType: 'system_tracking_message',
+      entityId: message.publicId,
+      entityTitle: message.messageId,
+      description: `Updated tracking message: ${message.messageId}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  return newStatus
-}
-
-// ============================================================================
-// Delete Operations (Soft Delete)
-// ============================================================================
-
-/**
- * Soft deletes a tracking message
- * Sets deletedAt and deletedBy fields instead of removing the record
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @returns {Promise<void>}
- * @throws {Error} If message not found or already deleted
- *
- * @example
- * await softDeleteTrackingMessage(ctx, userId, messageId)
- */
-export async function softDeleteTrackingMessage(
-  ctx: MutationCtx,
-  userId: string,
-  messageId: TrackingMessageId
-): Promise<void> {
-  const message = await ctx.db.get(messageId)
-  if (!message) {
-    throw new Error('Tracking message not found')
-  }
-
-  if (message.deletedAt) {
-    throw new Error('Tracking message is already deleted')
-  }
-
-  // Soft delete
-  await ctx.db.patch(messageId, {
-    deletedAt: Date.now(),
-    deletedBy: userId,
-    isActive: false, // Also deactivate when deleting
-  })
-}
+    // 8. RETURN: Return entity ID
+    return messageId;
+  },
+});
 
 /**
- * Restores a soft-deleted tracking message
- * Clears deletedAt and deletedBy fields
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @returns {Promise<void>}
- * @throws {Error} If message not found or not deleted
- *
- * @example
- * await restoreTrackingMessage(ctx, userId, messageId)
+ * Delete tracking message (soft delete)
  */
-export async function restoreTrackingMessage(
-  ctx: MutationCtx,
-  userId: string,
-  messageId: TrackingMessageId
-): Promise<void> {
-  const message = await ctx.db.get(messageId)
-  if (!message) {
-    throw new Error('Tracking message not found')
-  }
+export const deleteTrackingMessage = mutation({
+  args: {
+    messageId: v.id('softwareYourObcTrackingMessages'),
+  },
+  handler: async (ctx, { messageId }): Promise<TrackingMessageId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  if (!message.deletedAt) {
-    throw new Error('Tracking message is not deleted')
-  }
+    // 2. CHECK: Verify entity exists
+    const message = await ctx.db.get(messageId);
+    if (!message || message.deletedAt) {
+      throw new Error('Tracking message not found');
+    }
 
-  // Restore
-  await ctx.db.patch(messageId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: Date.now(),
-    updatedBy: userId,
-  })
-}
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteTrackingMessageAccess(message, user);
+
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(messageId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'tracking_message.deleted',
+      entityType: 'system_tracking_message',
+      entityId: message.publicId,
+      entityTitle: message.messageId,
+      description: `Deleted tracking message: ${message.messageId}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return messageId;
+  },
+});
 
 /**
- * Permanently deletes a tracking message
- * USE WITH CAUTION - This cannot be undone
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @returns {Promise<void>}
- *
- * @example
- * await hardDeleteTrackingMessage(ctx, messageId)
+ * Restore soft-deleted tracking message
  */
-export async function hardDeleteTrackingMessage(
-  ctx: MutationCtx,
-  messageId: TrackingMessageId
-): Promise<void> {
-  await ctx.db.delete(messageId)
-}
+export const restoreTrackingMessage = mutation({
+  args: {
+    messageId: v.id('softwareYourObcTrackingMessages'),
+  },
+  handler: async (ctx, { messageId }): Promise<TrackingMessageId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-// ============================================================================
-// Statistics Operations
-// ============================================================================
+    // 2. CHECK: Verify entity exists and is deleted
+    const message = await ctx.db.get(messageId);
+    if (!message) {
+      throw new Error('Tracking message not found');
+    }
+    if (!message.deletedAt) {
+      throw new Error('Tracking message is not deleted');
+    }
+
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      message.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this tracking message');
+    }
+
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(messageId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'tracking_message.restored',
+      entityType: 'system_tracking_message',
+      entityId: message.publicId,
+      entityTitle: message.messageId,
+      description: `Restored tracking message: ${message.messageId}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return messageId;
+  },
+});
 
 /**
- * Increments the usage count for a tracking message
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @returns {Promise<void>}
- *
- * @example
- * await incrementTrackingMessageUsage(ctx, messageId)
+ * Mark tracking message as read
  */
-export async function incrementTrackingMessageUsage(
-  ctx: MutationCtx,
-  messageId: TrackingMessageId
-): Promise<void> {
-  const message = await ctx.db.get(messageId)
-  if (!message) {
-    throw new Error('Tracking message not found')
-  }
+export const markTrackingMessageAsRead = mutation({
+  args: {
+    messageId: v.id('softwareYourObcTrackingMessages'),
+  },
+  handler: async (ctx, { messageId }): Promise<TrackingMessageId> => {
+    const user = await requireCurrentUser(ctx);
 
-  const currentStats = message.stats || { usageCount: 0, rating: 0, ratingCount: 0 }
+    const message = await ctx.db.get(messageId);
+    if (!message || message.deletedAt) {
+      throw new Error('Tracking message not found');
+    }
 
-  await ctx.db.patch(messageId, {
-    stats: {
-      ...currentStats,
-      usageCount: currentStats.usageCount + 1,
-    },
-  })
-}
+    const now = Date.now();
+    await ctx.db.patch(messageId, {
+      status: 'read',
+      readAt: now,
+      readBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
 
-/**
- * Updates the rating for a tracking message
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {TrackingMessageId} messageId - The tracking message ID
- * @param {number} rating - Rating value (0-5)
- * @returns {Promise<void>}
- *
- * @example
- * await updateTrackingMessageRating(ctx, messageId, 4.5)
- */
-export async function updateTrackingMessageRating(
-  ctx: MutationCtx,
-  messageId: TrackingMessageId,
-  rating: number
-): Promise<void> {
-  if (rating < 0 || rating > 5) {
-    throw new Error('Rating must be between 0 and 5')
-  }
-
-  const message = await ctx.db.get(messageId)
-  if (!message) {
-    throw new Error('Tracking message not found')
-  }
-
-  const currentStats = message.stats || { usageCount: 0, rating: 0, ratingCount: 0 }
-  const newRatingCount = currentStats.ratingCount + 1
-  const newAverageRating =
-    (currentStats.rating * currentStats.ratingCount + rating) / newRatingCount
-
-  await ctx.db.patch(messageId, {
-    stats: {
-      ...currentStats,
-      rating: newAverageRating,
-      ratingCount: newRatingCount,
-    },
-  })
-}
-
-// ============================================================================
-// Batch Operations
-// ============================================================================
-
-/**
- * Creates multiple tracking messages in batch
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {CreateTrackingMessageInput[]} inputs - Array of tracking message data
- * @returns {Promise<TrackingMessageId[]>} Array of created message IDs
- *
- * @example
- * const ids = await batchCreateTrackingMessages(ctx, userId, [input1, input2])
- */
-export async function batchCreateTrackingMessages(
-  ctx: MutationCtx,
-  userId: string,
-  inputs: CreateTrackingMessageInput[]
-): Promise<TrackingMessageId[]> {
-  const messageIds: TrackingMessageId[] = []
-
-  for (const input of inputs) {
-    const id = await createTrackingMessage(ctx, userId, input)
-    messageIds.push(id)
-  }
-
-  return messageIds
-}
-
-/**
- * Soft deletes multiple tracking messages
- *
- * @param {MutationCtx} ctx - Convex mutation context
- * @param {string} userId - The user's auth ID
- * @param {TrackingMessageId[]} messageIds - Array of message IDs to delete
- * @returns {Promise<void>}
- *
- * @example
- * await batchSoftDeleteTrackingMessages(ctx, userId, [id1, id2, id3])
- */
-export async function batchSoftDeleteTrackingMessages(
-  ctx: MutationCtx,
-  userId: string,
-  messageIds: TrackingMessageId[]
-): Promise<void> {
-  for (const messageId of messageIds) {
-    await softDeleteTrackingMessage(ctx, userId, messageId)
-  }
-}
+    return messageId;
+  },
+});

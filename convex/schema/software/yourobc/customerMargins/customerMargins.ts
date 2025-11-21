@@ -1,138 +1,106 @@
 // convex/schema/software/yourobc/customerMargins/customerMargins.ts
-/**
- * Customer Margins Table Schema
- *
- * Manages customer-specific margin rules and pricing configurations.
- * Supports:
- * - Dual margin system (percentage AND minimum EUR - higher wins)
- * - Service-specific margins (standard, express, international, etc.)
- * - Route-specific margins (origin-destination pairs)
- * - Volume-based tier pricing
- * - Negotiated special rates with expiry tracking
- * - Review schedule management
- *
- * @module convex/schema/software/yourobc/customerMargins/customerMargins
- */
+// Table definitions for customerMargins module
 
-import { defineTable } from 'convex/server'
-import { v } from 'convex/values'
-import {
-  marginCalculationMethodValidator,
-  auditFields,
-  softDeleteFields,
-  metadataSchema,
-  publicIdField,
-  ownerIdField,
-} from '../../base'
-import {
-  serviceMarginValidator,
-  routeMarginValidator,
-  volumeTierValidator,
-} from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, softDeleteFields } from '@/schema/base';
+import { customerMarginsValidators } from './validators';
 
-/**
- * Customer Margin Rules Table
- *
- * Stores customer-specific margin configurations with multiple pricing strategies.
- * The dual margin system ensures profitability: final margin is the HIGHER of:
- * - (cost × marginPercentage) OR
- * - minimumMarginEUR
- *
- * Supports hierarchical pricing:
- * 1. Route-specific margins (most specific)
- * 2. Service-specific margins
- * 3. Volume-tier margins
- * 4. Default margins (fallback)
- */
 export const customerMarginsTable = defineTable({
-  // Identity & Ownership
-  ...publicIdField,
-  ...ownerIdField,
+  // Required: Main display field
+  name: v.string(), // e.g., "Premium Service Margin"
+
+  // Alternative identifier
+  marginId: v.string(), // Auto-generated unique identifier
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
+  // Margin details
+  status: customerMarginsValidators.status,
+  serviceType: customerMarginsValidators.serviceType,
+  marginType: customerMarginsValidators.marginType,
+
+  // Customer reference
   customerId: v.id('yourobcCustomers'),
+  customerName: v.optional(v.string()),
 
-  // Default Margin Settings (applies to all services if no specific rule)
-  defaultMarginPercentage: v.number(), // e.g., 15 for 15%
-  defaultMinimumMarginEUR: v.number(), // e.g., 50 EUR minimum
+  // Margin values
+  baseMargin: v.number(), // Base margin percentage or amount
+  appliedMargin: v.number(), // Actually applied margin (may differ from base)
+  minimumMargin: v.optional(v.number()),
+  maximumMargin: v.optional(v.number()),
 
-  // Service-Specific Margins
-  // Override defaults for specific service types (standard, express, etc.)
-  serviceMargins: v.optional(v.array(serviceMarginValidator)),
+  // Effective dates
+  effectiveFrom: v.number(),
+  effectiveTo: v.optional(v.number()),
 
-  // Route-Specific Margins
-  // Override for specific origin-destination pairs (most specific pricing)
-  routeMargins: v.optional(v.array(routeMarginValidator)),
+  // Pricing rules
+  pricingRules: v.optional(v.array(v.object({
+    id: v.string(),
+    condition: v.string(), // e.g., "weight > 100kg"
+    marginAdjustment: v.number(),
+    description: v.optional(v.string()),
+  }))),
 
-  // Volume-Based Margin Tiers
-  // Lower margins for high-volume customers
-  volumeTiers: v.optional(v.array(volumeTierValidator)),
+  // Volume tiers (for volume-based margins)
+  volumeTiers: v.optional(v.array(v.object({
+    id: v.string(),
+    minVolume: v.number(),
+    maxVolume: v.optional(v.number()),
+    marginPercentage: v.number(),
+    description: v.optional(v.string()),
+  }))),
 
-  // Negotiated Special Rates
-  hasNegotiatedRates: v.boolean(),
-  negotiatedRatesNotes: v.optional(v.string()),
-  negotiatedRatesValidUntil: v.optional(v.number()),
+  // History tracking
+  previousMargin: v.optional(v.number()),
+  changeReason: v.optional(v.string()),
+  changeHistory: v.optional(v.array(v.object({
+    id: v.string(),
+    timestamp: v.number(),
+    changedBy: v.id('userProfiles'),
+    oldMargin: v.number(),
+    newMargin: v.number(),
+    reason: v.string(),
+  }))),
 
-  // Margin Calculation
-  calculationMethod: v.optional(marginCalculationMethodValidator),
-  customCalculationNotes: v.optional(v.string()),
+  // Approval workflow
+  approvalStatus: v.optional(customerMarginsValidators.approvalStatus),
+  approvedBy: v.optional(v.id('userProfiles')),
+  approvedDate: v.optional(v.number()),
+  approvalNotes: v.optional(v.string()),
+  rejectedBy: v.optional(v.id('userProfiles')),
+  rejectedDate: v.optional(v.number()),
+  rejectionReason: v.optional(v.string()),
 
-  // Status & Dates
-  isActive: v.boolean(),
-  effectiveDate: v.number(),
-  expiryDate: v.optional(v.number()),
-
-  // Review Schedule
-  lastReviewDate: v.optional(v.number()),
-  nextReviewDate: v.optional(v.number()),
-
-  // Modification Tracking
-  lastModifiedBy: v.optional(v.string()), // authUserId who last modified
-
-  // Notes
+  // Additional info
   notes: v.optional(v.string()),
-  internalNotes: v.optional(v.string()),
+  isAutoApplied: v.optional(v.boolean()),
+  requiresApproval: v.optional(v.boolean()),
 
-  // Metadata and audit fields
-  ...metadataSchema,
+  // Classification
+  tags: v.optional(v.array(v.string())),
+  category: v.optional(v.string()),
+
+  // Required: Audit fields
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_publicId', ['publicId'])
-  .index('by_ownerId', ['ownerId'])
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_margin_id', ['marginId'])
+  .index('by_name', ['name'])
+  .index('by_owner', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_status', ['status'])
   .index('by_customer', ['customerId'])
-  .index('customer_active', ['customerId', 'isActive'])
-  .index('by_active', ['isActive'])
-  .index('by_next_review', ['nextReviewDate'])
-  .index('by_created', ['createdAt'])
-
-/**
- * Table exports
- */
-export default customerMarginsTable
-
-/**
- * USAGE NOTES:
- *
- * Margin Calculation Priority:
- * 1. Check route-specific margins first (if origin/destination match)
- * 2. Check service-specific margins (if service type matches)
- * 3. Check volume tiers (based on customer's monthly volume)
- * 4. Fall back to default margins
- *
- * For each level, apply dual margin system:
- * - finalMargin = Math.max(cost × marginPercentage/100, minimumMarginEUR)
- *
- * Review Schedule:
- * - Set nextReviewDate when creating/updating margins
- * - Query by_next_review index to find margins needing review
- * - Update lastReviewDate when review is completed
- *
- * Negotiated Rates:
- * - Set hasNegotiatedRates = true for custom pricing
- * - Track expiry with negotiatedRatesValidUntil
- * - Document terms in negotiatedRatesNotes
- *
- * Active Status:
- * - Use customer_active index for efficient lookups
- * - Only active margins should be used for pricing calculations
- * - Keep inactive margins for historical reference
- */
+  .index('by_service_type', ['serviceType'])
+  .index('by_approval_status', ['approvalStatus'])
+  .index('by_effective_from', ['effectiveFrom'])
+  .index('by_customer_and_status', ['customerId', 'status'])
+  .index('by_customer_and_service', ['customerId', 'serviceType'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_created_at', ['createdAt']);

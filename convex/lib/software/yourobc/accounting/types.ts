@@ -1,153 +1,111 @@
 // convex/lib/software/yourobc/accounting/types.ts
-/**
- * Accounting Library Types
- *
- * TypeScript types for accounting library functions, parameters, and return values.
- *
- * @module convex/lib/software/yourobc/accounting/types
- */
+// TypeScript type definitions for accounting module
 
-import { Id } from '../../../../_generated/dataModel'
+import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  AccountingStatus,
+  AccountingTransactionType,
+  AccountingReconciliationStatus,
+  AccountingApprovalStatus,
+} from '@/schema/software/yourobc/accounting/types';
 
-// Re-export types from schema
-export type {
-  IncomingInvoiceTracking,
-  InvoiceNumbering,
-  StatementOfAccounts,
-  AccountingDashboardCache,
-  InvoiceAutoGenLog,
-  IncomingInvoiceTrackingId,
-  InvoiceNumberingId,
-  StatementOfAccountsId,
-  AccountingDashboardCacheId,
-  InvoiceAutoGenLogId,
-  IncomingInvoiceStatus,
-  StatementTransactionType,
-  ExportFormat,
-  InvoiceAutoGenStatus,
-  StatementTransaction,
-  OutstandingInvoice,
-  OverdueBreakdown,
-  CashFlowItem,
-  CreateIncomingInvoiceTrackingInput,
-  UpdateIncomingInvoiceTrackingInput,
-  CreateInvoiceNumberingInput,
-  CreateStatementOfAccountsInput,
-  CreateDashboardCacheInput,
-  CreateInvoiceAutoGenLogInput,
-} from '../../../../schema/software/yourobc/accounting/types'
+// Entity types
+export type AccountingEntry = Doc<'softwareYourObcAccounting'>;
+export type AccountingEntryId = Id<'softwareYourObcAccounting'>;
 
-/**
- * Currency amount interface
- */
-export interface CurrencyAmount {
-  amount: number
-  currency: 'EUR' | 'USD'
-  exchangeRate?: number
-  exchangeRateDate?: number
+// Sub-types
+export interface AccountingAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
 }
 
-/**
- * Public ID generation options
- */
-export interface PublicIdOptions {
-  prefix: string
-  year: number
-  sequence: number
+// Data interfaces
+export interface CreateAccountingEntryData {
+  journalEntryNumber?: string; // Auto-generated if not provided
+  referenceNumber?: string;
+  status?: AccountingStatus;
+  transactionType: AccountingTransactionType;
+  transactionDate: number;
+  postingDate?: number;
+  debitAmount: number;
+  creditAmount: number;
+  currency: string;
+  debitAccountId?: string;
+  creditAccountId?: string;
+  accountCode?: string;
+  relatedInvoiceId?: Id<'yourobcInvoices'>;
+  relatedExpenseId?: string;
+  relatedShipmentId?: Id<'yourobcShipments'>;
+  relatedCustomerId?: Id<'yourobcCustomers'>;
+  relatedPartnerId?: Id<'yourobcPartners'>;
+  memo?: string;
+  description?: string;
+  taxAmount?: number;
+  taxRate?: number;
+  taxCategory?: string;
+  isTaxable?: boolean;
+  attachments?: AccountingAttachment[];
+  tags?: string[];
+  category?: string;
+  fiscalYear?: number;
+  fiscalPeriod?: number;
 }
 
-/**
- * Invoice number generation result
- */
-export interface InvoiceNumberResult {
-  invoiceNumber: string
-  year: number
-  month: number
-  sequence: number
+export interface UpdateAccountingEntryData {
+  referenceNumber?: string;
+  status?: AccountingStatus;
+  transactionType?: AccountingTransactionType;
+  transactionDate?: number;
+  postingDate?: number;
+  debitAmount?: number;
+  creditAmount?: number;
+  currency?: string;
+  debitAccountId?: string;
+  creditAccountId?: string;
+  accountCode?: string;
+  memo?: string;
+  description?: string;
+  taxAmount?: number;
+  taxRate?: number;
+  taxCategory?: string;
+  isTaxable?: boolean;
+  reconciliationStatus?: AccountingReconciliationStatus;
+  approvalStatus?: AccountingApprovalStatus;
+  approvalNotes?: string;
+  rejectionReason?: string;
+  attachments?: AccountingAttachment[];
+  tags?: string[];
+  category?: string;
 }
 
-/**
- * Dashboard metrics summary
- */
-export interface DashboardMetrics {
-  receivables: {
-    total: CurrencyAmount
-    current: CurrencyAmount
-    overdue: CurrencyAmount
-    breakdown: {
-      overdue1to30: CurrencyAmount
-      overdue31to60: CurrencyAmount
-      overdue61to90: CurrencyAmount
-      overdue90plus: CurrencyAmount
-    }
-  }
-  payables: {
-    total: CurrencyAmount
-    current: CurrencyAmount
-    overdue: CurrencyAmount
-  }
-  cashFlow: {
-    incoming: Array<{
-      date: number
-      amount: CurrencyAmount
-      description: string
-    }>
-    outgoing: Array<{
-      date: number
-      amount: CurrencyAmount
-      description: string
-    }>
-  }
-  dunning: {
-    level1: number
-    level2: number
-    level3: number
-    suspended: number
-  }
-  missingInvoices: {
-    count: number
-    value: CurrencyAmount
-  }
-  pendingApprovals: {
-    count: number
-    value: CurrencyAmount
-  }
+// Response types
+export interface AccountingEntryWithRelations extends AccountingEntry {
+  relatedInvoice?: Doc<'yourobcInvoices'> | null;
+  relatedShipment?: Doc<'yourobcShipments'> | null;
+  relatedCustomer?: Doc<'yourobcCustomers'> | null;
+  relatedPartner?: Doc<'yourobcPartners'> | null;
 }
 
-/**
- * Statement generation options
- */
-export interface StatementGenerationOptions {
-  customerId: Id<'yourobcCustomers'>
-  startDate: number
-  endDate: number
-  includeTransactions?: boolean
-  includeOutstandingInvoices?: boolean
+export interface AccountingEntryListResponse {
+  items: AccountingEntry[];
+  total: number;
+  hasMore: boolean;
 }
 
-/**
- * Reminder tracking info
- */
-export interface ReminderInfo {
-  remindersSent: number
-  lastReminderDate?: number
-  nextReminderDate?: number
-}
-
-/**
- * Invoice auto-gen notification result
- */
-export interface NotificationResult {
-  success: boolean
-  sentDate?: number
-  error?: string
-}
-
-/**
- * Overdue analysis result
- */
-export interface OverdueAnalysis {
-  daysOverdue: number
-  agingBucket: '1-30' | '31-60' | '61-90' | '90+'
-  isOverdue: boolean
+// Filter types
+export interface AccountingEntryFilters {
+  status?: AccountingStatus[];
+  transactionType?: AccountingTransactionType[];
+  reconciliationStatus?: AccountingReconciliationStatus[];
+  approvalStatus?: AccountingApprovalStatus[];
+  search?: string;
+  relatedInvoiceId?: Id<'yourobcInvoices'>;
+  relatedShipmentId?: Id<'yourobcShipments'>;
+  relatedCustomerId?: Id<'yourobcCustomers'>;
+  fiscalYear?: number;
+  fiscalPeriod?: number;
+  dateFrom?: number;
+  dateTo?: number;
 }

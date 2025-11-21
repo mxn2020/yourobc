@@ -1,78 +1,130 @@
 // convex/lib/software/yourobc/customers/types.ts
-// TypeScript interfaces for customers module
+// TypeScript type definitions for customers module
 
-import type { Id } from '@/generated/dataModel';
-import type {
-  Customer,
-  CustomerId,
-  CustomerStatus,
-  Currency,
-  PaymentMethod,
-  Contact,
-  Address,
-  EntityStats,
-} from '@/schema/software/yourobc/customers';
+import type { Doc, Id } from '@/generated/dataModel';
+import type { CustomerStatus, CustomerCurrency, CustomerPaymentMethod } from '@/schema/software/yourobc/customers/types';
 
-// Re-export schema types
-export type {
-  Customer,
-  CustomerId,
-  CustomerStatus,
-  Currency,
-  PaymentMethod,
-  Contact,
-  Address,
-  EntityStats,
-};
+// Entity types
+export type Customer = Doc<'yourobcCustomers'>;
+export type CustomerId = Id<'yourobcCustomers'>;
 
-/**
- * Customer query filters
- */
-export interface CustomerFilters {
-  status?: CustomerStatus;
-  ownerId?: Id<'userProfiles'>;
-  country?: string;
-  inquirySourceId?: Id<'yourobcInquirySources'>;
-  currency?: Currency;
-  includeDeleted?: boolean;
-  searchTerm?: string;
-}
-
-/**
- * Customer list options
- */
-export interface CustomerListOptions {
-  filters?: CustomerFilters;
-  limit?: number;
-  offset?: number;
-  sortBy?: 'companyName' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'asc' | 'desc';
-}
-
-/**
- * Customer suspension data
- */
-export interface CustomerSuspensionData {
-  reason: string;
+// Contact interface (matching schema)
+export interface ContactData {
+  name: string;
+  email?: string;
+  phone?: string;
+  isPrimary: boolean;
+  role?: string;
+  position?: string;
+  department?: string;
+  mobile?: string;
+  preferredContactMethod?: 'email' | 'phone' | 'mobile';
   notes?: string;
 }
 
-/**
- * Customer reactivation data
- */
-export interface CustomerReactivationData {
-  notes?: string;
+// Address interface (matching schema)
+export interface AddressData {
+  street?: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  countryCode: string;
 }
 
-/**
- * Customer statistics summary
- */
-export interface CustomerStatsSummary {
-  totalCustomers: number;
-  activeCustomers: number;
-  inactiveCustomers: number;
-  blacklistedCustomers: number;
-  suspendedCustomers: number;
+// Statistics interface (matching schema)
+export interface CustomerStats {
+  totalQuotes: number;
+  acceptedQuotes: number;
   totalRevenue: number;
-  averageRevenue: number;
+  lastQuoteDate?: number;
+  lastShipmentDate?: number;
+}
+
+// Data interfaces
+export interface CreateCustomerData {
+  companyName: string;
+  shortName?: string;
+  website?: string;
+  primaryContact: ContactData;
+  additionalContacts?: ContactData[];
+  billingAddress: AddressData;
+  shippingAddress?: AddressData;
+  defaultCurrency: CustomerCurrency;
+  paymentTerms: number;
+  paymentMethod: CustomerPaymentMethod;
+  margin: number;
+  status?: CustomerStatus;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
+  serviceSuspended?: boolean;
+  serviceSuspendedDate?: number;
+  serviceSuspendedReason?: string;
+  serviceReactivatedDate?: number;
+  notes?: string;
+  internalNotes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+}
+
+export interface UpdateCustomerData {
+  companyName?: string;
+  shortName?: string;
+  website?: string;
+  primaryContact?: ContactData;
+  additionalContacts?: ContactData[];
+  billingAddress?: AddressData;
+  shippingAddress?: AddressData;
+  defaultCurrency?: CustomerCurrency;
+  paymentTerms?: number;
+  paymentMethod?: CustomerPaymentMethod;
+  margin?: number;
+  status?: CustomerStatus;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
+  serviceSuspended?: boolean;
+  serviceSuspendedDate?: number;
+  serviceSuspendedReason?: string;
+  serviceReactivatedDate?: number;
+  notes?: string;
+  internalNotes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+}
+
+// Response types
+export interface CustomerWithRelations extends Customer {
+  inquirySource?: Doc<'yourobcInquirySources'> | null;
+}
+
+export interface CustomerListResponse {
+  items: Customer[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
+export interface CustomerFilters {
+  status?: CustomerStatus[];
+  currency?: CustomerCurrency[];
+  search?: string;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
+  country?: string;
+  serviceSuspended?: boolean;
+}
+
+// Stats response type
+export interface CustomerStatsResponse {
+  total: number;
+  byStatus: {
+    active: number;
+    inactive: number;
+    blacklisted: number;
+  };
+  byCurrency: {
+    EUR: number;
+    USD: number;
+  };
+  serviceSuspended: number;
+  averageMargin: number;
+  averagePaymentTerms: number;
 }

@@ -1,395 +1,471 @@
 // convex/lib/software/yourobc/employees/queries.ts
-/**
- * Query Operations for Employees Entity
- *
- * Provides query functions for retrieving employees and vacation data
- * with filtering, pagination, and permission checks.
- *
- * @module convex/lib/software/yourobc/employees/queries
- */
+// Read operations for employees module
 
-import { QueryCtx } from '../../../_generated/server'
-import { Id } from '../../../_generated/dataModel'
-import type {
-  Employee,
-  VacationDays,
-  EmployeeFilter,
-  VacationDaysFilter,
-} from './types'
-
-// ============================================================================
-// Employee Queries
-// ============================================================================
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { employeesValidators } from '@/schema/software/yourobc/employees/validators';
+import {
+  filterEmployeesByAccess,
+  filterVacationDaysByAccess,
+  requireViewEmployeeAccess,
+  requireViewVacationDaysAccess,
+  canViewSalary,
+} from './permissions';
+import type { EmployeeListResponse, VacationDaysListResponse, EmployeeStats, VacationStats } from './types';
 
 /**
- * Get employee by ID
+ * Get paginated list of employees with filtering
  */
-export async function getEmployeeById(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>
-): Promise<Employee | null> {
-  const employee = await ctx.db.get(employeeId)
-  if (!employee || employee.deletedAt) return null
-  return employee
-}
+export const getEmployees = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(employeesValidators.status)),
+      workStatus: v.optional(v.array(employeesValidators.workStatus)),
+      department: v.optional(v.string()),
+      position: v.optional(v.string()),
+      managerId: v.optional(v.id('yourobcEmployees')),
+      isActive: v.optional(v.boolean()),
+      isOnline: v.optional(v.boolean()),
+      search: v.optional(v.string()),
+    })),
+  },
+  handler: async (ctx, args): Promise<EmployeeListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
+
+    // Query with index
+    let employees = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    employees = await filterEmployeesByAccess(ctx, employees, user);
+
+    // Apply status filter
+    if (filters.status?.length) {
+      employees = employees.filter(item =>
+        filters.status!.includes(item.status)
+      );
+    }
+
+    // Apply work status filter
+    if (filters.workStatus?.length) {
+      employees = employees.filter(item =>
+        item.workStatus && filters.workStatus!.includes(item.workStatus)
+      );
+    }
+
+    // Apply department filter
+    if (filters.department) {
+      employees = employees.filter(item =>
+        item.department === filters.department
+      );
+    }
+
+    // Apply position filter
+    if (filters.position) {
+      employees = employees.filter(item =>
+        item.position === filters.position
+      );
+    }
+
+    // Apply manager filter
+    if (filters.managerId) {
+      employees = employees.filter(item =>
+        item.managerId === filters.managerId
+      );
+    }
+
+    // Apply isActive filter
+    if (filters.isActive !== undefined) {
+      employees = employees.filter(item => item.isActive === filters.isActive);
+    }
+
+    // Apply isOnline filter
+    if (filters.isOnline !== undefined) {
+      employees = employees.filter(item => item.isOnline === filters.isOnline);
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      employees = employees.filter(item =>
+        item.name.toLowerCase().includes(term) ||
+        (item.email && item.email.toLowerCase().includes(term)) ||
+        (item.employeeNumber && item.employeeNumber.toLowerCase().includes(term)) ||
+        (item.department && item.department.toLowerCase().includes(term)) ||
+        (item.position && item.position.toLowerCase().includes(term))
+      );
+    }
+
+    // Paginate
+    const total = employees.length;
+    const items = employees.slice(offset, offset + limit);
+
+    // Filter out salary information for users without permission
+    const itemsWithFilteredSalary = await Promise.all(
+      items.map(async (employee) => {
+        const canView = await canViewSalary(ctx, employee, user);
+        if (!canView && employee.salary !== undefined) {
+          const { salary, ...rest } = employee;
+          return rest as typeof employee;
+        }
+        return employee;
+      })
+    );
+
+    return {
+      items: itemsWithFilteredSalary,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
+
+/**
+ * Get single employee by ID
+ */
+export const getEmployee = query({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+  },
+  handler: async (ctx, { employeeId }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const employee = await ctx.db.get(employeeId);
+    if (!employee || employee.deletedAt) {
+      throw new Error('Employee not found');
+    }
+
+    await requireViewEmployeeAccess(ctx, employee, user);
+
+    // Filter salary if user doesn't have permission
+    const canView = await canViewSalary(ctx, employee, user);
+    if (!canView && employee.salary !== undefined) {
+      const { salary, ...rest } = employee;
+      return rest as typeof employee;
+    }
+
+    return employee;
+  },
+});
 
 /**
  * Get employee by public ID
  */
-export async function getEmployeeByPublicId(
-  ctx: QueryCtx,
-  publicId: string
-): Promise<Employee | null> {
-  const employee = await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-  return employee
-}
+export const getEmployeeByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const employee = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!employee) {
+      throw new Error('Employee not found');
+    }
+
+    await requireViewEmployeeAccess(ctx, employee, user);
+
+    // Filter salary if user doesn't have permission
+    const canView = await canViewSalary(ctx, employee, user);
+    if (!canView && employee.salary !== undefined) {
+      const { salary, ...rest } = employee;
+      return rest as typeof employee;
+    }
+
+    return employee;
+  },
+});
 
 /**
- * Get employee by auth user ID
+ * Get employee by user profile ID
  */
-export async function getEmployeeByAuthUserId(
-  ctx: QueryCtx,
-  authUserId: string
-): Promise<Employee | null> {
-  const employee = await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_authUserId', (q) => q.eq('authUserId', authUserId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-  return employee
-}
+export const getEmployeeByUserProfileId = query({
+  args: {
+    userProfileId: v.id('userProfiles'),
+  },
+  handler: async (ctx, { userProfileId }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const employee = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_userProfile', q => q.eq('userProfileId', userProfileId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!employee) {
+      throw new Error('Employee not found');
+    }
+
+    await requireViewEmployeeAccess(ctx, employee, user);
+
+    // Filter salary if user doesn't have permission
+    const canView = await canViewSalary(ctx, employee, user);
+    if (!canView && employee.salary !== undefined) {
+      const { salary, ...rest } = employee;
+      return rest as typeof employee;
+    }
+
+    return employee;
+  },
+});
 
 /**
- * Get employee by employee number
+ * Get employee statistics
  */
-export async function getEmployeeByEmployeeNumber(
-  ctx: QueryCtx,
-  employeeNumber: string
-): Promise<Employee | null> {
-  const employee = await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_employeeNumber', (q) => q.eq('employeeNumber', employeeNumber))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-  return employee
-}
+export const getEmployeeStats = query({
+  args: {},
+  handler: async (ctx): Promise<EmployeeStats> => {
+    const user = await requireCurrentUser(ctx);
+
+    const employees = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    const accessible = await filterEmployeesByAccess(ctx, employees, user);
+
+    const byStatus: Record<string, number> = {
+      active: 0,
+      inactive: 0,
+      terminated: 0,
+      on_leave: 0,
+      probation: 0,
+    };
+
+    const byDepartment: Record<string, number> = {};
+    const byEmploymentType: Record<string, number> = {};
+    let online = 0;
+    let onVacation = 0;
+
+    for (const employee of accessible) {
+      // Count by status
+      byStatus[employee.status] = (byStatus[employee.status] || 0) + 1;
+
+      // Count by department
+      if (employee.department) {
+        byDepartment[employee.department] = (byDepartment[employee.department] || 0) + 1;
+      }
+
+      // Count by employment type
+      if (employee.employmentType) {
+        byEmploymentType[employee.employmentType] = (byEmploymentType[employee.employmentType] || 0) + 1;
+      }
+
+      // Count online
+      if (employee.isOnline) {
+        online++;
+      }
+
+      // Count on vacation
+      if (employee.currentVacationStatus?.isOnVacation) {
+        onVacation++;
+      }
+    }
+
+    return {
+      total: accessible.length,
+      byStatus: byStatus as any,
+      byDepartment,
+      byEmploymentType,
+      online,
+      onVacation,
+    };
+  },
+});
 
 /**
- * List employees with filtering
+ * Get employees by manager
  */
-export async function listEmployees(
-  ctx: QueryCtx,
-  ownerId: string,
-  filter?: EmployeeFilter,
-  limit: number = 100
-): Promise<Employee[]> {
-  let query = ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
+export const getEmployeesByManager = query({
+  args: {
+    managerId: v.id('yourobcEmployees'),
+  },
+  handler: async (ctx, { managerId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // Apply filters
-  if (filter?.status) {
-    query = query.filter((q) => q.eq(q.field('status'), filter.status))
-  }
-  if (filter?.workStatus) {
-    query = query.filter((q) => q.eq(q.field('workStatus'), filter.workStatus))
-  }
-  if (filter?.isActive !== undefined) {
-    query = query.filter((q) => q.eq(q.field('isActive'), filter.isActive))
-  }
-  if (filter?.isOnline !== undefined) {
-    query = query.filter((q) => q.eq(q.field('isOnline'), filter.isOnline))
-  }
-  if (filter?.department) {
-    query = query.filter((q) => q.eq(q.field('department'), filter.department))
-  }
-  if (filter?.officeLocation) {
-    query = query.filter((q) =>
-      q.eq(q.field('office.location'), filter.officeLocation)
-    )
-  }
-  if (filter?.officeCountryCode) {
-    query = query.filter((q) =>
-      q.eq(q.field('office.countryCode'), filter.officeCountryCode)
-    )
-  }
-  if (filter?.managerId) {
-    query = query.filter((q) =>
-      q.eq(q.field('managerId'), filter.managerId as Id<'yourobcEmployees'>)
-    )
-  }
-  if (filter?.isOnVacation !== undefined) {
-    query = query.filter((q) =>
-      q.eq(q.field('currentVacationStatus.isOnVacation'), filter.isOnVacation)
-    )
-  }
+    const employees = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_manager', q => q.eq('managerId', managerId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  return await query.take(limit)
-}
+    const accessible = await filterEmployeesByAccess(ctx, employees, user);
 
-/**
- * Get employees by status
- */
-export async function getEmployeesByStatus(
-  ctx: QueryCtx,
-  ownerId: string,
-  status: string
-): Promise<Employee[]> {
-  return await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_status', (q) => q.eq('status', status))
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('ownerId'), ownerId),
-        q.eq(q.field('deletedAt'), undefined)
-      )
-    )
-    .collect()
-}
+    return accessible;
+  },
+});
 
 /**
  * Get employees by department
  */
-export async function getEmployeesByDepartment(
-  ctx: QueryCtx,
-  ownerId: string,
-  department: string
-): Promise<Employee[]> {
-  return await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_department', (q) => q.eq('department', department))
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('ownerId'), ownerId),
-        q.eq(q.field('deletedAt'), undefined)
-      )
-    )
-    .collect()
-}
+export const getEmployeesByDepartment = query({
+  args: {
+    department: v.string(),
+  },
+  handler: async (ctx, { department }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const employees = await ctx.db
+      .query('yourobcEmployees')
+      .withIndex('by_department', q => q.eq('department', department))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    const accessible = await filterEmployeesByAccess(ctx, employees, user);
+
+    return accessible;
+  },
+});
 
 /**
- * Get active online employees
+ * Get vacation days for employee
  */
-export async function getActiveOnlineEmployees(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<Employee[]> {
-  return await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_isOnline', (q) => q.eq('isOnline', true))
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('ownerId'), ownerId),
-        q.eq(q.field('isActive'), true),
-        q.eq(q.field('deletedAt'), undefined)
-      )
-    )
-    .collect()
-}
+export const getVacationDays = query({
+  args: {
+    employeeId: v.id('yourobcEmployees'),
+    year: v.optional(v.number()),
+  },
+  handler: async (ctx, { employeeId, year }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const currentYear = year || new Date().getFullYear();
+
+    const vacationDays = await ctx.db
+      .query('yourobcVacationDays')
+      .withIndex('by_employee_year', q => q.eq('employeeId', employeeId).eq('year', currentYear))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!vacationDays) {
+      return null;
+    }
+
+    await requireViewVacationDaysAccess(ctx, vacationDays, user);
+
+    return vacationDays;
+  },
+});
 
 /**
- * Get employees on vacation
+ * Get all vacation days records
  */
-export async function getEmployeesOnVacation(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<Employee[]> {
-  return await ctx.db
-    .query('yourobcEmployees')
-    .withIndex('by_vacation_status', (q) =>
-      q.eq('currentVacationStatus.isOnVacation', true)
-    )
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('ownerId'), ownerId),
-        q.eq(q.field('deletedAt'), undefined)
-      )
-    )
-    .collect()
-}
+export const getAllVacationDays = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      year: v.optional(v.number()),
+    })),
+  },
+  handler: async (ctx, args): Promise<VacationDaysListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-// ============================================================================
-// Vacation Days Queries
-// ============================================================================
+    let vacationDaysList = await ctx.db
+      .query('yourobcVacationDays')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    vacationDaysList = await filterVacationDaysByAccess(ctx, vacationDaysList, user);
+
+    // Apply employee filter
+    if (filters.employeeId) {
+      vacationDaysList = vacationDaysList.filter(item => item.employeeId === filters.employeeId);
+    }
+
+    // Apply year filter
+    if (filters.year) {
+      vacationDaysList = vacationDaysList.filter(item => item.year === filters.year);
+    }
+
+    // Paginate
+    const total = vacationDaysList.length;
+    const items = vacationDaysList.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get vacation days by ID
+ * Get vacation statistics
  */
-export async function getVacationDaysById(
-  ctx: QueryCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>
-): Promise<VacationDays | null> {
-  const vacationDays = await ctx.db.get(vacationDaysId)
-  if (!vacationDays || vacationDays.deletedAt) return null
-  return vacationDays
-}
+export const getVacationStats = query({
+  args: {
+    employeeId: v.optional(v.id('yourobcEmployees')),
+    year: v.optional(v.number()),
+  },
+  handler: async (ctx, { employeeId, year }): Promise<VacationStats> => {
+    const user = await requireCurrentUser(ctx);
+    const currentYear = year || new Date().getFullYear();
 
-/**
- * Get vacation days by public ID
- */
-export async function getVacationDaysByPublicId(
-  ctx: QueryCtx,
-  publicId: string
-): Promise<VacationDays | null> {
-  const vacationDays = await ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-  return vacationDays
-}
+    let query = ctx.db
+      .query('yourobcVacationDays')
+      .withIndex('by_year', q => q.eq('year', currentYear))
+      .filter(q => q.eq(q.field('deletedAt'), undefined));
 
-/**
- * Get vacation days for employee and year
- */
-export async function getVacationDaysByEmployeeYear(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  year: number
-): Promise<VacationDays | null> {
-  const vacationDays = await ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_employee_year', (q) =>
-      q.eq('employeeId', employeeId).eq('year', year)
-    )
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-  return vacationDays
-}
+    const vacationDaysList = await query.collect();
+    const accessible = await filterVacationDaysByAccess(ctx, vacationDaysList, user);
 
-/**
- * List vacation days for employee
- */
-export async function listVacationDaysForEmployee(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>
-): Promise<VacationDays[]> {
-  return await ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_employee', (q) => q.eq('employeeId', employeeId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
-}
+    // Filter by employee if specified
+    const filtered = employeeId
+      ? accessible.filter(item => item.employeeId === employeeId)
+      : accessible;
 
-/**
- * List vacation days with filtering
- */
-export async function listVacationDays(
-  ctx: QueryCtx,
-  ownerId: string,
-  filter?: VacationDaysFilter,
-  limit: number = 100
-): Promise<VacationDays[]> {
-  let query = ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
+    let totalDays = 0;
+    let usedDays = 0;
+    let pendingDays = 0;
+    let remainingDays = 0;
+    const byType: Record<string, number> = {
+      annual: 0,
+      sick: 0,
+      personal: 0,
+      maternity: 0,
+      paternity: 0,
+      unpaid: 0,
+      bereavement: 0,
+      other: 0,
+    };
 
-  // Apply filters
-  if (filter?.employeeId) {
-    query = query.filter((q) =>
-      q.eq(q.field('employeeId'), filter.employeeId as Id<'yourobcEmployees'>)
-    )
-  }
-  if (filter?.year) {
-    query = query.filter((q) => q.eq(q.field('year'), filter.year))
-  }
-  if (filter?.hasAvailableDays) {
-    query = query.filter((q) => q.gt(q.field('remaining'), 0))
-  }
-  if (filter?.hasPendingRequests) {
-    query = query.filter((q) => q.gt(q.field('pending'), 0))
-  }
+    for (const vacationDays of filtered) {
+      totalDays += vacationDays.annualEntitlement + vacationDays.carryoverDays;
+      usedDays += vacationDays.used;
+      pendingDays += vacationDays.pending;
+      remainingDays += vacationDays.remaining;
 
-  return await query.take(limit)
-}
-
-/**
- * Get vacation days by year
- */
-export async function getVacationDaysByYear(
-  ctx: QueryCtx,
-  ownerId: string,
-  year: number
-): Promise<VacationDays[]> {
-  return await ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_year', (q) => q.eq('year', year))
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('ownerId'), ownerId),
-        q.eq(q.field('deletedAt'), undefined)
-      )
-    )
-    .collect()
-}
-
-/**
- * Get pending vacation requests
- */
-export async function getPendingVacationRequests(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<VacationDays[]> {
-  const allVacationDays = await ctx.db
-    .query('yourobcVacationDays')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
-
-  // Filter for those with pending entries
-  return allVacationDays.filter((vd) =>
-    vd.entries.some((entry) => entry.status === 'pending')
-  )
-}
-
-// ============================================================================
-// Vacation Entry Queries
-// ============================================================================
-
-/**
- * Get vacation entry by ID within vacation days
- */
-export async function getVacationEntry(
-  ctx: QueryCtx,
-  vacationDaysId: Id<'yourobcVacationDays'>,
-  entryId: string
-) {
-  const vacationDays = await getVacationDaysById(ctx, vacationDaysId)
-  if (!vacationDays) return null
-
-  const entry = vacationDays.entries.find((e) => e.entryId === entryId)
-  return entry || null
-}
-
-/**
- * Get approved vacation entries for date range
- */
-export async function getApprovedVacationsInRange(
-  ctx: QueryCtx,
-  employeeId: Id<'yourobcEmployees'>,
-  startDate: number,
-  endDate: number
-) {
-  const allVacationDays = await listVacationDaysForEmployee(ctx, employeeId)
-
-  const overlappingEntries = []
-  for (const vd of allVacationDays) {
-    for (const entry of vd.entries) {
-      if (
-        entry.status === 'approved' &&
-        entry.startDate <= endDate &&
-        entry.endDate >= startDate
-      ) {
-        overlappingEntries.push({ vacationDaysId: vd._id, entry })
+      // Count by type
+      for (const entry of vacationDays.entries) {
+        if (entry.status === 'approved' || entry.status === 'completed') {
+          byType[entry.type] = (byType[entry.type] || 0) + entry.days;
+        }
       }
     }
-  }
 
-  return overlappingEntries
-}
+    return {
+      totalDays,
+      usedDays,
+      pendingDays,
+      remainingDays,
+      byType: byType as any,
+    };
+  },
+});

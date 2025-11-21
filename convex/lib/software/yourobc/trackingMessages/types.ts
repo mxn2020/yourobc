@@ -1,168 +1,99 @@
 // convex/lib/software/yourobc/trackingMessages/types.ts
-/**
- * Tracking Messages Library Types
- *
- * TypeScript types and interfaces for tracking messages business logic.
- * Extends schema types with additional runtime and API types.
- *
- * @module convex/lib/software/yourobc/trackingMessages/types
- */
+// TypeScript type definitions for trackingMessages module
 
-import { Doc, Id } from '../../../../_generated/dataModel'
+import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  TrackingMessagesStatus,
+  TrackingMessagesType,
+  TrackingMessagesPriority,
+  TrackingMessagesDeliveryChannel,
+} from '@/schema/software/yourobc/trackingMessages/types';
 
-// ============================================================================
-// Document Types
-// ============================================================================
+// Entity types
+export type TrackingMessage = Doc<'softwareYourObcTrackingMessages'>;
+export type TrackingMessageId = Id<'softwareYourObcTrackingMessages'>;
 
-/**
- * Tracking message document type
- */
-export type TrackingMessage = Doc<'trackingMessages'>
-
-/**
- * Tracking message ID type
- */
-export type TrackingMessageId = Id<'trackingMessages'>
-
-// ============================================================================
-// Create/Update Types
-// ============================================================================
-
-/**
- * Fields required to create a new tracking message
- */
-export interface CreateTrackingMessageInput {
-  name: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  serviceType: string
-  status: string
-  language: string
-  subject?: string
-  template: string
-  variables?: string[]
-  isActive?: boolean
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, any>
-  useCase?: string
-  difficulty?: string
-  visibility?: string
-  isOfficial?: boolean
+// Sub-types
+export interface MessageRecipient {
+  email?: string;
+  phone?: string;
+  name?: string;
+  userId?: Id<'userProfiles'>;
 }
 
-/**
- * Fields that can be updated on an existing tracking message
- */
-export interface UpdateTrackingMessageInput {
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  serviceType?: string
-  status?: string
-  language?: string
-  subject?: string
-  template?: string
-  variables?: string[]
-  isActive?: boolean
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, any>
-  useCase?: string
-  difficulty?: string
-  visibility?: string
-  isOfficial?: boolean
+export interface MessageAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+  size?: number;
 }
 
-// ============================================================================
-// Query Types
-// ============================================================================
+export interface TimelineEvent {
+  id: string;
+  timestamp: number;
+  event: string;
+  description?: string;
+  userId?: Id<'userProfiles'>;
+}
 
-/**
- * Filter options for tracking message queries
- */
+export interface RoutingInfo {
+  origin?: string;
+  destination?: string;
+  currentLocation?: string;
+  estimatedDelivery?: number;
+}
+
+// Data interfaces
+export interface CreateTrackingMessageData {
+  messageId?: string; // Auto-generated if not provided
+  subject?: string;
+  content: string;
+  status?: TrackingMessagesStatus;
+  messageType: TrackingMessagesType;
+  priority?: TrackingMessagesPriority;
+  templateId?: string;
+  shipmentId?: Id<'yourobcShipments'>;
+  shipmentNumber?: string;
+  recipients: MessageRecipient[];
+  deliveryChannel?: TrackingMessagesDeliveryChannel;
+  attachments?: MessageAttachment[];
+  routingInfo?: RoutingInfo;
+  tags?: string[];
+  category?: string;
+}
+
+export interface UpdateTrackingMessageData {
+  subject?: string;
+  content?: string;
+  status?: TrackingMessagesStatus;
+  messageType?: TrackingMessagesType;
+  priority?: TrackingMessagesPriority;
+  recipients?: MessageRecipient[];
+  deliveryChannel?: TrackingMessagesDeliveryChannel;
+  attachments?: MessageAttachment[];
+  routingInfo?: RoutingInfo;
+  tags?: string[];
+  category?: string;
+}
+
+// Response types
+export interface TrackingMessageWithRelations extends TrackingMessage {
+  shipment?: Doc<'yourobcShipments'> | null;
+}
+
+export interface TrackingMessageListResponse {
+  items: TrackingMessage[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
 export interface TrackingMessageFilters {
-  serviceType?: string
-  status?: string
-  language?: string
-  isActive?: boolean
-  isOfficial?: boolean
-  category?: string
-  ownerId?: string
-  includeDeleted?: boolean
-}
-
-/**
- * Pagination options
- */
-export interface PaginationOptions {
-  limit?: number
-  cursor?: string
-}
-
-/**
- * Search options for tracking messages
- */
-export interface SearchTrackingMessagesOptions extends TrackingMessageFilters {
-  searchTerm?: string
-  sortBy?: 'createdAt' | 'updatedAt' | 'name' | 'usageCount'
-  sortOrder?: 'asc' | 'desc'
-  pagination?: PaginationOptions
-}
-
-// ============================================================================
-// Template Processing Types
-// ============================================================================
-
-/**
- * Variable substitution data for template rendering
- */
-export interface TemplateVariableData {
-  [key: string]: string | number | boolean | null | undefined
-}
-
-/**
- * Rendered template result
- */
-export interface RenderedTemplate {
-  subject?: string
-  body: string
-  missingVariables: string[]
-}
-
-// ============================================================================
-// Statistics Types
-// ============================================================================
-
-/**
- * Usage statistics for a tracking message template
- */
-export interface TrackingMessageStats {
-  usageCount: number
-  rating?: number
-  ratingCount?: number
-  lastUsedAt?: number
-}
-
-// ============================================================================
-// Permission Types
-// ============================================================================
-
-/**
- * Permission check result
- */
-export interface PermissionCheckResult {
-  allowed: boolean
-  reason?: string
-}
-
-/**
- * Permission context for authorization checks
- */
-export interface PermissionContext {
-  userId: string
-  trackingMessage?: TrackingMessage
-  action: 'read' | 'create' | 'update' | 'delete'
+  status?: TrackingMessagesStatus[];
+  messageType?: TrackingMessagesType[];
+  priority?: TrackingMessagesPriority[];
+  shipmentId?: Id<'yourobcShipments'>;
+  search?: string;
+  unreadOnly?: boolean;
 }

@@ -1,49 +1,36 @@
 // convex/schema/software/yourobc/trackingMessages/validators.ts
-/**
- * Tracking Messages Validators
- *
- * Defines Convex validators for tracking message templates.
- * These validators ensure data integrity for message templates used in
- * shipment notifications across different statuses, languages, and service types.
- *
- * @module convex/schema/software/yourobc/trackingMessages/validators
- */
+// Grouped validators for trackingMessages module
 
-import { v } from 'convex/values'
-
-// ============================================================================
-// Message Status Validators
-// ============================================================================
-
-/**
- * Message template status validator
- * Tracks whether a message template is active or inactive
- */
-export const messageTemplateStatusValidator = v.union(
-  v.literal('active'),
-  v.literal('inactive'),
-  v.literal('draft'),
-  v.literal('archived')
-)
-
-/**
- * Template variable validator
- * Validates individual template variables like {customerName}, {trackingNumber}, etc.
- */
-export const templateVariableValidator = v.string()
-
-/**
- * Template variables array validator
- * List of all variables used in the template
- */
-export const templateVariablesValidator = v.array(templateVariableValidator)
-
-// ============================================================================
-// Export Validators
-// ============================================================================
+import { v } from 'convex/values';
 
 export const trackingMessagesValidators = {
-  messageTemplateStatus: messageTemplateStatusValidator,
-  templateVariable: templateVariableValidator,
-  templateVariables: templateVariablesValidator,
-} as const
+  status: v.union(
+    v.literal('draft'),
+    v.literal('sent'),
+    v.literal('delivered'),
+    v.literal('read'),
+    v.literal('archived')
+  ),
+
+  messageType: v.union(
+    v.literal('event'),
+    v.literal('note'),
+    v.literal('alert'),
+    v.literal('update'),
+    v.literal('notification')
+  ),
+
+  priority: v.union(
+    v.literal('low'),
+    v.literal('normal'),
+    v.literal('high'),
+    v.literal('urgent')
+  ),
+
+  deliveryChannel: v.union(
+    v.literal('email'),
+    v.literal('sms'),
+    v.literal('push'),
+    v.literal('internal')
+  ),
+} as const;

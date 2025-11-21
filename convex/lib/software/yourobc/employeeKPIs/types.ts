@@ -1,126 +1,66 @@
 // convex/lib/software/yourobc/employeeKPIs/types.ts
-/**
- * Employee KPIs Library Types
- *
- * TypeScript types for employee KPIs and targets operations.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/types
- */
+// TypeScript type definitions for employeeKPIs module
 
-import { Id } from '../../../_generated/dataModel'
-import type { RankByMetric } from '../../../schema/yourobc/base'
+import type { Doc, Id } from '@/generated/dataModel';
+import type { EmployeeKPIsStatus, EmployeeKPIsPeriod } from '@/schema/software/yourobc/employeeKPIs/types';
 
-/**
- * KPI creation arguments
- */
-export interface CreateKPIArgs {
-  publicId: string
-  ownerId: string
-  employeeId: Id<'yourobcEmployees'>
-  year: number
-  month: number
-  quotesCreated: number
-  quotesConverted: number
-  quotesValue: number
-  convertedValue: number
-  ordersProcessed: number
-  ordersCompleted: number
-  ordersValue: number
-  averageOrderValue: number
-  commissionsEarned: number
-  commissionsPaid: number
-  commissionsPending: number
-  conversionRate: number
-  averageQuoteValue: number
-  customerRetentionRate?: number
-  rank?: number
-  rankBy?: RankByMetric
-  tags?: string[]
-  category?: string
+// Entity types
+export type EmployeeKPI = Doc<'yourobcEmployeeKPIs'>;
+export type EmployeeKPIId = Id<'yourobcEmployeeKPIs'>;
+
+// Data interfaces
+export interface CreateEmployeeKPIData {
+  employeeId: Id<'yourobcEmployees'>;
+  kpiName: string;
+  metricType: string;
+  description?: string;
+  targetValue: number;
+  currentValue: number;
+  period: EmployeeKPIsPeriod;
+  year: number;
+  month?: number;
+  quarter?: number;
+  week?: number;
+  day?: number;
+  startDate: number;
+  endDate: number;
+  warningThreshold?: number;
+  criticalThreshold?: number;
+  status?: EmployeeKPIsStatus;
+  notes?: string;
 }
 
-/**
- * KPI update arguments
- */
-export interface UpdateKPIArgs {
-  id: Id<'yourobcEmployeeKPIs'>
-  quotesCreated?: number
-  quotesConverted?: number
-  quotesValue?: number
-  convertedValue?: number
-  ordersProcessed?: number
-  ordersCompleted?: number
-  ordersValue?: number
-  averageOrderValue?: number
-  commissionsEarned?: number
-  commissionsPaid?: number
-  commissionsPending?: number
-  conversionRate?: number
-  averageQuoteValue?: number
-  customerRetentionRate?: number
-  rank?: number
-  rankBy?: RankByMetric
-  tags?: string[]
-  category?: string
+export interface UpdateEmployeeKPIData {
+  kpiName?: string;
+  metricType?: string;
+  description?: string;
+  targetValue?: number;
+  currentValue?: number;
+  historicalData?: Array<{
+    date: number;
+    value: number;
+    note?: string;
+  }>;
+  previousPeriodValue?: number;
+  warningThreshold?: number;
+  criticalThreshold?: number;
+  status?: EmployeeKPIsStatus;
+  notes?: string;
 }
 
-/**
- * Target creation arguments
- */
-export interface CreateTargetArgs {
-  publicId: string
-  ownerId: string
-  employeeId: Id<'yourobcEmployees'>
-  kpiId?: Id<'yourobcEmployeeKPIs'>
-  year: number
-  month?: number
-  quarter?: number
-  period: string
-  quotesTarget?: number
-  ordersTarget?: number
-  revenueTarget?: number
-  conversionTarget?: number
-  commissionsTarget?: number
-  setBy: string
-  notes?: string
-  tags?: string[]
-  category?: string
+// Response types
+export interface EmployeeKPIListResponse {
+  items: EmployeeKPI[];
+  total: number;
+  hasMore: boolean;
 }
 
-/**
- * Target update arguments
- */
-export interface UpdateTargetArgs {
-  id: Id<'yourobcEmployeeTargets'>
-  kpiId?: Id<'yourobcEmployeeKPIs'>
-  quotesTarget?: number
-  ordersTarget?: number
-  revenueTarget?: number
-  conversionTarget?: number
-  commissionsTarget?: number
-  notes?: string
-  tags?: string[]
-  category?: string
-}
-
-/**
- * KPI calculation result
- */
-export interface KPICalculationResult {
-  conversionRate: number
-  averageQuoteValue: number
-  averageOrderValue: number
-  rank?: number
-  rankBy?: RankByMetric
-}
-
-/**
- * Target achievement result
- */
-export interface TargetAchievementResult {
-  quotesAchievement: number
-  ordersAchievement: number
-  revenueAchievement: number
-  conversionAchievement: number
-  overallAchievement: number
+// Filter types
+export interface EmployeeKPIFilters {
+  status?: EmployeeKPIsStatus[];
+  period?: EmployeeKPIsPeriod[];
+  employeeId?: Id<'yourobcEmployees'>;
+  year?: number;
+  month?: number;
+  metricType?: string;
 }

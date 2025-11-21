@@ -1,431 +1,414 @@
 // convex/lib/software/yourobc/partners/mutations.ts
 // Write operations for partners module
 
+import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
-import type { MutationCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { partnersValidators } from '@/schema/software/yourobc/partners/validators';
+import { partnerServiceTypeValidator, currencyValidator, addressSchema, contactSchema, serviceCoverageSchema } from '@/schema/yourobc/base';
 import { PARTNERS_CONSTANTS } from './constants';
-import { validatePartnerData, validatePartnerUpdateData, generatePartnerCode } from './utils';
-import {
-  canEditPartner,
-  canDeletePartner,
-  canRestorePartner,
-  canChangePartnerStatus,
-  canTransferPartnerOwnership,
-  requireAdminAccess,
-} from './permissions';
-import type { CreatePartnerInput, UpdatePartnerInput } from './types';
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
+import { validatePartnerData } from './utils';
+import { requireEditPartnerAccess, requireDeletePartnerAccess, canEditPartner, canDeletePartner } from './permissions';
+import type { PartnerId } from './types';
 
 /**
- * Generate a unique public ID for a partner
+ * Create new partner
  */
-async function generateUniquePublicId(ctx: MutationCtx, prefix: string = 'ptn_'): Promise<string> {
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const timestamp = Date.now().toString(36);
-  return `${prefix}${timestamp}${randomString}`;
-}
+export const createPartner = mutation({
+  args: {
+    data: v.object({
+      companyName: v.string(),
+      shortName: v.optional(v.string()),
+      partnerCode: v.optional(v.string()),
+      primaryContact: contactSchema,
+      quotingEmail: v.optional(v.string()),
+      address: addressSchema,
+      serviceCoverage: serviceCoverageSchema,
+      serviceType: partnerServiceTypeValidator,
+      preferredCurrency: currencyValidator,
+      paymentTerms: v.number(),
+      ranking: v.optional(v.number()),
+      rankingNotes: v.optional(v.string()),
+      internalPaymentNotes: v.optional(v.string()),
+      serviceCapabilities: v.optional(v.object({
+        handlesCustoms: v.optional(v.boolean()),
+        handlesPickup: v.optional(v.boolean()),
+        handlesDelivery: v.optional(v.boolean()),
+        handlesNFO: v.optional(v.boolean()),
+        handlesTrucking: v.optional(v.boolean()),
+      })),
+      commissionRate: v.optional(v.number()),
+      apiEnabled: v.optional(v.boolean()),
+      apiKey: v.optional(v.string()),
+      apiEndpoint: v.optional(v.string()),
+      status: v.optional(partnersValidators.status),
+      notes: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<PartnerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-/**
- * Get current user or throw error
- */
-async function requireCurrentUser(ctx: MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, PARTNERS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  // Get user profile by auth subject
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
-
-  if (!user) {
-    throw new Error('User profile not found');
-  }
-
-  return user;
-}
-
-// ============================================================================
-// Partner Mutations
-// ============================================================================
-
-/**
- * Create partner
- */
-export async function createPartner(
-  ctx: MutationCtx,
-  data: CreatePartnerInput
-): Promise<Id<'yourobcPartners'>> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. VALIDATE: Check data validity
-  validatePartnerData(data);
-
-  // 3. CHECK: Ensure company name doesn't already exist
-  const existingPartner = await ctx.db
-    .query('yourobcPartners')
-    .withIndex('by_company_name', (q) => q.eq('companyName', data.companyName))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first();
-
-  if (existingPartner) {
-    throw new Error(`Partner with company name "${data.companyName}" already exists`);
-  }
-
-  // 4. PROCESS: Generate IDs and prepare data
-  const publicId = await generateUniquePublicId(ctx);
-  const partnerCode = data.partnerCode || generatePartnerCode(data.companyName);
-  const now = Date.now();
-
-  // 5. CREATE: Insert into database
-  const partnerId = await ctx.db.insert('yourobcPartners', {
-    publicId,
-    companyName: data.companyName.trim(),
-    shortName: data.shortName?.trim(),
-    partnerCode,
-    ownerId: user.authUserId, // Use authUserId instead of _id
-    primaryContact: data.primaryContact,
-    quotingEmail: data.quotingEmail?.trim(),
-    address: data.address,
-    serviceCoverage: data.serviceCoverage,
-    serviceType: data.serviceType,
-    preferredCurrency: data.preferredCurrency,
-    paymentTerms: data.paymentTerms,
-    ranking: data.ranking,
-    rankingNotes: data.rankingNotes?.trim(),
-    internalPaymentNotes: data.internalPaymentNotes?.trim(),
-    serviceCapabilities: data.serviceCapabilities || PARTNERS_CONSTANTS.DEFAULT_VALUES.SERVICE_CAPABILITIES,
-    status: (data.status as any) || PARTNERS_CONSTANTS.DEFAULT_VALUES.STATUS,
-    notes: data.notes?.trim(),
-    tags: data.tags || [],
-    category: data.category,
-    customFields: {},
-    createdAt: now,
-    createdBy: user.authUserId,
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-
-  return partnerId;
-}
-
-/**
- * Update partner
- */
-export async function updatePartner(
-  ctx: MutationCtx,
-  partnerId: Id<'yourobcPartners'>,
-  data: UpdatePartnerInput
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check edit permissions
-  const canEdit = await canEditPartner(ctx, partner, user);
-  if (!canEdit) {
-    throw new Error('You do not have permission to edit this partner');
-  }
-
-  // 4. VALIDATE: Check update data validity
-  validatePartnerUpdateData(data);
-
-  // 5. CHECK: If updating company name, ensure it doesn't conflict
-  if (data.companyName && data.companyName !== partner.companyName) {
-    const existingPartner = await ctx.db
-      .query('yourobcPartners')
-      .withIndex('by_company_name', (q) => q.eq('companyName', data.companyName!))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first();
-
-    if (existingPartner && existingPartner._id !== partnerId) {
-      throw new Error(`Partner with company name "${data.companyName}" already exists`);
+    // 3. VALIDATE: Check data validity
+    const errors = validatePartnerData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
-  }
 
-  // 6. UPDATE: Prepare update object
-  const now = Date.now();
-  const updates: any = {
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  };
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'yourobcPartners');
+    const now = Date.now();
 
-  // Only include fields that are being updated
-  if (data.companyName !== undefined) updates.companyName = data.companyName.trim();
-  if (data.shortName !== undefined) updates.shortName = data.shortName?.trim();
-  if (data.partnerCode !== undefined) updates.partnerCode = data.partnerCode?.trim();
-  if (data.primaryContact !== undefined) updates.primaryContact = data.primaryContact;
-  if (data.quotingEmail !== undefined) updates.quotingEmail = data.quotingEmail?.trim();
-  if (data.address !== undefined) updates.address = data.address;
-  if (data.serviceCoverage !== undefined) updates.serviceCoverage = data.serviceCoverage;
-  if (data.serviceType !== undefined) updates.serviceType = data.serviceType;
-  if (data.preferredCurrency !== undefined) updates.preferredCurrency = data.preferredCurrency;
-  if (data.paymentTerms !== undefined) updates.paymentTerms = data.paymentTerms;
-  if (data.ranking !== undefined) updates.ranking = data.ranking;
-  if (data.rankingNotes !== undefined) updates.rankingNotes = data.rankingNotes?.trim();
-  if (data.internalPaymentNotes !== undefined) updates.internalPaymentNotes = data.internalPaymentNotes?.trim();
-  if (data.serviceCapabilities !== undefined) updates.serviceCapabilities = data.serviceCapabilities;
-  if (data.status !== undefined) updates.status = data.status;
-  if (data.notes !== undefined) updates.notes = data.notes?.trim();
-  if (data.tags !== undefined) updates.tags = data.tags;
-  if (data.category !== undefined) updates.category = data.category;
+    // 5. CREATE: Insert into database
+    const partnerId = await ctx.db.insert('yourobcPartners', {
+      publicId,
+      companyName: data.companyName.trim(),
+      shortName: data.shortName?.trim(),
+      partnerCode: data.partnerCode?.trim(),
+      primaryContact: data.primaryContact,
+      quotingEmail: data.quotingEmail?.trim(),
+      address: data.address,
+      serviceCoverage: data.serviceCoverage,
+      serviceType: data.serviceType,
+      preferredCurrency: data.preferredCurrency,
+      paymentTerms: data.paymentTerms,
+      ranking: data.ranking,
+      rankingNotes: data.rankingNotes?.trim(),
+      internalPaymentNotes: data.internalPaymentNotes?.trim(),
+      serviceCapabilities: data.serviceCapabilities,
+      commissionRate: data.commissionRate,
+      apiEnabled: data.apiEnabled,
+      apiKey: data.apiKey?.trim(),
+      apiEndpoint: data.apiEndpoint?.trim(),
+      status: data.status || 'active',
+      notes: data.notes?.trim(),
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  // 7. PERSIST: Update in database
-  await ctx.db.patch(partnerId, updates);
-}
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.created',
+      entityType: 'system_partners',
+      entityId: publicId,
+      entityTitle: data.companyName.trim(),
+      description: `Created partner: ${data.companyName.trim()}`,
+      metadata: {
+        status: data.status || 'active',
+        serviceType: data.serviceType,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 7. RETURN: Return entity ID
+    return partnerId;
+  },
+});
+
+/**
+ * Update existing partner
+ */
+export const updatePartner = mutation({
+  args: {
+    partnerId: v.id('yourobcPartners'),
+    updates: v.object({
+      companyName: v.optional(v.string()),
+      shortName: v.optional(v.string()),
+      partnerCode: v.optional(v.string()),
+      primaryContact: v.optional(contactSchema),
+      quotingEmail: v.optional(v.string()),
+      address: v.optional(addressSchema),
+      serviceCoverage: v.optional(serviceCoverageSchema),
+      serviceType: v.optional(partnerServiceTypeValidator),
+      preferredCurrency: v.optional(currencyValidator),
+      paymentTerms: v.optional(v.number()),
+      ranking: v.optional(v.number()),
+      rankingNotes: v.optional(v.string()),
+      internalPaymentNotes: v.optional(v.string()),
+      serviceCapabilities: v.optional(v.object({
+        handlesCustoms: v.optional(v.boolean()),
+        handlesPickup: v.optional(v.boolean()),
+        handlesDelivery: v.optional(v.boolean()),
+        handlesNFO: v.optional(v.boolean()),
+        handlesTrucking: v.optional(v.boolean()),
+      })),
+      commissionRate: v.optional(v.number()),
+      apiEnabled: v.optional(v.boolean()),
+      apiKey: v.optional(v.string()),
+      apiEndpoint: v.optional(v.string()),
+      status: v.optional(partnersValidators.status),
+      notes: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { partnerId, updates }): Promise<PartnerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const partner = await ctx.db.get(partnerId);
+    if (!partner || partner.deletedAt) {
+      throw new Error('Partner not found');
+    }
+
+    // 3. AUTHZ: Check edit permission
+    await requireEditPartnerAccess(ctx, partner, user);
+
+    // 4. VALIDATE: Check update data validity
+    const errors = validatePartnerData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (updates.companyName !== undefined) {
+      updateData.companyName = updates.companyName.trim();
+    }
+    if (updates.shortName !== undefined) {
+      updateData.shortName = updates.shortName?.trim();
+    }
+    if (updates.partnerCode !== undefined) {
+      updateData.partnerCode = updates.partnerCode?.trim();
+    }
+    if (updates.primaryContact !== undefined) {
+      updateData.primaryContact = updates.primaryContact;
+    }
+    if (updates.quotingEmail !== undefined) {
+      updateData.quotingEmail = updates.quotingEmail?.trim();
+    }
+    if (updates.address !== undefined) {
+      updateData.address = updates.address;
+    }
+    if (updates.serviceCoverage !== undefined) {
+      updateData.serviceCoverage = updates.serviceCoverage;
+    }
+    if (updates.serviceType !== undefined) {
+      updateData.serviceType = updates.serviceType;
+    }
+    if (updates.preferredCurrency !== undefined) {
+      updateData.preferredCurrency = updates.preferredCurrency;
+    }
+    if (updates.paymentTerms !== undefined) {
+      updateData.paymentTerms = updates.paymentTerms;
+    }
+    if (updates.ranking !== undefined) {
+      updateData.ranking = updates.ranking;
+    }
+    if (updates.rankingNotes !== undefined) {
+      updateData.rankingNotes = updates.rankingNotes?.trim();
+    }
+    if (updates.internalPaymentNotes !== undefined) {
+      updateData.internalPaymentNotes = updates.internalPaymentNotes?.trim();
+    }
+    if (updates.serviceCapabilities !== undefined) {
+      updateData.serviceCapabilities = updates.serviceCapabilities;
+    }
+    if (updates.commissionRate !== undefined) {
+      updateData.commissionRate = updates.commissionRate;
+    }
+    if (updates.apiEnabled !== undefined) {
+      updateData.apiEnabled = updates.apiEnabled;
+    }
+    if (updates.apiKey !== undefined) {
+      updateData.apiKey = updates.apiKey?.trim();
+    }
+    if (updates.apiEndpoint !== undefined) {
+      updateData.apiEndpoint = updates.apiEndpoint?.trim();
+    }
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+    }
+    if (updates.notes !== undefined) {
+      updateData.notes = updates.notes?.trim();
+    }
+
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(partnerId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.updated',
+      entityType: 'system_partners',
+      entityId: partner.publicId,
+      entityTitle: updateData.companyName || partner.companyName,
+      description: `Updated partner: ${updateData.companyName || partner.companyName}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return partnerId;
+  },
+});
 
 /**
  * Delete partner (soft delete)
  */
-export async function deletePartner(ctx: MutationCtx, partnerId: Id<'yourobcPartners'>): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const deletePartner = mutation({
+  args: {
+    partnerId: v.id('yourobcPartners'),
+  },
+  handler: async (ctx, { partnerId }): Promise<PartnerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check delete permissions
-  const canDelete = await canDeletePartner(ctx, partner, user);
-  if (!canDelete) {
-    throw new Error('You do not have permission to delete this partner');
-  }
-
-  // 4. DELETE: Soft delete by setting deletedAt
-  const now = Date.now();
-  await ctx.db.patch(partnerId, {
-    deletedAt: now,
-    deletedBy: user.authUserId,
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-}
-
-/**
- * Restore deleted partner
- */
-export async function restorePartner(ctx: MutationCtx, partnerId: Id<'yourobcPartners'>): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check restore permissions
-  const canRestore = await canRestorePartner(ctx, partner, user);
-  if (!canRestore) {
-    throw new Error('You do not have permission to restore this partner');
-  }
-
-  // 4. RESTORE: Remove deletedAt and deletedBy
-  const now = Date.now();
-  await ctx.db.patch(partnerId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-}
-
-/**
- * Change partner status
- */
-export async function changePartnerStatus(
-  ctx: MutationCtx,
-  partnerId: Id<'yourobcPartners'>,
-  newStatus: 'active' | 'inactive' | 'suspended'
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check status change permissions
-  const canChange = await canChangePartnerStatus(ctx, partner, user);
-  if (!canChange) {
-    throw new Error('You do not have permission to change this partner status');
-  }
-
-  // 4. UPDATE: Change status
-  const now = Date.now();
-  await ctx.db.patch(partnerId, {
-    status: newStatus,
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-}
-
-/**
- * Update partner ranking
- */
-export async function updatePartnerRanking(
-  ctx: MutationCtx,
-  partnerId: Id<'yourobcPartners'>,
-  ranking: 1 | 2 | 3 | 4 | 5,
-  notes?: string
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check edit permissions
-  const canEdit = await canEditPartner(ctx, partner, user);
-  if (!canEdit) {
-    throw new Error('You do not have permission to update this partner ranking');
-  }
-
-  // 4. UPDATE: Update ranking
-  const now = Date.now();
-  await ctx.db.patch(partnerId, {
-    ranking,
-    rankingNotes: notes?.trim(),
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-}
-
-/**
- * Transfer partner ownership
- */
-export async function transferPartnerOwnership(
-  ctx: MutationCtx,
-  partnerId: Id<'yourobcPartners'>,
-  newOwnerId: string
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing partner
-  const partner = await ctx.db.get(partnerId);
-  if (!partner) {
-    throw new Error('Partner not found');
-  }
-
-  // 3. AUTHORIZE: Check transfer permissions
-  const canTransfer = await canTransferPartnerOwnership(ctx, partner, user);
-  if (!canTransfer) {
-    throw new Error('You do not have permission to transfer ownership of this partner');
-  }
-
-  // 4. VALIDATE: Check new owner exists
-  const newOwner = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authUserId'), newOwnerId))
-    .first();
-
-  if (!newOwner) {
-    throw new Error('New owner not found');
-  }
-
-  // 5. UPDATE: Transfer ownership
-  const now = Date.now();
-  await ctx.db.patch(partnerId, {
-    ownerId: newOwnerId,
-    updatedAt: now,
-    updatedBy: user.authUserId,
-  });
-}
-
-/**
- * Bulk update partner status
- */
-export async function bulkUpdatePartnerStatus(
-  ctx: MutationCtx,
-  partnerIds: Id<'yourobcPartners'>[],
-  newStatus: 'active' | 'inactive' | 'suspended'
-): Promise<{ success: number; failed: number }> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-  await requireAdminAccess(ctx, user);
-
-  let success = 0;
-  let failed = 0;
-
-  for (const partnerId of partnerIds) {
-    try {
-      const partner = await ctx.db.get(partnerId);
-      if (!partner || partner.deletedAt) {
-        failed++;
-        continue;
-      }
-
-      const now = Date.now();
-      await ctx.db.patch(partnerId, {
-        status: newStatus,
-        updatedAt: now,
-        updatedBy: user.authUserId,
-      });
-
-      success++;
-    } catch (error) {
-      failed++;
+    // 2. CHECK: Verify entity exists
+    const partner = await ctx.db.get(partnerId);
+    if (!partner || partner.deletedAt) {
+      throw new Error('Partner not found');
     }
-  }
 
-  return { success, failed };
-}
+    // 3. AUTHZ: Check delete permission
+    await requireDeletePartnerAccess(partner, user);
+
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(partnerId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.deleted',
+      entityType: 'system_partners',
+      entityId: partner.publicId,
+      entityTitle: partner.companyName,
+      description: `Deleted partner: ${partner.companyName}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return partnerId;
+  },
+});
 
 /**
- * Bulk delete partners (soft delete)
+ * Restore soft-deleted partner
  */
-export async function bulkDeletePartners(
-  ctx: MutationCtx,
-  partnerIds: Id<'yourobcPartners'>[]
-): Promise<{ success: number; failed: number }> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-  await requireAdminAccess(ctx, user);
+export const restorePartner = mutation({
+  args: {
+    partnerId: v.id('yourobcPartners'),
+  },
+  handler: async (ctx, { partnerId }): Promise<PartnerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  let success = 0;
-  let failed = 0;
-
-  for (const partnerId of partnerIds) {
-    try {
-      const partner = await ctx.db.get(partnerId);
-      if (!partner || partner.deletedAt) {
-        failed++;
-        continue;
-      }
-
-      const now = Date.now();
-      await ctx.db.patch(partnerId, {
-        deletedAt: now,
-        deletedBy: user.authUserId,
-        updatedAt: now,
-        updatedBy: user.authUserId,
-      });
-
-      success++;
-    } catch (error) {
-      failed++;
+    // 2. CHECK: Verify entity exists and is deleted
+    const partner = await ctx.db.get(partnerId);
+    if (!partner) {
+      throw new Error('Partner not found');
     }
-  }
+    if (!partner.deletedAt) {
+      throw new Error('Partner is not deleted');
+    }
 
-  return { success, failed };
-}
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      partner.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this partner');
+    }
+
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(partnerId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.restored',
+      entityType: 'system_partners',
+      entityId: partner.publicId,
+      entityTitle: partner.companyName,
+      description: `Restored partner: ${partner.companyName}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return partnerId;
+  },
+});
+
+/**
+ * Archive partner
+ */
+export const archivePartner = mutation({
+  args: {
+    partnerId: v.id('yourobcPartners'),
+  },
+  handler: async (ctx, { partnerId }): Promise<PartnerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
+
+    // 2. CHECK: Verify entity exists
+    const partner = await ctx.db.get(partnerId);
+    if (!partner || partner.deletedAt) {
+      throw new Error('Partner not found');
+    }
+
+    // 3. AUTHZ: Check edit permission
+    await requireEditPartnerAccess(ctx, partner, user);
+
+    // 4. ARCHIVE: Update status
+    const now = Date.now();
+    await ctx.db.patch(partnerId, {
+      status: 'archived',
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.archived',
+      entityType: 'system_partners',
+      entityId: partner.publicId,
+      entityTitle: partner.companyName,
+      description: `Archived partner: ${partner.companyName}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return partnerId;
+  },
+});

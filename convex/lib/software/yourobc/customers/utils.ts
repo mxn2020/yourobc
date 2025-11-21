@@ -1,212 +1,211 @@
 // convex/lib/software/yourobc/customers/utils.ts
-// Validation and utility functions for customers module
+// Validation functions and utility helpers for customers module
 
-import type { CreateCustomerInput, UpdateCustomerInput, Contact, Address } from '@/schema/software/yourobc/customers';
 import { CUSTOMERS_CONSTANTS } from './constants';
+import type { CreateCustomerData, UpdateCustomerData, ContactData, AddressData } from './types';
 
 /**
- * Validate company name
+ * Validate customer data for creation/update
  */
-export function validateCompanyName(companyName: string): void {
-  if (!companyName || companyName.trim().length === 0) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.COMPANY_NAME_REQUIRED);
-  }
-  if (companyName.trim().length < CUSTOMERS_CONSTANTS.BUSINESS_RULES.COMPANY_NAME_MIN_LENGTH) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.COMPANY_NAME_TOO_SHORT);
-  }
-  if (companyName.length > CUSTOMERS_CONSTANTS.BUSINESS_RULES.COMPANY_NAME_MAX_LENGTH) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.COMPANY_NAME_TOO_LONG);
-  }
-}
+export function validateCustomerData(
+  data: Partial<CreateCustomerData | UpdateCustomerData>
+): string[] {
+  const errors: string[] = [];
 
-/**
- * Validate email address
- */
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-/**
- * Validate contact information
- */
-export function validateContact(contact: Contact): void {
-  if (!contact.name || contact.name.trim().length === 0) {
-    throw new Error('Contact name is required');
-  }
-  if (contact.email && !validateEmail(contact.email)) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.INVALID_EMAIL);
-  }
-}
-
-/**
- * Validate address information
- */
-export function validateAddress(address: Address): void {
-  if (!address.city || address.city.trim().length === 0) {
-    throw new Error('City is required');
-  }
-  if (!address.country || address.country.trim().length === 0) {
-    throw new Error('Country is required');
-  }
-  if (!address.countryCode || address.countryCode.trim().length === 0) {
-    throw new Error('Country code is required');
-  }
-}
-
-/**
- * Validate payment terms
- */
-export function validatePaymentTerms(paymentTerms: number): void {
-  if (
-    paymentTerms < CUSTOMERS_CONSTANTS.BUSINESS_RULES.MIN_PAYMENT_TERMS ||
-    paymentTerms > CUSTOMERS_CONSTANTS.BUSINESS_RULES.MAX_PAYMENT_TERMS
-  ) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.INVALID_PAYMENT_TERMS);
-  }
-}
-
-/**
- * Validate margin
- */
-export function validateMargin(margin: number): void {
-  if (
-    margin < CUSTOMERS_CONSTANTS.BUSINESS_RULES.MIN_MARGIN ||
-    margin > CUSTOMERS_CONSTANTS.BUSINESS_RULES.MAX_MARGIN
-  ) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.INVALID_MARGIN);
-  }
-}
-
-/**
- * Validate customer creation data
- */
-export function validateCustomerData(data: CreateCustomerInput): void {
   // Validate company name
-  validateCompanyName(data.companyName);
+  if (data.companyName !== undefined) {
+    const trimmed = data.companyName.trim();
 
-  // Validate primary contact
-  if (!data.primaryContact) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.PRIMARY_CONTACT_REQUIRED);
+    if (!trimmed) {
+      errors.push('Company name is required');
+    } else if (trimmed.length < CUSTOMERS_CONSTANTS.LIMITS.MIN_COMPANY_NAME_LENGTH) {
+      errors.push(`Company name must be at least ${CUSTOMERS_CONSTANTS.LIMITS.MIN_COMPANY_NAME_LENGTH} characters`);
+    } else if (trimmed.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_COMPANY_NAME_LENGTH) {
+      errors.push(`Company name cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_COMPANY_NAME_LENGTH} characters`);
+    } else if (!CUSTOMERS_CONSTANTS.VALIDATION.COMPANY_NAME_PATTERN.test(trimmed)) {
+      errors.push('Company name contains invalid characters');
+    }
   }
-  validateContact(data.primaryContact);
 
-  // Validate additional contacts
-  if (data.additionalContacts) {
-    data.additionalContacts.forEach((contact) => validateContact(contact));
+  // Validate short name
+  if (data.shortName !== undefined && data.shortName.trim()) {
+    const trimmed = data.shortName.trim();
+    if (trimmed.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_SHORT_NAME_LENGTH) {
+      errors.push(`Short name cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_SHORT_NAME_LENGTH} characters`);
+    }
   }
 
-  // Validate billing address
-  if (!data.billingAddress) {
-    throw new Error(CUSTOMERS_CONSTANTS.VALIDATION.BILLING_ADDRESS_REQUIRED);
+  // Validate website
+  if (data.website !== undefined && data.website.trim()) {
+    const trimmed = data.website.trim();
+    if (trimmed.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_WEBSITE_LENGTH) {
+      errors.push(`Website cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_WEBSITE_LENGTH} characters`);
+    } else if (!CUSTOMERS_CONSTANTS.VALIDATION.WEBSITE_PATTERN.test(trimmed)) {
+      errors.push('Website URL is invalid');
+    }
   }
-  validateAddress(data.billingAddress);
 
-  // Validate shipping address if provided
-  if (data.shippingAddress) {
-    validateAddress(data.shippingAddress);
+  // Validate notes
+  if (data.notes !== undefined && data.notes.trim()) {
+    const trimmed = data.notes.trim();
+    if (trimmed.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_NOTES_LENGTH) {
+      errors.push(`Notes cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_NOTES_LENGTH} characters`);
+    }
+  }
+
+  // Validate internal notes
+  if (data.internalNotes !== undefined && data.internalNotes.trim()) {
+    const trimmed = data.internalNotes.trim();
+    if (trimmed.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_INTERNAL_NOTES_LENGTH) {
+      errors.push(`Internal notes cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_INTERNAL_NOTES_LENGTH} characters`);
+    }
+  }
+
+  // Validate margin
+  if (data.margin !== undefined) {
+    if (data.margin < CUSTOMERS_CONSTANTS.LIMITS.MIN_MARGIN) {
+      errors.push(`Margin cannot be less than ${CUSTOMERS_CONSTANTS.LIMITS.MIN_MARGIN}%`);
+    } else if (data.margin > CUSTOMERS_CONSTANTS.LIMITS.MAX_MARGIN) {
+      errors.push(`Margin cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_MARGIN}%`);
+    }
   }
 
   // Validate payment terms
-  validatePaymentTerms(data.paymentTerms);
-
-  // Validate margin
-  validateMargin(data.margin);
-}
-
-/**
- * Validate customer update data
- */
-export function validateCustomerUpdateData(data: UpdateCustomerInput): void {
-  // Validate company name if provided
-  if (data.companyName !== undefined) {
-    validateCompanyName(data.companyName);
-  }
-
-  // Validate primary contact if provided
-  if (data.primaryContact) {
-    validateContact(data.primaryContact);
-  }
-
-  // Validate additional contacts if provided
-  if (data.additionalContacts) {
-    data.additionalContacts.forEach((contact) => validateContact(contact));
-  }
-
-  // Validate billing address if provided
-  if (data.billingAddress) {
-    validateAddress(data.billingAddress);
-  }
-
-  // Validate shipping address if provided
-  if (data.shippingAddress) {
-    validateAddress(data.shippingAddress);
-  }
-
-  // Validate payment terms if provided
   if (data.paymentTerms !== undefined) {
-    validatePaymentTerms(data.paymentTerms);
+    if (data.paymentTerms < CUSTOMERS_CONSTANTS.LIMITS.MIN_PAYMENT_TERMS) {
+      errors.push(`Payment terms cannot be less than ${CUSTOMERS_CONSTANTS.LIMITS.MIN_PAYMENT_TERMS} days`);
+    } else if (data.paymentTerms > CUSTOMERS_CONSTANTS.LIMITS.MAX_PAYMENT_TERMS) {
+      errors.push(`Payment terms cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_PAYMENT_TERMS} days`);
+    }
   }
 
-  // Validate margin if provided
-  if (data.margin !== undefined) {
-    validateMargin(data.margin);
+  // Validate additional contacts
+  if ('additionalContacts' in data && data.additionalContacts) {
+    if (data.additionalContacts.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_ADDITIONAL_CONTACTS) {
+      errors.push(`Cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_ADDITIONAL_CONTACTS} additional contacts`);
+    }
+
+    // Validate each contact
+    data.additionalContacts.forEach((contact, index) => {
+      const contactErrors = validateContact(contact);
+      if (contactErrors.length > 0) {
+        errors.push(`Contact ${index + 1}: ${contactErrors.join(', ')}`);
+      }
+    });
   }
+
+  // Validate primary contact
+  if ('primaryContact' in data && data.primaryContact) {
+    const contactErrors = validateContact(data.primaryContact);
+    if (contactErrors.length > 0) {
+      errors.push(`Primary contact: ${contactErrors.join(', ')}`);
+    }
+  }
+
+  // Validate billing address
+  if ('billingAddress' in data && data.billingAddress) {
+    const addressErrors = validateAddress(data.billingAddress);
+    if (addressErrors.length > 0) {
+      errors.push(`Billing address: ${addressErrors.join(', ')}`);
+    }
+  }
+
+  // Validate shipping address
+  if ('shippingAddress' in data && data.shippingAddress) {
+    const addressErrors = validateAddress(data.shippingAddress);
+    if (addressErrors.length > 0) {
+      errors.push(`Shipping address: ${addressErrors.join(', ')}`);
+    }
+  }
+
+  // Validate tags
+  if ('tags' in data && data.tags) {
+    if (data.tags.length > CUSTOMERS_CONSTANTS.LIMITS.MAX_TAGS) {
+      errors.push(`Cannot exceed ${CUSTOMERS_CONSTANTS.LIMITS.MAX_TAGS} tags`);
+    }
+
+    const emptyTags = data.tags.filter(tag => !tag.trim());
+    if (emptyTags.length > 0) {
+      errors.push('Tags cannot be empty');
+    }
+  }
+
+  return errors;
 }
 
 /**
- * Generate a unique public ID
+ * Validate contact data
  */
-export function generatePublicId(): string {
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const timestamp = Date.now().toString(36);
-  return `cust_${timestamp}${randomString}`;
+export function validateContact(contact: ContactData): string[] {
+  const errors: string[] = [];
+
+  if (!contact.name || !contact.name.trim()) {
+    errors.push('Contact name is required');
+  }
+
+  if (contact.email && contact.email.trim()) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(contact.email.trim())) {
+      errors.push('Invalid email address');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate address data
+ */
+export function validateAddress(address: AddressData): string[] {
+  const errors: string[] = [];
+
+  if (!address.city || !address.city.trim()) {
+    errors.push('City is required');
+  }
+
+  if (!address.country || !address.country.trim()) {
+    errors.push('Country is required');
+  }
+
+  if (!address.countryCode || !address.countryCode.trim()) {
+    errors.push('Country code is required');
+  } else if (address.countryCode.trim().length !== 2) {
+    errors.push('Country code must be 2 characters');
+  }
+
+  return errors;
 }
 
 /**
  * Format customer display name
  */
-export function formatCustomerDisplayName(customer: { companyName: string; shortName?: string }): string {
-  return customer.shortName || customer.companyName;
+export function formatCustomerDisplayName(customer: { companyName: string; status?: string }): string {
+  const statusBadge = customer.status ? ` [${customer.status}]` : '';
+  return `${customer.companyName}${statusBadge}`;
 }
 
 /**
- * Check if customer is suspended
+ * Check if customer is editable
  */
-export function isCustomerSuspended(customer: { serviceSuspended?: boolean }): boolean {
-  return customer.serviceSuspended === true;
+export function isCustomerEditable(customer: { status: string; deletedAt?: number }): boolean {
+  if (customer.deletedAt) return false;
+  return customer.status !== 'blacklisted';
 }
 
 /**
- * Check if customer is blacklisted
+ * Calculate average margin for customers
  */
-export function isCustomerBlacklisted(customer: { status: string }): boolean {
-  return customer.status === CUSTOMERS_CONSTANTS.STATUS.BLACKLISTED;
+export function calculateAverageMargin(customers: { margin: number }[]): number {
+  if (customers.length === 0) return 0;
+  const total = customers.reduce((sum, customer) => sum + customer.margin, 0);
+  return Math.round((total / customers.length) * 100) / 100;
 }
 
 /**
- * Check if customer is active
+ * Calculate average payment terms for customers
  */
-export function isCustomerActive(customer: { status: string }): boolean {
-  return customer.status === CUSTOMERS_CONSTANTS.STATUS.ACTIVE;
-}
-
-/**
- * Normalize search term for case-insensitive search
- */
-export function normalizeSearchTerm(searchTerm: string): string {
-  return searchTerm.toLowerCase().trim();
-}
-
-/**
- * Check if customer matches search term
- */
-export function matchesSearchTerm(
-  customer: { companyName: string; shortName?: string },
-  searchTerm: string
-): boolean {
-  const normalized = normalizeSearchTerm(searchTerm);
-  const companyNameMatch = customer.companyName.toLowerCase().includes(normalized);
-  const shortNameMatch = customer.shortName?.toLowerCase().includes(normalized);
-  return companyNameMatch || (shortNameMatch ?? false);
+export function calculateAveragePaymentTerms(customers: { paymentTerms: number }[]): number {
+  if (customers.length === 0) return 0;
+  const total = customers.reduce((sum, customer) => sum + customer.paymentTerms, 0);
+  return Math.round(total / customers.length);
 }

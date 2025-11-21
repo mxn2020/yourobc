@@ -1,123 +1,208 @@
-// convex/lib/software/yourobc/couriers/types.ts
-// Additional types for couriers module operations
+// convex/lib/software/yourobc/convex/lib/software/yourobc/couriers/types.ts
+// TypeScript type definitions for couriers module
 
-import type { Id } from '@/generated/dataModel';
-import type { Courier, Commission } from '@/schema/software/yourobc/couriers';
+import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  CourierStatus,
+  CourierServiceType,
+  CourierDeliverySpeed,
+  CourierPricingModel,
+  CourierApiType,
+} from '@/schema/software/yourobc/couriers/types';
 
-// ============================================================================
-// Courier Operation Types
-// ============================================================================
+// Entity types
+export type Courier = Doc<'yourobcCouriers'>;
+export type CourierId = Id<'yourobcCouriers'>;
 
-/**
- * Time tracking data
- */
-export interface TimeTrackingData {
-  type: 'login' | 'logout';
-  location?: string;
+// Contact interface (matching schema)
+export interface ContactData {
+  name: string;
+  email?: string;
+  phone?: string;
+  isPrimary: boolean;
+  role?: string;
+  position?: string;
+  department?: string;
+  mobile?: string;
+  preferredContactMethod?: 'email' | 'phone' | 'mobile';
   notes?: string;
 }
 
-/**
- * Courier availability data
- */
-export interface CourierAvailabilityData {
-  isActive: boolean;
-  isOnline: boolean;
-  status: 'available' | 'busy' | 'offline' | 'vacation';
+// Address interface (matching schema)
+export interface AddressData {
+  street?: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  countryCode: string;
 }
 
-/**
- * Courier ranking data
- */
-export interface CourierRankingData {
-  ranking: number;
-  rankingNotes?: string;
+// Service coverage interface
+export interface ServiceCoverageData {
+  countries: string[];
+  regions?: string[];
+  cities?: string[];
+  airports?: string[];
 }
 
-// ============================================================================
-// Commission Operation Types
-// ============================================================================
+// Dimensions interface
+export interface DimensionsData {
+  length: number;
+  width: number;
+  height: number;
+}
 
-/**
- * Commission approval data
- */
-export interface CommissionApprovalData {
-  approvedBy: string;
+// Cost structure interface
+export interface CostStructureData {
+  baseFee?: number;
+  perKgRate?: number;
+  perKmRate?: number;
+  fuelSurcharge?: number;
+  handlingFee?: number;
   notes?: string;
 }
 
-/**
- * Commission payment data
- */
-export interface CommissionPaymentData {
-  paidDate: number;
-  paymentReference: string;
-  paymentMethod: 'bank_transfer' | 'credit_card' | 'cash' | 'check' | 'paypal' | 'wire_transfer' | 'other';
+// Delivery times interface
+export interface DeliveryTimesData {
+  standardDomestic?: string;
+  standardInternational?: string;
+  expressDomestic?: string;
+  expressInternational?: string;
   notes?: string;
 }
 
-/**
- * Commission calculation data
- */
-export interface CommissionCalculationData {
-  type: 'percentage' | 'fixed';
-  rate: number;
-  baseAmount: number;
+// API integration interface
+export interface ApiIntegrationData {
+  enabled: boolean;
+  apiType: CourierApiType;
+  baseUrl?: string;
+  apiVersion?: string;
+  hasTracking?: boolean;
+  hasRateQuotes?: boolean;
+  hasLabelGeneration?: boolean;
+  notes?: string;
 }
 
-// ============================================================================
-// Filter and Search Types
-// ============================================================================
+// API credentials interface
+export interface ApiCredentialsData {
+  apiKey?: string;
+  apiSecret?: string;
+  accountNumber?: string;
+  username?: string;
+  password?: string;
+  additionalFields?: Record<string, unknown>;
+}
 
-/**
- * Courier filters
- */
-export interface CourierFilters {
-  status?: 'available' | 'busy' | 'offline' | 'vacation';
+// Performance metrics interface
+export interface PerformanceMetricsData {
+  reliabilityScore?: number;
+  onTimeDeliveryRate?: number;
+  averageTransitDays?: number;
+  lastUpdated?: number;
+}
+
+// Data interfaces
+export interface CreateCourierData {
+  name: string;
+  shortName?: string;
+  website?: string;
+  email?: string;
+  phone?: string;
+  primaryContact: ContactData;
+  additionalContacts?: ContactData[];
+  headquartersAddress?: AddressData;
+  serviceCoverage: ServiceCoverageData;
+  serviceTypes: CourierServiceType[];
+  deliverySpeeds: CourierDeliverySpeed[];
+  maxWeightKg?: number;
+  maxDimensionsCm?: DimensionsData;
+  handlesHazmat?: boolean;
+  handlesRefrigerated?: boolean;
+  handlesFragile?: boolean;
+  pricingModel: CourierPricingModel;
+  defaultCurrency: 'EUR' | 'USD';
+  costStructure?: CostStructureData;
+  deliveryTimes?: DeliveryTimesData;
+  apiIntegration?: ApiIntegrationData;
+  apiCredentials?: ApiCredentialsData;
+  metrics?: PerformanceMetricsData;
+  status?: CourierStatus;
+  isPreferred?: boolean;
   isActive?: boolean;
-  isOnline?: boolean;
+  notes?: string;
+  internalNotes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+}
+
+export interface UpdateCourierData {
+  name?: string;
+  shortName?: string;
+  website?: string;
+  email?: string;
+  phone?: string;
+  primaryContact?: ContactData;
+  additionalContacts?: ContactData[];
+  headquartersAddress?: AddressData;
+  serviceCoverage?: ServiceCoverageData;
+  serviceTypes?: CourierServiceType[];
+  deliverySpeeds?: CourierDeliverySpeed[];
+  maxWeightKg?: number;
+  maxDimensionsCm?: DimensionsData;
+  handlesHazmat?: boolean;
+  handlesRefrigerated?: boolean;
+  handlesFragile?: boolean;
+  pricingModel?: CourierPricingModel;
+  defaultCurrency?: 'EUR' | 'USD';
+  costStructure?: CostStructureData;
+  deliveryTimes?: DeliveryTimesData;
+  apiIntegration?: ApiIntegrationData;
+  apiCredentials?: ApiCredentialsData;
+  metrics?: PerformanceMetricsData;
+  status?: CourierStatus;
+  isPreferred?: boolean;
+  isActive?: boolean;
+  notes?: string;
+  internalNotes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+}
+
+// Response types
+export interface CourierListResponse {
+  items: Courier[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
+export interface CourierFilters {
+  status?: CourierStatus[];
+  serviceTypes?: CourierServiceType[];
+  deliverySpeeds?: CourierDeliverySpeed[];
+  pricingModel?: CourierPricingModel[];
+  search?: string;
   country?: string;
-  city?: string;
-  language?: string;
-  serviceType?: 'OBC' | 'NFO';
+  isPreferred?: boolean;
+  isActive?: boolean;
+  hasApiIntegration?: boolean;
 }
 
-/**
- * Commission filters
- */
-export interface CommissionFilters {
-  courierId?: Id<'yourobcCouriers'>;
-  shipmentId?: Id<'yourobcShipments'>;
-  status?: 'pending' | 'paid';
-  type?: 'percentage' | 'fixed';
-  dateFrom?: number;
-  dateTo?: number;
-}
-
-// ============================================================================
-// Dashboard and Analytics Types
-// ============================================================================
-
-/**
- * Courier performance metrics
- */
-export interface CourierPerformanceMetrics {
-  totalShipments: number;
-  totalCommissions: number;
-  totalEarnings: number;
-  averageRating: number;
-  completionRate: number;
-  onTimeDeliveryRate: number;
-}
-
-/**
- * Commission summary
- */
-export interface CommissionSummary {
-  totalPending: number;
-  totalPaid: number;
-  pendingAmount: number;
-  paidAmount: number;
-  commissionsThisMonth: number;
-  commissionsThisYear: number;
+// Stats response type
+export interface CourierStatsResponse {
+  total: number;
+  byStatus: {
+    active: number;
+    inactive: number;
+    archived: number;
+  };
+  byServiceType: Record<string, number>;
+  byPricingModel: Record<string, number>;
+  withApiIntegration: number;
+  preferredCouriers: number;
+  activeCouriers: number;
+  averageReliabilityScore: number;
+  averageOnTimeRate: number;
 }

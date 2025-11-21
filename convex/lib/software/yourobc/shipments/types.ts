@@ -1,122 +1,172 @@
 // convex/lib/software/yourobc/shipments/types.ts
-// Library types for shipments module
+// TypeScript type definitions for shipments module
 
-import type { Id } from '@/generated/dataModel';
+import type { Doc, Id } from '@/generated/dataModel';
 import type {
   ShipmentStatus,
-  ServiceType,
-  ServicePriority,
-  SlaStatus,
-} from '@/schema/software/yourobc/shipments';
+  ShipmentServiceType,
+  ShipmentPriority,
+  ShipmentCommunicationChannel,
+} from '@/schema/software/yourobc/shipments/types';
 
-// ============================================================================
-// Query Filter Types
-// ============================================================================
+// Entity types
+export type Shipment = Doc<'yourobcShipments'>;
+export type ShipmentId = Id<'yourobcShipments'>;
+export type ShipmentStatusHistory = Doc<'yourobcShipmentStatusHistory'>;
+export type ShipmentStatusHistoryId = Id<'yourobcShipmentStatusHistory'>;
 
-/**
- * Shipment filters for list queries
- */
-export interface ShipmentFilters {
-  status?: ShipmentStatus;
-  serviceType?: ServiceType;
-  priority?: ServicePriority;
-  customerId?: Id<'yourobcCustomers'>;
-  employeeId?: Id<'yourobcEmployees'>;
-  partnerId?: Id<'yourobcPartners'>;
-  assignedCourierId?: Id<'yourobcCouriers'>;
-  slaStatus?: SlaStatus;
-  searchTerm?: string;
-  includeDeleted?: boolean;
+// Address interface (matching addressSchema)
+export interface ShipmentAddress {
+  street?: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  countryCode: string;
 }
 
-/**
- * Shipment list options
- */
-export interface ShipmentListOptions {
-  filters?: ShipmentFilters;
-  limit?: number;
-  offset?: number;
-  sortBy?: 'shipmentNumber' | 'createdAt' | 'sla.deadline' | 'currentStatus';
-  sortOrder?: 'asc' | 'desc';
+// Dimensions interface (matching dimensionsSchema)
+export interface ShipmentDimensions {
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+  unit: 'cm' | 'inch';
+  weightUnit: 'kg' | 'lb';
+  chargeableWeight?: number;
 }
 
-/**
- * Shipment status history filters
- */
-export interface ShipmentStatusHistoryFilters {
-  shipmentId?: Id<'yourobcShipments'>;
-  status?: ShipmentStatus;
-  startDate?: number;
-  endDate?: number;
-  includeDeleted?: boolean;
+// Currency amount interface (matching currencyAmountSchema)
+export interface CurrencyAmount {
+  amount: number;
+  currency: 'EUR' | 'USD';
+  exchangeRate?: number;
+  exchangeRateDate?: number;
 }
 
-/**
- * Shipment status history list options
- */
-export interface ShipmentStatusHistoryListOptions {
-  filters?: ShipmentStatusHistoryFilters;
-  limit?: number;
-  offset?: number;
-  sortBy?: 'timestamp' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
-}
-
-// ============================================================================
-// Statistics Types
-// ============================================================================
-
-/**
- * Shipment statistics summary
- */
-export interface ShipmentStatsSummary {
-  totalShipments: number;
-  activeShipments: number;
-  completedShipments: number;
-  cancelledShipments: number;
-  onTimeShipments: number;
-  overdueShipments: number;
-  totalRevenue: number;
-  averageDeliveryTime: number;
-}
-
-/**
- * Shipment status breakdown
- */
-export interface ShipmentStatusBreakdown {
-  status: ShipmentStatus;
-  count: number;
-  percentage: number;
-}
-
-// ============================================================================
-// Business Logic Types
-// ============================================================================
-
-/**
- * Status change data
- */
-export interface StatusChangeData {
-  shipmentId: Id<'yourobcShipments'>;
-  newStatus: ShipmentStatus;
-  location?: string;
-  notes?: string;
-  metadata?: Record<string, any>;
-}
-
-/**
- * SLA update data
- */
-export interface SlaUpdateData {
+// SLA interface (matching slaSchema)
+export interface ShipmentSla {
   deadline: number;
-  reason?: string;
+  status: 'on_time' | 'warning' | 'overdue';
+  remainingHours?: number;
 }
 
-/**
- * Assignment data
- */
-export interface AssignmentData {
+// Scheduled time interface (matching scheduledTimeSchema)
+export interface ScheduledTime {
+  utcTimestamp: number;
+  timezone: string;
+}
+
+// Data interfaces for creation
+export interface CreateShipmentData {
+  shipmentNumber: string;
+  awbNumber?: string;
+  customerReference?: string;
+  serviceType: ShipmentServiceType;
+  priority: ShipmentPriority;
+  customerId: Id<'yourobcCustomers'>;
+  quoteId?: Id<'yourobcQuotes'>;
+  origin: ShipmentAddress;
+  destination: ShipmentAddress;
+  dimensions: ShipmentDimensions;
+  description: string;
+  specialInstructions?: string;
+  currentStatus?: ShipmentStatus;
+  sla: ShipmentSla;
   assignedCourierId?: Id<'yourobcCouriers'>;
   courierInstructions?: string;
   employeeId?: Id<'yourobcEmployees'>;
+  partnerId?: Id<'yourobcPartners'>;
+  partnerReference?: string;
+  agreedPrice: CurrencyAmount;
+  actualCosts?: CurrencyAmount;
+  totalPrice?: CurrencyAmount;
+  purchasePrice?: CurrencyAmount;
+  commission?: CurrencyAmount;
+  pickupTime?: ScheduledTime;
+  deliveryTime?: ScheduledTime;
+  communicationChannel?: {
+    type: ShipmentCommunicationChannel;
+    identifier?: string;
+  };
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, any>;
+}
+
+export interface UpdateShipmentData {
+  shipmentNumber?: string;
+  awbNumber?: string;
+  customerReference?: string;
+  serviceType?: ShipmentServiceType;
+  priority?: ShipmentPriority;
+  description?: string;
+  specialInstructions?: string;
+  currentStatus?: ShipmentStatus;
+  assignedCourierId?: Id<'yourobcCouriers'>;
+  courierInstructions?: string;
+  employeeId?: Id<'yourobcEmployees'>;
+  partnerId?: Id<'yourobcPartners'>;
+  partnerReference?: string;
+  actualCosts?: CurrencyAmount;
+  totalPrice?: CurrencyAmount;
+  purchasePrice?: CurrencyAmount;
+  commission?: CurrencyAmount;
+  pickupTime?: ScheduledTime;
+  deliveryTime?: ScheduledTime;
+  tags?: string[];
+  category?: string;
+}
+
+// Response types
+export interface ShipmentWithRelations extends Shipment {
+  customer?: Doc<'yourobcCustomers'> | null;
+  quote?: Doc<'yourobcQuotes'> | null;
+  courier?: Doc<'yourobcCouriers'> | null;
+  employee?: Doc<'yourobcEmployees'> | null;
+  partner?: Doc<'yourobcPartners'> | null;
+  statusHistory?: ShipmentStatusHistory[];
+}
+
+export interface ShipmentListResponse {
+  items: Shipment[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
+export interface ShipmentFilters {
+  status?: ShipmentStatus[];
+  serviceType?: ShipmentServiceType[];
+  priority?: ShipmentPriority[];
+  customerId?: Id<'yourobcCustomers'>;
+  assignedCourierId?: Id<'yourobcCouriers'>;
+  employeeId?: Id<'yourobcEmployees'>;
+  partnerId?: Id<'yourobcPartners'>;
+  search?: string;
+  dateFrom?: number;
+  dateTo?: number;
+}
+
+// Status history data interface
+export interface CreateStatusHistoryData {
+  shipmentId: ShipmentId;
+  status: ShipmentStatus;
+  timestamp: number;
+  location?: string;
+  notes?: string;
+  metadata?: {
+    flightNumber?: string;
+    estimatedArrival?: number;
+    delayReason?: string;
+    podReceived?: boolean;
+    customerSignature?: string;
+    courierAssigned?: Id<'yourobcCouriers'>;
+    courierNumber?: string;
+    oldDeadline?: number;
+    newDeadline?: number;
+    reason?: string;
+    actualCosts?: CurrencyAmount;
+    costNotes?: string;
+    cancellationReason?: string;
+  };
 }

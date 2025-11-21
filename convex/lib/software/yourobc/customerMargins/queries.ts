@@ -1,602 +1,227 @@
 // convex/lib/software/yourobc/customerMargins/queries.ts
-/**
- * Customer Margins Query Operations
- *
- * Read operations for all 4 tables in the customer margins module:
- * - Customer Margins
- * - Contact Log
- * - Customer Analytics
- * - Customer Dunning Config
- *
- * @module convex/lib/software/yourobc/customerMargins/queries
- */
+// Read operations for customerMargins module
 
-import { query } from '../../../../_generated/server'
-import { v } from 'convex/values'
-import type { Id } from '../../../../_generated/dataModel'
-import { PAGE_SIZES } from './constants'
-
-// ============================================================================
-// Customer Margins Queries
-// ============================================================================
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { customerMarginsValidators } from '@/schema/software/yourobc/customerMargins/validators';
+import { filterCustomerMarginsByAccess, requireViewCustomerMarginAccess } from './permissions';
+import type { CustomerMarginListResponse } from './types';
 
 /**
- * Get customer margin by ID
+ * Get paginated list of customer margins with filtering
  */
-export const getMarginById = query({
-  args: { id: v.id('customerMarginsTable') },
-  handler: async (ctx, args) => {
-    const margin = await ctx.db.get(args.id)
-    if (!margin || margin.deletedAt) return null
-    return margin
-  },
-})
-
-/**
- * Get customer margin by publicId
- */
-export const getMarginByPublicId = query({
-  args: { publicId: v.string() },
-  handler: async (ctx, args) => {
-    const margin = await ctx.db
-      .query('customerMarginsTable')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return margin
-  },
-})
-
-/**
- * Get active customer margin for a customer
- */
-export const getActiveMarginByCustomer = query({
-  args: { customerId: v.id('yourobcCustomers') },
-  handler: async (ctx, args) => {
-    const margin = await ctx.db
-      .query('customerMarginsTable')
-      .withIndex('customer_active', (q) =>
-        q.eq('customerId', args.customerId).eq('isActive', true)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return margin
-  },
-})
-
-/**
- * List all margins for a customer
- */
-export const listMarginsByCustomer = query({
+export const getCustomerMargins = query({
   args: {
-    customerId: v.id('yourobcCustomers'),
-    includeInactive: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    let query = ctx.db
-      .query('customerMarginsTable')
-      .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-
-    if (!args.includeInactive) {
-      query = query.filter((q) => q.eq(q.field('isActive'), true))
-    }
-
-    const margins = await query.collect()
-    return margins
-  },
-})
-
-/**
- * List margins needing review
- */
-export const listMarginsNeedingReview = query({
-  args: {},
-  handler: async (ctx) => {
-    const now = Date.now()
-    const margins = await ctx.db
-      .query('customerMarginsTable')
-      .withIndex('by_next_review')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.lte(q.field('nextReviewDate'), now)
-        )
-      )
-      .collect()
-    return margins
-  },
-})
-
-// ============================================================================
-// Contact Log Queries
-// ============================================================================
-
-/**
- * Get contact log by ID
- */
-export const getContactById = query({
-  args: { id: v.id('contactLogTable') },
-  handler: async (ctx, args) => {
-    const contact = await ctx.db.get(args.id)
-    if (!contact || contact.deletedAt) return null
-    return contact
-  },
-})
-
-/**
- * Get contact log by publicId
- */
-export const getContactByPublicId = query({
-  args: { publicId: v.string() },
-  handler: async (ctx, args) => {
-    const contact = await ctx.db
-      .query('contactLogTable')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return contact
-  },
-})
-
-/**
- * List contact logs for a customer
- */
-export const listContactsByCustomer = query({
-  args: {
-    customerId: v.id('yourobcCustomers'),
     limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(customerMarginsValidators.status)),
+      serviceType: v.optional(v.array(customerMarginsValidators.serviceType)),
+      marginType: v.optional(v.array(customerMarginsValidators.marginType)),
+      approvalStatus: v.optional(v.array(customerMarginsValidators.approvalStatus)),
+      customerId: v.optional(v.id('yourobcCustomers')),
+      search: v.optional(v.string()),
+      activeOnly: v.optional(v.boolean()),
+    })),
   },
-  handler: async (ctx, args) => {
-    const contacts = await ctx.db
-      .query('contactLogTable')
-      .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .take(args.limit || PAGE_SIZES.MEDIUM)
-    return contacts
-  },
-})
+  handler: async (ctx, args): Promise<CustomerMarginListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-/**
- * List contact logs by date range
- */
-export const listContactsByDateRange = query({
-  args: {
-    customerId: v.id('yourobcCustomers'),
-    fromDate: v.number(),
-    toDate: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const contacts = await ctx.db
-      .query('contactLogTable')
-      .withIndex('by_customer_date', (q) =>
-        q.eq('customerId', args.customerId)
-      )
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.gte(q.field('contactDate'), args.fromDate),
-          q.lte(q.field('contactDate'), args.toDate)
-        )
-      )
-      .collect()
-    return contacts
-  },
-})
+    // Query with index
+    let margins = await ctx.db
+      .query('softwareYourObcCustomerMargins')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-/**
- * List pending follow-ups
- */
-export const listPendingFollowUps = query({
-  args: {
-    assignedTo: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    let query = ctx.db
-      .query('contactLogTable')
-      .withIndex('by_followUp', (q) => q.eq('requiresFollowUp', true))
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.eq(q.field('followUpCompleted'), false)
-        )
-      )
+    // Apply access filtering
+    margins = await filterCustomerMarginsByAccess(ctx, margins, user);
 
-    const contacts = await query.collect()
-
-    if (args.assignedTo) {
-      return contacts.filter((c) => c.followUpAssignedTo === args.assignedTo)
+    // Apply status filter
+    if (filters.status?.length) {
+      margins = margins.filter(item =>
+        filters.status!.includes(item.status)
+      );
     }
 
-    return contacts
-  },
-})
-
-/**
- * List overdue follow-ups
- */
-export const listOverdueFollowUps = query({
-  args: {
-    assignedTo: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const now = Date.now()
-    let query = ctx.db
-      .query('contactLogTable')
-      .withIndex('by_followUp', (q) => q.eq('requiresFollowUp', true))
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.eq(q.field('followUpCompleted'), false),
-          q.lt(q.field('followUpDate'), now)
-        )
-      )
-
-    const contacts = await query.collect()
-
-    if (args.assignedTo) {
-      return contacts.filter((c) => c.followUpAssignedTo === args.assignedTo)
+    // Apply service type filter
+    if (filters.serviceType?.length) {
+      margins = margins.filter(item =>
+        filters.serviceType!.includes(item.serviceType)
+      );
     }
 
-    return contacts
-  },
-})
-
-/**
- * List contacts by employee
- */
-export const listContactsByEmployee = query({
-  args: {
-    contactedBy: v.string(),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const contacts = await ctx.db
-      .query('contactLogTable')
-      .withIndex('by_contactedBy', (q) => q.eq('contactedBy', args.contactedBy))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .take(args.limit || PAGE_SIZES.MEDIUM)
-    return contacts
-  },
-})
-
-// ============================================================================
-// Customer Analytics Queries
-// ============================================================================
-
-/**
- * Get analytics by ID
- */
-export const getAnalyticsById = query({
-  args: { id: v.id('customerAnalyticsTable') },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db.get(args.id)
-    if (!analytics || analytics.deletedAt) return null
-    return analytics
-  },
-})
-
-/**
- * Get analytics by publicId
- */
-export const getAnalyticsByPublicId = query({
-  args: { publicId: v.string() },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return analytics
-  },
-})
-
-/**
- * Get latest analytics for customer
- */
-export const getLatestAnalyticsByCustomer = query({
-  args: { customerId: v.id('yourobcCustomers') },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .first()
-    return analytics
-  },
-})
-
-/**
- * Get analytics for specific period
- */
-export const getAnalyticsByPeriod = query({
-  args: {
-    customerId: v.id('yourobcCustomers'),
-    year: v.number(),
-    month: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_customer_period', (q) =>
-        q.eq('customerId', args.customerId)
-          .eq('year', args.year)
-          .eq('month', args.month)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return analytics
-  },
-})
-
-/**
- * List analytics for customer
- */
-export const listAnalyticsByCustomer = query({
-  args: {
-    customerId: v.id('yourobcCustomers'),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .order('desc')
-      .take(args.limit || PAGE_SIZES.MEDIUM)
-    return analytics
-  },
-})
-
-/**
- * List customers needing follow-up
- */
-export const listCustomersNeedingFollowUp = query({
-  args: {},
-  handler: async (ctx) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_followUpAlert', (q) => q.eq('needsFollowUpAlert', true))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect()
-    return analytics
-  },
-})
-
-/**
- * Get analytics for period across all customers
- */
-export const listAnalyticsByPeriod = query({
-  args: {
-    year: v.number(),
-    month: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const analytics = await ctx.db
-      .query('customerAnalyticsTable')
-      .withIndex('by_year_month', (q) =>
-        q.eq('year', args.year).eq('month', args.month)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect()
-    return analytics
-  },
-})
-
-// ============================================================================
-// Customer Dunning Config Queries
-// ============================================================================
-
-/**
- * Get dunning config by ID
- */
-export const getDunningConfigById = query({
-  args: { id: v.id('customerDunningConfigTable') },
-  handler: async (ctx, args) => {
-    const config = await ctx.db.get(args.id)
-    if (!config || config.deletedAt) return null
-    return config
-  },
-})
-
-/**
- * Get dunning config by publicId
- */
-export const getDunningConfigByPublicId = query({
-  args: { publicId: v.string() },
-  handler: async (ctx, args) => {
-    const config = await ctx.db
-      .query('customerDunningConfigTable')
-      .withIndex('by_publicId', (q) => q.eq('publicId', args.publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return config
-  },
-})
-
-/**
- * Get active dunning config for customer
- */
-export const getActiveDunningConfigByCustomer = query({
-  args: { customerId: v.id('yourobcCustomers') },
-  handler: async (ctx, args) => {
-    const config = await ctx.db
-      .query('customerDunningConfigTable')
-      .withIndex('by_customer_active', (q) =>
-        q.eq('customerId', args.customerId).eq('isActive', true)
-      )
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .first()
-    return config
-  },
-})
-
-/**
- * List all dunning configs for customer
- */
-export const listDunningConfigsByCustomer = query({
-  args: {
-    customerId: v.id('yourobcCustomers'),
-    includeInactive: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    let query = ctx.db
-      .query('customerDunningConfigTable')
-      .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-
-    if (!args.includeInactive) {
-      query = query.filter((q) => q.eq(q.field('isActive'), true))
+    // Apply margin type filter
+    if (filters.marginType?.length) {
+      margins = margins.filter(item =>
+        filters.marginType!.includes(item.marginType)
+      );
     }
 
-    const configs = await query.collect()
-    return configs
-  },
-})
+    // Apply approval status filter
+    if (filters.approvalStatus?.length) {
+      margins = margins.filter(item =>
+        item.approvalStatus && filters.approvalStatus!.includes(item.approvalStatus)
+      );
+    }
 
-/**
- * List suspended customers
- */
-export const listSuspendedCustomers = query({
-  args: {},
-  handler: async (ctx) => {
-    const configs = await ctx.db
-      .query('customerDunningConfigTable')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.eq(q.field('serviceSuspended'), true)
-        )
-      )
-      .collect()
-    return configs
-  },
-})
+    // Apply customer filter
+    if (filters.customerId) {
+      margins = margins.filter(item => item.customerId === filters.customerId);
+    }
 
-/**
- * List customers with service restrictions
- */
-export const listCustomersWithServiceRestrictions = query({
-  args: {},
-  handler: async (ctx) => {
-    const configs = await ctx.db
-      .query('customerDunningConfigTable')
-      .withIndex('by_suspendService', (q) => q.eq('allowServiceWhenOverdue', false))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect()
-    return configs
-  },
-})
+    // Apply active only filter
+    if (filters.activeOnly) {
+      const now = Date.now();
+      margins = margins.filter(item =>
+        item.status === 'active' &&
+        item.effectiveFrom <= now &&
+        (!item.effectiveTo || item.effectiveTo >= now)
+      );
+    }
 
-/**
- * List customers requiring prepayment
- */
-export const listPrepaymentCustomers = query({
-  args: {},
-  handler: async (ctx) => {
-    const configs = await ctx.db
-      .query('customerDunningConfigTable')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('deletedAt'), undefined),
-          q.eq(q.field('requirePrepayment'), true)
-        )
-      )
-      .collect()
-    return configs
-  },
-})
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      margins = margins.filter(item =>
+        item.name.toLowerCase().includes(term) ||
+        item.marginId.toLowerCase().includes(term) ||
+        (item.customerName && item.customerName.toLowerCase().includes(term)) ||
+        (item.notes && item.notes.toLowerCase().includes(term))
+      );
+    }
 
-// ============================================================================
-// Combined Queries
-// ============================================================================
-
-/**
- * Get complete customer margin profile
- */
-export const getCustomerMarginProfile = query({
-  args: { customerId: v.id('yourobcCustomers') },
-  handler: async (ctx, args) => {
-    const [margin, analytics, dunningConfig, recentContacts] = await Promise.all([
-      ctx.db
-        .query('customerMarginsTable')
-        .withIndex('customer_active', (q) =>
-          q.eq('customerId', args.customerId).eq('isActive', true)
-        )
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
-        .first(),
-      ctx.db
-        .query('customerAnalyticsTable')
-        .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
-        .order('desc')
-        .first(),
-      ctx.db
-        .query('customerDunningConfigTable')
-        .withIndex('by_customer_active', (q) =>
-          q.eq('customerId', args.customerId).eq('isActive', true)
-        )
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
-        .first(),
-      ctx.db
-        .query('contactLogTable')
-        .withIndex('by_customer', (q) => q.eq('customerId', args.customerId))
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
-        .order('desc')
-        .take(5),
-    ])
+    // Paginate
+    const total = margins.length;
+    const items = margins.slice(offset, offset + limit);
 
     return {
-      margin,
-      analytics,
-      dunningConfig,
-      recentContacts,
-    }
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
   },
-})
+});
 
-// ============================================================================
-// Export All Queries
-// ============================================================================
+/**
+ * Get single customer margin by ID
+ */
+export const getCustomerMargin = query({
+  args: {
+    marginId: v.id('softwareYourObcCustomerMargins'),
+  },
+  handler: async (ctx, { marginId }) => {
+    const user = await requireCurrentUser(ctx);
 
-export default {
-  // Customer Margins
-  getMarginById,
-  getMarginByPublicId,
-  getActiveMarginByCustomer,
-  listMarginsByCustomer,
-  listMarginsNeedingReview,
+    const margin = await ctx.db.get(marginId);
+    if (!margin || margin.deletedAt) {
+      throw new Error('Customer margin not found');
+    }
 
-  // Contact Log
-  getContactById,
-  getContactByPublicId,
-  listContactsByCustomer,
-  listContactsByDateRange,
-  listPendingFollowUps,
-  listOverdueFollowUps,
-  listContactsByEmployee,
+    await requireViewCustomerMarginAccess(ctx, margin, user);
 
-  // Analytics
-  getAnalyticsById,
-  getAnalyticsByPublicId,
-  getLatestAnalyticsByCustomer,
-  getAnalyticsByPeriod,
-  listAnalyticsByCustomer,
-  listCustomersNeedingFollowUp,
-  listAnalyticsByPeriod,
+    return margin;
+  },
+});
 
-  // Dunning Config
-  getDunningConfigById,
-  getDunningConfigByPublicId,
-  getActiveDunningConfigByCustomer,
-  listDunningConfigsByCustomer,
-  listSuspendedCustomers,
-  listCustomersWithServiceRestrictions,
-  listPrepaymentCustomers,
+/**
+ * Get customer margin by public ID
+ */
+export const getCustomerMarginByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // Combined
-  getCustomerMarginProfile,
-}
+    const margin = await ctx.db
+      .query('softwareYourObcCustomerMargins')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!margin) {
+      throw new Error('Customer margin not found');
+    }
+
+    await requireViewCustomerMarginAccess(ctx, margin, user);
+
+    return margin;
+  },
+});
+
+/**
+ * Get customer margin by margin ID
+ */
+export const getCustomerMarginByMarginId = query({
+  args: {
+    marginId: v.string(),
+  },
+  handler: async (ctx, { marginId }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const margin = await ctx.db
+      .query('softwareYourObcCustomerMargins')
+      .withIndex('by_margin_id', q => q.eq('marginId', marginId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (!margin) {
+      throw new Error('Customer margin not found');
+    }
+
+    await requireViewCustomerMarginAccess(ctx, margin, user);
+
+    return margin;
+  },
+});
+
+/**
+ * Get customer margin statistics
+ */
+export const getCustomerMarginStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
+
+    const margins = await ctx.db
+      .query('softwareYourObcCustomerMargins')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    const accessible = await filterCustomerMarginsByAccess(ctx, margins, user);
+
+    const now = Date.now();
+    const active = accessible.filter(m =>
+      m.status === 'active' &&
+      m.effectiveFrom <= now &&
+      (!m.effectiveTo || m.effectiveTo >= now)
+    );
+
+    return {
+      total: accessible.length,
+      byStatus: {
+        draft: accessible.filter(item => item.status === 'draft').length,
+        active: accessible.filter(item => item.status === 'active').length,
+        pending_approval: accessible.filter(item => item.status === 'pending_approval').length,
+        expired: accessible.filter(item => item.status === 'expired').length,
+        archived: accessible.filter(item => item.status === 'archived').length,
+      },
+      byServiceType: {
+        standard: accessible.filter(item => item.serviceType === 'standard').length,
+        express: accessible.filter(item => item.serviceType === 'express').length,
+        overnight: accessible.filter(item => item.serviceType === 'overnight').length,
+        international: accessible.filter(item => item.serviceType === 'international').length,
+        freight: accessible.filter(item => item.serviceType === 'freight').length,
+        custom: accessible.filter(item => item.serviceType === 'custom').length,
+      },
+      currentlyActive: active.length,
+      pendingApproval: accessible.filter(item =>
+        item.approvalStatus === 'pending'
+      ).length,
+    };
+  },
+});

@@ -1,286 +1,178 @@
 // convex/lib/software/yourobc/accounting/utils.ts
-/**
- * Accounting Utilities
- *
- * Utility functions for accounting calculations, formatting, and business logic.
- *
- * @module convex/lib/software/yourobc/accounting/utils
- */
+// Validation functions and utility helpers for accounting module
 
-import {
-  CurrencyAmount,
-  PublicIdOptions,
-  InvoiceNumberResult,
-  OverdueAnalysis,
-} from './types'
-import {
-  PUBLIC_ID_PREFIXES,
-  AGING_BUCKETS,
-  DEFAULT_CURRENCY,
-  ZERO_AMOUNT,
-} from './constants'
+import { ACCOUNTING_CONSTANTS } from './constants';
+import type { CreateAccountingEntryData, UpdateAccountingEntryData } from './types';
 
 /**
- * Generate a public ID for an accounting entity
+ * Validate accounting entry data for creation/update
  */
-export function generatePublicId(options: PublicIdOptions): string {
-  const { prefix, year, sequence } = options
-  const paddedSequence = sequence.toString().padStart(5, '0')
-  return `${prefix}-${year}-${paddedSequence}`
-}
+export function validateAccountingEntryData(
+  data: Partial<CreateAccountingEntryData | UpdateAccountingEntryData>
+): string[] {
+  const errors: string[] = [];
 
-/**
- * Generate an invoice number based on format and sequence
- * Format: YYMM#### where #### is the sequence number
- */
-export function generateInvoiceNumber(
-  year: number,
-  month: number,
-  sequence: number,
-  format: string = 'YYMM####'
-): InvoiceNumberResult {
-  const yy = year.toString().slice(-2)
-  const mm = month.toString().padStart(2, '0')
+  // Validate journal entry number if provided
+  if (data.journalEntryNumber !== undefined) {
+    const trimmed = data.journalEntryNumber.trim();
 
-  // Replace placeholders in format
-  let invoiceNumber = format
-    .replace('YY', yy)
-    .replace('MM', mm)
-    .replace('####', sequence.toString().padStart(4, '0'))
-
-  return {
-    invoiceNumber,
-    year,
-    month,
-    sequence,
-  }
-}
-
-/**
- * Calculate days between two dates
- */
-export function calculateDaysBetween(startDate: number, endDate: number): number {
-  const msPerDay = 24 * 60 * 60 * 1000
-  return Math.floor((endDate - startDate) / msPerDay)
-}
-
-/**
- * Calculate days overdue for an invoice
- */
-export function calculateDaysOverdue(dueDate: number, currentDate: number = Date.now()): number {
-  if (currentDate <= dueDate) {
-    return 0
-  }
-  return calculateDaysBetween(dueDate, currentDate)
-}
-
-/**
- * Analyze overdue status and determine aging bucket
- */
-export function analyzeOverdue(dueDate: number, currentDate: number = Date.now()): OverdueAnalysis {
-  const daysOverdue = calculateDaysOverdue(dueDate, currentDate)
-
-  let agingBucket: '1-30' | '31-60' | '61-90' | '90+' = '1-30'
-
-  if (daysOverdue >= AGING_BUCKETS.BUCKET_4.min) {
-    agingBucket = '90+'
-  } else if (daysOverdue >= AGING_BUCKETS.BUCKET_3.min) {
-    agingBucket = '61-90'
-  } else if (daysOverdue >= AGING_BUCKETS.BUCKET_2.min) {
-    agingBucket = '31-60'
-  } else if (daysOverdue >= AGING_BUCKETS.BUCKET_1.min) {
-    agingBucket = '1-30'
-  }
-
-  return {
-    daysOverdue,
-    agingBucket,
-    isOverdue: daysOverdue > 0,
-  }
-}
-
-/**
- * Add two currency amounts (must be same currency)
- */
-export function addCurrencyAmounts(a: CurrencyAmount, b: CurrencyAmount): CurrencyAmount {
-  if (a.currency !== b.currency) {
-    throw new Error(`Cannot add different currencies: ${a.currency} and ${b.currency}`)
-  }
-
-  return {
-    amount: a.amount + b.amount,
-    currency: a.currency,
-  }
-}
-
-/**
- * Subtract two currency amounts (must be same currency)
- */
-export function subtractCurrencyAmounts(a: CurrencyAmount, b: CurrencyAmount): CurrencyAmount {
-  if (a.currency !== b.currency) {
-    throw new Error(`Cannot subtract different currencies: ${a.currency} and ${b.currency}`)
-  }
-
-  return {
-    amount: a.amount - b.amount,
-    currency: a.currency,
-  }
-}
-
-/**
- * Compare two currency amounts (must be same currency)
- */
-export function compareCurrencyAmounts(a: CurrencyAmount, b: CurrencyAmount): number {
-  if (a.currency !== b.currency) {
-    throw new Error(`Cannot compare different currencies: ${a.currency} and ${b.currency}`)
-  }
-
-  return a.amount - b.amount
-}
-
-/**
- * Create a zero amount for a given currency
- */
-export function createZeroAmount(currency: 'EUR' | 'USD' = DEFAULT_CURRENCY): CurrencyAmount {
-  return {
-    amount: 0,
-    currency,
-  }
-}
-
-/**
- * Format currency amount for display
- */
-export function formatCurrencyAmount(amount: CurrencyAmount): string {
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: amount.currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount.amount)
-
-  return formatted
-}
-
-/**
- * Calculate cache expiry time
- */
-export function calculateCacheExpiry(hours: number = 24): number {
-  return Date.now() + (hours * 60 * 60 * 1000)
-}
-
-/**
- * Check if cache is valid
- */
-export function isCacheValid(validUntil: number, currentDate: number = Date.now()): boolean {
-  return currentDate < validUntil
-}
-
-/**
- * Get start of day timestamp
- */
-export function getStartOfDay(date: number = Date.now()): number {
-  const d = new Date(date)
-  d.setHours(0, 0, 0, 0)
-  return d.getTime()
-}
-
-/**
- * Get end of day timestamp
- */
-export function getEndOfDay(date: number = Date.now()): number {
-  const d = new Date(date)
-  d.setHours(23, 59, 59, 999)
-  return d.getTime()
-}
-
-/**
- * Get start of month timestamp
- */
-export function getStartOfMonth(year: number, month: number): number {
-  return new Date(year, month - 1, 1, 0, 0, 0, 0).getTime()
-}
-
-/**
- * Get end of month timestamp
- */
-export function getEndOfMonth(year: number, month: number): number {
-  return new Date(year, month, 0, 23, 59, 59, 999).getTime()
-}
-
-/**
- * Sum an array of currency amounts (must all be same currency)
- */
-export function sumCurrencyAmounts(amounts: CurrencyAmount[]): CurrencyAmount {
-  if (amounts.length === 0) {
-    return ZERO_AMOUNT
-  }
-
-  const currency = amounts[0].currency
-  const total = amounts.reduce((sum, curr) => {
-    if (curr.currency !== currency) {
-      throw new Error(`Cannot sum different currencies: ${currency} and ${curr.currency}`)
+    if (trimmed.length < ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH) {
+      errors.push(`Journal entry number must be at least ${ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
+    } else if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH) {
+      errors.push(`Journal entry number cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
+    } else if (!ACCOUNTING_CONSTANTS.VALIDATION.JOURNAL_ENTRY_NUMBER_PATTERN.test(trimmed)) {
+      errors.push('Journal entry number contains invalid characters (use A-Z, 0-9, -, _)');
     }
-    return sum + curr.amount
-  }, 0)
-
-  return {
-    amount: total,
-    currency,
   }
+
+  // Validate reference number
+  if (data.referenceNumber !== undefined && data.referenceNumber.trim()) {
+    const trimmed = data.referenceNumber.trim();
+    if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_REFERENCE_NUMBER_LENGTH) {
+      errors.push(`Reference number cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_REFERENCE_NUMBER_LENGTH} characters`);
+    }
+  }
+
+  // Validate currency code
+  if (data.currency !== undefined) {
+    if (!ACCOUNTING_CONSTANTS.VALIDATION.CURRENCY_CODE_PATTERN.test(data.currency)) {
+      errors.push('Currency code must be a valid ISO 4217 code (e.g., EUR, USD, GBP)');
+    }
+  }
+
+  // Validate amounts
+  if ('debitAmount' in data && data.debitAmount !== undefined) {
+    if (data.debitAmount < 0) {
+      errors.push('Debit amount cannot be negative');
+    }
+  }
+
+  if ('creditAmount' in data && data.creditAmount !== undefined) {
+    if (data.creditAmount < 0) {
+      errors.push('Credit amount cannot be negative');
+    }
+  }
+
+  // Validate balanced entry for journal entries
+  if ('debitAmount' in data && 'creditAmount' in data && data.debitAmount !== undefined && data.creditAmount !== undefined) {
+    if (data.debitAmount !== data.creditAmount) {
+      errors.push('Debit and credit amounts must be equal for a balanced entry');
+    }
+  }
+
+  // Validate tax rate
+  if (data.taxRate !== undefined) {
+    if (data.taxRate < 0 || data.taxRate > 100) {
+      errors.push('Tax rate must be between 0 and 100');
+    }
+  }
+
+  // Validate memo
+  if (data.memo !== undefined && data.memo.trim()) {
+    const trimmed = data.memo.trim();
+    if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_MEMO_LENGTH) {
+      errors.push(`Memo cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_MEMO_LENGTH} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined && data.description.trim()) {
+    const trimmed = data.description.trim();
+    if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH) {
+      errors.push(`Description cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH} characters`);
+    }
+  }
+
+  // Validate approval notes
+  if ('approvalNotes' in data && data.approvalNotes && data.approvalNotes.trim()) {
+    const trimmed = data.approvalNotes.trim();
+    if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_APPROVAL_NOTES_LENGTH) {
+      errors.push(`Approval notes cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_APPROVAL_NOTES_LENGTH} characters`);
+    }
+  }
+
+  // Validate tags
+  if ('tags' in data && data.tags) {
+    if (data.tags.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_TAGS) {
+      errors.push(`Cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_TAGS} tags`);
+    }
+
+    const emptyTags = data.tags.filter(tag => !tag.trim());
+    if (emptyTags.length > 0) {
+      errors.push('Tags cannot be empty');
+    }
+  }
+
+  // Validate attachments
+  if ('attachments' in data && data.attachments) {
+    if (data.attachments.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_ATTACHMENTS) {
+      errors.push(`Cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_ATTACHMENTS} attachments`);
+    }
+  }
+
+  return errors;
 }
 
 /**
- * Calculate percentage of total
+ * Format accounting entry display name
  */
-export function calculatePercentage(part: CurrencyAmount, total: CurrencyAmount): number {
-  if (total.amount === 0) {
-    return 0
-  }
-
-  if (part.currency !== total.currency) {
-    throw new Error(`Cannot calculate percentage of different currencies: ${part.currency} and ${total.currency}`)
-  }
-
-  return (part.amount / total.amount) * 100
+export function formatAccountingEntryDisplayName(entry: { journalEntryNumber: string; status?: string }): string {
+  const statusBadge = entry.status ? ` [${entry.status}]` : '';
+  return `${entry.journalEntryNumber}${statusBadge}`;
 }
 
 /**
- * Determine next reminder date based on intervals
+ * Generate unique journal entry number
  */
-export function calculateNextReminderDate(
-  expectedDate: number,
-  remindersSent: number,
-  intervals: readonly number[] = [7, 14, 21, 30]
-): number | null {
-  if (remindersSent >= intervals.length) {
-    return null // No more reminders
-  }
-
-  const daysToAdd = intervals[remindersSent]
-  return expectedDate + (daysToAdd * 24 * 60 * 60 * 1000)
+export function generateJournalEntryNumber(fiscalYear: number, sequence: number): string {
+  const year = fiscalYear.toString().slice(-2);
+  const seq = sequence.toString().padStart(6, '0');
+  return `JE${year}-${seq}`;
 }
 
 /**
- * Convert exchange rate between currencies
+ * Check if accounting entry is editable
  */
-export function convertCurrency(
-  amount: CurrencyAmount,
-  targetCurrency: 'EUR' | 'USD',
-  exchangeRate?: number
-): CurrencyAmount {
-  if (amount.currency === targetCurrency) {
-    return amount
+export function isAccountingEntryEditable(entry: { status: string; deletedAt?: number }): boolean {
+  if (entry.deletedAt) return false;
+  return entry.status === 'draft' || entry.status === 'pending';
+}
+
+/**
+ * Calculate fiscal period from date
+ */
+export function calculateFiscalPeriod(date: number, fiscalYearStart: number = 1): number {
+  const d = new Date(date);
+  const month = d.getMonth() + 1; // 1-12
+
+  // Adjust for fiscal year start
+  let period = month - fiscalYearStart + 1;
+  if (period <= 0) {
+    period += 12;
   }
 
-  if (!exchangeRate) {
-    throw new Error(`Exchange rate required to convert from ${amount.currency} to ${targetCurrency}`)
+  return period;
+}
+
+/**
+ * Calculate fiscal year from date
+ */
+export function calculateFiscalYear(date: number, fiscalYearStart: number = 1): number {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1; // 1-12
+
+  // If month is before fiscal year start, it belongs to previous fiscal year
+  if (month < fiscalYearStart) {
+    return year - 1;
   }
 
-  return {
-    amount: amount.amount * exchangeRate,
-    currency: targetCurrency,
-    exchangeRate,
-    exchangeRateDate: Date.now(),
-  }
+  return year;
+}
+
+/**
+ * Validate entry balance
+ */
+export function isEntryBalanced(entry: { debitAmount: number; creditAmount: number }): boolean {
+  return Math.abs(entry.debitAmount - entry.creditAmount) < 0.01; // Allow for rounding errors
 }

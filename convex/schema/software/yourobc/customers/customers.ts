@@ -1,40 +1,27 @@
 // convex/schema/software/yourobc/customers/customers.ts
-// Table definition for customers module
+// Table definitions for customers module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import {
-  customerStatusValidator,
-  currencyValidator,
-  paymentMethodValidator,
-  contactSchema,
   addressSchema,
+  contactSchema,
   entityStatsSchema,
   metadataSchema,
   auditFields,
   softDeleteFields,
-} from './validators';
+} from '@/schema/yourobc/base';
+import { customersValidators } from './validators';
 
-// ============================================================================
-// Customers Table
-// ============================================================================
-
-/**
- * Customers table
- * Tracks customer information, contact details, and financial settings
- */
 export const customersTable = defineTable({
-  // Required: Public ID for external APIs and shareable URLs
-  publicId: v.string(),
-
   // Required: Main display field
   companyName: v.string(),
 
   // Required: Core fields
-  ownerId: v.id('userProfiles'),
-  status: customerStatusValidator,
+  publicId: v.string(),
+  ownerId: v.string(), // authUserId - following yourobc pattern
 
-  // Company Information
+  // Core Identity
   shortName: v.optional(v.string()),
   website: v.optional(v.string()),
 
@@ -47,12 +34,13 @@ export const customersTable = defineTable({
   shippingAddress: v.optional(addressSchema),
 
   // Financial Settings
-  defaultCurrency: currencyValidator,
+  defaultCurrency: customersValidators.currency,
   paymentTerms: v.number(),
-  paymentMethod: paymentMethodValidator,
+  paymentMethod: customersValidators.paymentMethod,
   margin: v.number(),
 
-  // Classification
+  // Status & Classification
+  status: customersValidators.status,
   inquirySourceId: v.optional(v.id('yourobcInquirySources')),
 
   // Service Suspension Tracking
@@ -68,14 +56,14 @@ export const customersTable = defineTable({
   notes: v.optional(v.string()),
   internalNotes: v.optional(v.string()),
 
-  // Standard metadata and audit fields
+  // Metadata and audit fields
   ...metadataSchema,
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_name', ['companyName'])
+  .index('by_companyName', ['companyName'])
   .index('by_owner', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 

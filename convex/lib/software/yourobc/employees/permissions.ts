@@ -1,282 +1,300 @@
 // convex/lib/software/yourobc/employees/permissions.ts
-/**
- * Permissions for Employees Entity
- *
- * Defines permission checks and access control logic for employee
- * and vacation management operations.
- *
- * @module convex/lib/software/yourobc/employees/permissions
- */
+// Access control and authorization logic for employees module
 
-import type { Employee, VacationDays } from './types'
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { Employee, VacationDays } from './types';
+import type { Doc } from '@/generated/dataModel';
+
+type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
-// Permission Types
+// Employee View Access
 // ============================================================================
 
-export type PermissionContext = {
-  authUserId: string
-  isOwner?: boolean
-  isManager?: boolean
-  isAdmin?: boolean
+export async function canViewEmployee(
+  ctx: QueryCtx | MutationCtx,
+  employee: Employee,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Employee can view their own record
+  if (employee.userProfileId === user._id) return true;
+
+  // Owner can view
+  if (employee.ownerId === user._id) return true;
+
+  // Creator can view
+  if (employee.createdBy === user._id) return true;
+
+  // Manager can view their subordinates
+  if (employee.managerId) {
+    const manager = await ctx.db.get(employee.managerId);
+    if (manager && manager.userProfileId === user._id) return true;
+  }
+
+  // Check if user is manager of this employee
+  const userEmployee = await ctx.db
+    .query('yourobcEmployees')
+    .withIndex('by_userProfile', q => q.eq('userProfileId', user._id))
+    .filter(q => q.eq(q.field('deletedAt'), undefined))
+    .first();
+
+  if (userEmployee && employee.managerId === userEmployee._id) {
+    return true;
+  }
+
+  return false;
+}
+
+export async function requireViewEmployeeAccess(
+  ctx: QueryCtx | MutationCtx,
+  employee: Employee,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewEmployee(ctx, employee, user))) {
+    throw new Error('You do not have permission to view this employee');
+  }
 }
 
 // ============================================================================
-// Employee Permissions
+// Employee Edit Access
 // ============================================================================
 
-/**
- * Check if user can view employee
- */
-export function canViewEmployee(
+export async function canEditEmployee(
+  ctx: QueryCtx | MutationCtx,
   employee: Employee,
-  context: PermissionContext
-): boolean {
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (employee.ownerId === user._id) return true;
+
+  // Cannot edit terminated employees (except admins)
+  if (employee.status === 'terminated') {
+    return false;
+  }
+
+  // Manager can edit their subordinates (limited fields)
+  if (employee.managerId) {
+    const manager = await ctx.db.get(employee.managerId);
+    if (manager && manager.userProfileId === user._id) return true;
+  }
+
+  // Check if user is manager of this employee
+  const userEmployee = await ctx.db
+    .query('yourobcEmployees')
+    .withIndex('by_userProfile', q => q.eq('userProfileId', user._id))
+    .filter(q => q.eq(q.field('deletedAt'), undefined))
+    .first();
+
+  if (userEmployee && employee.managerId === userEmployee._id) {
+    return true;
+  }
+
+  return false;
+}
+
+export async function requireEditEmployeeAccess(
+  ctx: QueryCtx | MutationCtx,
+  employee: Employee,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditEmployee(ctx, employee, user))) {
+    throw new Error('You do not have permission to edit this employee');
+  }
+}
+
+// ============================================================================
+// Employee Delete Access
+// ============================================================================
+
+export async function canDeleteEmployee(
+  employee: Employee,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (employee.ownerId === user._id) return true;
+  return false;
+}
+
+export async function requireDeleteEmployeeAccess(
+  employee: Employee,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteEmployee(employee, user))) {
+    throw new Error('You do not have permission to delete this employee');
+  }
+}
+
+// ============================================================================
+// Salary Access (Special Permission)
+// ============================================================================
+
+export async function canViewSalary(
+  ctx: QueryCtx | MutationCtx,
+  employee: Employee,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can view all salaries
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can view all salaries
+  if (employee.ownerId === user._id) return true;
+
+  // Employee can view their own salary
+  if (employee.userProfileId === user._id) return true;
+
+  // HR role can view salaries (if you implement role-based permissions)
+  // This would require checking a roles table or user permissions
+
+  return false;
+}
+
+export async function canEditSalary(
+  employee: Employee,
+  user: UserProfile
+): Promise<boolean> {
+  // Only admins and owners can edit salaries
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (employee.ownerId === user._id) return true;
+  return false;
+}
+
+export async function requireEditSalaryAccess(
+  employee: Employee,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditSalary(employee, user))) {
+    throw new Error('You do not have permission to edit employee salary');
+  }
+}
+
+// ============================================================================
+// Vacation Access
+// ============================================================================
+
+export async function canViewVacationDays(
+  ctx: QueryCtx | MutationCtx,
+  vacationDays: VacationDays,
+  user: UserProfile
+): Promise<boolean> {
   // Admins can view all
-  if (context.isAdmin) return true
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Owners can view their own employees
-  if (employee.ownerId === context.authUserId) return true
+  // Owner can view
+  if (vacationDays.ownerId === user._id) return true;
 
-  // Managers can view their direct reports
-  if (context.isManager && employee.managerId) {
-    // TODO: Implement manager check
-    return true
+  // Employee can view their own vacation days
+  const employee = await ctx.db.get(vacationDays.employeeId);
+  if (employee && employee.userProfileId === user._id) return true;
+
+  // Manager can view their subordinates' vacation days
+  if (employee && employee.managerId) {
+    const manager = await ctx.db.get(employee.managerId);
+    if (manager && manager.userProfileId === user._id) return true;
   }
 
-  // Users can view their own profile
-  if (employee.authUserId === context.authUserId) return true
-
-  return false
+  return false;
 }
 
-/**
- * Check if user can create employee
- */
-export function canCreateEmployee(context: PermissionContext): boolean {
-  // Only admins and owners can create employees
-  return context.isAdmin || context.isOwner || false
+export async function requireViewVacationDaysAccess(
+  ctx: QueryCtx | MutationCtx,
+  vacationDays: VacationDays,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewVacationDays(ctx, vacationDays, user))) {
+    throw new Error('You do not have permission to view these vacation days');
+  }
 }
 
-/**
- * Check if user can update employee
- */
-export function canUpdateEmployee(
+export async function canApproveVacation(
+  ctx: QueryCtx | MutationCtx,
   employee: Employee,
-  context: PermissionContext
-): boolean {
-  // Admins can update all
-  if (context.isAdmin) return true
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can approve all vacation requests
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
-  // Owners can update their own employees
-  if (employee.ownerId === context.authUserId) return true
+  // Owner can approve all vacation requests
+  if (employee.ownerId === user._id) return true;
 
-  // Managers can update their direct reports (limited fields)
-  if (context.isManager && employee.managerId) {
-    // TODO: Implement manager check
-    return true
+  // Manager can approve their subordinates' vacation requests
+  if (employee.managerId) {
+    const manager = await ctx.db.get(employee.managerId);
+    if (manager && manager.userProfileId === user._id) return true;
   }
 
-  return false
+  // Check if user is manager of this employee
+  const userEmployee = await ctx.db
+    .query('yourobcEmployees')
+    .withIndex('by_userProfile', q => q.eq('userProfileId', user._id))
+    .filter(q => q.eq(q.field('deletedAt'), undefined))
+    .first();
+
+  if (userEmployee && employee.managerId === userEmployee._id) {
+    return true;
+  }
+
+  return false;
 }
 
-/**
- * Check if user can delete (soft delete) employee
- */
-export function canDeleteEmployee(
+export async function requireApproveVacationAccess(
+  ctx: QueryCtx | MutationCtx,
   employee: Employee,
-  context: PermissionContext
-): boolean {
-  // Only admins and owners can delete employees
-  return (
-    context.isAdmin ||
-    (context.isOwner && employee.ownerId === context.authUserId)
-  )
-}
-
-/**
- * Check if user can restore employee
- */
-export function canRestoreEmployee(
-  employee: Employee,
-  context: PermissionContext
-): boolean {
-  // Same as delete permissions
-  return canDeleteEmployee(employee, context)
+  user: UserProfile
+): Promise<void> {
+  if (!(await canApproveVacation(ctx, employee, user))) {
+    throw new Error('You do not have permission to approve vacation requests');
+  }
 }
 
 // ============================================================================
-// Vacation Permissions
+// Bulk Access Filtering
 // ============================================================================
 
-/**
- * Check if user can view vacation days
- */
-export function canViewVacationDays(
-  vacationDays: VacationDays,
-  employeeAuthUserId: string,
-  context: PermissionContext
-): boolean {
-  // Admins can view all
-  if (context.isAdmin) return true
-
-  // Owners can view their employees' vacation days
-  if (vacationDays.ownerId === context.authUserId) return true
-
-  // Users can view their own vacation days
-  if (employeeAuthUserId === context.authUserId) return true
-
-  // Managers can view their direct reports' vacation days
-  if (context.isManager) {
-    // TODO: Implement manager check
-    return true
+export async function filterEmployeesByAccess(
+  ctx: QueryCtx | MutationCtx,
+  employees: Employee[],
+  user: UserProfile
+): Promise<Employee[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return employees;
   }
 
-  return false
-}
+  const accessible: Employee[] = [];
 
-/**
- * Check if user can create vacation days record
- */
-export function canCreateVacationDays(context: PermissionContext): boolean {
-  // Only admins and owners can create vacation days records
-  return context.isAdmin || context.isOwner || false
-}
-
-/**
- * Check if user can request vacation
- */
-export function canRequestVacation(
-  vacationDays: VacationDays,
-  employeeAuthUserId: string,
-  context: PermissionContext
-): boolean {
-  // Admins can request for anyone
-  if (context.isAdmin) return true
-
-  // Owners can request for their employees
-  if (vacationDays.ownerId === context.authUserId) return true
-
-  // Users can request their own vacation
-  if (employeeAuthUserId === context.authUserId) return true
-
-  return false
-}
-
-/**
- * Check if user can approve/reject vacation
- */
-export function canApproveVacation(
-  vacationDays: VacationDays,
-  employeeAuthUserId: string,
-  context: PermissionContext
-): boolean {
-  // Admins can approve all
-  if (context.isAdmin) return true
-
-  // Owners can approve their employees' vacation
-  if (vacationDays.ownerId === context.authUserId) return true
-
-  // Managers can approve their direct reports' vacation
-  if (context.isManager) {
-    // TODO: Implement manager check
-    return true
+  for (const employee of employees) {
+    if (await canViewEmployee(ctx, employee, user)) {
+      accessible.push(employee);
+    }
   }
 
-  // Users cannot approve their own vacation
-  return false
+  return accessible;
 }
 
-/**
- * Check if user can cancel vacation
- */
-export function canCancelVacation(
-  vacationDays: VacationDays,
-  employeeAuthUserId: string,
-  context: PermissionContext
-): boolean {
-  // Admins can cancel all
-  if (context.isAdmin) return true
-
-  // Owners can cancel their employees' vacation
-  if (vacationDays.ownerId === context.authUserId) return true
-
-  // Users can cancel their own vacation (before it starts)
-  if (employeeAuthUserId === context.authUserId) return true
-
-  // Managers can cancel their direct reports' vacation
-  if (context.isManager) {
-    // TODO: Implement manager check
-    return true
+export async function filterVacationDaysByAccess(
+  ctx: QueryCtx | MutationCtx,
+  vacationDaysList: VacationDays[],
+  user: UserProfile
+): Promise<VacationDays[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return vacationDaysList;
   }
 
-  return false
-}
+  const accessible: VacationDays[] = [];
 
-/**
- * Check if user can update vacation entitlements
- */
-export function canUpdateVacationEntitlements(
-  vacationDays: VacationDays,
-  context: PermissionContext
-): boolean {
-  // Only admins and owners can update entitlements
-  return (
-    context.isAdmin ||
-    (context.isOwner && vacationDays.ownerId === context.authUserId)
-  )
-}
-
-// ============================================================================
-// Field-Level Permissions
-// ============================================================================
-
-/**
- * Get allowed fields for employee update based on permission level
- */
-export function getAllowedEmployeeUpdateFields(
-  employee: Employee,
-  context: PermissionContext
-): string[] {
-  // Admins and owners can update all fields
-  if (context.isAdmin || employee.ownerId === context.authUserId) {
-    return [
-      'department',
-      'position',
-      'managerId',
-      'office',
-      'hireDate',
-      'workPhone',
-      'workEmail',
-      'emergencyContact',
-      'status',
-      'workStatus',
-      'isActive',
-      'isOnline',
-      'timeEntries',
-      'timezone',
-      'currentVacationStatus',
-      'recentVacations',
-      'metadata',
-    ]
+  for (const vacationDays of vacationDaysList) {
+    if (await canViewVacationDays(ctx, vacationDays, user)) {
+      accessible.push(vacationDays);
+    }
   }
 
-  // Managers can update limited fields for direct reports
-  if (context.isManager && employee.managerId) {
-    return ['workStatus', 'isOnline', 'lastActivity', 'timeEntries']
-  }
-
-  // Users can update their own limited fields
-  if (employee.authUserId === context.authUserId) {
-    return [
-      'workPhone',
-      'emergencyContact',
-      'workStatus',
-      'isOnline',
-      'lastActivity',
-      'timezone',
-    ]
-  }
-
-  return []
+  return accessible;
 }

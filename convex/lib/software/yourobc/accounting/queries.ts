@@ -1,373 +1,254 @@
 // convex/lib/software/yourobc/accounting/queries.ts
-/**
- * Accounting Queries
- *
- * Query functions for retrieving accounting data.
- *
- * @module convex/lib/software/yourobc/accounting/queries
- */
+// Read operations for accounting module
 
-import { QueryCtx } from '../../../../_generated/server'
-import { Id } from '../../../../_generated/dataModel'
-import {
-  IncomingInvoiceTracking,
-  InvoiceNumbering,
-  StatementOfAccounts,
-  AccountingDashboardCache,
-  InvoiceAutoGenLog,
-} from './types'
-import { assertCanViewAccounting } from './permissions'
-import { isCacheValid } from './utils'
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/lib/auth.helper';
+import { accountingValidators } from '@/schema/software/yourobc/accounting/validators';
+import { filterAccountingEntriesByAccess, requireViewAccountingEntryAccess } from './permissions';
+import type { AccountingEntryListResponse } from './types';
 
 /**
- * Get incoming invoice tracking by ID
+ * Get paginated list of accounting entries with filtering
  */
-export async function getIncomingInvoiceTracking(
-  ctx: QueryCtx,
-  id: Id<'yourobcIncomingInvoiceTracking'>
-): Promise<IncomingInvoiceTracking | null> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    return null
-  }
+export const getAccountingEntries = query({
+  args: {
+    limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
+    filters: v.optional(v.object({
+      status: v.optional(v.array(accountingValidators.status)),
+      transactionType: v.optional(v.array(accountingValidators.transactionType)),
+      reconciliationStatus: v.optional(v.array(accountingValidators.reconciliationStatus)),
+      approvalStatus: v.optional(v.array(accountingValidators.approvalStatus)),
+      search: v.optional(v.string()),
+      relatedInvoiceId: v.optional(v.id('yourobcInvoices')),
+      relatedShipmentId: v.optional(v.id('yourobcShipments')),
+      relatedCustomerId: v.optional(v.id('yourobcCustomers')),
+      fiscalYear: v.optional(v.number()),
+      fiscalPeriod: v.optional(v.number()),
+      dateFrom: v.optional(v.number()),
+      dateTo: v.optional(v.number()),
+    })),
+  },
+  handler: async (ctx, args): Promise<AccountingEntryListResponse> => {
+    const user = await requireCurrentUser(ctx);
+    const { limit = 50, offset = 0, filters = {} } = args;
 
-  await assertCanViewAccounting(ctx, record.ownerId)
-  return record
-}
+    // Query with index
+    let entries = await ctx.db
+      .query('softwareYourObcAccounting')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
+
+    // Apply access filtering
+    entries = await filterAccountingEntriesByAccess(ctx, entries, user);
+
+    // Apply status filter
+    if (filters.status?.length) {
+      entries = entries.filter(item =>
+        filters.status!.includes(item.status)
+      );
+    }
+
+    // Apply transaction type filter
+    if (filters.transactionType?.length) {
+      entries = entries.filter(item =>
+        filters.transactionType!.includes(item.transactionType)
+      );
+    }
+
+    // Apply reconciliation status filter
+    if (filters.reconciliationStatus?.length) {
+      entries = entries.filter(item =>
+        item.reconciliationStatus && filters.reconciliationStatus!.includes(item.reconciliationStatus)
+      );
+    }
+
+    // Apply approval status filter
+    if (filters.approvalStatus?.length) {
+      entries = entries.filter(item =>
+        item.approvalStatus && filters.approvalStatus!.includes(item.approvalStatus)
+      );
+    }
+
+    // Apply related entity filters
+    if (filters.relatedInvoiceId) {
+      entries = entries.filter(item => item.relatedInvoiceId === filters.relatedInvoiceId);
+    }
+
+    if (filters.relatedShipmentId) {
+      entries = entries.filter(item => item.relatedShipmentId === filters.relatedShipmentId);
+    }
+
+    if (filters.relatedCustomerId) {
+      entries = entries.filter(item => item.relatedCustomerId === filters.relatedCustomerId);
+    }
+
+    // Apply fiscal period filters
+    if (filters.fiscalYear) {
+      entries = entries.filter(item => item.fiscalYear === filters.fiscalYear);
+    }
+
+    if (filters.fiscalPeriod) {
+      entries = entries.filter(item => item.fiscalPeriod === filters.fiscalPeriod);
+    }
+
+    // Apply date range filter
+    if (filters.dateFrom) {
+      entries = entries.filter(item => item.transactionDate >= filters.dateFrom!);
+    }
+
+    if (filters.dateTo) {
+      entries = entries.filter(item => item.transactionDate <= filters.dateTo!);
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      entries = entries.filter(item =>
+        item.journalEntryNumber.toLowerCase().includes(term) ||
+        (item.referenceNumber && item.referenceNumber.toLowerCase().includes(term)) ||
+        (item.memo && item.memo.toLowerCase().includes(term)) ||
+        (item.description && item.description.toLowerCase().includes(term))
+      );
+    }
+
+    // Paginate
+    const total = entries.length;
+    const items = entries.slice(offset, offset + limit);
+
+    return {
+      items,
+      total,
+      hasMore: total > offset + limit,
+    };
+  },
+});
 
 /**
- * Get incoming invoice tracking by public ID
+ * Get single accounting entry by ID
  */
-export async function getIncomingInvoiceTrackingByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  ownerId: string
-): Promise<IncomingInvoiceTracking | null> {
-  await assertCanViewAccounting(ctx, ownerId)
+export const getAccountingEntry = query({
+  args: {
+    entryId: v.id('softwareYourObcAccounting'),
+  },
+  handler: async (ctx, { entryId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const record = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
+    const entry = await ctx.db.get(entryId);
+    if (!entry || entry.deletedAt) {
+      throw new Error('Accounting entry not found');
+    }
 
-  return record
-}
+    await requireViewAccountingEntryAccess(ctx, entry, user);
+
+    return entry;
+  },
+});
 
 /**
- * List incoming invoice tracking by status
+ * Get accounting entry by public ID
  */
-export async function listIncomingInvoiceTrackingByStatus(
-  ctx: QueryCtx,
-  ownerId: string,
-  status: string
-): Promise<IncomingInvoiceTracking[]> {
-  await assertCanViewAccounting(ctx, ownerId)
+export const getAccountingEntryByPublicId = query({
+  args: {
+    publicId: v.string(),
+  },
+  handler: async (ctx, { publicId }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const records = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_ownerId_status', (q) => q.eq('ownerId', ownerId).eq('status', status))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
+    const entry = await ctx.db
+      .query('softwareYourObcAccounting')
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  return records
-}
+    if (!entry) {
+      throw new Error('Accounting entry not found');
+    }
+
+    await requireViewAccountingEntryAccess(ctx, entry, user);
+
+    return entry;
+  },
+});
 
 /**
- * List incoming invoice tracking by shipment
+ * Get accounting entry by journal entry number
  */
-export async function listIncomingInvoiceTrackingByShipment(
-  ctx: QueryCtx,
-  shipmentId: Id<'yourobcShipments'>,
-  ownerId: string
-): Promise<IncomingInvoiceTracking[]> {
-  await assertCanViewAccounting(ctx, ownerId)
+export const getAccountingEntryByJournalEntryNumber = query({
+  args: {
+    journalEntryNumber: v.string(),
+  },
+  handler: async (ctx, { journalEntryNumber }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const records = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_shipment', (q) => q.eq('shipmentId', shipmentId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
+    const entry = await ctx.db
+      .query('softwareYourObcAccounting')
+      .withIndex('by_journal_entry_number', q => q.eq('journalEntryNumber', journalEntryNumber))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .first();
 
-  return records
-}
+    if (!entry) {
+      throw new Error('Accounting entry not found');
+    }
+
+    await requireViewAccountingEntryAccess(ctx, entry, user);
+
+    return entry;
+  },
+});
 
 /**
- * List incoming invoice tracking by partner
+ * Get accounting statistics
  */
-export async function listIncomingInvoiceTrackingByPartner(
-  ctx: QueryCtx,
-  partnerId: Id<'yourobcPartners'>,
-  ownerId: string
-): Promise<IncomingInvoiceTracking[]> {
-  await assertCanViewAccounting(ctx, ownerId)
+export const getAccountingStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
 
-  const records = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_partner', (q) => q.eq('partnerId', partnerId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
+    const entries = await ctx.db
+      .query('softwareYourObcAccounting')
+      .withIndex('by_owner', q => q.eq('ownerId', user._id))
+      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
-  return records
-}
+    const accessible = await filterAccountingEntriesByAccess(ctx, entries, user);
 
-/**
- * Get invoice numbering for a month
- */
-export async function getInvoiceNumberingForMonth(
-  ctx: QueryCtx,
-  ownerId: string,
-  year: number,
-  month: number
-): Promise<InvoiceNumbering | null> {
-  await assertCanViewAccounting(ctx, ownerId)
+    // Calculate totals
+    const totals = accessible.reduce((acc, entry) => {
+      acc.totalDebit += entry.debitAmount;
+      acc.totalCredit += entry.creditAmount;
+      acc.totalTax += entry.taxAmount || 0;
+      return acc;
+    }, { totalDebit: 0, totalCredit: 0, totalTax: 0 });
 
-  const record = await ctx.db
-    .query('yourobcInvoiceNumbering')
-    .withIndex('by_ownerId_year_month', (q) =>
-      q.eq('ownerId', ownerId).eq('year', year).eq('month', month)
-    )
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  return record
-}
-
-/**
- * Get statement of accounts by ID
- */
-export async function getStatementOfAccounts(
-  ctx: QueryCtx,
-  id: Id<'yourobcStatementOfAccounts'>
-): Promise<StatementOfAccounts | null> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    return null
-  }
-
-  await assertCanViewAccounting(ctx, record.ownerId)
-  return record
-}
-
-/**
- * Get statement of accounts by public ID
- */
-export async function getStatementOfAccountsByPublicId(
-  ctx: QueryCtx,
-  publicId: string,
-  ownerId: string
-): Promise<StatementOfAccounts | null> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const record = await ctx.db
-    .query('yourobcStatementOfAccounts')
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  return record
-}
-
-/**
- * List statements of accounts by customer
- */
-export async function listStatementsByCustomer(
-  ctx: QueryCtx,
-  customerId: Id<'yourobcCustomers'>,
-  ownerId: string
-): Promise<StatementOfAccounts[]> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const records = await ctx.db
-    .query('yourobcStatementOfAccounts')
-    .withIndex('by_ownerId_customer', (q) => q.eq('ownerId', ownerId).eq('customerId', customerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .collect()
-
-  return records
-}
-
-/**
- * Get accounting dashboard cache for a date
- */
-export async function getAccountingDashboardCache(
-  ctx: QueryCtx,
-  ownerId: string,
-  date: number
-): Promise<AccountingDashboardCache | null> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const record = await ctx.db
-    .query('yourobcAccountingDashboardCache')
-    .withIndex('by_ownerId_date', (q) => q.eq('ownerId', ownerId).eq('date', date))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  // Check if cache is still valid
-  if (record && !isCacheValid(record.validUntil)) {
-    return null
-  }
-
-  return record
-}
-
-/**
- * Get latest accounting dashboard cache
- */
-export async function getLatestAccountingDashboardCache(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<AccountingDashboardCache | null> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const record = await ctx.db
-    .query('yourobcAccountingDashboardCache')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .first()
-
-  // Check if cache is still valid
-  if (record && !isCacheValid(record.validUntil)) {
-    return null
-  }
-
-  return record
-}
-
-/**
- * Get invoice auto-gen log by ID
- */
-export async function getInvoiceAutoGenLog(
-  ctx: QueryCtx,
-  id: Id<'yourobcInvoiceAutoGenLog'>
-): Promise<InvoiceAutoGenLog | null> {
-  const record = await ctx.db.get(id)
-  if (!record || record.deletedAt) {
-    return null
-  }
-
-  await assertCanViewAccounting(ctx, record.ownerId)
-  return record
-}
-
-/**
- * Get invoice auto-gen log by shipment
- */
-export async function getInvoiceAutoGenLogByShipment(
-  ctx: QueryCtx,
-  shipmentId: Id<'yourobcShipments'>,
-  ownerId: string
-): Promise<InvoiceAutoGenLog | null> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const record = await ctx.db
-    .query('yourobcInvoiceAutoGenLog')
-    .withIndex('by_shipment', (q) => q.eq('shipmentId', shipmentId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  return record
-}
-
-/**
- * Get invoice auto-gen log by invoice
- */
-export async function getInvoiceAutoGenLogByInvoice(
-  ctx: QueryCtx,
-  invoiceId: Id<'yourobcInvoices'>,
-  ownerId: string
-): Promise<InvoiceAutoGenLog | null> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const record = await ctx.db
-    .query('yourobcInvoiceAutoGenLog')
-    .withIndex('by_invoice', (q) => q.eq('invoiceId', invoiceId))
-    .filter((q) => q.eq(q.field('ownerId'), ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .first()
-
-  return record
-}
-
-/**
- * List invoice auto-gen logs by status
- */
-export async function listInvoiceAutoGenLogsByStatus(
-  ctx: QueryCtx,
-  ownerId: string,
-  status: string
-): Promise<InvoiceAutoGenLog[]> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const records = await ctx.db
-    .query('yourobcInvoiceAutoGenLog')
-    .withIndex('by_ownerId_status', (q) => q.eq('ownerId', ownerId).eq('status', status))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .collect()
-
-  return records
-}
-
-/**
- * List all incoming invoice tracking records
- */
-export async function listAllIncomingInvoiceTracking(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<IncomingInvoiceTracking[]> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const records = await ctx.db
-    .query('yourobcIncomingInvoiceTracking')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .collect()
-
-  return records
-}
-
-/**
- * List all statements of accounts
- */
-export async function listAllStatements(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<StatementOfAccounts[]> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const records = await ctx.db
-    .query('yourobcStatementOfAccounts')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .collect()
-
-  return records
-}
-
-/**
- * List all invoice auto-gen logs
- */
-export async function listAllInvoiceAutoGenLogs(
-  ctx: QueryCtx,
-  ownerId: string
-): Promise<InvoiceAutoGenLog[]> {
-  await assertCanViewAccounting(ctx, ownerId)
-
-  const records = await ctx.db
-    .query('yourobcInvoiceAutoGenLog')
-    .withIndex('by_ownerId', (q) => q.eq('ownerId', ownerId))
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    .order('desc')
-    .collect()
-
-  return records
-}
+    return {
+      total: accessible.length,
+      byStatus: {
+        draft: accessible.filter(item => item.status === 'draft').length,
+        pending: accessible.filter(item => item.status === 'pending').length,
+        approved: accessible.filter(item => item.status === 'approved').length,
+        posted: accessible.filter(item => item.status === 'posted').length,
+        reconciled: accessible.filter(item => item.status === 'reconciled').length,
+        cancelled: accessible.filter(item => item.status === 'cancelled').length,
+        archived: accessible.filter(item => item.status === 'archived').length,
+      },
+      byTransactionType: {
+        journal_entry: accessible.filter(item => item.transactionType === 'journal_entry').length,
+        invoice: accessible.filter(item => item.transactionType === 'invoice').length,
+        expense: accessible.filter(item => item.transactionType === 'expense').length,
+        payment: accessible.filter(item => item.transactionType === 'payment').length,
+        transfer: accessible.filter(item => item.transactionType === 'transfer').length,
+        adjustment: accessible.filter(item => item.transactionType === 'adjustment').length,
+      },
+      totals,
+      unreconciled: accessible.filter(item =>
+        !item.reconciliationStatus || item.reconciliationStatus === 'unreconciled'
+      ).length,
+      pendingApproval: accessible.filter(item =>
+        item.approvalStatus === 'pending'
+      ).length,
+    };
+  },
+});

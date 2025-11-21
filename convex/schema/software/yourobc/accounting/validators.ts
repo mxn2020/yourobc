@@ -1,36 +1,39 @@
 // convex/schema/software/yourobc/accounting/validators.ts
-/**
- * Accounting Validators
- *
- * All validators for the accounting module.
- * These are imported from the base schema and re-exported for convenience.
- *
- * @module convex/schema/software/yourobc/accounting/validators
- */
+// Grouped validators for accounting module
 
-import { v } from 'convex/values'
-import {
-  incomingInvoiceStatusValidator,
-  statementTransactionTypeValidator,
-  exportFormatValidator,
-  invoiceAutoGenStatusValidator,
-  currencyAmountSchema,
-  auditFields,
-  softDeleteFields,
-  metadataSchema,
-} from '../../../yourobc/base'
+import { v } from 'convex/values';
 
-// Re-export validators from base
-export {
-  incomingInvoiceStatusValidator,
-  statementTransactionTypeValidator,
-  exportFormatValidator,
-  invoiceAutoGenStatusValidator,
-  currencyAmountSchema,
-  auditFields,
-  softDeleteFields,
-  metadataSchema,
-}
+export const accountingValidators = {
+  status: v.union(
+    v.literal('draft'),
+    v.literal('pending'),
+    v.literal('approved'),
+    v.literal('posted'),
+    v.literal('reconciled'),
+    v.literal('cancelled'),
+    v.literal('archived')
+  ),
 
-// Additional validators specific to accounting module if needed in the future
-// can be defined here
+  transactionType: v.union(
+    v.literal('journal_entry'),
+    v.literal('invoice'),
+    v.literal('expense'),
+    v.literal('payment'),
+    v.literal('transfer'),
+    v.literal('adjustment')
+  ),
+
+  reconciliationStatus: v.union(
+    v.literal('unreconciled'),
+    v.literal('partial'),
+    v.literal('reconciled'),
+    v.literal('disputed')
+  ),
+
+  approvalStatus: v.union(
+    v.literal('pending'),
+    v.literal('approved'),
+    v.literal('rejected'),
+    v.literal('revision_requested')
+  ),
+} as const;

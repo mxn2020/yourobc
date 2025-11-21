@@ -1,310 +1,137 @@
 // convex/lib/software/yourobc/couriers/permissions.ts
-// Permission checks for couriers module
+// Access control and authorization logic for couriers module
 
-import type { Doc, Id } from '@/generated/dataModel';
-import { COURIERS_CONSTANTS, COMMISSIONS_CONSTANTS } from './constants';
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { Courier } from './types';
+import type { Doc } from '@/generated/dataModel';
+
+type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
-// Courier Permissions
+// View Access
 // ============================================================================
 
-/**
- * Check if user can view courier
- */
-export function canViewCourier(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!courier) return false;
-  if (courier.deletedAt) return false;
+export async function canViewCourier(
+  ctx: QueryCtx | MutationCtx,
+  courier: Courier,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can view
-  if (courier.ownerId === user._id) return true;
+  if (courier.ownerId === user.authUserId) return true;
 
-  // TODO: Add role-based access control
-  // For now, allow all authenticated users to view
-  return true;
-}
+  // Creator can view
+  if (courier.createdBy === user.authUserId) return true;
 
-/**
- * Check if user can edit courier
- */
-export function canEditCourier(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!courier) return false;
-  if (courier.deletedAt) return false;
+  // Active couriers can be viewed by all authenticated users
+  if (courier.status === 'active' && courier.isActive) return true;
 
-  // Owner can edit
-  if (courier.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
   return false;
 }
 
-/**
- * Check if user can delete courier
- */
-export function canDeleteCourier(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!courier) return false;
-  if (courier.deletedAt) return false;
-
-  // Owner can delete
-  if (courier.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Check if user can restore courier
- */
-export function canRestoreCourier(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!courier) return false;
-  if (!courier.deletedAt) return false;
-
-  // Owner can restore
-  if (courier.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Check if user can change courier status
- */
-export async function canChangeCourierStatus(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): Promise<boolean> {
-  if (!courier) return false;
-  if (courier.deletedAt) return false;
-
-  // Owner can change status
-  if (courier.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Validate courier exists and is not deleted
- */
-export function validateCourierExists(
-  courier: Doc<'yourobcCouriers'> | null
-): asserts courier is Doc<'yourobcCouriers'> {
-  if (!courier) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.NOT_FOUND);
-  }
-  if (courier.deletedAt) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.ALREADY_DELETED);
-  }
-}
-
-/**
- * Require edit permission or throw error
- */
-export async function requireEditPermission(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
+export async function requireViewCourierAccess(
+  ctx: QueryCtx | MutationCtx,
+  courier: Courier,
+  user: UserProfile
 ): Promise<void> {
-  if (!canEditCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_EDIT);
-  }
-}
-
-/**
- * Require delete permission or throw error
- */
-export async function requireDeletePermission(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): Promise<void> {
-  if (!canDeleteCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_DELETE);
-  }
-}
-
-/**
- * Require restore permission or throw error
- */
-export async function requireRestorePermission(
-  courier: Doc<'yourobcCouriers'> | null,
-  user: Doc<'userProfiles'>
-): Promise<void> {
-  if (!canRestoreCourier(courier, user)) {
-    throw new Error(COURIERS_CONSTANTS.ERRORS.UNAUTHORIZED_RESTORE);
+  if (!(await canViewCourier(ctx, courier, user))) {
+    throw new Error('You do not have permission to view this courier');
   }
 }
 
 // ============================================================================
-// Commission Permissions
+// Edit Access
 // ============================================================================
 
-/**
- * Check if user can view commission
- */
-export function canViewCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!commission) return false;
-  if (commission.deletedAt) return false;
-
-  // Owner can view
-  if (commission.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  // For now, allow all authenticated users to view
-  return true;
-}
-
-/**
- * Check if user can edit commission
- */
-export function canEditCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!commission) return false;
-  if (commission.deletedAt) return false;
-
-  // Cannot edit paid commissions
-  if (commission.status === 'paid') return false;
+export async function canEditCourier(
+  ctx: QueryCtx | MutationCtx,
+  courier: Courier,
+  user: UserProfile
+): Promise<boolean> {
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can edit
-  if (commission.ownerId === user._id) return true;
+  if (courier.ownerId === user.authUserId) return true;
 
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Check if user can delete commission
- */
-export function canDeleteCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!commission) return false;
-  if (commission.deletedAt) return false;
-
-  // Cannot delete paid commissions
-  if (commission.status === 'paid') return false;
-
-  // Owner can delete
-  if (commission.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Check if user can restore commission
- */
-export function canRestoreCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): boolean {
-  if (!commission) return false;
-  if (!commission.deletedAt) return false;
-
-  // Owner can restore
-  if (commission.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control
-  return false;
-}
-
-/**
- * Check if user can approve commission
- */
-export async function canApproveCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): Promise<boolean> {
-  if (!commission) return false;
-  if (commission.deletedAt) return false;
-  if (commission.status === 'paid') return false;
-
-  // Owner can approve
-  if (commission.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control (managers, admins)
-  return false;
-}
-
-/**
- * Check if user can pay commission
- */
-export async function canPayCommission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): Promise<boolean> {
-  if (!commission) return false;
-  if (commission.deletedAt) return false;
-  if (commission.status === 'paid') return false;
-
-  // Owner can pay
-  if (commission.ownerId === user._id) return true;
-
-  // TODO: Add role-based access control (finance team, admins)
-  return false;
-}
-
-/**
- * Validate commission exists and is not deleted
- */
-export function validateCommissionExists(
-  commission: Doc<'yourobcCourierCommissions'> | null
-): asserts commission is Doc<'yourobcCourierCommissions'> {
-  if (!commission) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.NOT_FOUND);
+  // Check if courier is archived
+  if (courier.status === 'archived') {
+    // Only admins can edit archived items
+    return false;
   }
-  if (commission.deletedAt) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.ALREADY_DELETED);
-  }
+
+  return false;
 }
 
-/**
- * Require edit permission or throw error
- */
-export async function requireCommissionEditPermission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
+export async function requireEditCourierAccess(
+  ctx: QueryCtx | MutationCtx,
+  courier: Courier,
+  user: UserProfile
 ): Promise<void> {
-  if (!canEditCommission(commission, user)) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.UNAUTHORIZED_EDIT);
+  if (!(await canEditCourier(ctx, courier, user))) {
+    throw new Error('You do not have permission to edit this courier');
   }
 }
 
-/**
- * Require delete permission or throw error
- */
-export async function requireCommissionDeletePermission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
-): Promise<void> {
-  if (!canDeleteCommission(commission, user)) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.UNAUTHORIZED_DELETE);
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteCourier(courier: Courier, user: UserProfile): Promise<boolean> {
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (courier.ownerId === user.authUserId) return true;
+  return false;
+}
+
+export async function requireDeleteCourierAccess(courier: Courier, user: UserProfile): Promise<void> {
+  if (!(await canDeleteCourier(courier, user))) {
+    throw new Error('You do not have permission to delete this courier');
   }
 }
 
-/**
- * Require restore permission or throw error
- */
-export async function requireCommissionRestorePermission(
-  commission: Doc<'yourobcCourierCommissions'> | null,
-  user: Doc<'userProfiles'>
+// ============================================================================
+// API Management Access
+// ============================================================================
+
+export async function canManageCourierApi(courier: Courier, user: UserProfile): Promise<boolean> {
+  // Only admins can manage API credentials
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  return false;
+}
+
+export async function requireManageCourierApiAccess(
+  courier: Courier,
+  user: UserProfile
 ): Promise<void> {
-  if (!canRestoreCommission(commission, user)) {
-    throw new Error(COMMISSIONS_CONSTANTS.ERRORS.UNAUTHORIZED_RESTORE);
+  if (!(await canManageCourierApi(courier, user))) {
+    throw new Error('You do not have permission to manage API credentials for this courier');
   }
+}
+
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterCouriersByAccess(
+  ctx: QueryCtx | MutationCtx,
+  couriers: Courier[],
+  user: UserProfile
+): Promise<Courier[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return couriers;
+  }
+
+  const accessible: Courier[] = [];
+
+  for (const courier of couriers) {
+    if (await canViewCourier(ctx, courier, user)) {
+      accessible.push(courier);
+    }
+  }
+
+  return accessible;
 }

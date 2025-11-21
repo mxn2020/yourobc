@@ -1,45 +1,39 @@
 // convex/lib/software/yourobc/partners/types.ts
-// Type definitions for partners module
+// TypeScript type definitions for partners module
 
 import type { Doc, Id } from '@/generated/dataModel';
+import type { PartnersStatus } from '@/schema/software/yourobc/partners/types';
 
-// Partner entity type
+// Entity types
 export type Partner = Doc<'yourobcPartners'>;
+export type PartnerId = Id<'yourobcPartners'>;
 
-// Partner creation input type
-export interface CreatePartnerInput {
+// Data interfaces
+export interface CreatePartnerData {
   companyName: string;
   shortName?: string;
   partnerCode?: string;
   primaryContact: {
     name: string;
-    email?: string;
+    email: string;
     phone?: string;
-    isPrimary: boolean;
-    role?: string;
-    position?: string;
-    department?: string;
-    mobile?: string;
-    preferredContactMethod?: 'email' | 'phone' | 'mobile';
-    notes?: string;
   };
   quotingEmail?: string;
   address: {
-    street?: string;
+    street: string;
     city: string;
-    postalCode?: string;
+    state?: string;
+    postalCode: string;
     country: string;
-    countryCode: string;
   };
   serviceCoverage: {
     countries: string[];
-    cities: string[];
-    airports: string[];
+    regions?: string[];
   };
-  serviceType: 'OBC' | 'NFO' | 'both';
+  serviceType: 'air' | 'ocean' | 'road' | 'rail' | 'multimodal';
   preferredCurrency: 'EUR' | 'USD';
   paymentTerms: number;
-  ranking?: 1 | 2 | 3 | 4 | 5;
+  ranking?: number;
   rankingNotes?: string;
   internalPaymentNotes?: string;
   serviceCapabilities?: {
@@ -49,46 +43,39 @@ export interface CreatePartnerInput {
     handlesNFO?: boolean;
     handlesTrucking?: boolean;
   };
-  status?: 'active' | 'inactive' | 'suspended';
+  commissionRate?: number;
+  apiEnabled?: boolean;
+  apiKey?: string;
+  apiEndpoint?: string;
+  status?: PartnersStatus;
   notes?: string;
-  tags?: string[];
-  category?: string;
 }
 
-// Partner update input type
-export interface UpdatePartnerInput {
+export interface UpdatePartnerData {
   companyName?: string;
   shortName?: string;
   partnerCode?: string;
   primaryContact?: {
     name: string;
-    email?: string;
+    email: string;
     phone?: string;
-    isPrimary: boolean;
-    role?: string;
-    position?: string;
-    department?: string;
-    mobile?: string;
-    preferredContactMethod?: 'email' | 'phone' | 'mobile';
-    notes?: string;
   };
   quotingEmail?: string;
   address?: {
-    street?: string;
+    street: string;
     city: string;
-    postalCode?: string;
+    state?: string;
+    postalCode: string;
     country: string;
-    countryCode: string;
   };
   serviceCoverage?: {
     countries: string[];
-    cities: string[];
-    airports: string[];
+    regions?: string[];
   };
-  serviceType?: 'OBC' | 'NFO' | 'both';
+  serviceType?: 'air' | 'ocean' | 'road' | 'rail' | 'multimodal';
   preferredCurrency?: 'EUR' | 'USD';
   paymentTerms?: number;
-  ranking?: 1 | 2 | 3 | 4 | 5;
+  ranking?: number;
   rankingNotes?: string;
   internalPaymentNotes?: string;
   serviceCapabilities?: {
@@ -98,46 +85,25 @@ export interface UpdatePartnerInput {
     handlesNFO?: boolean;
     handlesTrucking?: boolean;
   };
-  status?: 'active' | 'inactive' | 'suspended';
+  commissionRate?: number;
+  apiEnabled?: boolean;
+  apiKey?: string;
+  apiEndpoint?: string;
+  status?: PartnersStatus;
   notes?: string;
-  tags?: string[];
-  category?: string;
 }
 
-// Partner list filters
-export interface PartnerListFilters {
-  status?: 'active' | 'inactive' | 'suspended';
-  serviceType?: 'OBC' | 'NFO' | 'both';
+// Response types
+export interface PartnerListResponse {
+  items: Partner[];
+  total: number;
+  hasMore: boolean;
+}
+
+// Filter types
+export interface PartnerFilters {
+  status?: PartnersStatus[];
+  serviceType?: string[];
+  search?: string;
   country?: string;
-  city?: string;
-  airport?: string;
-  ranking?: 1 | 2 | 3 | 4 | 5;
-  minRanking?: 1 | 2 | 3 | 4 | 5;
-  searchQuery?: string;
-  tags?: string[];
-}
-
-// Partner statistics
-export interface PartnerStatistics {
-  totalPartners: number;
-  activePartners: number;
-  inactivePartners: number;
-  suspendedPartners: number;
-  partnersByServiceType: {
-    OBC: number;
-    NFO: number;
-    both: number;
-  };
-  partnersByCurrency: {
-    EUR: number;
-    USD: number;
-  };
-  averageRanking: number;
-  partnersByRanking: {
-    1: number;
-    2: number;
-    3: number;
-    4: number;
-    5: number;
-  };
 }

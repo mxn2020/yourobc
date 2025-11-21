@@ -1,457 +1,679 @@
 // convex/lib/software/yourobc/customers/mutations.ts
 // Write operations for customers module
 
-import type { MutationCtx } from '@/generated/server';
-import type { Id } from '@/generated/dataModel';
-import type { Customer, CustomerId, CreateCustomerInput, UpdateCustomerInput } from '@/schema/software/yourobc/customers';
-import type { CustomerSuspensionData, CustomerReactivationData } from './types';
-import {
-  canEditCustomer,
-  canDeleteCustomer,
-  canRestoreCustomer,
-  canSuspendCustomer,
-  canReactivateCustomer,
-  canChangeCustomerStatus,
-  requireEditPermission,
-  requireDeletePermission,
-  requireRestorePermission,
-  validateCustomerExists,
-} from './permissions';
-import {
-  validateCustomerData,
-  validateCustomerUpdateData,
-  generatePublicId,
-} from './utils';
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { customersValidators } from '@/schema/software/yourobc/customers/validators';
 import { CUSTOMERS_CONSTANTS } from './constants';
+import { validateCustomerData } from './utils';
+import { requireEditCustomerAccess, requireDeleteCustomerAccess, canEditCustomer, canDeleteCustomer } from './permissions';
+import type { CustomerId } from './types';
+
+// Contact schema validator for args
+const contactValidator = v.object({
+  name: v.string(),
+  email: v.optional(v.string()),
+  phone: v.optional(v.string()),
+  isPrimary: v.boolean(),
+  role: v.optional(v.string()),
+  position: v.optional(v.string()),
+  department: v.optional(v.string()),
+  mobile: v.optional(v.string()),
+  preferredContactMethod: v.optional(v.union(v.literal('email'), v.literal('phone'), v.literal('mobile'))),
+  notes: v.optional(v.string()),
+});
+
+// Address schema validator for args
+const addressValidator = v.object({
+  street: v.optional(v.string()),
+  city: v.string(),
+  postalCode: v.optional(v.string()),
+  country: v.string(),
+  countryCode: v.string(),
+});
 
 /**
- * Get current user or throw error
+ * Create new customer
  */
-async function requireCurrentUser(ctx: MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
+export const createCustomer = mutation({
+  args: {
+    data: v.object({
+      companyName: v.string(),
+      shortName: v.optional(v.string()),
+      website: v.optional(v.string()),
+      primaryContact: contactValidator,
+      additionalContacts: v.optional(v.array(contactValidator)),
+      billingAddress: addressValidator,
+      shippingAddress: v.optional(addressValidator),
+      defaultCurrency: customersValidators.currency,
+      paymentTerms: v.number(),
+      paymentMethod: customersValidators.paymentMethod,
+      margin: v.number(),
+      status: v.optional(customersValidators.status),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
+      serviceSuspended: v.optional(v.boolean()),
+      serviceSuspendedDate: v.optional(v.number()),
+      serviceSuspendedReason: v.optional(v.string()),
+      serviceReactivatedDate: v.optional(v.number()),
+      notes: v.optional(v.string()),
+      internalNotes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.object({})),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<CustomerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  const user = await ctx.db
-    .query('userProfiles')
-    .filter((q) => q.eq(q.field('authSubject'), identity.subject))
-    .first();
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, CUSTOMERS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  if (!user) {
-    throw new Error('User profile not found');
-  }
+    // 3. VALIDATE: Check data validity
+    const errors = validateCustomerData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  return user;
-}
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+    const now = Date.now();
+
+    // Initialize stats
+    const stats = {
+      totalQuotes: 0,
+      acceptedQuotes: 0,
+      totalRevenue: 0,
+    };
+
+    // 5. CREATE: Insert into database
+    const customerId = await ctx.db.insert('yourobcCustomers', {
+      publicId,
+      companyName: data.companyName.trim(),
+      shortName: data.shortName?.trim(),
+      website: data.website?.trim(),
+      primaryContact: {
+        ...data.primaryContact,
+        name: data.primaryContact.name.trim(),
+        email: data.primaryContact.email?.trim(),
+        phone: data.primaryContact.phone?.trim(),
+        mobile: data.primaryContact.mobile?.trim(),
+        notes: data.primaryContact.notes?.trim(),
+      },
+      additionalContacts: (data.additionalContacts || []).map(contact => ({
+        ...contact,
+        name: contact.name.trim(),
+        email: contact.email?.trim(),
+        phone: contact.phone?.trim(),
+        mobile: contact.mobile?.trim(),
+        notes: contact.notes?.trim(),
+      })),
+      billingAddress: {
+        ...data.billingAddress,
+        street: data.billingAddress.street?.trim(),
+        city: data.billingAddress.city.trim(),
+        postalCode: data.billingAddress.postalCode?.trim(),
+        country: data.billingAddress.country.trim(),
+        countryCode: data.billingAddress.countryCode.trim().toUpperCase(),
+      },
+      shippingAddress: data.shippingAddress ? {
+        ...data.shippingAddress,
+        street: data.shippingAddress.street?.trim(),
+        city: data.shippingAddress.city.trim(),
+        postalCode: data.shippingAddress.postalCode?.trim(),
+        country: data.shippingAddress.country.trim(),
+        countryCode: data.shippingAddress.countryCode.trim().toUpperCase(),
+      } : undefined,
+      defaultCurrency: data.defaultCurrency,
+      paymentTerms: data.paymentTerms,
+      paymentMethod: data.paymentMethod,
+      margin: data.margin,
+      status: data.status || 'active',
+      inquirySourceId: data.inquirySourceId,
+      serviceSuspended: data.serviceSuspended,
+      serviceSuspendedDate: data.serviceSuspendedDate,
+      serviceSuspendedReason: data.serviceSuspendedReason?.trim(),
+      serviceReactivatedDate: data.serviceReactivatedDate,
+      stats,
+      notes: data.notes?.trim(),
+      internalNotes: data.internalNotes?.trim(),
+      tags: (data.tags || []).map(tag => tag.trim()),
+      category: data.category?.trim(),
+      customFields: data.customFields,
+      ownerId: user.authUserId,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user.authUserId,
+    });
+
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.created',
+      entityType: 'system_customer',
+      entityId: publicId,
+      entityTitle: data.companyName.trim(),
+      description: `Created customer: ${data.companyName.trim()}`,
+      metadata: {
+        status: data.status || 'active',
+        currency: data.defaultCurrency,
+        margin: data.margin,
+      },
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
+
+    // 7. RETURN: Return entity ID
+    return customerId;
+  },
+});
 
 /**
- * Create an audit log entry
+ * Update existing customer
  */
-async function createAuditLog(
-  ctx: MutationCtx,
-  action: string,
-  entityType: string,
-  entityId: string,
-  entityTitle: string,
-  description: string,
-  userId: Id<'userProfiles'>,
-  userName: string,
-  metadata?: Record<string, any>
-): Promise<void> {
-  const now = Date.now();
-  await ctx.db.insert('auditLogs', {
-    userId,
-    userName,
-    action,
-    entityType,
-    entityId,
-    entityTitle,
-    description,
-    metadata: metadata || {},
-    createdAt: now,
-    createdBy: userId,
-    updatedAt: now,
-  });
-}
+export const updateCustomer = mutation({
+  args: {
+    customerId: v.id('yourobcCustomers'),
+    updates: v.object({
+      companyName: v.optional(v.string()),
+      shortName: v.optional(v.string()),
+      website: v.optional(v.string()),
+      primaryContact: v.optional(contactValidator),
+      additionalContacts: v.optional(v.array(contactValidator)),
+      billingAddress: v.optional(addressValidator),
+      shippingAddress: v.optional(addressValidator),
+      defaultCurrency: v.optional(customersValidators.currency),
+      paymentTerms: v.optional(v.number()),
+      paymentMethod: v.optional(customersValidators.paymentMethod),
+      margin: v.optional(v.number()),
+      status: v.optional(customersValidators.status),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
+      serviceSuspended: v.optional(v.boolean()),
+      serviceSuspendedDate: v.optional(v.number()),
+      serviceSuspendedReason: v.optional(v.string()),
+      serviceReactivatedDate: v.optional(v.number()),
+      notes: v.optional(v.string()),
+      internalNotes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.object({})),
+    }),
+  },
+  handler: async (ctx, { customerId, updates }): Promise<CustomerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-/**
- * Create customer
- */
-export async function createCustomer(
-  ctx: MutationCtx,
-  data: CreateCustomerInput
-): Promise<CustomerId> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+    // 2. CHECK: Verify entity exists
+    const customer = await ctx.db.get(customerId);
+    if (!customer || customer.deletedAt) {
+      throw new Error('Customer not found');
+    }
 
-  // 2. VALIDATE: Check data validity
-  validateCustomerData(data);
+    // 3. AUTHZ: Check edit permission
+    await requireEditCustomerAccess(ctx, customer, user);
 
-  // 3. PROCESS: Generate IDs and prepare data
-  const publicId = generatePublicId();
-  const now = Date.now();
+    // 4. VALIDATE: Check update data validity
+    const errors = validateCustomerData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // 4. CREATE: Insert into database
-  const customerId = await ctx.db.insert('yourobcCustomers', {
-    publicId,
-    companyName: data.companyName.trim(),
-    shortName: data.shortName?.trim(),
-    website: data.website?.trim(),
-    ownerId: user._id,
-    status: CUSTOMERS_CONSTANTS.DEFAULT_VALUES.STATUS as any,
-    primaryContact: data.primaryContact,
-    additionalContacts: data.additionalContacts || [],
-    billingAddress: data.billingAddress,
-    shippingAddress: data.shippingAddress,
-    defaultCurrency: data.defaultCurrency,
-    paymentTerms: data.paymentTerms,
-    paymentMethod: data.paymentMethod,
-    margin: data.margin,
-    inquirySourceId: data.inquirySourceId,
-    stats: CUSTOMERS_CONSTANTS.DEFAULT_VALUES.STATS as any,
-    notes: data.notes,
-    internalNotes: data.internalNotes,
-    tags: data.tags || [],
-    category: data.category,
-    customFields: {},
-    createdAt: now,
-    updatedAt: now,
-    createdBy: user._id,
-    deletedAt: undefined,
-  });
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user.authUserId,
+    };
 
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.CREATED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    publicId,
-    data.companyName.trim(),
-    `Created customer: ${data.companyName.trim()}`,
-    user._id,
-    user.name || user.email || 'Unknown User',
-    { companyName: data.companyName, currency: data.defaultCurrency }
-  );
+    if (updates.companyName !== undefined) {
+      updateData.companyName = updates.companyName.trim();
+    }
+    if (updates.shortName !== undefined) {
+      updateData.shortName = updates.shortName?.trim();
+    }
+    if (updates.website !== undefined) {
+      updateData.website = updates.website?.trim();
+    }
+    if (updates.primaryContact !== undefined) {
+      updateData.primaryContact = {
+        ...updates.primaryContact,
+        name: updates.primaryContact.name.trim(),
+        email: updates.primaryContact.email?.trim(),
+        phone: updates.primaryContact.phone?.trim(),
+        mobile: updates.primaryContact.mobile?.trim(),
+        notes: updates.primaryContact.notes?.trim(),
+      };
+    }
+    if (updates.additionalContacts !== undefined) {
+      updateData.additionalContacts = updates.additionalContacts.map(contact => ({
+        ...contact,
+        name: contact.name.trim(),
+        email: contact.email?.trim(),
+        phone: contact.phone?.trim(),
+        mobile: contact.mobile?.trim(),
+        notes: contact.notes?.trim(),
+      }));
+    }
+    if (updates.billingAddress !== undefined) {
+      updateData.billingAddress = {
+        ...updates.billingAddress,
+        street: updates.billingAddress.street?.trim(),
+        city: updates.billingAddress.city.trim(),
+        postalCode: updates.billingAddress.postalCode?.trim(),
+        country: updates.billingAddress.country.trim(),
+        countryCode: updates.billingAddress.countryCode.trim().toUpperCase(),
+      };
+    }
+    if (updates.shippingAddress !== undefined) {
+      updateData.shippingAddress = updates.shippingAddress ? {
+        ...updates.shippingAddress,
+        street: updates.shippingAddress.street?.trim(),
+        city: updates.shippingAddress.city.trim(),
+        postalCode: updates.shippingAddress.postalCode?.trim(),
+        country: updates.shippingAddress.country.trim(),
+        countryCode: updates.shippingAddress.countryCode.trim().toUpperCase(),
+      } : undefined;
+    }
+    if (updates.defaultCurrency !== undefined) {
+      updateData.defaultCurrency = updates.defaultCurrency;
+    }
+    if (updates.paymentTerms !== undefined) {
+      updateData.paymentTerms = updates.paymentTerms;
+    }
+    if (updates.paymentMethod !== undefined) {
+      updateData.paymentMethod = updates.paymentMethod;
+    }
+    if (updates.margin !== undefined) {
+      updateData.margin = updates.margin;
+    }
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+    }
+    if (updates.inquirySourceId !== undefined) {
+      updateData.inquirySourceId = updates.inquirySourceId;
+    }
+    if (updates.serviceSuspended !== undefined) {
+      updateData.serviceSuspended = updates.serviceSuspended;
+    }
+    if (updates.serviceSuspendedDate !== undefined) {
+      updateData.serviceSuspendedDate = updates.serviceSuspendedDate;
+    }
+    if (updates.serviceSuspendedReason !== undefined) {
+      updateData.serviceSuspendedReason = updates.serviceSuspendedReason?.trim();
+    }
+    if (updates.serviceReactivatedDate !== undefined) {
+      updateData.serviceReactivatedDate = updates.serviceReactivatedDate;
+    }
+    if (updates.notes !== undefined) {
+      updateData.notes = updates.notes?.trim();
+    }
+    if (updates.internalNotes !== undefined) {
+      updateData.internalNotes = updates.internalNotes?.trim();
+    }
+    if (updates.tags !== undefined) {
+      updateData.tags = updates.tags.map(tag => tag.trim());
+    }
+    if (updates.category !== undefined) {
+      updateData.category = updates.category?.trim();
+    }
+    if (updates.customFields !== undefined) {
+      updateData.customFields = updates.customFields;
+    }
 
-  // 6. RETURN: Return entity ID
-  return customerId;
-}
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(customerId, updateData);
 
-/**
- * Update customer
- */
-export async function updateCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId,
-  updates: UpdateCustomerInput
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.updated',
+      entityType: 'system_customer',
+      entityId: customer.publicId,
+      entityTitle: updateData.companyName || customer.companyName,
+      description: `Updated customer: ${updateData.companyName || customer.companyName}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
-
-  // 3. AUTHORIZE: Check edit permission
-  await requireEditPermission(customer, user);
-
-  // 4. VALIDATE: Check update data validity
-  validateCustomerUpdateData(updates);
-
-  // 5. UPDATE: Apply changes
-  const now = Date.now();
-  const updateData: any = {
-    ...updates,
-    updatedAt: now,
-    updatedBy: user._id,
-  };
-
-  // Trim string fields
-  if (updateData.companyName) {
-    updateData.companyName = updateData.companyName.trim();
-  }
-  if (updateData.shortName) {
-    updateData.shortName = updateData.shortName.trim();
-  }
-  if (updateData.website) {
-    updateData.website = updateData.website.trim();
-  }
-
-  await ctx.db.patch(customerId, updateData);
-
-  // 6. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.UPDATED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Updated customer: ${customer.companyName}`,
-    user._id,
-    user.name || user.email || 'Unknown User',
-    { updates: Object.keys(updates) }
-  );
-}
+    // 8. RETURN: Return entity ID
+    return customerId;
+  },
+});
 
 /**
  * Delete customer (soft delete)
  */
-export async function deleteCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const deleteCustomer = mutation({
+  args: {
+    customerId: v.id('yourobcCustomers'),
+  },
+  handler: async (ctx, { customerId }): Promise<CustomerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
+    // 2. CHECK: Verify entity exists
+    const customer = await ctx.db.get(customerId);
+    if (!customer || customer.deletedAt) {
+      throw new Error('Customer not found');
+    }
 
-  // 3. AUTHORIZE: Check delete permission
-  await requireDeletePermission(customer, user);
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteCustomerAccess(customer, user);
 
-  // 4. DELETE: Soft delete
-  const now = Date.now();
-  await ctx.db.patch(customerId, {
-    deletedAt: now,
-    deletedBy: user._id,
-  });
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(customerId, {
+      deletedAt: now,
+      deletedBy: user.authUserId,
+      updatedAt: now,
+      updatedBy: user.authUserId,
+    });
 
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.DELETED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Deleted customer: ${customer.companyName}`,
-    user._id,
-    user.name || user.email || 'Unknown User'
-  );
-}
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.deleted',
+      entityType: 'system_customer',
+      entityId: customer.publicId,
+      entityTitle: customer.companyName,
+      description: `Deleted customer: ${customer.companyName}`,
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
 
-/**
- * Restore customer (undo soft delete)
- */
-export async function restoreCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
-
-  // 2. FETCH: Get existing entity (including deleted)
-  const customer = await ctx.db.get(customerId);
-  if (!customer) {
-    throw new Error(CUSTOMERS_CONSTANTS.ERRORS.NOT_FOUND);
-  }
-
-  // Check if actually deleted
-  if (!customer.deletedAt) {
-    throw new Error('Customer is not deleted');
-  }
-
-  // 3. AUTHORIZE: Check restore permission
-  await requireRestorePermission(customer, user);
-
-  // 4. RESTORE: Remove deletion markers
-  await ctx.db.patch(customerId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-  });
-
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.RESTORED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Restored customer: ${customer.companyName}`,
-    user._id,
-    user.name || user.email || 'Unknown User'
-  );
-}
+    // 6. RETURN: Return entity ID
+    return customerId;
+  },
+});
 
 /**
- * Archive customer (set status to inactive)
+ * Restore soft-deleted customer
  */
-export async function archiveCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const restoreCustomer = mutation({
+  args: {
+    customerId: v.id('yourobcCustomers'),
+  },
+  handler: async (ctx, { customerId }): Promise<CustomerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
+    // 2. CHECK: Verify entity exists and is deleted
+    const customer = await ctx.db.get(customerId);
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+    if (!customer.deletedAt) {
+      throw new Error('Customer is not deleted');
+    }
 
-  // 3. AUTHORIZE: Check permission
-  const canChange = await canChangeCustomerStatus(customer, user);
-  if (!canChange) {
-    throw new Error('You do not have permission to archive this customer');
-  }
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      customer.ownerId !== user.authUserId &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this customer');
+    }
 
-  // 4. ARCHIVE: Set status to inactive
-  await ctx.db.patch(customerId, {
-    status: CUSTOMERS_CONSTANTS.STATUS.INACTIVE as any,
-    updatedAt: Date.now(),
-    updatedBy: user._id,
-  });
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(customerId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user.authUserId,
+    });
 
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.ARCHIVED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Archived customer: ${customer.companyName}`,
-    user._id,
-    user.name || user.email || 'Unknown User'
-  );
-}
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.restored',
+      entityType: 'system_customer',
+      entityId: customer.publicId,
+      entityTitle: customer.companyName,
+      description: `Restored customer: ${customer.companyName}`,
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return customerId;
+  },
+});
 
 /**
- * Suspend customer service
+ * Archive customer (status-based soft delete alternative)
  */
-export async function suspendCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId,
-  suspensionData: CustomerSuspensionData
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const archiveCustomer = mutation({
+  args: {
+    customerId: v.id('yourobcCustomers'),
+  },
+  handler: async (ctx, { customerId }): Promise<CustomerId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
+    // 2. CHECK: Verify entity exists
+    const customer = await ctx.db.get(customerId);
+    if (!customer || customer.deletedAt) {
+      throw new Error('Customer not found');
+    }
 
-  // 3. AUTHORIZE: Check permission
-  const canSuspend = await canSuspendCustomer(customer, user);
-  if (!canSuspend) {
-    throw new Error('You do not have permission to suspend this customer');
-  }
+    // 3. AUTHZ: Check edit permission
+    await requireEditCustomerAccess(ctx, customer, user);
 
-  // 4. SUSPEND: Set suspension fields
-  const now = Date.now();
-  await ctx.db.patch(customerId, {
-    serviceSuspended: true,
-    serviceSuspendedDate: now,
-    serviceSuspendedReason: suspensionData.reason,
-    updatedAt: now,
-    updatedBy: user._id,
-  });
+    // 4. ARCHIVE: Update status to inactive
+    const now = Date.now();
+    await ctx.db.patch(customerId, {
+      status: 'inactive',
+      updatedAt: now,
+      updatedBy: user.authUserId,
+    });
 
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.SUSPENDED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Suspended customer: ${customer.companyName} - Reason: ${suspensionData.reason}`,
-    user._id,
-    user.name || user.email || 'Unknown User',
-    { reason: suspensionData.reason, notes: suspensionData.notes }
-  );
-}
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.archived',
+      entityType: 'system_customer',
+      entityId: customer.publicId,
+      entityTitle: customer.companyName,
+      description: `Archived customer: ${customer.companyName}`,
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return customerId;
+  },
+});
 
 /**
- * Reactivate customer service
+ * Bulk update multiple customers
  */
-export async function reactivateCustomer(
-  ctx: MutationCtx,
-  customerId: CustomerId,
-  reactivationData: CustomerReactivationData = {}
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const bulkUpdateCustomers = mutation({
+  args: {
+    customerIds: v.array(v.id('yourobcCustomers')),
+    updates: v.object({
+      status: v.optional(customersValidators.status),
+      defaultCurrency: v.optional(customersValidators.currency),
+      paymentMethod: v.optional(customersValidators.paymentMethod),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { customerIds, updates }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
+    // 2. AUTHZ: Check bulk edit permission
+    await requirePermission(ctx, CUSTOMERS_CONSTANTS.PERMISSIONS.BULK_EDIT, {
+      allowAdmin: true,
+    });
 
-  // 3. AUTHORIZE: Check permission
-  const canReactivate = await canReactivateCustomer(customer, user);
-  if (!canReactivate) {
-    throw new Error('You do not have permission to reactivate this customer');
-  }
+    // 3. VALIDATE: Check update data
+    const errors = validateCustomerData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // 4. REACTIVATE: Clear suspension fields
-  const now = Date.now();
-  await ctx.db.patch(customerId, {
-    serviceSuspended: false,
-    serviceReactivatedDate: now,
-    updatedAt: now,
-    updatedBy: user._id,
-  });
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-  // 5. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.REACTIVATED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Reactivated customer: ${customer.companyName}`,
-    user._id,
-    user.name || user.email || 'Unknown User',
-    { notes: reactivationData.notes }
-  );
-}
+    // 4. PROCESS: Update each entity
+    for (const customerId of customerIds) {
+      try {
+        const customer = await ctx.db.get(customerId);
+        if (!customer || customer.deletedAt) {
+          failed.push({ id: customerId, reason: 'Not found' });
+          continue;
+        }
+
+        // Check individual edit access
+        const canEdit = await canEditCustomer(ctx, customer, user);
+        if (!canEdit) {
+          failed.push({ id: customerId, reason: 'No permission' });
+          continue;
+        }
+
+        // Apply updates
+        const updateData: any = {
+          updatedAt: now,
+          updatedBy: user.authUserId,
+        };
+
+        if (updates.status !== undefined) updateData.status = updates.status;
+        if (updates.defaultCurrency !== undefined) updateData.defaultCurrency = updates.defaultCurrency;
+        if (updates.paymentMethod !== undefined) updateData.paymentMethod = updates.paymentMethod;
+        if (updates.tags !== undefined) {
+          updateData.tags = updates.tags.map(tag => tag.trim());
+        }
+        if (updates.category !== undefined) {
+          updateData.category = updates.category?.trim();
+        }
+
+        await ctx.db.patch(customerId, updateData);
+        results.push({ id: customerId, success: true });
+      } catch (error: any) {
+        failed.push({ id: customerId, reason: error.message });
+      }
+    }
+
+    // 5. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.bulk_updated',
+      entityType: 'system_customer',
+      entityId: 'bulk',
+      entityTitle: `${results.length} customers`,
+      description: `Bulk updated ${results.length} customers`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+        updates,
+      },
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return results summary
+    return {
+      updated: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});
 
 /**
- * Change customer status
+ * Bulk delete multiple customers (soft delete)
  */
-export async function changeCustomerStatus(
-  ctx: MutationCtx,
-  customerId: CustomerId,
-  newStatus: string
-): Promise<void> {
-  // 1. AUTH: Get authenticated user
-  const user = await requireCurrentUser(ctx);
+export const bulkDeleteCustomers = mutation({
+  args: {
+    customerIds: v.array(v.id('yourobcCustomers')),
+  },
+  handler: async (ctx, { customerIds }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // 2. FETCH: Get existing entity
-  const customer = await ctx.db.get(customerId);
-  validateCustomerExists(customer);
+    // 2. AUTHZ: Check delete permission
+    await requirePermission(ctx, CUSTOMERS_CONSTANTS.PERMISSIONS.DELETE, {
+      allowAdmin: true,
+    });
 
-  // 3. AUTHORIZE: Check permission
-  const canChange = await canChangeCustomerStatus(customer, user);
-  if (!canChange) {
-    throw new Error('You do not have permission to change customer status');
-  }
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-  // 4. VALIDATE: Check valid status
-  const validStatuses = [
-    CUSTOMERS_CONSTANTS.STATUS.ACTIVE,
-    CUSTOMERS_CONSTANTS.STATUS.INACTIVE,
-    CUSTOMERS_CONSTANTS.STATUS.BLACKLISTED,
-  ];
-  if (!validStatuses.includes(newStatus as any)) {
-    throw new Error('Invalid customer status');
-  }
+    // 3. PROCESS: Delete each entity
+    for (const customerId of customerIds) {
+      try {
+        const customer = await ctx.db.get(customerId);
+        if (!customer || customer.deletedAt) {
+          failed.push({ id: customerId, reason: 'Not found' });
+          continue;
+        }
 
-  // 5. UPDATE: Change status
-  const now = Date.now();
-  await ctx.db.patch(customerId, {
-    status: newStatus as any,
-    updatedAt: now,
-    updatedBy: user._id,
-  });
+        // Check individual delete access
+        const canDelete = await canDeleteCustomer(customer, user);
+        if (!canDelete) {
+          failed.push({ id: customerId, reason: 'No permission' });
+          continue;
+        }
 
-  // 6. AUDIT: Create audit log
-  await createAuditLog(
-    ctx,
-    CUSTOMERS_CONSTANTS.AUDIT_ACTIONS.STATUS_CHANGED,
-    CUSTOMERS_CONSTANTS.ENTITY_TYPE,
-    customer.publicId,
-    customer.companyName,
-    `Changed customer status: ${customer.companyName} from ${customer.status} to ${newStatus}`,
-    user._id,
-    user.name || user.email || 'Unknown User',
-    { oldStatus: customer.status, newStatus }
-  );
-}
+        // Soft delete
+        await ctx.db.patch(customerId, {
+          deletedAt: now,
+          deletedBy: user.authUserId,
+          updatedAt: now,
+          updatedBy: user.authUserId,
+        });
+
+        results.push({ id: customerId, success: true });
+      } catch (error: any) {
+        failed.push({ id: customerId, reason: error.message });
+      }
+    }
+
+    // 4. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user.authUserId,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'customer.bulk_deleted',
+      entityType: 'system_customer',
+      entityId: 'bulk',
+      entityTitle: `${results.length} customers`,
+      description: `Bulk deleted ${results.length} customers`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+      },
+      createdAt: now,
+      createdBy: user.authUserId,
+      updatedAt: now,
+    });
+
+    // 5. RETURN: Return results summary
+    return {
+      deleted: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});

@@ -1,197 +1,125 @@
 // convex/lib/software/yourobc/employeeKPIs/permissions.ts
-/**
- * Employee KPIs Permissions
- *
- * Authorization and permission checks for employee KPIs and targets.
- *
- * @module convex/lib/software/yourobc/employeeKPIs/permissions
- */
+// Access control and authorization logic for employeeKPIs module
 
-import { QueryCtx, MutationCtx } from '../../../_generated/server'
-import { Id } from '../../../_generated/dataModel'
+import type { QueryCtx, MutationCtx } from '@/generated/server';
+import type { EmployeeKPI } from './types';
+import type { Doc } from '@/generated/dataModel';
 
-/**
- * Check if user can view KPI
- * Users can view their own KPIs or if they're a manager/admin
- */
-export async function canViewKPI(
+type UserProfile = Doc<'userProfiles'>;
+
+// ============================================================================
+// View Access
+// ============================================================================
+
+export async function canViewEmployeeKPI(
   ctx: QueryCtx | MutationCtx,
-  kpi: {
-    ownerId: string
-    employeeId: Id<'yourobcEmployees'>
-    deletedAt?: number
-  },
-  userId: string
+  kpi: EmployeeKPI,
+  user: UserProfile
 ): Promise<boolean> {
-  // Check if soft deleted
-  if (kpi.deletedAt) {
-    return false
-  }
+  // Admins and superadmins can view all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can view
-  if (kpi.ownerId === userId) {
-    return true
-  }
+  if (kpi.ownerId === user._id) return true;
 
-  // TODO: Add role-based checks (manager, admin)
-  // For now, allow viewing if user is authenticated
-  return true
+  // Creator can view
+  if (kpi.createdBy === user._id) return true;
+
+  // Employee can view their own KPIs
+  const employee = await ctx.db.get(kpi.employeeId);
+  if (employee && employee.userProfileId === user._id) return true;
+
+  return false;
 }
 
-/**
- * Check if user can create KPI
- * Only managers/admins can create KPIs
- */
-export async function canCreateKPI(
+export async function requireViewEmployeeKPIAccess(
   ctx: QueryCtx | MutationCtx,
-  userId: string
-): Promise<boolean> {
-  // TODO: Add role-based checks (manager, admin)
-  // For now, allow any authenticated user
-  return true
+  kpi: EmployeeKPI,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canViewEmployeeKPI(ctx, kpi, user))) {
+    throw new Error('You do not have permission to view this KPI');
+  }
 }
 
-/**
- * Check if user can update KPI
- * Only the owner or managers/admins can update
- */
-export async function canUpdateKPI(
+// ============================================================================
+// Edit Access
+// ============================================================================
+
+export async function canEditEmployeeKPI(
   ctx: QueryCtx | MutationCtx,
-  kpi: {
-    ownerId: string
-    deletedAt?: number
-  },
-  userId: string
+  kpi: EmployeeKPI,
+  user: UserProfile
 ): Promise<boolean> {
-  // Check if soft deleted
-  if (kpi.deletedAt) {
-    return false
+  // Admins can edit all
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+
+  // Owner can edit
+  if (kpi.ownerId === user._id) return true;
+
+  // Check if KPI is achieved (typically locked)
+  if (kpi.status === 'achieved') {
+    // Only admins can edit achieved KPIs
+    return false;
   }
 
-  // Owner can update
-  if (kpi.ownerId === userId) {
-    return true
-  }
-
-  // TODO: Add role-based checks (manager, admin)
-  return false
+  return false;
 }
 
-/**
- * Check if user can delete KPI
- * Only the owner or managers/admins can delete
- */
-export async function canDeleteKPI(
+export async function requireEditEmployeeKPIAccess(
   ctx: QueryCtx | MutationCtx,
-  kpi: {
-    ownerId: string
-    deletedAt?: number
-  },
-  userId: string
-): Promise<boolean> {
-  // Already deleted
-  if (kpi.deletedAt) {
-    return false
+  kpi: EmployeeKPI,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canEditEmployeeKPI(ctx, kpi, user))) {
+    throw new Error('You do not have permission to edit this KPI');
   }
-
-  // Owner can delete
-  if (kpi.ownerId === userId) {
-    return true
-  }
-
-  // TODO: Add role-based checks (manager, admin)
-  return false
 }
 
-/**
- * Check if user can view target
- * Users can view their own targets or if they're a manager/admin
- */
-export async function canViewTarget(
-  ctx: QueryCtx | MutationCtx,
-  target: {
-    ownerId: string
-    employeeId: Id<'yourobcEmployees'>
-    deletedAt?: number
-  },
-  userId: string
+// ============================================================================
+// Delete Access
+// ============================================================================
+
+export async function canDeleteEmployeeKPI(
+  kpi: EmployeeKPI,
+  user: UserProfile
 ): Promise<boolean> {
-  // Check if soft deleted
-  if (target.deletedAt) {
-    return false
-  }
-
-  // Owner can view
-  if (target.ownerId === userId) {
-    return true
-  }
-
-  // TODO: Add role-based checks (manager, admin)
-  // For now, allow viewing if user is authenticated
-  return true
+  // Only admins and owners can delete
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (kpi.ownerId === user._id) return true;
+  return false;
 }
 
-/**
- * Check if user can create target
- * Only managers/admins can create targets
- */
-export async function canCreateTarget(
-  ctx: QueryCtx | MutationCtx,
-  userId: string
-): Promise<boolean> {
-  // TODO: Add role-based checks (manager, admin)
-  // For now, allow any authenticated user
-  return true
+export async function requireDeleteEmployeeKPIAccess(
+  kpi: EmployeeKPI,
+  user: UserProfile
+): Promise<void> {
+  if (!(await canDeleteEmployeeKPI(kpi, user))) {
+    throw new Error('You do not have permission to delete this KPI');
+  }
 }
 
-/**
- * Check if user can update target
- * Only the setter or managers/admins can update
- */
-export async function canUpdateTarget(
+// ============================================================================
+// Bulk Access Filtering
+// ============================================================================
+
+export async function filterEmployeeKPIsByAccess(
   ctx: QueryCtx | MutationCtx,
-  target: {
-    setBy: string
-    deletedAt?: number
-  },
-  userId: string
-): Promise<boolean> {
-  // Check if soft deleted
-  if (target.deletedAt) {
-    return false
+  kpis: EmployeeKPI[],
+  user: UserProfile
+): Promise<EmployeeKPI[]> {
+  // Admins see everything
+  if (user.role === 'admin' || user.role === 'superadmin') {
+    return kpis;
   }
 
-  // Setter can update
-  if (target.setBy === userId) {
-    return true
+  const accessible: EmployeeKPI[] = [];
+
+  for (const kpi of kpis) {
+    if (await canViewEmployeeKPI(ctx, kpi, user)) {
+      accessible.push(kpi);
+    }
   }
 
-  // TODO: Add role-based checks (manager, admin)
-  return false
-}
-
-/**
- * Check if user can delete target
- * Only the setter or managers/admins can delete
- */
-export async function canDeleteTarget(
-  ctx: QueryCtx | MutationCtx,
-  target: {
-    setBy: string
-    deletedAt?: number
-  },
-  userId: string
-): Promise<boolean> {
-  // Already deleted
-  if (target.deletedAt) {
-    return false
-  }
-
-  // Setter can delete
-  if (target.setBy === userId) {
-    return true
-  }
-
-  // TODO: Add role-based checks (manager, admin)
-  return false
+  return accessible;
 }

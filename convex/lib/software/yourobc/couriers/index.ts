@@ -1,88 +1,60 @@
 // convex/lib/software/yourobc/couriers/index.ts
-// Barrel exports for couriers library module
+// Public API exports for couriers module
 
-// Export constants
-export { COURIERS_CONSTANTS, COMMISSIONS_CONSTANTS } from './constants';
+// Constants
+export { COURIERS_CONSTANTS } from './constants';
 
-// Export types
-export type {
-  TimeTrackingData,
-  CourierAvailabilityData,
-  CourierRankingData,
-  CommissionApprovalData,
-  CommissionPaymentData,
-  CommissionCalculationData,
-  CourierFilters,
-  CommissionFilters,
-  CourierPerformanceMetrics,
-  CommissionSummary,
-} from './types';
+// Types
+export type * from './types';
 
-// Export utils
+// Utilities
 export {
-  generatePublicId,
-  generateCommissionPublicId,
   validateCourierData,
-  validateCourierUpdateData,
-  validateCommissionData,
-  validateCommissionUpdateData,
-  calculateCommissionAmount,
-  validateCommissionCalculation,
+  validateContact,
+  validateAddress,
+  validateServiceCoverage,
+  validateApiIntegration,
+  validateCostStructure,
   formatCourierDisplayName,
-  getCommissionDisplayDate,
+  isCourierEditable,
+  courierSupportsService,
+  courierCoversCountry,
+  calculateAverageReliability,
+  calculateAverageOnTimeRate,
 } from './utils';
 
-// Export permissions
+// Permissions
 export {
   canViewCourier,
   canEditCourier,
   canDeleteCourier,
-  canRestoreCourier,
-  canChangeCourierStatus,
-  validateCourierExists,
-  requireEditPermission,
-  requireDeletePermission,
-  requireRestorePermission,
-  canViewCommission,
-  canEditCommission,
-  canDeleteCommission,
-  canRestoreCommission,
-  canApproveCommission,
-  canPayCommission,
-  validateCommissionExists,
-  requireCommissionEditPermission,
-  requireCommissionDeletePermission,
-  requireCommissionRestorePermission,
+  canManageCourierApi,
+  requireViewCourierAccess,
+  requireEditCourierAccess,
+  requireDeleteCourierAccess,
+  requireManageCourierApiAccess,
+  filterCouriersByAccess,
 } from './permissions';
 
-// Export queries
+// Queries
 export {
-  getCourierById,
+  getCouriers,
+  getCourier,
   getCourierByPublicId,
-  getCourierByCourierNumber,
-  listCouriers,
-  listCouriersByOwner,
-  searchCouriers,
-  getCommissionById,
-  getCommissionByPublicId,
-  listCommissionsByCourier,
-  listCommissionsByShipment,
-  listCommissions,
-  getCommissionSummaryForCourier,
+  getCourierByName,
+  getPreferredCouriers,
+  getCouriersByServiceType,
+  getCouriersByCountry,
+  getCourierStats,
 } from './queries';
 
-// Export mutations
+// Mutations
 export {
   createCourier,
   updateCourier,
   deleteCourier,
   restoreCourier,
-  addTimeEntry,
-  changeCourierStatus,
-  createCommission,
-  updateCommission,
-  deleteCommission,
-  restoreCommission,
-  approveCommission,
-  payCommission,
+  archiveCourier,
+  bulkUpdateCouriers,
+  bulkDeleteCouriers,
 } from './mutations';

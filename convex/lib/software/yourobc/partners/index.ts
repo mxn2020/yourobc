@@ -2,14 +2,7 @@
 // Public API exports for partners module
 
 // Constants
-export {
-  PARTNERS_CONSTANTS,
-  PARTNER_STATUS_LABELS,
-  PARTNER_SERVICE_TYPE_LABELS,
-  CURRENCY_LABELS,
-  RANKING_LABELS,
-  SERVICE_CAPABILITIES_LABELS,
-} from './constants';
+export { PARTNERS_CONSTANTS } from './constants';
 
 // Types
 export type * from './types';
@@ -17,53 +10,27 @@ export type * from './types';
 // Utilities
 export {
   validatePartnerData,
-  validatePartnerUpdateData,
-  generatePartnerCode,
-  getPartnerDisplayName,
-  getPartnerStatusLabel,
-  getServiceTypeLabel,
-  getRankingLabel,
-  isPartnerActive,
-  canHandleServiceType,
-  coversCountry,
-  coversCity,
-  coversAirport,
-  getServiceCapabilitiesSummary,
-  formatRating,
-  formatPaymentTerms,
-  generateSearchKeywords,
+  formatPartnerDisplayName,
+  isPartnerEditable,
 } from './utils';
 
 // Permissions
 export {
   canViewPartner,
-  canViewInternalNotes,
-  canCreatePartner,
   canEditPartner,
   canDeletePartner,
-  canRestorePartner,
-  canPermanentlyDeletePartner,
-  canChangePartnerStatus,
-  canTransferPartnerOwnership,
-  requireViewAccess,
-  requireEditAccess,
-  requireDeleteAccess,
-  requireAdminAccess,
-  requireSuperAdminAccess,
+  requireViewPartnerAccess,
+  requireEditPartnerAccess,
+  requireDeletePartnerAccess,
+  filterPartnersByAccess,
 } from './permissions';
 
 // Queries
 export {
+  getPartners,
   getPartner,
   getPartnerByPublicId,
-  getPartnerByCompanyName,
-  listPartners,
-  listPartnersByOwner,
-  listActivePartners,
-  searchPartnersByLocation,
-  getPartnersCountByStatus,
-  getTopRatedPartners,
-  partnerExistsByCompanyName,
+  getPartnerStats,
 } from './queries';
 
 // Mutations
@@ -72,9 +39,5 @@ export {
   updatePartner,
   deletePartner,
   restorePartner,
-  changePartnerStatus,
-  updatePartnerRanking,
-  transferPartnerOwnership,
-  bulkUpdatePartnerStatus,
-  bulkDeletePartners,
+  archivePartner,
 } from './mutations';

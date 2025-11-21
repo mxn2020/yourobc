@@ -1,424 +1,526 @@
 // convex/lib/software/yourobc/tasks/mutations.ts
-/**
- * Tasks Mutation Functions
- *
- * Provides reusable mutation logic for tasks.
- * These functions handle CRUD operations and state transitions.
- *
- * @module convex/lib/software/yourobc/tasks/mutations
- */
+// Write operations for tasks module
 
-import type { MutationCtx } from '../../../../_generated/server'
-import type {
-  Task,
-  TaskId,
-  CreateTaskInput,
-  UpdateTaskInput,
-  TaskAssignment,
-  TaskCompletion,
-  TaskCancellation,
-} from './types'
-import {
-  generateTaskPublicId,
-  validateTaskData,
-  isValidStatusTransition,
-  getTaskDefaults,
-} from './utils'
-import {
-  canCreateTask,
-  canUpdateTask,
-  canDeleteTask,
-  canAssignTask,
-  canCompleteTask,
-  canCancelTask,
-} from './permissions'
-
-// ============================================================================
-// Create Operations
-// ============================================================================
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser, requirePermission, generateUniquePublicId } from '@/lib/auth.helper';
+import { tasksValidators } from '@/schema/software/yourobc/tasks/validators';
+import { TASKS_CONSTANTS } from './constants';
+import { validateTaskData } from './utils';
+import { requireEditTaskAccess, requireDeleteTaskAccess, canEditTask, canDeleteTask } from './permissions';
+import type { TaskId } from './types';
 
 /**
- * Creates a new task
+ * Create new task
  */
-export async function createTask(
-  ctx: MutationCtx,
-  userId: string,
-  input: CreateTaskInput
-): Promise<TaskId> {
-  // Check permissions
-  const createPermission = canCreateTask(userId)
-  if (!createPermission.allowed) {
-    throw new Error(createPermission.reason || 'Cannot create task')
-  }
+export const createTask = mutation({
+  args: {
+    data: v.object({
+      title: v.string(),
+      description: v.optional(v.string()),
+      status: v.optional(tasksValidators.status),
+      priority: v.optional(tasksValidators.priority),
+      taskType: v.optional(tasksValidators.taskType),
+      assignedTo: v.optional(v.id('userProfiles')),
+      dueDate: v.optional(v.number()),
+      relatedShipmentId: v.optional(v.id('yourobcShipments')),
+      relatedQuoteId: v.optional(v.id('yourobcQuotes')),
+      relatedCustomerId: v.optional(v.id('yourobcCustomers')),
+      relatedPartnerId: v.optional(v.id('yourobcPartners')),
+      checklist: v.optional(v.array(v.object({
+        id: v.string(),
+        text: v.string(),
+        completed: v.boolean(),
+        completedAt: v.optional(v.number()),
+        completedBy: v.optional(v.id('userProfiles')),
+      }))),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { data }): Promise<TaskId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Validate input
-  const validation = validateTaskData({ title: input.title, description: input.description })
-  if (!validation.valid) {
-    throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
-  }
+    // 2. AUTHZ: Check create permission
+    await requirePermission(ctx, TASKS_CONSTANTS.PERMISSIONS.CREATE, {
+      allowAdmin: true,
+    });
 
-  // Get defaults
-  const defaults = getTaskDefaults()
-
-  // Generate public ID
-  const publicId = generateTaskPublicId()
-
-  // Create task
-  const now = Date.now()
-  const taskId = await ctx.db.insert('yourobcTasks', {
-    publicId,
-    title: input.title,
-    description: input.description,
-    shipmentId: input.shipmentId as any,
-    type: input.type || defaults.type,
-    status: input.status || defaults.status,
-    priority: input.priority || defaults.priority,
-    visibility: input.visibility || defaults.visibility,
-    ownerId: userId,
-    assignedTo: input.assignedTo as any,
-    dueDate: input.dueDate,
-    tags: input.tags || defaults.tags,
-    category: input.category,
-    metadata: input.metadata,
-    createdBy: userId,
-    createdAt: now,
-  })
-
-  return taskId
-}
-
-// ============================================================================
-// Update Operations
-// ============================================================================
-
-/**
- * Updates a task
- */
-export async function updateTask(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string,
-  updates: UpdateTaskInput
-): Promise<void> {
-  // Get existing task
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
-
-  // Check if this is a status change
-  const isStatusChange = updates.status !== undefined && updates.status !== task.status
-
-  // Check permissions
-  const updatePermission = canUpdateTask(userId, task, isStatusChange)
-  if (!updatePermission.allowed) {
-    throw new Error(updatePermission.reason || 'Cannot update task')
-  }
-
-  // Validate status transition if status is being changed
-  if (isStatusChange) {
-    const transitionValidation = isValidStatusTransition(task.status, updates.status!)
-    if (!transitionValidation.valid) {
-      throw new Error(transitionValidation.reason || 'Invalid status transition')
+    // 3. VALIDATE: Check data validity
+    const errors = validateTaskData(data);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
-  }
 
-  // Validate input
-  const validation = validateTaskData(updates)
-  if (!validation.valid) {
-    throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
-  }
+    // 4. PROCESS: Generate IDs and prepare data
+    const publicId = await generateUniquePublicId(ctx, 'softwareYourObcTasks');
+    const now = Date.now();
 
-  // Prepare update data
-  const updateData: any = {
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  }
+    // 5. CREATE: Insert into database
+    const taskId = await ctx.db.insert('softwareYourObcTasks', {
+      publicId,
+      title: data.title.trim(),
+      description: data.description?.trim(),
+      status: data.status || 'draft',
+      priority: data.priority,
+      taskType: data.taskType,
+      assignedTo: data.assignedTo,
+      assignedBy: data.assignedTo ? user._id : undefined,
+      assignedAt: data.assignedTo ? now : undefined,
+      dueDate: data.dueDate,
+      relatedShipmentId: data.relatedShipmentId,
+      relatedQuoteId: data.relatedQuoteId,
+      relatedCustomerId: data.relatedCustomerId,
+      relatedPartnerId: data.relatedPartnerId,
+      checklist: data.checklist?.map(item => ({
+        ...item,
+        text: item.text.trim(),
+      })),
+      tags: data.tags?.map(tag => tag.trim()),
+      category: data.category?.trim(),
+      ownerId: user._id,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+    });
 
-  // Add fields that are being updated
-  if (updates.title !== undefined) updateData.title = updates.title
-  if (updates.description !== undefined) updateData.description = updates.description
-  if (updates.type !== undefined) updateData.type = updates.type
-  if (updates.status !== undefined) updateData.status = updates.status
-  if (updates.priority !== undefined) updateData.priority = updates.priority
-  if (updates.visibility !== undefined) updateData.visibility = updates.visibility
-  if (updates.assignedTo !== undefined) updateData.assignedTo = updates.assignedTo as any
-  if (updates.dueDate !== undefined) updateData.dueDate = updates.dueDate
-  if (updates.startedAt !== undefined) updateData.startedAt = updates.startedAt
-  if (updates.completedAt !== undefined) updateData.completedAt = updates.completedAt
-  if (updates.completedBy !== undefined) updateData.completedBy = updates.completedBy as any
-  if (updates.completionNotes !== undefined) updateData.completionNotes = updates.completionNotes
-  if (updates.cancelledAt !== undefined) updateData.cancelledAt = updates.cancelledAt
-  if (updates.cancelledBy !== undefined) updateData.cancelledBy = updates.cancelledBy as any
-  if (updates.cancellationReason !== undefined) updateData.cancellationReason = updates.cancellationReason
-  if (updates.tags !== undefined) updateData.tags = updates.tags
-  if (updates.category !== undefined) updateData.category = updates.category
-  if (updates.metadata !== undefined) updateData.metadata = updates.metadata
+    // 6. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.created',
+      entityType: 'system_task',
+      entityId: publicId,
+      entityTitle: data.title.trim(),
+      description: `Created task: ${data.title.trim()}`,
+      metadata: {
+        status: data.status || 'draft',
+        priority: data.priority,
+        assignedTo: data.assignedTo,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  // Update task
-  await ctx.db.patch(taskId as any, updateData)
-}
-
-/**
- * Updates task status
- */
-export async function updateTaskStatus(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string,
-  newStatus: 'pending' | 'in_progress' | 'completed' | 'archived'
-): Promise<void> {
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
-
-  // Validate transition
-  const transitionValidation = isValidStatusTransition(task.status, newStatus)
-  if (!transitionValidation.valid) {
-    throw new Error(transitionValidation.reason || 'Invalid status transition')
-  }
-
-  // Check permissions
-  const updatePermission = canUpdateTask(userId, task, true)
-  if (!updatePermission.allowed) {
-    throw new Error(updatePermission.reason || 'Cannot update task status')
-  }
-
-  // Update status with automatic timestamp
-  const updateData: any = {
-    status: newStatus,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  }
-
-  // Set automatic timestamps based on status
-  if (newStatus === 'in_progress' && !task.startedAt) {
-    updateData.startedAt = Date.now()
-  }
-
-  await ctx.db.patch(taskId as any, updateData)
-}
-
-// ============================================================================
-// Assignment Operations
-// ============================================================================
+    // 7. RETURN: Return entity ID
+    return taskId;
+  },
+});
 
 /**
- * Assigns a task to a user
+ * Update existing task
  */
-export async function assignTask(
-  ctx: MutationCtx,
-  userId: string,
-  assignment: TaskAssignment
-): Promise<void> {
-  const task = await ctx.db.get(assignment.taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+export const updateTask = mutation({
+  args: {
+    taskId: v.id('softwareYourObcTasks'),
+    updates: v.object({
+      title: v.optional(v.string()),
+      description: v.optional(v.string()),
+      status: v.optional(tasksValidators.status),
+      priority: v.optional(tasksValidators.priority),
+      taskType: v.optional(tasksValidators.taskType),
+      assignedTo: v.optional(v.id('userProfiles')),
+      dueDate: v.optional(v.number()),
+      checklist: v.optional(v.array(v.object({
+        id: v.string(),
+        text: v.string(),
+        completed: v.boolean(),
+        completedAt: v.optional(v.number()),
+        completedBy: v.optional(v.id('userProfiles')),
+      }))),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      completionNotes: v.optional(v.string()),
+      cancellationReason: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { taskId, updates }): Promise<TaskId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Check permissions
-  const assignPermission = canAssignTask(userId, task)
-  if (!assignPermission.allowed) {
-    throw new Error(assignPermission.reason || 'Cannot assign task')
-  }
+    // 2. CHECK: Verify entity exists
+    const task = await ctx.db.get(taskId);
+    if (!task || task.deletedAt) {
+      throw new Error('Task not found');
+    }
 
-  // Assign task
-  await ctx.db.patch(assignment.taskId as any, {
-    assignedTo: assignment.assignedTo as any,
-    assignedBy: assignment.assignedBy as any,
-    assignedAt: assignment.assignedAt,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    // 3. AUTHZ: Check edit permission
+    await requireEditTaskAccess(ctx, task, user);
+
+    // 4. VALIDATE: Check update data validity
+    const errors = validateTaskData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    // 5. PROCESS: Prepare update data
+    const now = Date.now();
+    const updateData: any = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
+    if (updates.title !== undefined) {
+      updateData.title = updates.title.trim();
+    }
+    if (updates.description !== undefined) {
+      updateData.description = updates.description?.trim();
+    }
+    if (updates.status !== undefined) {
+      updateData.status = updates.status;
+      // Auto-track completion
+      if (updates.status === 'completed') {
+        updateData.completedAt = now;
+        updateData.completedBy = user._id;
+      }
+      // Auto-track cancellation
+      if (updates.status === 'cancelled') {
+        updateData.cancelledAt = now;
+        updateData.cancelledBy = user._id;
+      }
+      // Auto-track start
+      if (updates.status === 'active' && !task.startedAt) {
+        updateData.startedAt = now;
+      }
+    }
+    if (updates.priority !== undefined) {
+      updateData.priority = updates.priority;
+    }
+    if (updates.taskType !== undefined) {
+      updateData.taskType = updates.taskType;
+    }
+    if (updates.assignedTo !== undefined) {
+      updateData.assignedTo = updates.assignedTo;
+      if (updates.assignedTo !== task.assignedTo) {
+        updateData.assignedBy = user._id;
+        updateData.assignedAt = now;
+      }
+    }
+    if (updates.dueDate !== undefined) {
+      updateData.dueDate = updates.dueDate;
+    }
+    if (updates.checklist !== undefined) {
+      updateData.checklist = updates.checklist.map(item => ({
+        ...item,
+        text: item.text.trim(),
+      }));
+    }
+    if (updates.tags !== undefined) {
+      updateData.tags = updates.tags.map(tag => tag.trim());
+    }
+    if (updates.category !== undefined) {
+      updateData.category = updates.category?.trim();
+    }
+    if (updates.completionNotes !== undefined) {
+      updateData.completionNotes = updates.completionNotes?.trim();
+    }
+    if (updates.cancellationReason !== undefined) {
+      updateData.cancellationReason = updates.cancellationReason?.trim();
+    }
+
+    // 6. UPDATE: Apply changes
+    await ctx.db.patch(taskId, updateData);
+
+    // 7. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.updated',
+      entityType: 'system_task',
+      entityId: task.publicId,
+      entityTitle: updateData.title || task.title,
+      description: `Updated task: ${updateData.title || task.title}`,
+      metadata: { changes: updates },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 8. RETURN: Return entity ID
+    return taskId;
+  },
+});
 
 /**
- * Unassigns a task
+ * Delete task (soft delete)
  */
-export async function unassignTask(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string
-): Promise<void> {
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+export const deleteTask = mutation({
+  args: {
+    taskId: v.id('softwareYourObcTasks'),
+  },
+  handler: async (ctx, { taskId }): Promise<TaskId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Check permissions
-  const assignPermission = canAssignTask(userId, task)
-  if (!assignPermission.allowed) {
-    throw new Error(assignPermission.reason || 'Cannot unassign task')
-  }
+    // 2. CHECK: Verify entity exists
+    const task = await ctx.db.get(taskId);
+    if (!task || task.deletedAt) {
+      throw new Error('Task not found');
+    }
 
-  // Unassign task
-  await ctx.db.patch(taskId as any, {
-    assignedTo: undefined,
-    assignedBy: undefined,
-    assignedAt: undefined,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    // 3. AUTHZ: Check delete permission
+    await requireDeleteTaskAccess(task, user);
 
-// ============================================================================
-// Completion Operations
-// ============================================================================
+    // 4. SOFT DELETE: Mark as deleted
+    const now = Date.now();
+    await ctx.db.patch(taskId, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.deleted',
+      entityType: 'system_task',
+      entityId: task.publicId,
+      entityTitle: task.title,
+      description: `Deleted task: ${task.title}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return taskId;
+  },
+});
 
 /**
- * Marks a task as completed
+ * Restore soft-deleted task
  */
-export async function completeTask(
-  ctx: MutationCtx,
-  userId: string,
-  completion: TaskCompletion
-): Promise<void> {
-  const task = await ctx.db.get(completion.taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+export const restoreTask = mutation({
+  args: {
+    taskId: v.id('softwareYourObcTasks'),
+  },
+  handler: async (ctx, { taskId }): Promise<TaskId> => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Check permissions
-  const completePermission = canCompleteTask(userId, task)
-  if (!completePermission.allowed) {
-    throw new Error(completePermission.reason || 'Cannot complete task')
-  }
+    // 2. CHECK: Verify entity exists and is deleted
+    const task = await ctx.db.get(taskId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+    if (!task.deletedAt) {
+      throw new Error('Task is not deleted');
+    }
 
-  // Validate transition
-  const transitionValidation = isValidStatusTransition(task.status, 'completed')
-  if (!transitionValidation.valid) {
-    throw new Error(transitionValidation.reason || 'Cannot complete task in current status')
-  }
+    // 3. AUTHZ: Check edit permission (owners and admins can restore)
+    if (
+      task.ownerId !== user._id &&
+      user.role !== 'admin' &&
+      user.role !== 'superadmin'
+    ) {
+      throw new Error('You do not have permission to restore this task');
+    }
 
-  // Complete task
-  await ctx.db.patch(completion.taskId as any, {
-    status: 'completed',
-    completedBy: completion.completedBy as any,
-    completedAt: completion.completedAt,
-    completionNotes: completion.completionNotes,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    // 4. RESTORE: Clear soft delete fields
+    const now = Date.now();
+    await ctx.db.patch(taskId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // 5. AUDIT: Create audit log
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.restored',
+      entityType: 'system_task',
+      entityId: task.publicId,
+      entityTitle: task.title,
+      description: `Restored task: ${task.title}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return entity ID
+    return taskId;
+  },
+});
 
 /**
- * Cancels/archives a task
+ * Bulk update multiple tasks
  */
-export async function cancelTask(
-  ctx: MutationCtx,
-  userId: string,
-  cancellation: TaskCancellation
-): Promise<void> {
-  const task = await ctx.db.get(cancellation.taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+export const bulkUpdateTasks = mutation({
+  args: {
+    taskIds: v.array(v.id('softwareYourObcTasks')),
+    updates: v.object({
+      status: v.optional(tasksValidators.status),
+      priority: v.optional(tasksValidators.priority),
+      assignedTo: v.optional(v.id('userProfiles')),
+      tags: v.optional(v.array(v.string())),
+    }),
+  },
+  handler: async (ctx, { taskIds, updates }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Check permissions
-  const cancelPermission = canCancelTask(userId, task)
-  if (!cancelPermission.allowed) {
-    throw new Error(cancelPermission.reason || 'Cannot cancel task')
-  }
+    // 2. AUTHZ: Check bulk edit permission
+    await requirePermission(ctx, TASKS_CONSTANTS.PERMISSIONS.BULK_EDIT, {
+      allowAdmin: true,
+    });
 
-  // Validate transition
-  const transitionValidation = isValidStatusTransition(task.status, 'archived')
-  if (!transitionValidation.valid) {
-    throw new Error(transitionValidation.reason || 'Cannot archive task in current status')
-  }
+    // 3. VALIDATE: Check update data
+    const errors = validateTaskData(updates);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
 
-  // Cancel task
-  await ctx.db.patch(cancellation.taskId as any, {
-    status: 'archived',
-    cancelledBy: cancellation.cancelledBy as any,
-    cancelledAt: cancellation.cancelledAt,
-    cancellationReason: cancellation.cancellationReason,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-// ============================================================================
-// Delete Operations (Soft Delete)
-// ============================================================================
+    // 4. PROCESS: Update each entity
+    for (const taskId of taskIds) {
+      try {
+        const task = await ctx.db.get(taskId);
+        if (!task || task.deletedAt) {
+          failed.push({ id: taskId, reason: 'Not found' });
+          continue;
+        }
+
+        // Check individual edit access
+        const canEdit = await canEditTask(ctx, task, user);
+        if (!canEdit) {
+          failed.push({ id: taskId, reason: 'No permission' });
+          continue;
+        }
+
+        // Apply updates
+        const updateData: any = {
+          updatedAt: now,
+          updatedBy: user._id,
+        };
+
+        if (updates.status !== undefined) updateData.status = updates.status;
+        if (updates.priority !== undefined) updateData.priority = updates.priority;
+        if (updates.assignedTo !== undefined) {
+          updateData.assignedTo = updates.assignedTo;
+          updateData.assignedBy = user._id;
+          updateData.assignedAt = now;
+        }
+        if (updates.tags !== undefined) {
+          updateData.tags = updates.tags.map(tag => tag.trim());
+        }
+
+        await ctx.db.patch(taskId, updateData);
+        results.push({ id: taskId, success: true });
+      } catch (error: any) {
+        failed.push({ id: taskId, reason: error.message });
+      }
+    }
+
+    // 5. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.bulk_updated',
+      entityType: 'system_task',
+      entityId: 'bulk',
+      entityTitle: `${results.length} tasks`,
+      description: `Bulk updated ${results.length} tasks`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+        updates,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    // 6. RETURN: Return results summary
+    return {
+      updated: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});
 
 /**
- * Soft deletes a task
+ * Bulk delete multiple tasks (soft delete)
  */
-export async function deleteTask(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string
-): Promise<void> {
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+export const bulkDeleteTasks = mutation({
+  args: {
+    taskIds: v.array(v.id('softwareYourObcTasks')),
+  },
+  handler: async (ctx, { taskIds }) => {
+    // 1. AUTH: Get authenticated user
+    const user = await requireCurrentUser(ctx);
 
-  // Check permissions
-  const deletePermission = canDeleteTask(userId, task)
-  if (!deletePermission.allowed) {
-    throw new Error(deletePermission.reason || 'Cannot delete task')
-  }
+    // 2. AUTHZ: Check delete permission
+    await requirePermission(ctx, TASKS_CONSTANTS.PERMISSIONS.DELETE, {
+      allowAdmin: true,
+    });
 
-  // Soft delete
-  await ctx.db.patch(taskId as any, {
-    deletedAt: Date.now(),
-    deletedBy: userId,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+    const now = Date.now();
+    const results = [];
+    const failed = [];
 
-/**
- * Restores a soft-deleted task
- */
-export async function restoreTask(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string
-): Promise<void> {
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+    // 3. PROCESS: Delete each entity
+    for (const taskId of taskIds) {
+      try {
+        const task = await ctx.db.get(taskId);
+        if (!task || task.deletedAt) {
+          failed.push({ id: taskId, reason: 'Not found' });
+          continue;
+        }
 
-  if (!task.deletedAt) {
-    throw new Error('Task is not deleted')
-  }
+        // Check individual delete access
+        const canDelete = await canDeleteTask(task, user);
+        if (!canDelete) {
+          failed.push({ id: taskId, reason: 'No permission' });
+          continue;
+        }
 
-  // Only owner can restore
-  if (task.ownerId !== userId && task.createdBy !== userId) {
-    throw new Error('Only the owner can restore a deleted task')
-  }
+        // Soft delete
+        await ctx.db.patch(taskId, {
+          deletedAt: now,
+          deletedBy: user._id,
+          updatedAt: now,
+          updatedBy: user._id,
+        });
 
-  // Restore task
-  await ctx.db.patch(taskId as any, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    updatedBy: userId,
-    updatedAt: Date.now(),
-  })
-}
+        results.push({ id: taskId, success: true });
+      } catch (error: any) {
+        failed.push({ id: taskId, reason: error.message });
+      }
+    }
 
-/**
- * Permanently deletes a task (hard delete)
- */
-export async function permanentlyDeleteTask(
-  ctx: MutationCtx,
-  userId: string,
-  taskId: string
-): Promise<void> {
-  const task = await ctx.db.get(taskId as any)
-  if (!task) {
-    throw new Error('Task not found')
-  }
+    // 4. AUDIT: Create single audit log for bulk operation
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'task.bulk_deleted',
+      entityType: 'system_task',
+      entityId: 'bulk',
+      entityTitle: `${results.length} tasks`,
+      description: `Bulk deleted ${results.length} tasks`,
+      metadata: {
+        successful: results.length,
+        failed: failed.length,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
 
-  // Only owner can permanently delete
-  if (task.ownerId !== userId && task.createdBy !== userId) {
-    throw new Error('Only the owner can permanently delete a task')
-  }
-
-  // Hard delete
-  await ctx.db.delete(taskId as any)
-}
+    // 5. RETURN: Return results summary
+    return {
+      deleted: results.length,
+      failed: failed.length,
+      failures: failed,
+    };
+  },
+});

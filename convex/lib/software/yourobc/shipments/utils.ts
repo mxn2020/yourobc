@@ -1,265 +1,284 @@
 // convex/lib/software/yourobc/shipments/utils.ts
-// Utility functions for shipments module
+// Validation functions and utility helpers for shipments module
 
-import type {
-  CreateShipmentInput,
-  UpdateShipmentInput,
-  CreateShipmentStatusHistoryInput,
-  UpdateShipmentStatusHistoryInput,
-  ShipmentStatus,
-  Sla,
-  SlaStatus,
-} from '@/schema/software/yourobc/shipments';
 import { SHIPMENTS_CONSTANTS } from './constants';
-
-// ============================================================================
-// Public ID Generation
-// ============================================================================
-
-/**
- * Generate a unique public ID for shipments
- */
-export function generatePublicId(): string {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 10);
-  return `shp_${timestamp}${randomStr}`;
-}
+import type {
+  CreateShipmentData,
+  UpdateShipmentData,
+  ShipmentDimensions,
+  ShipmentAddress,
+  CurrencyAmount,
+} from './types';
 
 /**
- * Generate a unique public ID for shipment status history
+ * Validate shipment data for creation/update
  */
-export function generateStatusHistoryPublicId(): string {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 10);
-  return `shp_hist_${timestamp}${randomStr}`;
-}
+export function validateShipmentData(
+  data: Partial<CreateShipmentData | UpdateShipmentData>
+): string[] {
+  const errors: string[] = [];
 
-// ============================================================================
-// Validation Functions
-// ============================================================================
-
-/**
- * Validate shipment data
- */
-export function validateShipmentData(data: CreateShipmentInput): void {
   // Validate shipment number
-  if (!data.shipmentNumber || data.shipmentNumber.trim().length === 0) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_SHIPMENT_NUMBER);
+  if (data.shipmentNumber !== undefined) {
+    const trimmed = data.shipmentNumber.trim();
+
+    if (!trimmed) {
+      errors.push('Shipment number is required');
+    } else if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_SHIPMENT_NUMBER_LENGTH) {
+      errors.push(`Shipment number cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_SHIPMENT_NUMBER_LENGTH} characters`);
+    } else if (!SHIPMENTS_CONSTANTS.VALIDATION.SHIPMENT_NUMBER_PATTERN.test(trimmed)) {
+      errors.push('Shipment number must contain only letters, numbers, and hyphens');
+    }
   }
 
-  const trimmedNumber = data.shipmentNumber.trim();
-  if (
-    trimmedNumber.length < SHIPMENTS_CONSTANTS.MIN_SHIPMENT_NUMBER_LENGTH ||
-    trimmedNumber.length > SHIPMENTS_CONSTANTS.MAX_SHIPMENT_NUMBER_LENGTH
-  ) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_SHIPMENT_NUMBER);
+  // Validate AWB number
+  if (data.awbNumber !== undefined && data.awbNumber.trim()) {
+    const trimmed = data.awbNumber.trim();
+    if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_AWB_NUMBER_LENGTH) {
+      errors.push(`AWB number cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_AWB_NUMBER_LENGTH} characters`);
+    } else if (!SHIPMENTS_CONSTANTS.VALIDATION.AWB_NUMBER_PATTERN.test(trimmed)) {
+      errors.push('AWB number must contain only letters, numbers, and hyphens');
+    }
+  }
+
+  // Validate customer reference
+  if (data.customerReference !== undefined && data.customerReference.trim()) {
+    const trimmed = data.customerReference.trim();
+    if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_CUSTOMER_REFERENCE_LENGTH) {
+      errors.push(`Customer reference cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_CUSTOMER_REFERENCE_LENGTH} characters`);
+    }
+  }
+
+  // Validate description
+  if (data.description !== undefined) {
+    const trimmed = data.description.trim();
+    if (!trimmed) {
+      errors.push('Description is required');
+    } else if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH) {
+      errors.push(`Description cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH} characters`);
+    }
+  }
+
+  // Validate special instructions
+  if (data.specialInstructions !== undefined && data.specialInstructions.trim()) {
+    const trimmed = data.specialInstructions.trim();
+    if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_SPECIAL_INSTRUCTIONS_LENGTH) {
+      errors.push(`Special instructions cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_SPECIAL_INSTRUCTIONS_LENGTH} characters`);
+    }
+  }
+
+  // Validate courier instructions
+  if (data.courierInstructions !== undefined && data.courierInstructions.trim()) {
+    const trimmed = data.courierInstructions.trim();
+    if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_COURIER_INSTRUCTIONS_LENGTH) {
+      errors.push(`Courier instructions cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_COURIER_INSTRUCTIONS_LENGTH} characters`);
+    }
+  }
+
+  // Validate partner reference
+  if (data.partnerReference !== undefined && data.partnerReference.trim()) {
+    const trimmed = data.partnerReference.trim();
+    if (trimmed.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_PARTNER_REFERENCE_LENGTH) {
+      errors.push(`Partner reference cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_PARTNER_REFERENCE_LENGTH} characters`);
+    }
   }
 
   // Validate dimensions
-  if (
-    data.dimensions.length <= 0 ||
-    data.dimensions.width <= 0 ||
-    data.dimensions.height <= 0 ||
-    data.dimensions.weight <= 0
-  ) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_DIMENSIONS);
+  if ('dimensions' in data && data.dimensions) {
+    const dimErrors = validateDimensions(data.dimensions);
+    errors.push(...dimErrors);
   }
 
-  // Validate pricing
-  if (data.agreedPrice.amount < 0) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_PRICE);
+  // Validate origin address
+  if ('origin' in data && data.origin) {
+    const addressErrors = validateAddress(data.origin, 'Origin');
+    errors.push(...addressErrors);
   }
 
-  if (data.actualCosts && data.actualCosts.amount < 0) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_PRICE);
+  // Validate destination address
+  if ('destination' in data && data.destination) {
+    const addressErrors = validateAddress(data.destination, 'Destination');
+    errors.push(...addressErrors);
   }
 
-  // Validate SLA
-  if (data.sla.deadline <= Date.now()) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_SLA);
+  // Validate agreed price
+  if ('agreedPrice' in data && data.agreedPrice) {
+    const priceErrors = validateCurrencyAmount(data.agreedPrice, 'Agreed price');
+    errors.push(...priceErrors);
   }
-}
 
-/**
- * Validate shipment update data
- */
-export function validateShipmentUpdateData(data: UpdateShipmentInput): void {
-  // Validate shipment number if provided
-  if (data.shipmentNumber !== undefined) {
-    if (!data.shipmentNumber || data.shipmentNumber.trim().length === 0) {
-      throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_SHIPMENT_NUMBER);
-    }
+  // Validate actual costs
+  if ('actualCosts' in data && data.actualCosts) {
+    const costErrors = validateCurrencyAmount(data.actualCosts, 'Actual costs');
+    errors.push(...costErrors);
+  }
 
-    const trimmedNumber = data.shipmentNumber.trim();
-    if (
-      trimmedNumber.length < SHIPMENTS_CONSTANTS.MIN_SHIPMENT_NUMBER_LENGTH ||
-      trimmedNumber.length > SHIPMENTS_CONSTANTS.MAX_SHIPMENT_NUMBER_LENGTH
-    ) {
-      throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_SHIPMENT_NUMBER);
+  // Validate tags
+  if ('tags' in data && data.tags) {
+    if (data.tags.some(tag => !tag.trim())) {
+      errors.push('Tags cannot be empty');
     }
   }
 
-  // Validate dimensions if provided
-  if (data.dimensions) {
-    if (
-      data.dimensions.length <= 0 ||
-      data.dimensions.width <= 0 ||
-      data.dimensions.height <= 0 ||
-      data.dimensions.weight <= 0
-    ) {
-      throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_DIMENSIONS);
-    }
+  return errors;
+}
+
+/**
+ * Validate dimensions
+ */
+export function validateDimensions(dimensions: ShipmentDimensions): string[] {
+  const errors: string[] = [];
+
+  if (dimensions.length < SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS) {
+    errors.push(`Length must be at least ${SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS} ${dimensions.unit}`);
+  } else if (dimensions.length > SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS) {
+    errors.push(`Length cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS} ${dimensions.unit}`);
   }
 
-  // Validate pricing if provided
-  if (data.agreedPrice && data.agreedPrice.amount < 0) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_PRICE);
+  if (dimensions.width < SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS) {
+    errors.push(`Width must be at least ${SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS} ${dimensions.unit}`);
+  } else if (dimensions.width > SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS) {
+    errors.push(`Width cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS} ${dimensions.unit}`);
   }
 
-  if (data.actualCosts && data.actualCosts.amount < 0) {
-    throw new Error(SHIPMENTS_CONSTANTS.ERRORS.INVALID_PRICE);
+  if (dimensions.height < SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS) {
+    errors.push(`Height must be at least ${SHIPMENTS_CONSTANTS.LIMITS.MIN_DIMENSIONS} ${dimensions.unit}`);
+  } else if (dimensions.height > SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS) {
+    errors.push(`Height cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_DIMENSIONS} ${dimensions.unit}`);
   }
-}
 
-/**
- * Validate status history data
- */
-export function validateStatusHistoryData(
-  data: CreateShipmentStatusHistoryInput
-): void {
-  if (data.timestamp > Date.now()) {
-    throw new Error('Status history timestamp cannot be in the future');
+  if (dimensions.weight < SHIPMENTS_CONSTANTS.LIMITS.MIN_WEIGHT) {
+    errors.push(`Weight must be at least ${SHIPMENTS_CONSTANTS.LIMITS.MIN_WEIGHT} ${dimensions.weightUnit}`);
+  } else if (dimensions.weight > SHIPMENTS_CONSTANTS.LIMITS.MAX_WEIGHT) {
+    errors.push(`Weight cannot exceed ${SHIPMENTS_CONSTANTS.LIMITS.MAX_WEIGHT} ${dimensions.weightUnit}`);
   }
+
+  return errors;
 }
 
 /**
- * Validate status history update data
+ * Validate address
  */
-export function validateStatusHistoryUpdateData(
-  data: UpdateShipmentStatusHistoryInput
-): void {
-  if (data.timestamp !== undefined && data.timestamp > Date.now()) {
-    throw new Error('Status history timestamp cannot be in the future');
+export function validateAddress(address: ShipmentAddress, label: string = 'Address'): string[] {
+  const errors: string[] = [];
+
+  if (!address.city || !address.city.trim()) {
+    errors.push(`${label} city is required`);
   }
-}
 
-// ============================================================================
-// Status Transition Validation
-// ============================================================================
-
-/**
- * Check if a status transition is valid
- */
-export function isValidStatusTransition(
-  currentStatus: ShipmentStatus,
-  newStatus: ShipmentStatus
-): boolean {
-  const allowedTransitions =
-    SHIPMENTS_CONSTANTS.ALLOWED_STATUS_TRANSITIONS[currentStatus];
-  return allowedTransitions.includes(newStatus as any);
-}
-
-/**
- * Validate status transition
- */
-export function validateStatusTransition(
-  currentStatus: ShipmentStatus,
-  newStatus: ShipmentStatus
-): void {
-  if (!isValidStatusTransition(currentStatus, newStatus)) {
-    throw new Error(
-      `${SHIPMENTS_CONSTANTS.ERRORS.INVALID_STATUS_TRANSITION}: Cannot transition from ${currentStatus} to ${newStatus}`
-    );
+  if (!address.country || !address.country.trim()) {
+    errors.push(`${label} country is required`);
   }
-}
 
-// ============================================================================
-// SLA Calculation Functions
-// ============================================================================
-
-/**
- * Calculate SLA status based on deadline and current time
- */
-export function calculateSlaStatus(deadline: number): SlaStatus {
-  const now = Date.now();
-  const hoursRemaining = (deadline - now) / (1000 * 60 * 60);
-
-  if (hoursRemaining < SHIPMENTS_CONSTANTS.SLA_OVERDUE_THRESHOLD) {
-    return 'overdue';
-  } else if (hoursRemaining < SHIPMENTS_CONSTANTS.SLA_WARNING_THRESHOLD) {
-    return 'warning';
-  } else {
-    return 'on_time';
+  if (!address.countryCode || !address.countryCode.trim()) {
+    errors.push(`${label} country code is required`);
+  } else if (address.countryCode.trim().length !== 2) {
+    errors.push(`${label} country code must be 2 characters`);
   }
+
+  return errors;
 }
 
 /**
- * Calculate remaining hours for SLA
+ * Validate currency amount
  */
-export function calculateRemainingHours(deadline: number): number {
-  const now = Date.now();
-  const hoursRemaining = (deadline - now) / (1000 * 60 * 60);
-  return Math.max(0, hoursRemaining);
+export function validateCurrencyAmount(amount: CurrencyAmount, label: string = 'Amount'): string[] {
+  const errors: string[] = [];
+
+  if (amount.amount < 0) {
+    errors.push(`${label} cannot be negative`);
+  }
+
+  if (!amount.currency) {
+    errors.push(`${label} currency is required`);
+  }
+
+  if (amount.exchangeRate !== undefined && amount.exchangeRate <= 0) {
+    errors.push(`${label} exchange rate must be positive`);
+  }
+
+  return errors;
 }
 
 /**
- * Update SLA with current status
+ * Format shipment display name
  */
-export function updateSla(sla: Sla): Sla {
-  return {
-    ...sla,
-    status: calculateSlaStatus(sla.deadline),
-    remainingHours: calculateRemainingHours(sla.deadline),
-  };
-}
-
-// ============================================================================
-// Search and Filter Functions
-// ============================================================================
-
-/**
- * Check if shipment matches search term
- */
-export function matchesSearchTerm(
-  shipment: any,
-  searchTerm: string
-): boolean {
-  if (!searchTerm) return true;
-
-  const term = searchTerm.toLowerCase();
-  return (
-    shipment.shipmentNumber?.toLowerCase().includes(term) ||
-    shipment.awbNumber?.toLowerCase().includes(term) ||
-    shipment.customerReference?.toLowerCase().includes(term) ||
-    shipment.description?.toLowerCase().includes(term)
-  );
-}
-
-// ============================================================================
-// Data Formatting Functions
-// ============================================================================
-
-/**
- * Format shipment number for display
- */
-export function formatShipmentNumber(shipmentNumber: string): string {
-  return shipmentNumber.toUpperCase();
+export function formatShipmentDisplayName(shipment: { shipmentNumber: string; currentStatus?: string }): string {
+  const statusBadge = shipment.currentStatus ? ` [${shipment.currentStatus}]` : '';
+  return `${shipment.shipmentNumber}${statusBadge}`;
 }
 
 /**
- * Get status label
+ * Check if shipment is editable
  */
-export function getStatusLabel(status: ShipmentStatus): string {
-  const labels: Record<ShipmentStatus, string> = {
-    quoted: 'Quoted',
-    booked: 'Booked',
-    pickup: 'Pickup',
-    in_transit: 'In Transit',
-    delivered: 'Delivered',
-    customs: 'Customs',
-    document: 'Documentation',
-    invoiced: 'Invoiced',
-    cancelled: 'Cancelled',
-  };
-  return labels[status] || status;
+export function isShipmentEditable(shipment: { currentStatus: string; deletedAt?: number }): boolean {
+  if (shipment.deletedAt) return false;
+  return shipment.currentStatus !== 'invoiced' && shipment.currentStatus !== 'cancelled';
+}
+
+/**
+ * Check if shipment can be cancelled
+ */
+export function canCancelShipment(shipment: { currentStatus: string; deletedAt?: number }): boolean {
+  if (shipment.deletedAt) return false;
+  return shipment.currentStatus !== 'delivered'
+    && shipment.currentStatus !== 'invoiced'
+    && shipment.currentStatus !== 'cancelled';
+}
+
+/**
+ * Calculate chargeable weight (volumetric weight)
+ */
+export function calculateChargeableWeight(dimensions: ShipmentDimensions): number {
+  // Convert to cm if needed
+  let length = dimensions.length;
+  let width = dimensions.width;
+  let height = dimensions.height;
+
+  if (dimensions.unit === 'inch') {
+    length *= 2.54;
+    width *= 2.54;
+    height *= 2.54;
+  }
+
+  // Calculate volumetric weight (using standard air freight divisor 6000)
+  const volumetricWeight = (length * width * height) / 6000;
+
+  // Convert actual weight to kg if needed
+  let actualWeight = dimensions.weight;
+  if (dimensions.weightUnit === 'lb') {
+    actualWeight *= 0.453592;
+  }
+
+  // Return the greater of actual weight or volumetric weight
+  return Math.max(actualWeight, volumetricWeight);
+}
+
+/**
+ * Format tracking status for display
+ */
+export function formatTrackingStatus(status: string): string {
+  return status
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/**
+ * Trim string fields in shipment data
+ */
+export function trimShipmentData<T extends Partial<CreateShipmentData | UpdateShipmentData>>(data: T): T {
+  const trimmed = { ...data };
+
+  if (trimmed.shipmentNumber) trimmed.shipmentNumber = trimmed.shipmentNumber.trim();
+  if (trimmed.awbNumber) trimmed.awbNumber = trimmed.awbNumber.trim();
+  if (trimmed.customerReference) trimmed.customerReference = trimmed.customerReference.trim();
+  if (trimmed.description) trimmed.description = trimmed.description.trim();
+  if (trimmed.specialInstructions) trimmed.specialInstructions = trimmed.specialInstructions.trim();
+  if (trimmed.courierInstructions) trimmed.courierInstructions = trimmed.courierInstructions.trim();
+  if (trimmed.partnerReference) trimmed.partnerReference = trimmed.partnerReference.trim();
+  if (trimmed.tags) trimmed.tags = trimmed.tags.map(tag => tag.trim()).filter(tag => tag);
+  if (trimmed.category) trimmed.category = trimmed.category.trim();
+
+  return trimmed;
 }
