@@ -1,10 +1,10 @@
-// convex/schema/system/dashboards/dashboards/dashboards.ts
+// convex/schema/system/dashboards/dashboards.ts
 // Table definitions for dashboards module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { auditFields, softDeleteFields, classificationFields } from '@/schema/base';
-import { dashboardsValidators } from './validators';
+import { auditFields, classificationFields, softDeleteFields } from '@/schema/base';
+import { dashboardsFields, dashboardsValidators } from './validators';
 
 export const dashboardsTable = defineTable({
   // Required: Main display field
@@ -14,15 +14,15 @@ export const dashboardsTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
 
-  // Module-specific fields
+  // Dashboard metadata
   description: v.optional(v.string()),
   layout: dashboardsValidators.layout,
-  widgets: v.array(dashboardsValidators.widget),
+  widgets: v.array(dashboardsFields.widget),
   isDefault: v.boolean(),
   isPublic: v.boolean(),
 
-    // Classification
-    ...classificationFields,
+  // Classification for tags and custom metadata
+  ...classificationFields,
 
   // Required: Audit fields
   ...auditFields,
