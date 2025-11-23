@@ -1,8 +1,8 @@
-// convex/schema/system/system/notifications/schemas.ts
+// convex/schema/system/notifications/notifications/schemas.ts
 // Schema exports for notifications module
 
 import { notificationsTable } from './notifications';
 
-export const systemNotificationsSchemas = {
+export const systemNotificationsNotificationsSchemas = {
   notifications: notificationsTable,
 };

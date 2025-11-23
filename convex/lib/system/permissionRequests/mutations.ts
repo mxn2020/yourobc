@@ -30,10 +30,10 @@ export const requestPermission = mutation({
     // 3. Check if user already has a pending request for this permission
     const existingRequest = await ctx.db
       .query('permissionRequests')
-      .withIndex('by_user_status', (q) =>
-        q.eq('userId', currentUser._id).eq('status', 'pending')
+      .withIndex('by_owner_status', (q) =>
+        q.eq('ownerId', currentUser._id).eq('status', 'pending')
       )
-      .filter((q) => q.eq(q.field('permission'), trimmedPermission))
+      .filter((q) => q.eq(q.field('request.permission'), trimmedPermission))
       .first()
 
     if (existingRequest) {
@@ -44,13 +44,21 @@ export const requestPermission = mutation({
 
     // 4. Create permission request
     const requestId = await ctx.db.insert('permissionRequests', {
-      userId: currentUser._id,
-      userName: trimmedUserName,
-      userEmail: trimmedUserEmail,
-      permission: trimmedPermission,
-      module: trimmedModule,
-      message: trimmedMessage,
+      publicId: crypto.randomUUID(),
+      displayName: `${trimmedPermission} - ${trimmedUserName}`,
+      ownerId: currentUser._id,
+      requester: {
+        userId: currentUser._id,
+        userName: trimmedUserName,
+        userEmail: trimmedUserEmail,
+      },
+      request: {
+        permission: trimmedPermission,
+        module: trimmedModule,
+        message: trimmedMessage,
+      },
       status: 'pending',
+      review: {},
       createdAt: now,
       updatedAt: now,
       createdBy: currentUser._id,
@@ -67,7 +75,7 @@ export const requestPermission = mutation({
 
     for (const admin of admins) {
       await ctx.db.insert('notifications', {
-        userId: admin._id,
+        ownerId: admin._id,
         type: 'info',
         title: 'New Permission Request',
         message: `${trimmedUserName} has requested ${trimmedPermission} permission`,
@@ -150,10 +158,12 @@ export const approvePermissionRequest = mutation({
     // 4. Update request status
     await ctx.db.patch(requestId, {
       status: 'approved',
-      reviewedBy: admin._id,
-      reviewedByName: trimmedAdminName,
-      reviewedAt: now,
-      reviewNotes: trimmedReviewNotes,
+      review: {
+        reviewedBy: admin._id,
+        reviewedByName: trimmedAdminName,
+        reviewedAt: now,
+        reviewNotes: trimmedReviewNotes,
+      },
       updatedAt: now,
       updatedBy: admin._id,
     })
@@ -164,18 +174,18 @@ export const approvePermissionRequest = mutation({
 
     // 5. Notify the requester
     await ctx.db.insert('notifications', {
-      userId: request.userId,
+      ownerId: request.ownerId,
       type: 'success',
       title: 'Permission Request Approved',
-      message: `Your request for ${request.permission} permission has been approved`,
+      message: `Your request for ${request.request.permission} permission has been approved`,
       emoji: '✅',
       isRead: false,
       entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       metadata: {
         requestId,
-        permission: request.permission,
-        module: request.module,
+        permission: request.request.permission,
+        module: request.request.module,
         reviewedBy: trimmedAdminName,
       },
       createdAt: now,
@@ -193,12 +203,12 @@ export const approvePermissionRequest = mutation({
       action: ACTIONS.PERMISSION_REQUEST_APPROVED,
       entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
-      entityTitle: `${request.permission} permission`,
-      description: `Approved permission request for ${request.userName}`,
+      entityTitle: `${request.request.permission} permission`,
+      description: `Approved permission request for ${request.requester.userName}`,
       metadata: {
         requestId,
-        permission: request.permission,
-        module: request.module,
+        permission: request.request.permission,
+        module: request.request.module,
         reviewNotes: trimmedReviewNotes ?? null,
       },
       createdAt: now,
@@ -246,28 +256,30 @@ export const denyPermissionRequest = mutation({
     // 4. Update request status
     await ctx.db.patch(requestId, {
       status: 'denied',
-      reviewedBy: admin._id,
-      reviewedByName: trimmedAdminName,
-      reviewedAt: now,
-      reviewNotes: trimmedReviewNotes,
+      review: {
+        reviewedBy: admin._id,
+        reviewedByName: trimmedAdminName,
+        reviewedAt: now,
+        reviewNotes: trimmedReviewNotes,
+      },
       updatedAt: now,
       updatedBy: admin._id,
     })
 
     // 5. Notify the requester
     await ctx.db.insert('notifications', {
-      userId: request.userId,
+      ownerId: request.ownerId,
       type: 'error',
       title: 'Permission Request Denied',
-      message: `Your request for ${request.permission} permission has been denied`,
+      message: `Your request for ${request.request.permission} permission has been denied`,
       emoji: '❌',
       isRead: false,
       entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       metadata: {
         requestId,
-        permission: request.permission,
-        module: request.module,
+        permission: request.request.permission,
+        module: request.request.module,
         reviewedBy: trimmedAdminName,
         reviewNotes: trimmedReviewNotes ?? null,
       },
@@ -286,12 +298,12 @@ export const denyPermissionRequest = mutation({
       action: ACTIONS.PERMISSION_REQUEST_DENIED,
       entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
-      entityTitle: `${request.permission} permission`,
-      description: `Denied permission request for ${request.userName}`,
+      entityTitle: `${request.request.permission} permission`,
+      description: `Denied permission request for ${request.requester.userName}`,
       metadata: {
         requestId,
-        permission: request.permission,
-        module: request.module,
+        permission: request.request.permission,
+        module: request.request.module,
         reviewNotes: trimmedReviewNotes ?? null,
       },
       createdAt: now,
@@ -327,7 +339,7 @@ export const cancelPermissionRequest = mutation({
 
     // 3. Check authorization (must be request owner or admin)
     if (
-      request.userId !== currentUser._id &&
+      request.ownerId !== currentUser._id &&
       currentUser.role !== 'admin' &&
       currentUser.role !== 'superadmin'
     ) {
@@ -359,8 +371,8 @@ export const cancelPermissionRequest = mutation({
       entityTitle: `${request.permission} permission`,
       description: `Cancelled permission request for ${request.permission}`,
       metadata: {
-        permission: request.permission,
-        module: request.module,
+        permission: request.request.permission,
+        module: request.request.module,
       },
       createdAt: now,
       createdBy: currentUser._id,

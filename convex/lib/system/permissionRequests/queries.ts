@@ -87,7 +87,7 @@ export const getMyPermissionRequests = query({
 
     const requests = await ctx.db
       .query('permissionRequests')
-      .withIndex('by_user', (q) => q.eq('userId', currentUser._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', currentUser._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .order('desc')
       .collect()
@@ -120,7 +120,7 @@ export const getUserPermissionRequests = query({
 
     const requests = await ctx.db
       .query('permissionRequests')
-      .withIndex('by_user', (q) => q.eq('userId', userId))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', userId))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .order('desc')
       .collect()
@@ -151,7 +151,7 @@ export const getPermissionRequest = query({
 
     // Check authorization (must be request owner or admin)
     if (
-      request.userId !== currentUser._id &&
+      request.ownerId !== currentUser._id &&
       currentUser.role !== 'admin' &&
       currentUser.role !== 'superadmin'
     ) {

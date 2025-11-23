@@ -2,7 +2,7 @@
 // Type extractions from validators for analytics module
 
 import { Infer } from 'convex/values';
-import { analyticsValidators } from './validators';
+import { analyticsFields, analyticsValidators } from './validators';
 
 // Extract types from validators
 export type AnalyticsEventType = Infer<typeof analyticsValidators.eventType>;
@@ -23,3 +23,11 @@ export type TransformType = Infer<typeof analyticsValidators.transformType>;
 export type ChartFormat = Infer<typeof analyticsValidators.chartFormat>;
 export type ColorScheme = Infer<typeof analyticsValidators.colorScheme>;
 export type LastSyncStatus = Infer<typeof analyticsValidators.lastSyncStatus>;
+export type AnalyticsEventProperties = Infer<typeof analyticsFields.eventProperties>;
+export type AnalyticsFilterGroup = Infer<typeof analyticsFields.filterGroup>;
+export type AnalyticsDashboardWidget = Infer<typeof analyticsFields.dashboardWidget>;
+export type AnalyticsReportQuery = Infer<typeof analyticsFields.reportQuery>;
+export type AnalyticsReportSchedule = Infer<typeof analyticsFields.reportSchedule>;
+export type AnalyticsReportResult = Infer<typeof analyticsFields.reportResult>;
+export type AnalyticsProviderConfig = Infer<typeof analyticsFields.providerConfig>;
+export type AnalyticsEventMappings = Infer<typeof analyticsFields.eventMappings>;

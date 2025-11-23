@@ -24,6 +24,7 @@ export const createNotification = mutation({
       actionUrl: v.optional(v.string()),
       entityType: v.optional(entityTypes.all),
       entityId: v.optional(v.string()),
+      metadata: v.optional(v.any()),
     }),
   },
   handler: async (ctx, { data }) => {
@@ -43,21 +44,27 @@ export const createNotification = mutation({
 
     // 4. Prepare notification data with trimmed strings
     const notificationData = {
+      publicId: crypto.randomUUID(),
+      displayName: `${data.type} - ${data.title.trim()}`,
       ownerId: data.ownerId,
       type: data.type,
-      title: data.title.trim(),
-      message: data.message.trim(),
-      emoji:
-        data.emoji?.trim() ||
-        NOTIFICATION_CONSTANTS.DEFAULT_EMOJIS[
-          data.type as keyof typeof NOTIFICATION_CONSTANTS.DEFAULT_EMOJIS
-        ] ||
-        '📢',
+      content: {
+        title: data.title.trim(),
+        message: data.message.trim(),
+        emoji:
+          data.emoji?.trim() ||
+          NOTIFICATION_CONSTANTS.DEFAULT_EMOJIS[
+            data.type as keyof typeof NOTIFICATION_CONSTANTS.DEFAULT_EMOJIS
+          ] ||
+          '📢',
+        actionUrl: data.actionUrl?.trim(),
+      },
       isRead: false,
-      actionUrl: data.actionUrl?.trim(),
       entityType: data.entityType,
       entityId: data.entityId?.trim(),
-      metadata: {},
+      metadata: {
+        data: data.metadata,
+      },
       createdAt: now,
       updatedAt: now,
       createdBy: user._id,
@@ -126,8 +133,8 @@ export const markAsRead = mutation({
       action: 'notification.marked_read',
       entityType: 'notification',
       entityId: notificationId,
-      entityTitle: notification.title,
-      description: `Marked notification as read: ${notification.title}`,
+      entityTitle: notification.content?.title ?? notification.displayName,
+      description: `Marked notification as read: ${notification.content?.title ?? notification.displayName}`,
       createdAt: now,
     });
 
@@ -222,8 +229,8 @@ export const deleteNotification = mutation({
       action: 'notification.deleted',
       entityType: 'notification',
       entityId: notificationId,
-      entityTitle: notification.title,
-      description: `Deleted notification: ${notification.title}`,
+      entityTitle: notification.content?.title ?? notification.displayName,
+      description: `Deleted notification: ${notification.content?.title ?? notification.displayName}`,
       createdAt: now,
     });
 
