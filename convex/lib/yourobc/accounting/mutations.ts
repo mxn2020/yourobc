@@ -7,7 +7,13 @@ import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { accountingValidators } from '@/schema/yourobc/accounting/validators';
 import { ACCOUNTING_CONSTANTS } from './constants';
-import { validateAccountingEntryData, generateJournalEntryNumber, calculateFiscalYear, calculateFiscalPeriod } from './utils';
+import {
+  validateAccountingEntryData,
+  generateJournalEntryNumber,
+  calculateFiscalYear,
+  calculateFiscalPeriod,
+  normalizeAccountingEntryData,
+} from './utils';
 import { requireEditAccountingEntryAccess, requireDeleteAccountingEntryAccess, requireApproveAccountingEntryAccess } from './permissions';
 import type { AccountingEntryId } from './types';
 
@@ -59,7 +65,8 @@ export const createAccountingEntry = mutation({
       allowAdmin: true,
     });
 
-    const errors = validateAccountingEntryData(data);
+    const normalizedData = normalizeAccountingEntryData(data);
+    const errors = validateAccountingEntryData(normalizedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -68,41 +75,44 @@ export const createAccountingEntry = mutation({
     const now = Date.now();
 
     // Auto-calculate fiscal year and period if not provided
-    const fiscalYear = data.fiscalYear || calculateFiscalYear(data.transactionDate);
-    const fiscalPeriod = data.fiscalPeriod || calculateFiscalPeriod(data.transactionDate);
+    const fiscalYear =
+      normalizedData.fiscalYear || calculateFiscalYear(normalizedData.transactionDate);
+    const fiscalPeriod =
+      normalizedData.fiscalPeriod || calculateFiscalPeriod(normalizedData.transactionDate);
 
     // Generate journal entry number if not provided
     const sequence = Math.floor(Math.random() * 1000000);
-    const journalEntryNumber = data.journalEntryNumber?.trim() || generateJournalEntryNumber(fiscalYear, sequence);
+    const journalEntryNumber =
+      normalizedData.journalEntryNumber || generateJournalEntryNumber(fiscalYear, sequence);
 
     const entryId = await ctx.db.insert('yourobcAccounting', {
       publicId,
       journalEntryNumber,
-      referenceNumber: data.referenceNumber?.trim(),
-      status: data.status || 'draft',
-      transactionType: data.transactionType,
-      transactionDate: data.transactionDate,
-      postingDate: data.postingDate,
-      debitAmount: data.debitAmount,
-      creditAmount: data.creditAmount,
-      currency: data.currency.toUpperCase(),
-      debitAccountId: data.debitAccountId?.trim(),
-      creditAccountId: data.creditAccountId?.trim(),
-      accountCode: data.accountCode?.trim(),
-      relatedInvoiceId: data.relatedInvoiceId,
-      relatedExpenseId: data.relatedExpenseId?.trim(),
-      relatedShipmentId: data.relatedShipmentId,
-      relatedCustomerId: data.relatedCustomerId,
-      relatedPartnerId: data.relatedPartnerId,
-      memo: data.memo?.trim(),
-      description: data.description?.trim(),
-      taxAmount: data.taxAmount,
-      taxRate: data.taxRate,
-      taxCategory: data.taxCategory?.trim(),
-      isTaxable: data.isTaxable,
-      attachments: data.attachments,
-      tags: data.tags?.map(tag => tag.trim()),
-      category: data.category?.trim(),
+      referenceNumber: normalizedData.referenceNumber,
+      status: normalizedData.status || 'draft',
+      transactionType: normalizedData.transactionType!,
+      transactionDate: normalizedData.transactionDate!,
+      postingDate: normalizedData.postingDate,
+      debitAmount: normalizedData.debitAmount!,
+      creditAmount: normalizedData.creditAmount!,
+      currency: normalizedData.currency!,
+      debitAccountId: normalizedData.debitAccountId,
+      creditAccountId: normalizedData.creditAccountId,
+      accountCode: normalizedData.accountCode,
+      relatedInvoiceId: normalizedData.relatedInvoiceId,
+      relatedExpenseId: normalizedData.relatedExpenseId,
+      relatedShipmentId: normalizedData.relatedShipmentId,
+      relatedCustomerId: normalizedData.relatedCustomerId,
+      relatedPartnerId: normalizedData.relatedPartnerId,
+      memo: normalizedData.memo,
+      description: normalizedData.description,
+      taxAmount: normalizedData.taxAmount,
+      taxRate: normalizedData.taxRate,
+      taxCategory: normalizedData.taxCategory,
+      isTaxable: normalizedData.isTaxable,
+      attachments: normalizedData.attachments,
+      tags: normalizedData.tags,
+      category: normalizedData.category,
       fiscalYear,
       fiscalPeriod,
       ownerId: user._id,
@@ -120,9 +130,9 @@ export const createAccountingEntry = mutation({
       entityTitle: journalEntryNumber,
       description: `Created accounting entry: ${journalEntryNumber}`,
       metadata: {
-        status: data.status || 'draft',
-        transactionType: data.transactionType,
-        amount: data.debitAmount,
+        status: normalizedData.status || 'draft',
+        transactionType: normalizedData.transactionType,
+        amount: normalizedData.debitAmount,
       },
       createdAt: now,
       createdBy: user._id,
@@ -181,7 +191,8 @@ export const updateAccountingEntry = mutation({
 
     await requireEditAccountingEntryAccess(ctx, entry, user);
 
-    const errors = validateAccountingEntryData(updates);
+    const normalizedUpdates = normalizeAccountingEntryData(updates);
+    const errors = validateAccountingEntryData(normalizedUpdates);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -192,50 +203,54 @@ export const updateAccountingEntry = mutation({
       updatedBy: user._id,
     };
 
-    if (updates.referenceNumber !== undefined) updateData.referenceNumber = updates.referenceNumber?.trim();
-    if (updates.status !== undefined) {
-      updateData.status = updates.status;
-      if (updates.status === 'posted' && !entry.postingDate) {
+    if (normalizedUpdates.referenceNumber !== undefined)
+      updateData.referenceNumber = normalizedUpdates.referenceNumber;
+    if (normalizedUpdates.status !== undefined) {
+      updateData.status = normalizedUpdates.status;
+      if (normalizedUpdates.status === 'posted' && !entry.postingDate) {
         updateData.postingDate = now;
       }
     }
-    if (updates.transactionType !== undefined) updateData.transactionType = updates.transactionType;
-    if (updates.transactionDate !== undefined) updateData.transactionDate = updates.transactionDate;
-    if (updates.postingDate !== undefined) updateData.postingDate = updates.postingDate;
-    if (updates.debitAmount !== undefined) updateData.debitAmount = updates.debitAmount;
-    if (updates.creditAmount !== undefined) updateData.creditAmount = updates.creditAmount;
-    if (updates.currency !== undefined) updateData.currency = updates.currency.toUpperCase();
-    if (updates.debitAccountId !== undefined) updateData.debitAccountId = updates.debitAccountId?.trim();
-    if (updates.creditAccountId !== undefined) updateData.creditAccountId = updates.creditAccountId?.trim();
-    if (updates.accountCode !== undefined) updateData.accountCode = updates.accountCode?.trim();
-    if (updates.memo !== undefined) updateData.memo = updates.memo?.trim();
-    if (updates.description !== undefined) updateData.description = updates.description?.trim();
-    if (updates.taxAmount !== undefined) updateData.taxAmount = updates.taxAmount;
-    if (updates.taxRate !== undefined) updateData.taxRate = updates.taxRate;
-    if (updates.taxCategory !== undefined) updateData.taxCategory = updates.taxCategory?.trim();
-    if (updates.isTaxable !== undefined) updateData.isTaxable = updates.isTaxable;
-    if (updates.reconciliationStatus !== undefined) {
-      updateData.reconciliationStatus = updates.reconciliationStatus;
-      if (updates.reconciliationStatus === 'reconciled' && !entry.reconciledDate) {
+    if (normalizedUpdates.transactionType !== undefined)
+      updateData.transactionType = normalizedUpdates.transactionType;
+    if (normalizedUpdates.transactionDate !== undefined)
+      updateData.transactionDate = normalizedUpdates.transactionDate;
+    if (normalizedUpdates.postingDate !== undefined) updateData.postingDate = normalizedUpdates.postingDate;
+    if (normalizedUpdates.debitAmount !== undefined) updateData.debitAmount = normalizedUpdates.debitAmount;
+    if (normalizedUpdates.creditAmount !== undefined) updateData.creditAmount = normalizedUpdates.creditAmount;
+    if (normalizedUpdates.currency !== undefined) updateData.currency = normalizedUpdates.currency;
+    if (normalizedUpdates.debitAccountId !== undefined) updateData.debitAccountId = normalizedUpdates.debitAccountId;
+    if (normalizedUpdates.creditAccountId !== undefined) updateData.creditAccountId = normalizedUpdates.creditAccountId;
+    if (normalizedUpdates.accountCode !== undefined) updateData.accountCode = normalizedUpdates.accountCode;
+    if (normalizedUpdates.memo !== undefined) updateData.memo = normalizedUpdates.memo;
+    if (normalizedUpdates.description !== undefined) updateData.description = normalizedUpdates.description;
+    if (normalizedUpdates.taxAmount !== undefined) updateData.taxAmount = normalizedUpdates.taxAmount;
+    if (normalizedUpdates.taxRate !== undefined) updateData.taxRate = normalizedUpdates.taxRate;
+    if (normalizedUpdates.taxCategory !== undefined) updateData.taxCategory = normalizedUpdates.taxCategory;
+    if (normalizedUpdates.isTaxable !== undefined) updateData.isTaxable = normalizedUpdates.isTaxable;
+    if (normalizedUpdates.reconciliationStatus !== undefined) {
+      updateData.reconciliationStatus = normalizedUpdates.reconciliationStatus;
+      if (normalizedUpdates.reconciliationStatus === 'reconciled' && !entry.reconciledDate) {
         updateData.reconciledDate = now;
         updateData.reconciledBy = user._id;
       }
     }
-    if (updates.approvalStatus !== undefined) {
-      updateData.approvalStatus = updates.approvalStatus;
-      if (updates.approvalStatus === 'approved') {
+    if (normalizedUpdates.approvalStatus !== undefined) {
+      updateData.approvalStatus = normalizedUpdates.approvalStatus;
+      if (normalizedUpdates.approvalStatus === 'approved') {
         updateData.approvedBy = user._id;
         updateData.approvedDate = now;
-      } else if (updates.approvalStatus === 'rejected') {
+      } else if (normalizedUpdates.approvalStatus === 'rejected') {
         updateData.rejectedBy = user._id;
         updateData.rejectedDate = now;
       }
     }
-    if (updates.approvalNotes !== undefined) updateData.approvalNotes = updates.approvalNotes?.trim();
-    if (updates.rejectionReason !== undefined) updateData.rejectionReason = updates.rejectionReason?.trim();
-    if (updates.attachments !== undefined) updateData.attachments = updates.attachments;
-    if (updates.tags !== undefined) updateData.tags = updates.tags.map(tag => tag.trim());
-    if (updates.category !== undefined) updateData.category = updates.category?.trim();
+    if (normalizedUpdates.approvalNotes !== undefined) updateData.approvalNotes = normalizedUpdates.approvalNotes;
+    if (normalizedUpdates.rejectionReason !== undefined)
+      updateData.rejectionReason = normalizedUpdates.rejectionReason;
+    if (normalizedUpdates.attachments !== undefined) updateData.attachments = normalizedUpdates.attachments;
+    if (normalizedUpdates.tags !== undefined) updateData.tags = normalizedUpdates.tags;
+    if (normalizedUpdates.category !== undefined) updateData.category = normalizedUpdates.category;
 
     await ctx.db.patch(entryId, updateData);
 
@@ -247,7 +262,7 @@ export const updateAccountingEntry = mutation({
       entityId: entry.publicId,
       entityTitle: entry.journalEntryNumber,
       description: `Updated accounting entry: ${entry.journalEntryNumber}`,
-      metadata: { changes: updates },
+      metadata: { changes: normalizedUpdates },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,

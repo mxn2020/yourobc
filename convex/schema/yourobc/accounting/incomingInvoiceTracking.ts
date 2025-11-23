@@ -9,38 +9,40 @@
  * @module convex/schema/yourobc/accounting/incomingInvoiceTracking
  */
 
-import { defineTable } from 'convex/server'
-import { v } from 'convex/values'
-import { currencyAmountSchema, auditFields, softDeleteFields } from '@/schema/base'
-import { accountingValidators } from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, currencyAmountSchema, softDeleteFields } from '@/schema/base';
+import { accountingValidators } from './validators';
 
 /**
  * Incoming Invoice Tracking Table
  * Tracks expected invoices from suppliers (partners) and their lifecycle
  */
 export const incomingInvoiceTrackingTable = defineTable({
-  // Identity fields
-  publicId: v.string(), // Unique public identifier (e.g., "IIT-2025-00001")
-  ownerId: v.string(), // Organization owner
+  // Required: Main display field
+  publicId: v.string(),
+
+  // Required: Core fields
+  ownerId: v.id('userProfiles'),
 
   // References
   shipmentId: v.id('yourobcShipments'),
-  partnerId: v.id('yourobcPartners'), // Supplier/carrier
+  partnerId: v.id('yourobcPartners'),
 
   // Expected invoice details
-  expectedDate: v.number(), // When we expect to receive the invoice
+  expectedDate: v.number(),
   expectedAmount: v.optional(currencyAmountSchema),
 
   // Received status
   status: accountingValidators.incomingInvoiceStatus,
 
   // Received invoice details
-  invoiceId: v.optional(v.id('yourobcInvoices')), // Link to actual invoice when received
+  invoiceId: v.optional(v.id('yourobcInvoices')),
   receivedDate: v.optional(v.number()),
   actualAmount: v.optional(currencyAmountSchema),
 
   // Approval workflow
-  approvedBy: v.optional(v.string()),
+  approvedBy: v.optional(v.id('userProfiles')),
   approvedDate: v.optional(v.number()),
   approvalNotes: v.optional(v.string()),
 
@@ -49,8 +51,8 @@ export const incomingInvoiceTrackingTable = defineTable({
   paymentReference: v.optional(v.string()),
 
   // Missing invoice tracking
-  daysMissing: v.optional(v.number()), // Auto-calculated
-  remindersSent: v.number(), // Count of reminders sent to supplier
+  daysMissing: v.optional(v.number()),
+  remindersSent: v.number(),
   lastReminderDate: v.optional(v.number()),
 
   // Dispute tracking
@@ -65,13 +67,13 @@ export const incomingInvoiceTrackingTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_publicId', ['publicId'])
-  .index('by_ownerId', ['ownerId'])
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_shipment', ['shipmentId'])
   .index('by_partner', ['partnerId'])
   .index('by_status', ['status'])
-  .index('by_expectedDate', ['expectedDate'])
-  .index('by_status_expectedDate', ['status', 'expectedDate'])
-  .index('by_ownerId_status', ['ownerId', 'status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt'])
+  .index('by_expected_date', ['expectedDate'])
+  .index('by_status_expected_date', ['status', 'expectedDate'])
+  .index('by_owner_status', ['ownerId', 'status'])
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
