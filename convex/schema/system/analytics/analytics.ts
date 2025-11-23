@@ -4,8 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { analyticsValidators } from './validators';
-import { baseValidators } from '@/schema/base.validators';
+import { analyticsFields, analyticsValidators } from './validators';
 
 /**
  * Analytics Events Table
@@ -26,70 +25,7 @@ export const analyticsEventsTable = defineTable({
   anonymousId: v.optional(v.string()), // For non-logged-in users
 
   // Event Data - Discriminated union by eventType
-  properties: v.optional(
-    v.union(
-      // PageViewProperties
-      v.object({
-        eventType: v.literal('page_view'),
-        duration: v.optional(v.number()),
-        scrollDepth: v.optional(v.number()),
-        exitPage: v.optional(v.boolean()),
-      }),
-      // UserActionProperties
-      v.object({
-        eventType: v.literal('user_action'),
-        action: v.string(),
-        category: v.optional(v.string()),
-        label: v.optional(v.string()),
-        target: v.optional(v.string()),
-        buttonText: v.optional(v.string()),
-        formId: v.optional(v.string()),
-      }),
-      // AIUsageProperties
-      v.object({
-        eventType: v.literal('ai_usage'),
-        modelId: v.string(),
-        modelName: v.string(),
-        provider: v.string(),
-        promptTokens: v.number(),
-        completionTokens: v.number(),
-        totalTokens: v.number(),
-        cost: v.number(),
-        latency: v.number(),
-        success: v.boolean(),
-        errorCode: v.optional(v.string()),
-        errorMessage: v.optional(v.string()),
-      }),
-      // PaymentProperties
-      v.object({
-        eventType: v.literal('payment'),
-        transactionId: v.string(),
-        amount: v.number(),
-        currency: v.string(),
-        paymentMethod: baseValidators.paymentMethod,
-        status: analyticsValidators.paymentStatus,
-        subscriptionId: v.optional(v.string()),
-        planName: v.optional(v.string()),
-      }),
-      // ErrorProperties
-      v.object({
-        eventType: v.literal('error'),
-        errorType: v.string(),
-        errorMessage: v.string(),
-        errorStack: v.optional(v.string()),
-        statusCode: v.optional(v.number()),
-        url: v.optional(v.string()),
-        componentName: v.optional(v.string()),
-        severity: analyticsValidators.errorSeverity,
-      }),
-      // CustomProperties
-      v.object({
-        eventType: v.literal('custom'),
-        category: v.string(),
-        data: v.record(v.string(), v.union(v.string(), v.number(), v.boolean())),
-      })
-    )
-  ),
+  properties: v.optional(analyticsFields.eventProperties),
   value: v.optional(v.number()), // Monetary or numeric value
   currency: v.optional(v.string()), // For monetary events
 
@@ -199,107 +135,7 @@ export const analyticsDashboardsTable = defineTable({
   type: analyticsValidators.dashboardType,
 
   // Dashboard Config
-  widgets: v.array(
-    v.object({
-      id: v.string(),
-      type: analyticsValidators.widgetType,
-      title: v.string(),
-      query: v.object({
-        metricType: v.string(),
-        dimension: v.optional(v.string()),
-        filters: v.optional(
-          v.object({
-            conditions: v.array(
-              v.object({
-                field: v.string(),
-                operator: analyticsValidators.filterOperator,
-                value: v.union(
-                  v.string(),
-                  v.number(),
-                  v.boolean(),
-                  v.array(v.string()),
-                  v.array(v.number())
-                ),
-              })
-            ),
-            combinator: v.union(v.literal('and'), v.literal('or')),
-          })
-        ),
-        dateRange: v.optional(
-          v.object({
-            start: v.number(),
-            end: v.number(),
-          })
-        ),
-      }),
-      position: v.object({
-        x: v.number(),
-        y: v.number(),
-        width: v.number(),
-        height: v.number(),
-      }),
-      config: v.optional(
-        v.union(
-          // LineChartConfig
-          v.object({
-            type: v.literal('line_chart'),
-            showLegend: v.optional(v.boolean()),
-            showGrid: v.optional(v.boolean()),
-            colors: v.optional(v.array(v.string())),
-            smooth: v.optional(v.boolean()),
-            stacked: v.optional(v.boolean()),
-          }),
-          // BarChartConfig
-          v.object({
-            type: v.literal('bar_chart'),
-            showLegend: v.optional(v.boolean()),
-            showGrid: v.optional(v.boolean()),
-            colors: v.optional(v.array(v.string())),
-            horizontal: v.optional(v.boolean()),
-            stacked: v.optional(v.boolean()),
-          }),
-          // PieChartConfig
-          v.object({
-            type: v.literal('pie_chart'),
-            showLegend: v.optional(v.boolean()),
-            showValues: v.optional(v.boolean()),
-            colors: v.optional(v.array(v.string())),
-            donut: v.optional(v.boolean()),
-          }),
-          // MetricConfig
-          v.object({
-            type: v.literal('metric'),
-            showTrend: v.optional(v.boolean()),
-            showComparison: v.optional(v.boolean()),
-            format: v.optional(analyticsValidators.chartFormat),
-            precision: v.optional(v.number()),
-          }),
-          // TableConfig
-          v.object({
-            type: v.literal('table'),
-            showPagination: v.optional(v.boolean()),
-            pageSize: v.optional(v.number()),
-            sortable: v.optional(v.boolean()),
-            columns: v.optional(
-              v.array(
-                v.object({
-                  key: v.string(),
-                  label: v.string(),
-                  format: v.optional(analyticsValidators.chartFormat),
-                })
-              )
-            ),
-          }),
-          // HeatmapConfig
-          v.object({
-            type: v.literal('heatmap'),
-            colorScheme: v.optional(analyticsValidators.colorScheme),
-            showValues: v.optional(v.boolean()),
-          })
-        )
-      ),
-    })
-  ),
+  widgets: v.array(analyticsFields.dashboardWidget),
 
   // Access Control
   isPublic: v.boolean(),
@@ -338,55 +174,13 @@ export const analyticsReportsTable = defineTable({
 
   // Report Configuration
   reportType: analyticsValidators.reportType,
-  query: v.object({
-    metrics: v.array(v.string()),
-    dimensions: v.optional(v.array(v.string())),
-    filters: v.optional(
-      v.object({
-        conditions: v.array(
-          v.object({
-            field: v.string(),
-            operator: analyticsValidators.filterOperator,
-            value: v.union(
-              v.string(),
-              v.number(),
-              v.boolean(),
-              v.array(v.string()),
-              v.array(v.number())
-            ),
-          })
-        ),
-        combinator: v.union(v.literal('and'), v.literal('or')),
-      })
-    ),
-    dateRange: v.object({
-      start: v.number(),
-      end: v.number(),
-    }),
-  }),
+  query: analyticsFields.reportQuery,
 
   // Scheduling
-  schedule: v.optional(
-    v.object({
-      enabled: v.boolean(),
-      frequency: analyticsValidators.reportFrequency,
-      time: v.string(), // HH:mm format
-      recipients: v.array(v.string()), // Email addresses
-      lastRun: v.optional(v.number()),
-      nextRun: v.optional(v.number()),
-    })
-  ),
+  schedule: v.optional(analyticsFields.reportSchedule),
 
   // Results - data is array of metric rows
-  lastResult: v.optional(
-    v.object({
-      data: v.array(
-        v.record(v.string(), v.union(v.string(), v.number(), v.boolean(), v.null()))
-      ),
-      generatedAt: v.number(),
-      rowCount: v.number(),
-    })
-  ),
+  lastResult: v.optional(analyticsFields.reportResult),
 
   // Export Format
   exportFormats: v.array(analyticsValidators.exportFormat),
@@ -422,61 +216,14 @@ export const analyticsProviderSyncTable = defineTable({
 
   // Configuration - Discriminated union by provider
   enabled: v.boolean(),
-  config: v.union(
-    // GoogleAnalyticsConfig
-    v.object({
-      provider: v.literal('google_analytics'),
-      measurementId: v.string(),
-      apiSecret: v.string(),
-      propertyId: v.optional(v.string()),
-    }),
-    // MixpanelConfig
-    v.object({
-      provider: v.literal('mixpanel'),
-      token: v.string(),
-      apiSecret: v.optional(v.string()),
-      projectId: v.optional(v.string()),
-    }),
-    // PlausibleConfig
-    v.object({
-      provider: v.literal('plausible'),
-      domain: v.string(),
-      apiKey: v.optional(v.string()),
-    }),
-    // InternalConfig
-    v.object({
-      provider: v.literal('internal'),
-      enableBatching: v.optional(v.boolean()),
-      batchSize: v.optional(v.number()),
-    })
-  ),
+  config: analyticsFields.providerConfig,
 
   // Sync Settings
   autoSync: v.boolean(),
   syncDirection: analyticsValidators.syncDirection,
 
   // Event Mapping
-  eventMappings: v.optional(
-    v.array(
-      v.object({
-        internalEvent: v.string(),
-        externalEvent: v.string(),
-        transform: v.optional(
-          v.array(
-            v.object({
-              sourceField: v.string(),
-              targetField: v.string(),
-              transformType: analyticsValidators.transformType,
-              mapping: v.optional(
-                v.record(v.string(), v.union(v.string(), v.number(), v.boolean()))
-              ),
-              computeExpression: v.optional(v.string()),
-            })
-          )
-        ),
-      })
-    )
-  ),
+  eventMappings: v.optional(analyticsFields.eventMappings),
 
   // Sync Status
   lastSyncedAt: v.optional(v.number()),
