@@ -66,10 +66,12 @@ export function getDefaultUserProfile(
   email: string,
   name?: string,
   extendedMetadata?: UserProfileMetadata
-): Omit<UserProfile, '_id' | '_creationTime' | 'createdBy' | 'publicId'> {
+): Omit<UserProfile, '_id' | '_creationTime' | 'publicId'> {
   const now = Date.now();
+  const displayName = name || email;
 
   return {
+    displayName,
     authUserId,
     email,
     name: name || undefined,

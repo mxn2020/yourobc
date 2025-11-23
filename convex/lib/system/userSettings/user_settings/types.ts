@@ -26,7 +26,7 @@ export interface UpdateUserSettingsData {
  * Create data type for user settings
  */
 export interface CreateUserSettingsData {
-  userId: Id<'userProfiles'>;
+  ownerId: Id<'userProfiles'>;
   displayName: string;
   theme: UserSettings['theme'];
   language: string;

@@ -3,6 +3,6 @@
 
 import { userModelPreferencesTable } from './user_model_preferences';
 
-export const userModelPreferencesSchemas = {
+export const systemUserModelPreferencesSchemas = {
   userModelPreferences: userModelPreferencesTable,
 };

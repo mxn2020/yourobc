@@ -21,21 +21,21 @@ export const getSystemMetrics = query({
 
     const query = metricType && startTime
       ? ctx.db.query('systemMetrics')
-        .withIndex('by_type_timestamp', (q) =>
-          q.eq('metricType', metricType).gte('timestamp', startTime)
+        .withIndex('by_type_and_recorded_at', (q) =>
+          q.eq('metricType', metricType).gte('timestamps.recordedAt', startTime)
         )
       : metricType
         ? ctx.db.query('systemMetrics')
           .withIndex('by_type', (q) => q.eq('metricType', metricType))
         : startTime
           ? ctx.db.query('systemMetrics')
-            .withIndex('by_timestamp', (q) => q.gte('timestamp', startTime))
+            .withIndex('by_recorded_at', (q) => q.gte('timestamps.recordedAt', startTime))
           : ctx.db.query('systemMetrics');
 
     let metrics = await query.take(limit)
 
     if (endTime) {
-      metrics = metrics.filter((m) => m.timestamp <= endTime)
+      metrics = metrics.filter((m) => (m as any).timestamps?.recordedAt <= endTime)
     }
 
     return metrics
@@ -84,10 +84,10 @@ export const getMetricsStats = query({
 
     // Filter by time range if provided
     if (startTime) {
-      metrics = metrics.filter((m) => m.timestamp >= startTime)
+      metrics = metrics.filter((m) => (m as any).timestamps?.recordedAt >= startTime)
     }
     if (endTime) {
-      metrics = metrics.filter((m) => m.timestamp <= endTime)
+      metrics = metrics.filter((m) => (m as any).timestamps?.recordedAt <= endTime)
     }
 
     if (metrics.length === 0) {
@@ -101,7 +101,7 @@ export const getMetricsStats = query({
       }
     }
 
-    const values = metrics.map((m) => m.value)
+    const values = metrics.map((m) => (m as any).measurement?.value ?? 0)
     const sum = values.reduce((acc, val) => acc + val, 0)
 
     return {
@@ -109,8 +109,8 @@ export const getMetricsStats = query({
       average: sum / metrics.length,
       min: Math.min(...values),
       max: Math.max(...values),
-      latest: metrics[metrics.length - 1]?.value ?? 0,
-      unit: metrics[0]?.unit ?? '',
+      latest: (metrics[metrics.length - 1] as any)?.measurement?.value ?? 0,
+      unit: (metrics[0] as any)?.measurement?.unit ?? '',
     }
   },
 })
@@ -159,62 +159,62 @@ export const getSystemHealth = query({
     return {
       apiResponse: apiResponse
         ? {
-          value: apiResponse.value,
-          unit: apiResponse.unit,
-          timestamp: apiResponse.timestamp,
+          value: (apiResponse as any).measurement?.value,
+          unit: (apiResponse as any).measurement?.unit,
+          timestamp: (apiResponse as any).timestamps?.recordedAt,
           status:
-            apiResponse.value < 200
+            ((apiResponse as any).measurement?.value ?? 0) < 200
               ? 'healthy'
-              : apiResponse.value < 500
+              : ((apiResponse as any).measurement?.value ?? 0) < 500
                 ? 'warning'
                 : 'critical',
         }
         : null,
       cpu: cpuMetric
         ? {
-          value: cpuMetric.value,
-          unit: cpuMetric.unit,
-          timestamp: cpuMetric.timestamp,
+          value: (cpuMetric as any).measurement?.value,
+          unit: (cpuMetric as any).measurement?.unit,
+          timestamp: (cpuMetric as any).timestamps?.recordedAt,
           status:
-            cpuMetric.value < 70
+            ((cpuMetric as any).measurement?.value ?? 0) < 70
               ? 'healthy'
-              : cpuMetric.value < 90
+              : ((cpuMetric as any).measurement?.value ?? 0) < 90
                 ? 'warning'
                 : 'critical',
         }
         : null,
       memory: memoryMetric
         ? {
-          value: memoryMetric.value,
-          unit: memoryMetric.unit,
-          timestamp: memoryMetric.timestamp,
+          value: (memoryMetric as any).measurement?.value,
+          unit: (memoryMetric as any).measurement?.unit,
+          timestamp: (memoryMetric as any).timestamps?.recordedAt,
           status:
-            memoryMetric.value < 75
+            ((memoryMetric as any).measurement?.value ?? 0) < 75
               ? 'healthy'
-              : memoryMetric.value < 90
+              : ((memoryMetric as any).measurement?.value ?? 0) < 90
                 ? 'warning'
                 : 'critical',
         }
         : null,
       errorRate: errorRate
         ? {
-          value: errorRate.value,
-          unit: errorRate.unit,
-          timestamp: errorRate.timestamp,
+          value: (errorRate as any).measurement?.value,
+          unit: (errorRate as any).measurement?.unit,
+          timestamp: (errorRate as any).timestamps?.recordedAt,
           status:
-            errorRate.value < 1
+            ((errorRate as any).measurement?.value ?? 0) < 1
               ? 'healthy'
-              : errorRate.value < 5
+              : ((errorRate as any).measurement?.value ?? 0) < 5
                 ? 'warning'
                 : 'critical',
         }
         : null,
       uptime: uptimeMetric
         ? {
-          value: uptimeMetric.value,
-          unit: uptimeMetric.unit,
-          timestamp: uptimeMetric.timestamp,
-          status: uptimeMetric.value > 0 ? 'healthy' : 'critical',
+          value: (uptimeMetric as any).measurement?.value,
+          unit: (uptimeMetric as any).measurement?.unit,
+          timestamp: (uptimeMetric as any).timestamps?.recordedAt,
+          status: ((uptimeMetric as any).measurement?.value ?? 0) > 0 ? 'healthy' : 'critical',
         }
         : null,
       overallStatus: 'healthy', // Can be calculated based on component statuses
@@ -248,7 +248,7 @@ export const getMetricsDashboard = query({
     // Get all metrics in the time range
     const metrics = await ctx.db
       .query('systemMetrics')
-      .withIndex('by_timestamp', (q) => q.gte('timestamp', startTime))
+      .withIndex('by_recorded_at', (q) => q.gte('timestamps.recordedAt', startTime))
       .collect()
 
     // Group metrics by type
@@ -265,7 +265,7 @@ export const getMetricsDashboard = query({
 
     // Calculate stats for each type
     const stats = Object.entries(metricsByType).map(([type, typeMetrics]) => {
-      const values = typeMetrics.map((m) => m.value)
+      const values = typeMetrics.map((m) => (m as any).measurement?.value ?? 0)
       const sum = values.reduce((acc, val) => acc + val, 0)
 
       return {
@@ -274,11 +274,11 @@ export const getMetricsDashboard = query({
         average: sum / typeMetrics.length,
         min: Math.min(...values),
         max: Math.max(...values),
-        latest: typeMetrics[typeMetrics.length - 1]?.value ?? 0,
-        unit: typeMetrics[0]?.unit ?? '',
+        latest: (typeMetrics[typeMetrics.length - 1] as any)?.measurement?.value ?? 0,
+        unit: (typeMetrics[0] as any)?.measurement?.unit ?? '',
         data: typeMetrics.map((m) => ({
-          timestamp: m.timestamp,
-          value: m.value,
+          timestamp: (m as any).timestamps?.recordedAt,
+          value: (m as any).measurement?.value,
         })),
       }
     })

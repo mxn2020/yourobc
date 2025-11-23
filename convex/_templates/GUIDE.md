@@ -1,6 +1,3 @@
-## **GUIDE.md**
-
-```markdown
 # Convex Backend Implementation Guide
 
 > Complete reference for implementing Convex modules with the standardized template system.
@@ -73,5 +70,3 @@ Phase 3: Review (04-consistency-review.md)
 - **Examples**: See existing modules in `convex/lib/software/freelancer_dashboard/`
 - **Shared helpers**: Check `convex/shared/` for reusable utilities
 - **Questions**: Review troubleshooting sections in each document
-```
-

@@ -3,6 +3,6 @@
 
 import { userSettingsTable } from './user_settings';
 
-export const userSettingsSchemas = {
+export const systemUserSettingsUserSettingsSchemas = {
   userSettings: userSettingsTable,
 };

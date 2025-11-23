@@ -18,7 +18,7 @@ export function canReadUserSettings(
   currentUserId: Id<'userProfiles'>
 ): boolean {
   // Users can only read their own settings
-  return settings.userId === currentUserId;
+  return settings.ownerId === currentUserId;
 }
 
 /**
@@ -35,7 +35,7 @@ export function canUpdateUserSettings(
   currentUserId: Id<'userProfiles'>
 ): boolean {
   // Users can only update their own settings
-  return settings.userId === currentUserId;
+  return settings.ownerId === currentUserId;
 }
 
 /**
@@ -52,7 +52,7 @@ export function canDeleteUserSettings(
   currentUserId: Id<'userProfiles'>
 ): boolean {
   // Users can only delete their own settings
-  return settings.userId === currentUserId;
+  return settings.ownerId === currentUserId;
 }
 
 /**
@@ -64,5 +64,5 @@ export function canDeleteUserSettings(
  * @returns Filter predicate for settings query
  */
 export function getUserSettingsAccessFilter(currentUserId: Id<'userProfiles'>) {
-  return (settings: UserSettings) => settings.userId === currentUserId;
+  return (settings: UserSettings) => settings.ownerId === currentUserId;
 }

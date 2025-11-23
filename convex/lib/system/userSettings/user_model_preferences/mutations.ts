@@ -5,7 +5,7 @@ import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { notDeleted } from '@/shared/db.helper';
-import { userModelPreferencesValidators } from '@/schema/system/userSettings/user_model_preferences/validators';
+import { userModelPreferencesValidators } from '@/schema/system/user_settings/user_model_preferences/validators';
 import {
   getDefaultModelPreferences,
   validateModelPreferences,

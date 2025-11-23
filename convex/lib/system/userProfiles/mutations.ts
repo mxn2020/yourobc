@@ -79,7 +79,6 @@ export const createProfile = mutation({
       permissions: getRolePermissions((args.role ?? 'user') as UserRole),
       extendedMetadata: args.extendedMetadata || undefined,
       createdAt: now,
-      createdBy: undefined, // System-created
       updatedAt: now,
       updatedBy: undefined, // System-created
     };
@@ -92,6 +91,11 @@ export const createProfile = mutation({
 
     // 5. Create profile
     const profileId = await ctx.db.insert('userProfiles', profileData);
+    await ctx.db.patch(profileId, {
+      createdBy: profileId,
+      updatedBy: profileId,
+      displayName: defaultProfile.displayName,
+    });
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
@@ -162,7 +166,10 @@ export const updateProfile = mutation({
     };
 
     // 4. Update basic fields
-    if (trimmedUpdates.name !== undefined) updateData.name = trimmedUpdates.name;
+    if (trimmedUpdates.name !== undefined) {
+      updateData.name = trimmedUpdates.name;
+      updateData.displayName = trimmedUpdates.name || profile.email;
+    }
     if (trimmedUpdates.avatar !== undefined) updateData.avatar = trimmedUpdates.avatar;
     if (trimmedUpdates.bio !== undefined) updateData.bio = trimmedUpdates.bio;
 

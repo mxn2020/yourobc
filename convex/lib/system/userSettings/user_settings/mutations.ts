@@ -5,7 +5,7 @@ import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { notDeleted } from '@/shared/db.helper';
-import { userSettingsValidators } from '@/schema/system/userSettings/user_settings/validators';
+import { userSettingsFields, userSettingsValidators } from '@/schema/system/user_settings/user_settings/validators';
 import {
   getDefaultUserSettings,
   validateUserSettings,
@@ -28,9 +28,9 @@ export const updateUserSettings = mutation({
     language: v.optional(v.string()),
     timezone: v.optional(v.string()),
     dateFormat: v.optional(v.string()),
-    layoutPreferences: v.optional(userSettingsValidators.layoutPreferences),
-    notificationPreferences: v.optional(userSettingsValidators.notificationPreferences),
-    dashboardPreferences: v.optional(userSettingsValidators.dashboardPreferences),
+    layoutPreferences: v.optional(userSettingsFields.layoutPreferences),
+    notificationPreferences: v.optional(userSettingsFields.notificationPreferences),
+    dashboardPreferences: v.optional(userSettingsFields.dashboardPreferences),
   },
   handler: async (ctx, args) => {
     // 1. Authentication
@@ -48,7 +48,7 @@ export const updateUserSettings = mutation({
     // 4. Get existing settings
     const existing = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 
@@ -83,7 +83,7 @@ export const updateUserSettings = mutation({
 
       settingsId = await ctx.db.insert('userSettings', {
         publicId,
-        userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         ...updateData,
@@ -142,7 +142,7 @@ export const resetUserSettings = mutation({
     // 2. Get existing settings
     const existing = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 
@@ -154,7 +154,7 @@ export const resetUserSettings = mutation({
       await ctx.db.patch(existing._id, {
         ...defaults,
         publicId: existing.publicId,
-        userId: existing.userId,
+        ownerId: existing.ownerId,
         displayName: existing.displayName,
         version: existing.version + 1,
         updatedAt: now,
@@ -195,7 +195,7 @@ export const resetUserSettings = mutation({
 
       const settingsId = await ctx.db.insert('userSettings', {
         publicId,
-        userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         version: 1,
@@ -240,9 +240,9 @@ export const updateUserSetting = mutation({
       v.boolean(),
       v.null(),
       userSettingsValidators.theme,
-      userSettingsValidators.layoutPreferences,
-      userSettingsValidators.notificationPreferences,
-      userSettingsValidators.dashboardPreferences
+      userSettingsFields.layoutPreferences,
+      userSettingsFields.notificationPreferences,
+      userSettingsFields.dashboardPreferences
     ),
   },
   handler: async (ctx, { key, value }) => {
@@ -252,7 +252,7 @@ export const updateUserSetting = mutation({
     // 2. Get existing settings
     const existing = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 
@@ -301,7 +301,7 @@ export const updateUserSetting = mutation({
 
       const settingsId = await ctx.db.insert('userSettings', {
         publicId,
-        userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         ...updateData,
@@ -346,7 +346,7 @@ export const deleteUserSettings = mutation({
     // 2. Get existing settings
     const existing = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 

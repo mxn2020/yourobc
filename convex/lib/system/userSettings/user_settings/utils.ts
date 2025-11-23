@@ -1,14 +1,13 @@
 // convex/lib/system/user_settings/user_settings/utils.ts
 // Utility functions for user settings module
 
-import { Id } from '@/generated/dataModel';
 import { USER_SETTINGS_CONSTANTS } from './constants';
-import type { UserSettings, CreateUserSettingsData, UpdateUserSettingsData } from './types';
+import type { UpdateUserSettingsData, UserSettings } from './types';
 
 /**
  * Get default user settings values
  */
-export function getDefaultUserSettings(): Omit<UserSettings, '_id' | '_creationTime' | 'userId' | 'publicId' | 'displayName'> {
+export function getDefaultUserSettings(): Omit<UserSettings, '_id' | '_creationTime' | 'ownerId' | 'publicId' | 'displayName'> {
   const now = Date.now();
 
   return {

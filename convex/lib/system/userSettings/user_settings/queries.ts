@@ -23,7 +23,7 @@ export const getUserSettings = query({
     // 2. Query with soft delete filtering
     const settings = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 
@@ -50,7 +50,7 @@ export const getUserSetting = query({
     // 2. Query with soft delete filtering
     const settings = await ctx.db
       .query('userSettings')
-      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter(notDeleted)
       .unique();
 
@@ -84,7 +84,7 @@ export const getUserSettingsByPublicId = query({
       .unique();
 
     // 3. Authorization check
-    if (!settings || settings.userId !== user._id) {
+    if (!settings || settings.ownerId !== user._id) {
       return null;
     }
 

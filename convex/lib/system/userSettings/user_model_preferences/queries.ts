@@ -93,7 +93,7 @@ export const getCombinedUserPreferences = query({
     const [settings, modelPreferences] = await Promise.all([
       ctx.db
         .query('userSettings')
-        .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+        .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
         .filter(notDeleted)
         .unique(),
       ctx.db

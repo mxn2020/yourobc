@@ -23,13 +23,21 @@ export const recordMetric = mutation({
 
     // 3. Record metric
     const timestamp = Date.now();
+    const publicId = crypto.randomUUID();
     const metricId = await ctx.db.insert('systemMetrics', {
+      publicId,
+      displayName: trimmedMetricType,
       metricType: trimmedMetricType,
-      value: args.value,
-      unit: trimmedUnit,
-      timestamp,
+      measurement: {
+        value: args.value,
+        unit: trimmedUnit,
+      },
+      timestamps: {
+        recordedAt: timestamp,
+      },
       createdAt: timestamp,
       updatedAt: timestamp,
+      createdBy: undefined,
       updatedBy: undefined,
     });
 
@@ -65,13 +73,21 @@ export const recordMetricsBatch = mutation({
       const trimmedUnit = metric.unit.trim();
 
       // 4. Insert metric
+      const publicId = crypto.randomUUID();
       const metricId = await ctx.db.insert('systemMetrics', {
+        publicId,
+        displayName: trimmedMetricType,
         metricType: trimmedMetricType,
-        value: metric.value,
-        unit: trimmedUnit,
-        timestamp,
+        measurement: {
+          value: metric.value,
+          unit: trimmedUnit,
+        },
+        timestamps: {
+          recordedAt: timestamp,
+        },
         createdAt: timestamp,
         updatedAt: timestamp,
+        createdBy: undefined,
         updatedBy: undefined,
       });
       ids.push(metricId);
@@ -104,7 +120,7 @@ export const cleanupOldMetrics = mutation({
 
     // 4. Find old metrics
     const metrics = await query.collect();
-    const toDelete = metrics.filter((m) => m.timestamp < args.olderThan);
+    const toDelete = metrics.filter((m) => (m as any).timestamps?.recordedAt < args.olderThan);
 
     // 5. Soft delete old metrics
     const now = Date.now();
@@ -221,16 +237,23 @@ export const recordApiResponse = mutation({
     // 3. Record API response metric
     const timestamp = Date.now();
     const metricId = await ctx.db.insert('systemMetrics', {
+      publicId: crypto.randomUUID(),
+      displayName: 'api_response',
       metricType: 'api_response',
-      value: args.responseTime,
-      unit: 'ms',
+      measurement: {
+        value: args.responseTime,
+        unit: 'ms',
+      },
+      timestamps: {
+        recordedAt: timestamp,
+      },
       // metadata: {
       //   endpoint: trimmedEndpoint,
       //   statusCode: args.statusCode,
       // },
-      timestamp,
       createdAt: timestamp,
       updatedAt: timestamp,
+      createdBy: undefined,
       updatedBy: undefined,
     });
 
@@ -256,16 +279,23 @@ export const recordErrorRate = mutation({
     // 3. Record error rate metric
     const timestamp = Date.now();
     const metricId = await ctx.db.insert('systemMetrics', {
+      publicId: crypto.randomUUID(),
+      displayName: 'error_rate',
       metricType: 'error_rate',
-      value: errorRate,
-      unit: 'percent',
+      measurement: {
+        value: errorRate,
+        unit: 'percent',
+      },
+      timestamps: {
+        recordedAt: timestamp,
+      },
       // metadata: {
       //   errorCount: args.errorCount,
       //   totalRequests: args.totalRequests,
       // },
-      timestamp,
       createdAt: timestamp,
       updatedAt: timestamp,
+      createdBy: undefined,
       updatedBy: undefined,
     });
 
@@ -293,12 +323,19 @@ export const recordSystemResources = mutation({
     // 3. Record CPU metric if provided
     if (args.cpu !== undefined) {
       const metricId = await ctx.db.insert('systemMetrics', {
+        publicId: crypto.randomUUID(),
+        displayName: 'cpu',
         metricType: 'cpu',
-        value: args.cpu,
-        unit: 'percent',
-        timestamp,
+        measurement: {
+          value: args.cpu,
+          unit: 'percent',
+        },
+        timestamps: {
+          recordedAt: timestamp,
+        },
         createdAt: timestamp,
         updatedAt: timestamp,
+        createdBy: undefined,
         updatedBy: undefined,
       });
       ids.push(metricId);
@@ -307,12 +344,19 @@ export const recordSystemResources = mutation({
     // 4. Record memory metric if provided
     if (args.memory !== undefined) {
       const metricId = await ctx.db.insert('systemMetrics', {
+        publicId: crypto.randomUUID(),
+        displayName: 'memory',
         metricType: 'memory',
-        value: args.memory,
-        unit: 'percent',
-        timestamp,
+        measurement: {
+          value: args.memory,
+          unit: 'percent',
+        },
+        timestamps: {
+          recordedAt: timestamp,
+        },
         createdAt: timestamp,
         updatedAt: timestamp,
+        createdBy: undefined,
         updatedBy: undefined,
       });
       ids.push(metricId);
@@ -321,12 +365,19 @@ export const recordSystemResources = mutation({
     // 5. Record disk metric if provided
     if (args.disk !== undefined) {
       const metricId = await ctx.db.insert('systemMetrics', {
+        publicId: crypto.randomUUID(),
+        displayName: 'disk',
         metricType: 'disk',
-        value: args.disk,
-        unit: 'percent',
-        timestamp,
+        measurement: {
+          value: args.disk,
+          unit: 'percent',
+        },
+        timestamps: {
+          recordedAt: timestamp,
+        },
         createdAt: timestamp,
         updatedAt: timestamp,
+        createdBy: undefined,
         updatedBy: undefined,
       });
       ids.push(metricId);

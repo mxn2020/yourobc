@@ -1,18 +1,16 @@
 // convex/schema/system/user_profiles/user_profiles/validators.ts
-// Grouped validators for user_profiles module
+// Grouped validators and complex fields for user profiles module
 
 import { v } from 'convex/values';
-import { statusTypes, userStatsSchema } from '../../base';
+import { statusTypes, userStatsSchema } from '@/schema/base';
 
 export const userProfilesValidators = {
-  // User role validator
   role: statusTypes.role,
+} as const;
 
-  // User stats schema
-  userStats: userStatsSchema,
-
-  // Extended metadata structure
-  extendedMetadata: v.optional(v.object({
+export const userProfilesFields = {
+  stats: userStatsSchema,
+  extendedMetadata: v.object({
     recoveredAt: v.optional(v.number()),
     recoveredFrom: v.optional(v.string()),
     syncSource: v.optional(v.string()),
@@ -20,6 +18,5 @@ export const userProfilesValidators = {
     customFields: v.optional(v.record(v.string(), v.any())),
     tags: v.optional(v.array(v.string())),
     notes: v.optional(v.string()),
-  })),
-
+  }),
 } as const;
