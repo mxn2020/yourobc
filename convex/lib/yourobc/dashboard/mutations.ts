@@ -28,8 +28,7 @@ import {
   findActiveAcknowledgmentByUserAndAlert,
   findDashboardAlertAcknowledgmentForMutation,
 } from './queries';
-import { generateDashboardAlertAcknowledgmentPublicId } from './utils';
-import { assertValidAlertId } from './validation';
+import { generateDashboardAlertAcknowledgmentPublicId, assertValidAlertId } from './utils';
 
 function buildUpdatePayload(
   acknowledgment: DashboardAlertAcknowledgmentDoc,

@@ -28,7 +28,7 @@ export const getMetric = query({
     // Require authentication
     const user = await requireCurrentUser(ctx);
 
-    // Query metrics using the by_metric_period index
+    // Query metrics using the by_metric_period index and actor scoping
     const metrics = await ctx.db
       .query('analyticsMetrics')
       .withIndex('by_metric_period', (q) =>
@@ -36,6 +36,7 @@ export const getMetric = query({
       )
       .filter((q) =>
         q.and(
+          q.eq(q.field('actorId'), user._id),
           q.gte(q.field('periodStart'), startDate),
           q.lte(q.field('periodEnd'), endDate),
           q.eq(q.field('deletedAt'), undefined),
@@ -111,7 +112,9 @@ export const getAnalyticsSummary = query({
     // Get events in date range
     const events = await ctx.db
       .query('analyticsEvents')
-      .withIndex('by_timestamp', (q) => q.gte('timestamp', startDate).lte('timestamp', endDate))
+      .withIndex('by_actor_and_timestamp', (q) =>
+        q.eq('actorId', user._id).gte('timestamp', startDate).lte('timestamp', endDate)
+      )
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 

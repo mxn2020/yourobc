@@ -61,12 +61,12 @@ export const trackingMessagesTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_message_id', ['messageId'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_shipment', ['shipmentId'])
+  .index('by_shipment_id', ['shipmentId'])
   .index('by_message_type', ['messageType'])
   .index('by_sent_at', ['sentAt'])
   .index('by_owner_and_status', ['ownerId', 'status'])

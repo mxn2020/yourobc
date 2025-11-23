@@ -26,4 +26,6 @@ export type EmailTemplateVariable = Infer<typeof emailFields.templateVariable>;
 export type EmailProviderConfig = Infer<typeof emailFields.providerConfig>;
 export type EmailTemplateSettings = Infer<typeof emailFields.templateSettings>;
 export type EmailConfigSettings = Infer<typeof emailFields.configSettings>;
-
+export type EmailConfigMetadata = Infer<typeof emailFields.configMetadata>;
+export type EmailTemplateMetadata = Infer<typeof emailFields.templateMetadata>;
+export type EmailLogMetadata = Infer<typeof emailFields.logMetadata>;

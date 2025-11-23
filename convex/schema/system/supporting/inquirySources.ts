@@ -11,13 +11,17 @@
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import { supportingValidators, supportingFields } from './validators'
-import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 
 /**
  * Inquiry sources table
  * Tracks sources of customer inquiries (website, referral, partner, etc.)
  */
 export const inquirySourcesTable = defineTable({
+  // Required fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Core fields
   name: v.string(),
   code: v.optional(v.string()),
@@ -29,8 +33,10 @@ export const inquirySourcesTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_name', ['name'])
   .index('by_type', ['type'])
   .index('by_active', ['isActive'])
-  .index('by_deleted', ['deletedAt'])
-  .index('by_created', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt'])
+  .index('by_created_at', ['createdAt'])

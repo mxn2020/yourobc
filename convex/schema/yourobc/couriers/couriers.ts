@@ -21,6 +21,9 @@ export const couriersTable = defineTable({
   publicId: v.string(),
   ownerId: userProfileIdSchema,
 
+  // Denormalized search field (ONLY if a searchIndex exists)
+  searchableText: v.string(),
+
   // Core Identity
   shortName: v.optional(v.string()),
   website: v.optional(v.string()),
@@ -81,14 +84,21 @@ export const couriersTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  // Full-text search indexes
+  .searchIndex('search_all', {
+    searchField: 'searchableText',
+    filterFields: ['ownerId', 'status', 'deletedAt', 'isActive'],
+  })
+
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_isActive', ['isActive'])
-  .index('by_isPreferred', ['isPreferred'])
-  .index('by_created', ['createdAt']);
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_is_active', ['isActive'])
+  .index('by_is_preferred', ['isPreferred'])
+  .index('by_created_at', ['createdAt']);

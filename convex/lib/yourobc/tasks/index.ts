@@ -2,7 +2,7 @@
 // Public API exports for tasks module
 
 // Constants
-export { TASKS_CONSTANTS } from './constants';
+export { TASKS_CONSTANTS, TASKS_VALUES } from './constants';
 
 // Types
 export type * from './types';
@@ -10,6 +10,8 @@ export type * from './types';
 // Utilities
 export {
   validateTaskData,
+  trimTaskData,
+  buildSearchableText,
   formatTaskDisplayName,
   isTaskEditable,
   isTaskOverdue,

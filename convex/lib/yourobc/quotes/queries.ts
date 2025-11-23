@@ -4,33 +4,21 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { quotesValidators } from '@/schema/yourobc/quotes/validators';
+import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { filterQuotesByAccess, requireViewQuoteAccess } from './permissions';
 import type { QuoteListResponse, QuoteStatsResponse, QuoteFilters } from './types';
 import { baseValidators } from '@/schema/base.validators';
 
 /**
- * Get current user - helper function for authentication
- */
-async function requireCurrentUser(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
-  return {
-    _id: identity.subject,
-    email: identity.email,
-    name: identity.name,
-    role: identity.role,
-  };
-}
-
-/**
- * Get paginated list of quotes with filtering
+ * Get paginated list of quotes with filtering (cursor-based)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User sees own quotes + those where assigned as employee
  */
 export const getQuotes = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       status: v.optional(v.array(quotesValidators.status)),
       serviceType: v.optional(v.array(baseValidators.serviceType)),
@@ -45,91 +33,103 @@ export const getQuotes = query({
       validUntilTo: v.optional(v.number()),
     })),
   },
-  handler: async (ctx, args): Promise<QuoteListResponse> => {
+  handler: async (ctx, args): Promise<QuoteListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
-    // Query with index - start with owner index for better performance
-    let quotes = await ctx.db
-      .query('yourobcQuotes')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+    // Build indexed query - most selective filter first
+    const q = (() => {
+      // Single status filter with owner
+      if (filters.status?.length === 1) {
+        return ctx.db
+          .query('yourobcQuotes')
+          .withIndex('by_owner_and_status', iq =>
+            iq.eq('ownerId', user._id).eq('status', filters.status![0])
+          )
+          .filter(notDeleted);
+      }
 
-    // Apply access filtering (this will include quotes where user is employee, etc.)
-    quotes = await filterQuotesByAccess(ctx, quotes, user);
+      // Customer filter with owner
+      if (filters.customerId) {
+        return ctx.db
+          .query('yourobcQuotes')
+          .withIndex('by_owner_and_customer', iq =>
+            iq.eq('ownerId', user._id).eq('customerId', filters.customerId!)
+          )
+          .filter(notDeleted);
+      }
 
-    // Apply status filter
-    if (filters.status?.length) {
-      quotes = quotes.filter(item =>
-        filters.status!.includes(item.status)
-      );
+      // Default: owner only
+      return ctx.db
+        .query('yourobcQuotes')
+        .withIndex('by_owner_id', iq => iq.eq('ownerId', user._id))
+        .filter(notDeleted);
+    })();
+
+    // Paginate
+    const page = await q.order('desc').paginate({
+      numItems: limit,
+      cursor: cursor ?? null,
+    });
+
+    // Apply permission filtering
+    let items = await filterQuotesByAccess(ctx, page.page, user);
+
+    // Apply additional filters in-memory (for multiple values)
+    if (filters.status && filters.status.length > 1) {
+      items = items.filter(i => filters.status!.includes(i.status));
     }
 
-    // Apply service type filter
     if (filters.serviceType?.length) {
-      quotes = quotes.filter(item =>
-        filters.serviceType!.includes(item.serviceType)
-      );
+      items = items.filter(i => filters.serviceType!.includes(i.serviceType));
     }
 
-    // Apply priority filter
     if (filters.priority?.length) {
-      quotes = quotes.filter(item =>
-        filters.priority!.includes(item.priority)
-      );
+      items = items.filter(i => filters.priority!.includes(i.priority));
     }
 
-    // Apply customer filter
-    if (filters.customerId) {
-      quotes = quotes.filter(item => item.customerId === filters.customerId);
-    }
-
-    // Apply employee filter
     if (filters.employeeId) {
-      quotes = quotes.filter(item => item.employeeId === filters.employeeId);
+      items = items.filter(i => i.employeeId === filters.employeeId);
     }
 
-    // Apply courier filter
     if (filters.assignedCourierId) {
-      quotes = quotes.filter(item => item.assignedCourierId === filters.assignedCourierId);
+      items = items.filter(i => i.assignedCourierId === filters.assignedCourierId);
     }
 
     // Apply deadline range filter
-    if (filters.deadlineFrom) {
-      quotes = quotes.filter(item => item.deadline >= filters.deadlineFrom!);
-    }
-    if (filters.deadlineTo) {
-      quotes = quotes.filter(item => item.deadline <= filters.deadlineTo!);
+    if (filters.deadlineFrom || filters.deadlineTo) {
+      items = items.filter(item => {
+        if (filters.deadlineFrom && item.deadline < filters.deadlineFrom) return false;
+        if (filters.deadlineTo && item.deadline > filters.deadlineTo) return false;
+        return true;
+      });
     }
 
     // Apply validity range filter
-    if (filters.validUntilFrom) {
-      quotes = quotes.filter(item => item.validUntil >= filters.validUntilFrom!);
-    }
-    if (filters.validUntilTo) {
-      quotes = quotes.filter(item => item.validUntil <= filters.validUntilTo!);
+    if (filters.validUntilFrom || filters.validUntilTo) {
+      items = items.filter(item => {
+        if (filters.validUntilFrom && item.validUntil < filters.validUntilFrom) return false;
+        if (filters.validUntilTo && item.validUntil > filters.validUntilTo) return false;
+        return true;
+      });
     }
 
-    // Apply search filter
+    // Simple text search (fallback for non-search-index table)
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      quotes = quotes.filter(item =>
-        item.quoteNumber.toLowerCase().includes(term) ||
-        (item.customerReference && item.customerReference.toLowerCase().includes(term)) ||
-        item.description.toLowerCase().includes(term) ||
-        (item.notes && item.notes.toLowerCase().includes(term))
+      items = items.filter(i =>
+        i.quoteNumber.toLowerCase().includes(term) ||
+        (i.customerReference && i.customerReference.toLowerCase().includes(term)) ||
+        i.description.toLowerCase().includes(term) ||
+        (i.notes && i.notes.toLowerCase().includes(term))
       );
     }
 
-    // Paginate
-    const total = quotes.length;
-    const items = quotes.slice(offset, offset + limit);
-
     return {
       items,
-      total,
-      hasMore: total > offset + limit,
+      returnedCount: items.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
@@ -157,6 +157,8 @@ export const getQuote = query({
 
 /**
  * Get quote by public ID
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
 export const getQuoteByPublicId = query({
   args: {
@@ -168,7 +170,7 @@ export const getQuoteByPublicId = query({
     const quote = await ctx.db
       .query('yourobcQuotes')
       .withIndex('by_public_id', q => q.eq('publicId', publicId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!quote) {
@@ -183,6 +185,8 @@ export const getQuoteByPublicId = query({
 
 /**
  * Get quote by quote number
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
 export const getQuoteByQuoteNumber = query({
   args: {
@@ -193,8 +197,8 @@ export const getQuoteByQuoteNumber = query({
 
     const quote = await ctx.db
       .query('yourobcQuotes')
-      .withIndex('by_quoteNumber', q => q.eq('quoteNumber', quoteNumber))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_quote_number', q => q.eq('quoteNumber', quoteNumber))
+      .filter(notDeleted)
       .first();
 
     if (!quote) {
@@ -209,6 +213,8 @@ export const getQuoteByQuoteNumber = query({
 
 /**
  * Get quotes for a specific customer
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
 export const getQuotesByCustomer = query({
   args: {
@@ -220,8 +226,8 @@ export const getQuotesByCustomer = query({
 
     let quotes = await ctx.db
       .query('yourobcQuotes')
-      .withIndex('by_customer', q => q.eq('customerId', customerId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_customer_id', q => q.eq('customerId', customerId))
+      .filter(notDeleted)
       .order('desc')
       .take(limit);
 
@@ -233,6 +239,8 @@ export const getQuotesByCustomer = query({
 
 /**
  * Get quote statistics
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User sees own stats
  */
 export const getQuoteStats = query({
   args: {},
@@ -241,8 +249,8 @@ export const getQuoteStats = query({
 
     const quotes = await ctx.db
       .query('yourobcQuotes')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_owner_id', q => q.eq('ownerId', user._id))
+      .filter(notDeleted)
       .collect();
 
     const accessible = await filterQuotesByAccess(ctx, quotes, user);
@@ -295,6 +303,8 @@ export const getQuoteStats = query({
 
 /**
  * Get expiring quotes (quotes that will expire soon)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User sees own quotes
  */
 export const getExpiringQuotes = query({
   args: {
@@ -308,14 +318,13 @@ export const getExpiringQuotes = query({
 
     let quotes = await ctx.db
       .query('yourobcQuotes')
-      .withIndex('by_validUntil')
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_valid_until', iq => iq.gte('validUntil', now))
+      .filter(notDeleted)
       .collect();
 
     // Filter for quotes that are sent/pending and expiring soon
     quotes = quotes.filter(q =>
       (q.status === 'sent' || q.status === 'pending') &&
-      q.validUntil > now &&
       q.validUntil <= thresholdTime
     );
 

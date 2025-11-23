@@ -14,6 +14,9 @@ export const tasksTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'),
 
+  // Denormalized search field (ONLY if a searchIndex exists)
+  searchableText: v.string(),
+
   // Task details
   description: v.optional(v.string()),
   status: tasksValidators.status,
@@ -55,10 +58,16 @@ export const tasksTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  // Full-text search indexes
+  .searchIndex('search_all', {
+    searchField: 'searchableText',
+    filterFields: ['ownerId', 'status', 'deletedAt', 'assignedTo'],
+  })
+
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_title', ['title'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

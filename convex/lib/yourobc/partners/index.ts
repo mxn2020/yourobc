@@ -2,13 +2,14 @@
 // Public API exports for partners module
 
 // Constants
-export { PARTNERS_CONSTANTS } from './constants';
+export { PARTNERS_CONSTANTS, PARTNERS_VALUES } from './constants';
 
 // Types
 export type * from './types';
 
 // Utilities
 export {
+  trimPartnerData,
   validatePartnerData,
   formatPartnerDisplayName,
   isPartnerEditable,
@@ -40,4 +41,6 @@ export {
   deletePartner,
   restorePartner,
   archivePartner,
+  bulkUpdatePartners,
+  bulkDeletePartners,
 } from './mutations';

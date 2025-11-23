@@ -3,29 +3,26 @@
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { softDeleteFields } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 import { systemMetricsFields, systemMetricsValidators } from './validators';
-
-const systemMetricsAuditFields = {
-  createdAt: v.number(),
-  createdBy: v.optional(v.id('userProfiles')),
-  updatedAt: v.number(),
-  updatedBy: v.optional(v.id('userProfiles')),
-};
 
 export const systemMetricsTable = defineTable({
   displayName: v.string(),
   publicId: v.string(),
 
+  // Exemption: metrics are system-level; ownerId is optional for cross-tenant aggregation
+  ownerId: v.optional(v.id('userProfiles')),
+
   metricType: systemMetricsValidators.metricType,
   measurement: systemMetricsFields.measurement,
   timestamps: systemMetricsFields.timestamps,
 
-  ...systemMetricsAuditFields,
+  ...auditFields,
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
   .index('by_displayName', ['displayName'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
   .index('by_type', ['metricType'])
   .index('by_recorded_at', ['timestamps.recordedAt'])

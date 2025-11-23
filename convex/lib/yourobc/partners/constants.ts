@@ -35,3 +35,7 @@ export const PARTNERS_CONSTANTS = {
     EMAIL_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   },
 } as const;
+
+export const PARTNERS_VALUES = {
+  status: Object.values(PARTNERS_CONSTANTS.STATUS),
+} as const;

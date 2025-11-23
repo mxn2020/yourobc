@@ -129,8 +129,9 @@ export interface ShipmentWithRelations extends Shipment {
 
 export interface ShipmentListResponse {
   items: Shipment[];
-  total: number;
+  returnedCount: number; // count of items returned in this page
   hasMore: boolean;
+  cursor?: string; // cursor for pagination (only present in paginated queries)
 }
 
 // Filter types

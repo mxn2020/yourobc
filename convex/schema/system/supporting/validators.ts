@@ -54,13 +54,13 @@ export const supportingValidators = {
 export const supportingFields = {
   // Comment mention object
   mention: v.object({
-    userId: v.string(),
+    userId: v.id('userProfiles'),
     userName: v.string(),
   }),
 
   // Comment reaction object
   reaction: v.object({
-    userId: v.string(),
+    userId: v.id('userProfiles'),
     reaction: v.string(),
     createdAt: v.number(),
   }),
@@ -78,6 +78,15 @@ export const supportingFields = {
     content: v.string(),
     editedAt: v.number(),
     reason: v.optional(v.string()),
+  }),
+
+  // Thread reply summary (prevents v.any usage in arrays)
+  replySummary: v.object({
+    commentId: v.id('comments'),
+    authorId: v.id('userProfiles'),
+    authorName: v.string(),
+    contentPreview: v.string(),
+    createdAt: v.number(),
   }),
 
   // Reminder recurrence pattern

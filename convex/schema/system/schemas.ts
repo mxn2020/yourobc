@@ -2,12 +2,12 @@
 
 // Core system table imports
 import { systemUserProfilesUserProfilesSchemas } from './user_profiles/user_profiles/schemas'
-import { systemAuditLogsSchemas } from './auditLogs/schemas'
+import { systemAuditLogsSchemas } from './audit_logs/audit_logs/schemas'
 import { systemNotificationsNotificationsSchemas } from './notifications/notifications/schemas'
-import { systemAppSettingsSchemas } from './appSettings/schemas'
+import { systemAppSettingsAppSettingsSchemas } from './app_settings/app_settings/schemas'
 import { systemSystemMetricsSystemMetricsSchemas } from './system_metrics/system_metrics/schemas'
-import { systemSystemAppThemeSettingsSchemas } from './appThemeSettings/schemas'
-import { systemAppConfigsSchemas } from './appConfigs/schemas'
+import { systemAppThemeSettingsAppThemeSettingsSchemas } from './app_theme_settings/app_theme_settings/schemas'
+import { systemAppConfigsAppConfigsSchemas } from './app_configs/app_configs/schemas'
 import { systemPermissionRequestsPermissionRequestsSchemas } from './permission_requests/permission_requests/schemas'
 import { systemUserSettingsUserSettingsSchemas } from './user_settings/user_settings/schemas'
 import { systemUserModelPreferencesSchemas } from './user_settings/user_model_preferences/schemas'
@@ -25,10 +25,10 @@ export const systemSchemas = {
   // System
   ...systemAuditLogsSchemas,
   ...systemNotificationsNotificationsSchemas,
-  ...systemAppSettingsSchemas,
+  ...systemAppSettingsAppSettingsSchemas,
   ...systemSystemMetricsSystemMetricsSchemas,
-  ...systemSystemAppThemeSettingsSchemas,
-  ...systemAppConfigsSchemas,
+  ...systemAppThemeSettingsAppThemeSettingsSchemas,
+  ...systemAppConfigsAppConfigsSchemas,
   ...systemPermissionRequestsPermissionRequestsSchemas,
 
   // Supporting

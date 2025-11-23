@@ -2,7 +2,7 @@
 // Public API exports for quotes module
 
 // Constants
-export { QUOTES_CONSTANTS } from './constants';
+export { QUOTES_CONSTANTS, QUOTES_VALUES } from './constants';
 
 // Types
 export type * from './types';
@@ -10,6 +10,7 @@ export type * from './types';
 // Utilities
 export {
   validateQuoteData,
+  buildSearchableText,
   formatQuoteDisplayName,
   calculateTotalPrice,
   calculateValidityPeriodDays,

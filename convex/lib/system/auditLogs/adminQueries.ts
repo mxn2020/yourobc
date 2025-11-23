@@ -4,6 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireAdmin } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { entityTypes } from './entityTypes';
 import { AUDIT_LOG_CONSTANTS } from './constants';
 
@@ -51,6 +52,7 @@ export const adminGetAuditLogs = query({
         .withIndex('by_entity', (q) =>
           q.eq('entityType', filters.entityType!).eq('entityId', filters.entityId!)
         )
+        .filter(notDeleted)
         .order('desc')
         .take(
           Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -58,7 +60,8 @@ export const adminGetAuditLogs = query({
     } else if (filters.userId) {
       logs = await ctx.db
         .query('auditLogs')
-        .withIndex('by_user', (q) => q.eq('userId', filters.userId!))
+        .withIndex('by_user_id', (q) => q.eq('userId', filters.userId!))
+        .filter(notDeleted)
         .order('desc')
         .take(
           Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -67,6 +70,7 @@ export const adminGetAuditLogs = query({
       logs = await ctx.db
         .query('auditLogs')
         .withIndex('by_action', (q) => q.eq('action', filters.action!))
+        .filter(notDeleted)
         .order('desc')
         .take(
           Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -81,6 +85,7 @@ export const adminGetAuditLogs = query({
                 .lte('createdAt', filters.dateTo)
             : q.gte('createdAt', filters.dateFrom!)
         )
+        .filter(notDeleted)
         .order('desc')
         .take(
           Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -91,6 +96,7 @@ export const adminGetAuditLogs = query({
       logs = await ctx.db
         .query('auditLogs')
         .withIndex('by_created_at', (q) => q.gte('createdAt', thirtyDaysAgo))
+        .filter(notDeleted)
         .order('desc')
         .take(
           Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -154,7 +160,8 @@ export const adminGetUserAuditLogs = query({
     // ✅ Use indexed query
     const logs = await ctx.db
       .query('auditLogs')
-      .withIndex('by_user', (q) => q.eq('userId', targetUserId))
+      .withIndex('by_user_id', (q) => q.eq('userId', targetUserId))
+      .filter(notDeleted)
       .order('desc')
       .take(limit);
 

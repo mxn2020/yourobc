@@ -5,6 +5,15 @@ export { AUDIT_LOG_CONSTANTS } from './constants'
 export { entityTypes } from './entityTypes'
 export * from './types'
 
+// Export utils
+export {
+  trimAuditLogData,
+  validateAuditLogData,
+  formatAuditLogDescription,
+  sanitizeMetadata,
+  calculateChangedFields,
+} from './utils'
+
 // Export all queries
 export {
   getAuditLogs,

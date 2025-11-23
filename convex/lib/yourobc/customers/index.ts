@@ -2,7 +2,7 @@
 // Public API exports for customers module
 
 // Constants
-export { CUSTOMERS_CONSTANTS } from './constants';
+export { CUSTOMERS_CONSTANTS, CUSTOMERS_VALUES } from './constants';
 export { CUSTOMER_MARGINS_CONSTANTS } from './margins.constants';
 
 // Types
@@ -14,6 +14,8 @@ export {
   validateCustomerData,
   validateContact,
   validateAddress,
+  trimCustomerData,
+  buildSearchableText,
   formatCustomerDisplayName,
   isCustomerEditable,
   calculateAverageMargin,

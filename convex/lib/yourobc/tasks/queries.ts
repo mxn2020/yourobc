@@ -1,20 +1,23 @@
-// convex/lib/yourobc/convex/lib/yourobc/tasks/queries.ts
+// convex/lib/yourobc/tasks/queries.ts
 // Read operations for tasks module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { tasksValidators } from '@/schema/yourobc/tasks/validators';
 import { filterTasksByAccess, requireViewTaskAccess } from './permissions';
 import type { TaskListResponse } from './types';
 
 /**
- * Get paginated list of tasks with filtering
+ * Get paginated list of tasks with filtering (cursor-based)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User sees own tasks + those assigned to them
  */
 export const getTasks = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       status: v.optional(v.array(tasksValidators.status)),
       priority: v.optional(v.array(tasksValidators.priority)),
@@ -27,25 +30,41 @@ export const getTasks = query({
       overdueOnly: v.optional(v.boolean()),
     })),
   },
-  handler: async (ctx, args): Promise<TaskListResponse> => {
+  handler: async (ctx, args): Promise<TaskListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
-    // Query with index
-    let tasks = await ctx.db
-      .query('yourobcTasks')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+    // Build indexed query - most selective filter first
+    const q = (() => {
+      // Single status filter with owner
+      if (filters.status?.length === 1) {
+        return ctx.db
+          .query('yourobcTasks')
+          .withIndex('by_owner_and_status', iq =>
+            iq.eq('ownerId', user._id).eq('status', filters.status![0])
+          )
+          .filter(notDeleted);
+      }
 
-    // Apply access filtering
-    tasks = await filterTasksByAccess(ctx, tasks, user);
+      // Default: owner only
+      return ctx.db
+        .query('yourobcTasks')
+        .withIndex('by_owner_id', iq => iq.eq('ownerId', user._id))
+        .filter(notDeleted);
+    })();
 
-    // Apply status filter
-    if (filters.status?.length) {
-      tasks = tasks.filter(item =>
-        filters.status!.includes(item.status)
-      );
+    // Paginate
+    const page = await q.order('desc').paginate({
+      numItems: limit,
+      cursor: cursor ?? null,
+    });
+
+    // Apply permission filtering
+    let tasks = await filterTasksByAccess(ctx, page.page, user);
+
+    // Apply additional status filter (for multiple values since index only handles single)
+    if (filters.status && filters.status.length > 1) {
+      tasks = tasks.filter(i => filters.status!.includes(i.status));
     }
 
     // Apply priority filter
@@ -92,23 +111,20 @@ export const getTasks = query({
       );
     }
 
-    // Apply search filter
+    // Apply search filter (simple text search fallback)
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      tasks = tasks.filter(item =>
-        item.title.toLowerCase().includes(term) ||
-        (item.description && item.description.toLowerCase().includes(term))
+      tasks = tasks.filter(i =>
+        i.title.toLowerCase().includes(term) ||
+        (i.description && i.description.toLowerCase().includes(term))
       );
     }
 
-    // Paginate
-    const total = tasks.length;
-    const items = tasks.slice(offset, offset + limit);
-
     return {
-      items,
-      total,
-      hasMore: total > offset + limit,
+      items: tasks,
+      returnedCount: tasks.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
@@ -147,7 +163,7 @@ export const getTaskByPublicId = query({
     const task = await ctx.db
       .query('yourobcTasks')
       .withIndex('by_public_id', q => q.eq('publicId', publicId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!task) {
@@ -170,8 +186,8 @@ export const getTaskStats = query({
 
     const tasks = await ctx.db
       .query('yourobcTasks')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_owner_id', q => q.eq('ownerId', user._id))
+      .filter(notDeleted)
       .collect();
 
     const accessible = await filterTasksByAccess(ctx, tasks, user);

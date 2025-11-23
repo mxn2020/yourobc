@@ -4,8 +4,10 @@
 import { Infer } from 'convex/values';
 import { tasksValidators, tasksFields } from './validators';
 
-// Extract types from validators
-export type TasksStatus = Infer<typeof tasksValidators.status>;
-export type TasksPriority = Infer<typeof tasksValidators.priority>;
-export type TasksType = Infer<typeof tasksValidators.taskType>;
-export type TasksChecklistItem = Infer<typeof tasksFields.checklistItem>;
+// Status and classification types
+export type TaskStatus = Infer<typeof tasksValidators.status>;
+export type TaskPriority = Infer<typeof tasksValidators.priority>;
+export type TaskType = Infer<typeof tasksValidators.taskType>;
+
+// Field types
+export type TaskChecklistItem = Infer<typeof tasksFields.checklistItem>;

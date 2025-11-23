@@ -2,7 +2,7 @@
 // Public API exports for shipments module
 
 // Constants
-export { SHIPMENTS_CONSTANTS } from './constants';
+export { SHIPMENTS_CONSTANTS, SHIPMENTS_VALUES } from './constants';
 
 // Types
 export type * from './types';

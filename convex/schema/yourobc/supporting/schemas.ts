@@ -1,22 +1,26 @@
 // convex/schema/yourobc/supporting/schemas.ts
 // Schema exports for supporting module
+// All 8 modules refactored with per-module organization
 
-import { exchangeRatesTable } from './exchangeRates';
-import { inquirySourcesTable } from './inquirySources';
-import { wikiEntriesTable } from './wikiEntries';
-import { commentsTable } from './comments';
-import { followupRemindersTable } from './followupReminders';
-import { documentsTable } from './documents';
-import { notificationsTable } from './notifications';
-import { countersTable } from './counters';
+import { supportingExchangeRatesSchemas } from './exchange_rates/schemas';
+import { supportingInquirySourcesSchemas } from './inquiry_sources/schemas';
+import { supportingWikiEntriesSchemas } from './wiki_entries/schemas';
+import { supportingCommentsSchemas } from './comments/schemas';
+import { supportingCountersSchemas } from './counters/schemas';
+import { supportingDocumentsSchemas } from './documents/schemas';
+import { supportingFollowupRemindersSchemas } from './followup_reminders/schemas';
+import { supportingNotificationsSchemas } from './notifications/schemas';
 
 export const yourobcSupportingSchemas = {
-  exchangeRates: exchangeRatesTable,
-  inquirySources: inquirySourcesTable,
-  wikiEntries: wikiEntriesTable,
-  comments: commentsTable,
-  yourobcFollowupReminders: followupRemindersTable,
-  yourobcDocuments: documentsTable,
-  yourobcNotifications: notificationsTable,
-  yourobcCounters: countersTable,
+  // Phase 1 (Priority modules - refactored)
+  ...supportingExchangeRatesSchemas,
+  ...supportingInquirySourcesSchemas,
+  ...supportingWikiEntriesSchemas,
+
+  // Phase 2 (Remaining modules - refactored)
+  ...supportingCommentsSchemas,
+  ...supportingCountersSchemas,
+  ...supportingDocumentsSchemas,
+  ...supportingFollowupRemindersSchemas,
+  ...supportingNotificationsSchemas,
 };

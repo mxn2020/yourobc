@@ -4,6 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { customersValidators } from '@/schema/yourobc/customers/validators';
 import { filterCustomersByAccess } from './permissions';
 import { calculateAverageMargin, calculateAveragePaymentTerms } from './utils';
@@ -33,7 +34,7 @@ export const getCustomers = query({
     // Query all customers (will filter by access later)
     let customers = await ctx.db
       .query('yourobcCustomers')
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -134,7 +135,7 @@ export const getCustomerByPublicId = query({
     const customer = await ctx.db
       .query('yourobcCustomers')
       .withIndex('by_public_id', q => q.eq('publicId', publicId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!customer) {
@@ -162,7 +163,7 @@ export const getCustomerStats = query({
     // Get all non-deleted customers
     const customers = await ctx.db
       .query('yourobcCustomers')
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Filter by access

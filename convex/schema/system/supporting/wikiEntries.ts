@@ -18,6 +18,10 @@ import { auditFields, classificationFields, softDeleteFields, userProfileIdSchem
  * Tracks knowledge base articles and procedures
  */
 export const wikiEntriesTable = defineTable({
+  // Required fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Core fields
   title: v.string(),
   slug: v.string(),
@@ -35,10 +39,12 @@ export const wikiEntriesTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_slug', ['slug'])
   .index('by_category', ['category'])
   .index('by_type', ['type'])
   .index('by_status', ['status'])
   .index('by_public', ['isPublic'])
-  .index('by_deleted', ['deletedAt'])
-  .index('by_created', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt'])
+  .index('by_created_at', ['createdAt'])

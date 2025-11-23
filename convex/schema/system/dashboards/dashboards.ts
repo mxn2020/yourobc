@@ -31,7 +31,7 @@ export const dashboardsTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

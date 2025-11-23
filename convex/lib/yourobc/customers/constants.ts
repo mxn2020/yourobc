@@ -52,3 +52,9 @@ export const CUSTOMERS_CONSTANTS = {
     WEBSITE_PATTERN: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
   },
 } as const;
+
+export const CUSTOMERS_VALUES = {
+  status: Object.values(CUSTOMERS_CONSTANTS.STATUS),
+  currency: Object.values(CUSTOMERS_CONSTANTS.CURRENCY),
+  paymentMethod: Object.values(CUSTOMERS_CONSTANTS.PAYMENT_METHOD),
+} as const;

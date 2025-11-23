@@ -4,6 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { couriersValidators } from '@/schema/yourobc/couriers/validators';
 import { filterCouriersByAccess, requireViewCourierAccess } from './permissions';
 import type { CourierListResponse, CourierStatsResponse } from './types';
@@ -36,7 +37,7 @@ export const getCouriers = query({
     // Query with deletedAt filter
     let couriers = await ctx.db
       .query('yourobcCouriers')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -158,7 +159,7 @@ export const getCourierByPublicId = query({
     const courier = await ctx.db
       .query('yourobcCouriers')
       .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!courier) {
@@ -184,7 +185,7 @@ export const getCourierByName = query({
     const courier = await ctx.db
       .query('yourobcCouriers')
       .withIndex('by_name', (q) => q.eq('name', name))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!courier) {
@@ -208,7 +209,7 @@ export const getPreferredCouriers = query({
     let couriers = await ctx.db
       .query('yourobcCouriers')
       .withIndex('by_isPreferred', (q) => q.eq('isPreferred', true))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -236,7 +237,7 @@ export const getCouriersByServiceType = query({
 
     let couriers = await ctx.db
       .query('yourobcCouriers')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -272,7 +273,7 @@ export const getCouriersByCountry = query({
 
     let couriers = await ctx.db
       .query('yourobcCouriers')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -307,7 +308,7 @@ export const getCourierStats = query({
 
     let couriers = await ctx.db
       .query('yourobcCouriers')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     const accessible = await filterCouriersByAccess(ctx, couriers, user);

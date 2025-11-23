@@ -2,7 +2,7 @@
 // Type definitions for appConfigs module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { AppConfigValueType, AppConfigScope } from '@/schema/system/appConfigs/types';
+import type { AppConfigScope, AppConfigValueType } from '@/schema/system/app_configs/app_configs/types';
 
 export type AppConfig = Doc<'appConfigs'>;
 export type AppConfigId = Id<'appConfigs'>;

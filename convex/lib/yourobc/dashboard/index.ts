@@ -12,11 +12,8 @@ export * from './constants';
 // Types
 export * from './types';
 
-// Utilities
+// Utilities & Validation
 export * from './utils';
-
-// Validation
-export * from './validation';
 
 // Permissions
 export * from './permissions';

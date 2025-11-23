@@ -265,20 +265,57 @@ export function formatTrackingStatus(status: string): string {
 }
 
 /**
- * Trim string fields in shipment data
+ * Trim all string fields in shipment data
+ * Generic typing ensures type safety without `any`
  */
-export function trimShipmentData<T extends Partial<CreateShipmentData | UpdateShipmentData>>(data: T): T {
-  const trimmed = { ...data };
+export function trimShipmentData<
+  T extends Partial<CreateShipmentData | UpdateShipmentData>
+>(data: T): T {
+  // Clone to avoid mutating caller data
+  const trimmed: T = { ...data };
 
-  if (trimmed.shipmentNumber) trimmed.shipmentNumber = trimmed.shipmentNumber.trim();
-  if (trimmed.awbNumber) trimmed.awbNumber = trimmed.awbNumber.trim();
-  if (trimmed.customerReference) trimmed.customerReference = trimmed.customerReference.trim();
-  if (trimmed.description) trimmed.description = trimmed.description.trim();
-  if (trimmed.specialInstructions) trimmed.specialInstructions = trimmed.specialInstructions.trim();
-  if (trimmed.courierInstructions) trimmed.courierInstructions = trimmed.courierInstructions.trim();
-  if (trimmed.partnerReference) trimmed.partnerReference = trimmed.partnerReference.trim();
-  if (trimmed.tags) trimmed.tags = trimmed.tags.map(tag => tag.trim()).filter(tag => tag);
-  if (trimmed.category) trimmed.category = trimmed.category.trim();
+  // Trim string fields
+  if (typeof trimmed.shipmentNumber === "string") {
+    trimmed.shipmentNumber = trimmed.shipmentNumber.trim() as T["shipmentNumber"];
+  }
+
+  if (typeof trimmed.awbNumber === "string") {
+    trimmed.awbNumber = trimmed.awbNumber.trim() as T["awbNumber"];
+  }
+
+  if (typeof trimmed.customerReference === "string") {
+    trimmed.customerReference = trimmed.customerReference.trim() as T["customerReference"];
+  }
+
+  if (typeof trimmed.description === "string") {
+    trimmed.description = trimmed.description.trim() as T["description"];
+  }
+
+  if (typeof trimmed.specialInstructions === "string") {
+    trimmed.specialInstructions = trimmed.specialInstructions.trim() as T["specialInstructions"];
+  }
+
+  if (typeof trimmed.courierInstructions === "string") {
+    trimmed.courierInstructions = trimmed.courierInstructions.trim() as T["courierInstructions"];
+  }
+
+  if (typeof trimmed.partnerReference === "string") {
+    trimmed.partnerReference = trimmed.partnerReference.trim() as T["partnerReference"];
+  }
+
+  if (typeof trimmed.category === "string") {
+    trimmed.category = trimmed.category.trim() as T["category"];
+  }
+
+  // Trim array of strings
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t): t is string => typeof t === "string")
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    trimmed.tags = nextTags as T["tags"];
+  }
 
   return trimmed;
 }

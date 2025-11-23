@@ -1,18 +1,15 @@
 // convex/lib/yourobc/invoices/index.ts
 // Public API exports for invoices module
 
-// Constants
+// Constants & Configuration
 export { INVOICES_CONSTANTS } from './constants';
 
-// Types
+// Types & Interfaces
 export type * from './types';
 
-// Utilities
+// Utilities, Validation & Helpers
 export {
-  validateInvoiceData,
-  validateLineItem,
-  validateCurrencyAmount,
-  validatePaymentData,
+  // Business logic
   calculateInvoiceTotals,
   formatInvoiceDisplayName,
   isInvoiceEditable,
@@ -23,7 +20,13 @@ export {
   getNextDunningLevel,
   getDunningFee,
   formatCurrencyAmount,
+  // Validation & Trimming
+  validateInvoiceData,
+  validateLineItem,
+  validateCurrencyAmount,
+  validatePaymentData,
   trimInvoiceData,
+  buildSearchableText,
 } from './utils';
 
 // Permissions

@@ -2,14 +2,26 @@
 // Grouped validators and fields for notifications module
 
 import { v } from 'convex/values';
-import { statusTypes } from '@/schema/base';
 import { entityTypes } from '@/config/entityTypes';
 
+const notificationType = v.union(
+  v.literal('assignment'),
+  v.literal('completion'),
+  v.literal('invite'),
+  v.literal('achievement'),
+  v.literal('reminder'),
+  v.literal('mention'),
+  v.literal('request'),
+  v.literal('info'),
+  v.literal('success'),
+  v.literal('error'),
+);
+
 export const notificationsValidators = {
-  type: statusTypes.notificationType,
+  type: notificationType,
   isRead: v.boolean(),
-  entityType: v.optional(entityTypes.all),
-  entityId: v.optional(v.string()),
+  entityType: entityTypes.all,
+  entityId: v.string(),
 } as const;
 
 export const notificationsFields = {

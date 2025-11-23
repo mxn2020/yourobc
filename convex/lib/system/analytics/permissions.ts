@@ -47,7 +47,7 @@ export async function canViewDashboard(
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
   // Owner can view
-  if (dashboard.ownerId === user._id) {
+  if (dashboard.actorId === user._id) {
     return true;
   }
 
@@ -84,7 +84,7 @@ export async function canEditDashboard(
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
   // Owner can edit
-  if (dashboard.ownerId === user._id) {
+  if (dashboard.actorId === user._id) {
     return true;
   }
 
@@ -105,7 +105,7 @@ export async function canDeleteDashboard(
   dashboard: Doc<'analyticsDashboards'>
 ): Promise<boolean> {
   // Owner can delete
-  if (dashboard.ownerId === user._id) {
+  if (dashboard.actorId === user._id) {
     return true;
   }
 
@@ -126,7 +126,7 @@ export async function canViewReport(
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
   // Owner can view
-  if (report.ownerId === user._id) {
+  if (report.actorId === user._id) {
     return true;
   }
 
@@ -163,7 +163,7 @@ export async function canEditReport(
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
   // Owner can edit
-  if (report.ownerId === user._id) {
+  if (report.actorId === user._id) {
     return true;
   }
 
@@ -184,7 +184,7 @@ export async function canDeleteReport(
   report: Doc<'analyticsReports'>
 ): Promise<boolean> {
   // Owner can delete
-  if (report.ownerId === user._id) {
+  if (report.actorId === user._id) {
     return true;
   }
 
@@ -263,7 +263,7 @@ export function filterDashboardsByAccess(
 ): Doc<'analyticsDashboards'>[] {
   return dashboards.filter((dashboard) => {
     // Owner can access
-    if (dashboard.ownerId === user._id) {
+    if (dashboard.actorId === user._id) {
       return true;
     }
 
@@ -290,7 +290,7 @@ export function filterReportsByAccess(
 ): Doc<'analyticsReports'>[] {
   return reports.filter((report) => {
     // Owner can access
-    if (report.ownerId === user._id) {
+    if (report.actorId === user._id) {
       return true;
     }
 

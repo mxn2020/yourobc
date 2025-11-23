@@ -5,6 +5,56 @@ import { PARTNERS_CONSTANTS } from './constants';
 import type { CreatePartnerData, UpdatePartnerData } from './types';
 
 /**
+ * Trim all string fields in partner data
+ * Generic typing ensures type safety without `any`
+ */
+export function trimPartnerData<
+  T extends Partial<CreatePartnerData | UpdatePartnerData>
+>(data: T): T {
+  // Clone to avoid mutating caller data
+  const trimmed: T = { ...data };
+
+  // Trim string fields
+  if (typeof trimmed.companyName === 'string') {
+    trimmed.companyName = trimmed.companyName.trim() as T['companyName'];
+  }
+
+  if (typeof trimmed.shortName === 'string') {
+    trimmed.shortName = trimmed.shortName.trim() as T['shortName'];
+  }
+
+  if (typeof trimmed.partnerCode === 'string') {
+    trimmed.partnerCode = trimmed.partnerCode.trim() as T['partnerCode'];
+  }
+
+  if (typeof trimmed.quotingEmail === 'string') {
+    trimmed.quotingEmail = trimmed.quotingEmail.trim() as T['quotingEmail'];
+  }
+
+  if (typeof trimmed.rankingNotes === 'string') {
+    trimmed.rankingNotes = trimmed.rankingNotes.trim() as T['rankingNotes'];
+  }
+
+  if (typeof trimmed.internalPaymentNotes === 'string') {
+    trimmed.internalPaymentNotes = trimmed.internalPaymentNotes.trim() as T['internalPaymentNotes'];
+  }
+
+  if (typeof trimmed.apiKey === 'string') {
+    trimmed.apiKey = trimmed.apiKey.trim() as T['apiKey'];
+  }
+
+  if (typeof trimmed.apiEndpoint === 'string') {
+    trimmed.apiEndpoint = trimmed.apiEndpoint.trim() as T['apiEndpoint'];
+  }
+
+  if (typeof trimmed.notes === 'string') {
+    trimmed.notes = trimmed.notes.trim() as T['notes'];
+  }
+
+  return trimmed;
+}
+
+/**
  * Validate partner data for creation/update
  */
 export function validatePartnerData(

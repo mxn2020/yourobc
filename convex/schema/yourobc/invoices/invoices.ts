@@ -74,18 +74,18 @@ export const invoicesTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_invoiceNumber', ['invoiceNumber'])
-  .index('by_owner', ['ownerId'])
+  .index('by_invoice_number', ['invoiceNumber'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Additional useful indexes
   .index('by_type', ['type'])
   .index('by_status', ['status'])
-  .index('by_customer', ['customerId'])
-  .index('by_partner', ['partnerId'])
-  .index('by_shipment', ['shipmentId'])
-  .index('by_dueDate', ['dueDate'])
-  .index('by_issueDate', ['issueDate'])
+  .index('by_customer_id', ['customerId'])
+  .index('by_partner_id', ['partnerId'])
+  .index('by_shipment_id', ['shipmentId'])
+  .index('by_due_date', ['dueDate'])
+  .index('by_issue_date', ['issueDate'])
   .index('by_type_status', ['type', 'status'])
-  .index('by_owner_status', ['ownerId', 'status'])
-  .index('by_created', ['createdAt']);
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_created_at', ['createdAt']);

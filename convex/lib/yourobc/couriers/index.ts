@@ -2,7 +2,7 @@
 // Public API exports for couriers module
 
 // Constants
-export { COURIERS_CONSTANTS } from './constants';
+export { COURIERS_CONSTANTS, COURIERS_VALUES } from './constants';
 
 // Types
 export type * from './types';
@@ -15,6 +15,8 @@ export {
   validateServiceCoverage,
   validateApiIntegration,
   validateCostStructure,
+  trimCourierData,
+  buildSearchableText,
   formatCourierDisplayName,
   isCourierEditable,
   courierSupportsService,

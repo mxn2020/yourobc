@@ -68,12 +68,11 @@ export const partnersTable = defineTable({
 })
   // Required indexes
   .index('by_public_id', ['publicId'])
-  .index('by_companyName', ['companyName'])
-  .index('by_owner', ['ownerId'])
+  .index('by_company_name', ['companyName'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_status', ['status'])
-  .index('by_serviceType', ['serviceType'])
-  .index('by_countries', ['serviceCoverage.countries'])
+  .index('by_service_type', ['serviceType'])
   .index('by_owner_and_status', ['ownerId', 'status']);

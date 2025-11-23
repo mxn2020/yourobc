@@ -11,13 +11,18 @@
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import { supportingValidators, supportingFields } from './validators'
-import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 
 /**
  * Exchange rates table
  * Tracks daily exchange rates for currency conversion
  */
 export const exchangeRatesTable = defineTable({
+  // Required fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+  name: v.string(),
+
   // Core fields
   fromCurrency: supportingValidators.currency,
   toCurrency: supportingValidators.currency,
@@ -30,8 +35,11 @@ export const exchangeRatesTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
+  .index('by_owner_id', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
   .index('by_currency_pair', ['fromCurrency', 'toCurrency'])
   .index('by_date', ['date'])
   .index('by_active', ['isActive'])
-  .index('by_deleted', ['deletedAt'])
-  .index('by_created', ['createdAt'])
+  .index('by_created_at', ['createdAt'])

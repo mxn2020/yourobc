@@ -1,5 +1,5 @@
 // convex/schema/system/app_settings/app_settings/types.ts
-// Type extractions from validators for appSettings module
+// Type extractions from validators for app_settings module
 
 import { Infer } from 'convex/values';
 import { appSettingsFields, appSettingsValidators } from './validators';

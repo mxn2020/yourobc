@@ -4,10 +4,11 @@
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
+import { chunkIds } from '@/shared/bulk.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { partnersValidators, partnersFields } from '@/schema/yourobc/partners/validators';
 import { PARTNERS_CONSTANTS } from './constants';
-import { validatePartnerData } from './utils';
+import { trimPartnerData, validatePartnerData } from './utils';
 import { requireEditPartnerAccess, requireDeletePartnerAccess, canEditPartner, canDeletePartner } from './permissions';
 import type { PartnerId } from './types';
 import { baseValidators } from '@/schema/base.validators';
@@ -49,8 +50,11 @@ export const createPartner = mutation({
       allowAdmin: true,
     });
 
-    // 3. VALIDATE: Check data validity
-    const errors = validatePartnerData(data);
+    // 3. TRIM: Trim all string fields
+    const trimmed = trimPartnerData(data);
+
+    // 4. VALIDATE: Check data validity
+    const errors = validatePartnerData(trimmed);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -62,26 +66,26 @@ export const createPartner = mutation({
     // 5. CREATE: Insert into database
     const partnerId = await ctx.db.insert('yourobcPartners', {
       publicId,
-      companyName: data.companyName.trim(),
-      shortName: data.shortName?.trim(),
-      partnerCode: data.partnerCode?.trim(),
-      primaryContact: data.primaryContact,
-      quotingEmail: data.quotingEmail?.trim(),
-      address: data.address,
-      serviceCoverage: data.serviceCoverage,
-      serviceType: data.serviceType,
-      preferredCurrency: data.preferredCurrency,
-      paymentTerms: data.paymentTerms,
-      ranking: data.ranking,
-      rankingNotes: data.rankingNotes?.trim(),
-      internalPaymentNotes: data.internalPaymentNotes?.trim(),
-      serviceCapabilities: data.serviceCapabilities,
-      commissionRate: data.commissionRate,
-      apiEnabled: data.apiEnabled,
-      apiKey: data.apiKey?.trim(),
-      apiEndpoint: data.apiEndpoint?.trim(),
-      status: data.status || 'active',
-      notes: data.notes?.trim(),
+      companyName: trimmed.companyName || '',
+      shortName: trimmed.shortName,
+      partnerCode: trimmed.partnerCode,
+      primaryContact: trimmed.primaryContact!,
+      quotingEmail: trimmed.quotingEmail,
+      address: trimmed.address!,
+      serviceCoverage: trimmed.serviceCoverage!,
+      serviceType: trimmed.serviceType!,
+      preferredCurrency: trimmed.preferredCurrency!,
+      paymentTerms: trimmed.paymentTerms!,
+      ranking: trimmed.ranking,
+      rankingNotes: trimmed.rankingNotes,
+      internalPaymentNotes: trimmed.internalPaymentNotes,
+      serviceCapabilities: trimmed.serviceCapabilities,
+      commissionRate: trimmed.commissionRate,
+      apiEnabled: trimmed.apiEnabled,
+      apiKey: trimmed.apiKey,
+      apiEndpoint: trimmed.apiEndpoint,
+      status: trimmed.status || 'active',
+      notes: trimmed.notes,
       ownerId: user._id,
       createdAt: now,
       updatedAt: now,
@@ -93,13 +97,13 @@ export const createPartner = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.created',
-      entityType: 'system_partners',
+      entityType: 'yourobcPartners',
       entityId: publicId,
-      entityTitle: data.companyName.trim(),
-      description: `Created partner: ${data.companyName.trim()}`,
+      entityTitle: trimmed.companyName || '',
+      description: `Created partner: ${trimmed.companyName}`,
       metadata: {
-        status: data.status || 'active',
-        serviceType: data.serviceType,
+        status: trimmed.status || 'active',
+        serviceType: trimmed.serviceType,
       },
       createdAt: now,
       createdBy: user._id,
@@ -153,93 +157,56 @@ export const updatePartner = mutation({
     // 3. AUTHZ: Check edit permission
     await requireEditPartnerAccess(ctx, partner, user);
 
-    // 4. VALIDATE: Check update data validity
-    const errors = validatePartnerData(updates);
+    // 4. TRIM: Trim all string fields
+    const trimmed = trimPartnerData(updates);
+
+    // 5. VALIDATE: Check update data validity
+    const errors = validatePartnerData(trimmed);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 5. PROCESS: Prepare update data
+    // 7. UPDATE: Apply changes (use trimmed data)
     const now = Date.now();
     const updateData: any = {
       updatedAt: now,
       updatedBy: user._id,
     };
 
-    if (updates.companyName !== undefined) {
-      updateData.companyName = updates.companyName.trim();
-    }
-    if (updates.shortName !== undefined) {
-      updateData.shortName = updates.shortName?.trim();
-    }
-    if (updates.partnerCode !== undefined) {
-      updateData.partnerCode = updates.partnerCode?.trim();
-    }
-    if (updates.primaryContact !== undefined) {
-      updateData.primaryContact = updates.primaryContact;
-    }
-    if (updates.quotingEmail !== undefined) {
-      updateData.quotingEmail = updates.quotingEmail?.trim();
-    }
-    if (updates.address !== undefined) {
-      updateData.address = updates.address;
-    }
-    if (updates.serviceCoverage !== undefined) {
-      updateData.serviceCoverage = updates.serviceCoverage;
-    }
-    if (updates.serviceType !== undefined) {
-      updateData.serviceType = updates.serviceType;
-    }
-    if (updates.preferredCurrency !== undefined) {
-      updateData.preferredCurrency = updates.preferredCurrency;
-    }
-    if (updates.paymentTerms !== undefined) {
-      updateData.paymentTerms = updates.paymentTerms;
-    }
-    if (updates.ranking !== undefined) {
-      updateData.ranking = updates.ranking;
-    }
-    if (updates.rankingNotes !== undefined) {
-      updateData.rankingNotes = updates.rankingNotes?.trim();
-    }
-    if (updates.internalPaymentNotes !== undefined) {
-      updateData.internalPaymentNotes = updates.internalPaymentNotes?.trim();
-    }
-    if (updates.serviceCapabilities !== undefined) {
-      updateData.serviceCapabilities = updates.serviceCapabilities;
-    }
-    if (updates.commissionRate !== undefined) {
-      updateData.commissionRate = updates.commissionRate;
-    }
-    if (updates.apiEnabled !== undefined) {
-      updateData.apiEnabled = updates.apiEnabled;
-    }
-    if (updates.apiKey !== undefined) {
-      updateData.apiKey = updates.apiKey?.trim();
-    }
-    if (updates.apiEndpoint !== undefined) {
-      updateData.apiEndpoint = updates.apiEndpoint?.trim();
-    }
-    if (updates.status !== undefined) {
-      updateData.status = updates.status;
-    }
-    if (updates.notes !== undefined) {
-      updateData.notes = updates.notes?.trim();
-    }
+    // Copy trimmed values
+    if (trimmed.companyName !== undefined) updateData.companyName = trimmed.companyName;
+    if (trimmed.shortName !== undefined) updateData.shortName = trimmed.shortName;
+    if (trimmed.partnerCode !== undefined) updateData.partnerCode = trimmed.partnerCode;
+    if (trimmed.primaryContact !== undefined) updateData.primaryContact = trimmed.primaryContact;
+    if (trimmed.quotingEmail !== undefined) updateData.quotingEmail = trimmed.quotingEmail;
+    if (trimmed.address !== undefined) updateData.address = trimmed.address;
+    if (trimmed.serviceCoverage !== undefined) updateData.serviceCoverage = trimmed.serviceCoverage;
+    if (trimmed.serviceType !== undefined) updateData.serviceType = trimmed.serviceType;
+    if (trimmed.preferredCurrency !== undefined) updateData.preferredCurrency = trimmed.preferredCurrency;
+    if (trimmed.paymentTerms !== undefined) updateData.paymentTerms = trimmed.paymentTerms;
+    if (trimmed.ranking !== undefined) updateData.ranking = trimmed.ranking;
+    if (trimmed.rankingNotes !== undefined) updateData.rankingNotes = trimmed.rankingNotes;
+    if (trimmed.internalPaymentNotes !== undefined) updateData.internalPaymentNotes = trimmed.internalPaymentNotes;
+    if (trimmed.serviceCapabilities !== undefined) updateData.serviceCapabilities = trimmed.serviceCapabilities;
+    if (trimmed.commissionRate !== undefined) updateData.commissionRate = trimmed.commissionRate;
+    if (trimmed.apiEnabled !== undefined) updateData.apiEnabled = trimmed.apiEnabled;
+    if (trimmed.apiKey !== undefined) updateData.apiKey = trimmed.apiKey;
+    if (trimmed.apiEndpoint !== undefined) updateData.apiEndpoint = trimmed.apiEndpoint;
+    if (trimmed.status !== undefined) updateData.status = trimmed.status;
+    if (trimmed.notes !== undefined) updateData.notes = trimmed.notes;
 
-    // 6. UPDATE: Apply changes
     await ctx.db.patch(partnerId, updateData);
 
-    // 7. AUDIT: Create audit log
+    // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.updated',
-      entityType: 'system_partners',
+      entityType: 'yourobcPartners',
       entityId: partner.publicId,
       entityTitle: updateData.companyName || partner.companyName,
       description: `Updated partner: ${updateData.companyName || partner.companyName}`,
-      metadata: { changes: updates },
+      metadata: { changes: trimmed },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -284,7 +251,7 @@ export const deletePartner = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.deleted',
-      entityType: 'system_partners',
+      entityType: 'yourobcPartners',
       entityId: partner.publicId,
       entityTitle: partner.companyName,
       description: `Deleted partner: ${partner.companyName}`,
@@ -341,7 +308,7 @@ export const restorePartner = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.restored',
-      entityType: 'system_partners',
+      entityType: 'yourobcPartners',
       entityId: partner.publicId,
       entityTitle: partner.companyName,
       description: `Restored partner: ${partner.companyName}`,
@@ -388,7 +355,7 @@ export const archivePartner = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.archived',
-      entityType: 'system_partners',
+      entityType: 'yourobcPartners',
       entityId: partner.publicId,
       entityTitle: partner.companyName,
       description: `Archived partner: ${partner.companyName}`,
@@ -399,5 +366,155 @@ export const archivePartner = mutation({
 
     // 6. RETURN: Return entity ID
     return partnerId;
+  },
+});
+
+/**
+ * Bulk update multiple partners
+ */
+export const bulkUpdatePartners = mutation({
+  args: {
+    ids: v.array(v.id('yourobcPartners')),
+    updates: v.object({
+      status: v.optional(partnersValidators.status),
+      ranking: v.optional(v.number()),
+      rankingNotes: v.optional(v.string()),
+      commissionRate: v.optional(v.number()),
+    }),
+    chunkSize: v.optional(v.number()),
+  },
+  handler: async (ctx, { ids, updates, chunkSize }) => {
+    const user = await requireCurrentUser(ctx);
+
+    await requirePermission(ctx, PARTNERS_CONSTANTS.PERMISSIONS.BULK_EDIT, {
+      allowAdmin: true,
+    });
+
+    const trimmed = trimPartnerData(updates);
+    const errors = validatePartnerData(trimmed);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+
+    const now = Date.now();
+    const chunks = chunkIds(ids, chunkSize ?? 50);
+    let updatedCount = 0;
+    const denied: string[] = [];
+
+    for (const chunk of chunks) {
+      const docs = await Promise.all(chunk.map(id => ctx.db.get(id)));
+
+      for (const doc of docs) {
+        if (!doc || doc.deletedAt) continue;
+
+        const canEdit = await canEditPartner(ctx, doc, user);
+        if (!canEdit) {
+          denied.push(doc.publicId);
+          continue;
+        }
+
+        await ctx.db.patch(doc._id, {
+          ...trimmed,
+          updatedAt: now,
+          updatedBy: user._id,
+        });
+
+        updatedCount++;
+      }
+    }
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.bulk_updated',
+      entityType: 'yourobcPartners',
+      entityId: 'bulk',
+      entityTitle: 'partners bulk update',
+      description: `Bulk updated ${updatedCount} partners`,
+      metadata: {
+        updates: trimmed,
+        denied,
+        requestedCount: ids.length,
+        updatedCount,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return {
+      requestedCount: ids.length,
+      updatedCount,
+      denied,
+    };
+  },
+});
+
+/**
+ * Bulk delete multiple partners
+ */
+export const bulkDeletePartners = mutation({
+  args: {
+    ids: v.array(v.id('yourobcPartners')),
+    chunkSize: v.optional(v.number()),
+  },
+  handler: async (ctx, { ids, chunkSize }) => {
+    const user = await requireCurrentUser(ctx);
+
+    await requirePermission(ctx, PARTNERS_CONSTANTS.PERMISSIONS.DELETE, {
+      allowAdmin: true,
+    });
+
+    const now = Date.now();
+    const chunks = chunkIds(ids, chunkSize ?? 50);
+    let deletedCount = 0;
+    const denied: string[] = [];
+
+    for (const chunk of chunks) {
+      const docs = await Promise.all(chunk.map(id => ctx.db.get(id)));
+
+      for (const doc of docs) {
+        if (!doc || doc.deletedAt) continue;
+
+        const canDel = await canDeletePartner(doc, user);
+        if (!canDel) {
+          denied.push(doc.publicId);
+          continue;
+        }
+
+        await ctx.db.patch(doc._id, {
+          deletedAt: now,
+          deletedBy: user._id,
+          updatedAt: now,
+          updatedBy: user._id,
+        });
+
+        deletedCount++;
+      }
+    }
+
+    await ctx.db.insert('auditLogs', {
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown User',
+      action: 'partners.bulk_deleted',
+      entityType: 'yourobcPartners',
+      entityId: 'bulk',
+      entityTitle: 'partners bulk delete',
+      description: `Bulk deleted ${deletedCount} partners`,
+      metadata: {
+        denied,
+        requestedCount: ids.length,
+        deletedCount,
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return {
+      requestedCount: ids.length,
+      deletedCount,
+      denied,
+    };
   },
 });

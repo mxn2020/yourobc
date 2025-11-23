@@ -4,6 +4,14 @@
 import { ANALYTICS_CONSTANTS } from './constants';
 import type { DeviceInfo } from './types';
 
+export type AnalyticsPropertyValue =
+  | string
+  | number
+  | boolean
+  | null
+  | AnalyticsPropertyValue[]
+  | { [key: string]: AnalyticsPropertyValue };
+
 /**
  * Generate a unique session ID
  */
@@ -283,8 +291,8 @@ export function isSessionExpired(lastActivityTime: number): boolean {
  * Sanitize and trim event properties to remove sensitive data and trim strings
  */
 export function sanitizeEventProperties(
-  properties: Record<string, any>
-): Record<string, any> {
+  properties: AnalyticsPropertyValue
+): AnalyticsPropertyValue {
   const sensitiveKeys = [
     'password',
     'secret',
@@ -295,7 +303,10 @@ export function sanitizeEventProperties(
     'pin',
   ];
 
-  const sanitized = { ...properties };
+  if (properties === null) return null;
+  if (typeof properties !== 'object') return properties;
+
+  const sanitized: Record<string, AnalyticsPropertyValue> = { ...(properties as Record<string, AnalyticsPropertyValue>) };
 
   for (const key of Object.keys(sanitized)) {
     const lowerKey = key.toLowerCase();

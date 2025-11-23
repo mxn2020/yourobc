@@ -382,3 +382,75 @@ export function calculateAverageOnTimeRate(
   const total = rates.reduce((sum, rate) => sum + rate, 0);
   return Math.round((total / rates.length) * 100) / 100;
 }
+
+/**
+ * Trim all string fields in courier data
+ * Generic typing ensures type safety without `any`
+ */
+export function trimCourierData<T extends Partial<CreateCourierData | UpdateCourierData>>(
+  data: T
+): T {
+  // Clone to avoid mutating caller data
+  const trimmed: T = { ...data };
+
+  // Trim string fields
+  if (typeof trimmed.name === "string") {
+    trimmed.name = trimmed.name.trim() as T["name"];
+  }
+
+  if (typeof trimmed.shortName === "string") {
+    trimmed.shortName = trimmed.shortName.trim() as T["shortName"];
+  }
+
+  if (typeof trimmed.website === "string") {
+    trimmed.website = trimmed.website.trim() as T["website"];
+  }
+
+  if (typeof trimmed.email === "string") {
+    trimmed.email = trimmed.email.trim() as T["email"];
+  }
+
+  if (typeof trimmed.phone === "string") {
+    trimmed.phone = trimmed.phone.trim() as T["phone"];
+  }
+
+  if (typeof trimmed.notes === "string") {
+    trimmed.notes = trimmed.notes.trim() as T["notes"];
+  }
+
+  if (typeof trimmed.internalNotes === "string") {
+    trimmed.internalNotes = trimmed.internalNotes.trim() as T["internalNotes"];
+  }
+
+  // Trim array of strings (tags)
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t): t is string => typeof t === "string")
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    trimmed.tags = nextTags as T["tags"];
+  }
+
+  return trimmed;
+}
+
+/**
+ * Build searchable text for full-text search
+ */
+export function buildSearchableText(
+  data: Partial<CreateCourierData | UpdateCourierData>
+): string {
+  const parts: string[] = [];
+
+  if (data.name) parts.push(data.name);
+  if (data.shortName) parts.push(data.shortName);
+  if (data.website) parts.push(data.website);
+  if (data.email) parts.push(data.email);
+  if (data.phone) parts.push(data.phone);
+  if (data.notes) parts.push(data.notes);
+  if (data.internalNotes) parts.push(data.internalNotes);
+  if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
+
+  return parts.join(' ').toLowerCase().trim();
+}

@@ -12,6 +12,7 @@ import {
   getPeriodBoundaries,
   generateAnalyticsPublicId,
   validateDashboardSlug,
+  type AnalyticsPropertyValue,
 } from './utils';
 import { ANALYTICS_CONSTANTS } from './constants';
 import { Id } from '@/generated/dataModel';
@@ -126,6 +127,7 @@ async function insertAnalyticsEvent(
 
   // Trim string fields
   const eventName = args.eventName.trim();
+  const name = eventName;
   const sessionId = (args.sessionId || generateSessionId()).trim();
   const anonymousId = (args.anonymousId || (!args.userId ? generateAnonymousId() : undefined))?.trim();
   const currency = args.currency?.trim();
@@ -146,13 +148,17 @@ async function insertAnalyticsEvent(
 
   // Sanitize properties
   const sanitizedProperties = args.properties
-    ? (sanitizeEventProperties(args.properties as any) as EventProperties)
+    ? (sanitizeEventProperties(args.properties as AnalyticsPropertyValue) as EventProperties)
     : undefined;
 
+  const publicId = generateAnalyticsPublicId('evt');
   // Create event
   const eventId = await ctx.db.insert('analyticsEvents', {
+    name,
+    publicId,
     eventName,
     eventType: args.eventType,
+    actorId: args.userId,
     userId: args.userId,
     sessionId,
     anonymousId,
@@ -213,6 +219,7 @@ async function upsertMetricHelper(
   // Trim string fields
   const metricType = args.metricType.trim();
   const dimension = args.dimension?.trim();
+  const name = `${metricType}${dimension ? `:${dimension}` : ''}`;
 
   // Check if metric already exists
   const existingMetrics = await ctx.db
@@ -232,6 +239,7 @@ async function upsertMetricHelper(
   if (existing) {
     // Update existing metric
     await ctx.db.patch(existing._id, {
+      name,
       count: args.count,
       sum: args.sum,
       average: args.average,
@@ -245,6 +253,9 @@ async function upsertMetricHelper(
   } else {
     // Create new metric
     return await ctx.db.insert('analyticsMetrics', {
+      name,
+      publicId: generateAnalyticsPublicId('met'),
+      actorId: args.userId,
       metricType,
       period: args.period,
       periodStart: args.periodStart,
@@ -425,7 +436,7 @@ export const createDashboard = mutation({
     const name = args.name.trim();
     const slug = args.slug.trim().toLowerCase();
     const description = args.description?.trim();
-    const ownerName = (user.name || user.email || 'Unknown').trim();
+    const actorName = (user.name || user.email || 'Unknown').trim();
 
     // 3. Validate inputs
     if (!name) {
@@ -441,7 +452,7 @@ export const createDashboard = mutation({
     const existingDashboard = await ctx.db
       .query('analyticsDashboards')
       .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .filter((q) => q.eq(q.field('ownerId'), user._id))
+      .filter((q) => q.eq(q.field('actorId'), user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .first();
 
@@ -463,8 +474,8 @@ export const createDashboard = mutation({
       type: args.type,
       widgets: args.widgets,
       isPublic: args.isPublic,
-      ownerId: user._id,
-      ownerName,
+      actorId: user._id,
+      actorName,
       status: 'active',
       metadata: {
         source: 'dashboard_mutation',
@@ -479,7 +490,7 @@ export const createDashboard = mutation({
     // 4. Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
-      userName: ownerName,
+      userName: actorName,
       action: AUDIT_ACTIONS.DASHBOARD_CREATED,
       entityType: 'analyticsDashboards',
       entityId: publicId,
@@ -558,7 +569,7 @@ export const updateDashboard = mutation({
     }
 
     // 2. Check ownership
-    const user = await requireOwnershipOrAdmin(ctx, dashboard.ownerId);
+    const user = await requireOwnershipOrAdmin(ctx, dashboard.actorId);
 
     // 3. Trim string fields in updates
     const trimmedUpdates = {
@@ -617,7 +628,7 @@ export const deleteDashboard = mutation({
     }
 
     // 2. Check ownership
-    const user = await requireOwnershipOrAdmin(ctx, dashboard.ownerId);
+    const user = await requireOwnershipOrAdmin(ctx, dashboard.actorId);
 
     const now = Date.now();
     const userName = (user.name || user.email || 'Unknown').trim();
@@ -720,7 +731,7 @@ export const createReport = mutation({
       query: args.query,
       schedule: args.schedule,
       exportFormats: args.exportFormats,
-      ownerId: user._id,
+      actorId: user._id,
       isPublic: args.isPublic,
       status: args.schedule?.enabled ? 'scheduled' : 'active',
       metadata: {
@@ -813,7 +824,7 @@ export const updateReport = mutation({
     }
 
     // 2. Check ownership
-    const user = await requireOwnershipOrAdmin(ctx, report.ownerId);
+    const user = await requireOwnershipOrAdmin(ctx, report.actorId);
 
     // 3. Trim string fields in updates
     const trimmedUpdates = {
@@ -872,7 +883,7 @@ export const deleteReport = mutation({
     }
 
     // 2. Check ownership
-    const user = await requireOwnershipOrAdmin(ctx, report.ownerId);
+    const user = await requireOwnershipOrAdmin(ctx, report.actorId);
 
     const now = Date.now();
     const userName = (user.name || user.email || 'Unknown').trim();
@@ -1014,8 +1025,8 @@ export const upsertProviderConfig = mutation({
       configId = await ctx.db.insert('analyticsProviderSync', {
         provider,
         publicId,
-        ownerId: admin._id,
-        ownerName: adminName,
+        actorId: admin._id,
+        actorName: adminName,
         enabled: args.enabled,
         config: args.config,
         autoSync: args.autoSync,

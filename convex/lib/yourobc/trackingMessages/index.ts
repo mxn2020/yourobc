@@ -1,20 +1,24 @@
 // convex/lib/yourobc/trackingMessages/index.ts
 // Public API exports for trackingMessages module
 
-// Constants
+// Constants & Configuration
 export { TRACKING_MESSAGES_CONSTANTS } from './constants';
 
-// Types
+// Types & Interfaces
 export type * from './types';
 
-// Utilities
+// Utilities, Validation & Helpers
 export {
-  validateTrackingMessageData,
+  // Business logic
   formatTrackingMessageDisplayName,
   generateMessageId,
   isTrackingMessageEditable,
   isTrackingMessageRead,
   calculateDeliveryTime,
+  // Validation & Trimming
+  validateTrackingMessageData,
+  trimTrackingMessageData,
+  buildSearchableText,
 } from './utils';
 
 // Permissions

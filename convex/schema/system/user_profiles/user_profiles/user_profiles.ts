@@ -3,17 +3,11 @@
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { softDeleteFields } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 import { userProfilesFields, userProfilesValidators } from './validators';
 
-const userProfilesAuditFields = {
-  createdAt: v.number(),
-  createdBy: v.optional(v.id('userProfiles')),
-  updatedAt: v.number(),
-  updatedBy: v.optional(v.id('userProfiles')),
-};
-
 export const userProfilesTable = defineTable({
+  // Exemption: ownerId not used because the profile itself is the user record
   displayName: v.string(),
   publicId: v.string(),
 
@@ -46,7 +40,7 @@ export const userProfilesTable = defineTable({
 
   extendedMetadata: v.optional(userProfilesFields.extendedMetadata),
 
-  ...userProfilesAuditFields,
+  ...auditFields,
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])

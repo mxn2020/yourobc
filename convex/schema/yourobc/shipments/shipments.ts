@@ -22,6 +22,9 @@ export const shipmentsTable = defineTable({
   publicId: v.string(),
   ownerId: v.id('userProfiles'), // User who owns/manages this shipment record
 
+  // Denormalized search field (ONLY if a searchIndex exists)
+  searchableText: v.string(),
+
   // Additional Identification
   awbNumber: v.optional(v.string()),
   customerReference: v.optional(v.string()),
@@ -87,19 +90,20 @@ export const shipmentsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
-  // Required indexes
+  // Standard required indexes
   .index('by_public_id', ['publicId'])
   .index('by_shipmentNumber', ['shipmentNumber'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_customer', ['customerId'])
   .index('by_status', ['currentStatus'])
+  .index('by_owner_and_status', ['ownerId', 'currentStatus'])
   .index('by_sla_deadline', ['sla.deadline'])
   .index('by_sla_status', ['sla.status'])
-  .index('by_assignedCourier', ['assignedCourierId'])
+  .index('by_assigned_courier', ['assignedCourierId'])
   .index('by_employee', ['employeeId'])
   .index('by_partner', ['partnerId'])
-  .index('by_serviceType', ['serviceType'])
-  .index('by_created', ['createdAt']);
+  .index('by_service_type', ['serviceType'])
+  .index('by_created_at', ['createdAt']);

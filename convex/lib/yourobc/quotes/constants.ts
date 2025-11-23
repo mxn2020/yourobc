@@ -34,6 +34,13 @@ export const QUOTES_CONSTANTS = {
     CRITICAL: 'critical',
   },
 
+  SHIPMENT_TYPE: {
+    DOOR_TO_DOOR: 'door-door',
+    DOOR_TO_AIRPORT: 'door-airport',
+    AIRPORT_TO_DOOR: 'airport-door',
+    AIRPORT_TO_AIRPORT: 'airport-airport',
+  },
+
   LIMITS: {
     MAX_QUOTE_NUMBER_LENGTH: 50,
     MAX_CUSTOMER_REFERENCE_LENGTH: 100,
@@ -56,4 +63,10 @@ export const QUOTES_CONSTANTS = {
     QUOTE_NUMBER_PATTERN: /^[A-Z0-9\-]+$/,
     INCOTERMS_PATTERN: /^[A-Z]{3}$/,
   },
+} as const;
+
+export const QUOTES_VALUES = {
+  status: Object.values(QUOTES_CONSTANTS.STATUS),
+  priority: Object.values(QUOTES_CONSTANTS.PRIORITY),
+  shipmentType: Object.values(QUOTES_CONSTANTS.SHIPMENT_TYPE),
 } as const;

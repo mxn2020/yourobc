@@ -4,8 +4,18 @@
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { quotesValidators, quotesFields } from '@/schema/yourobc/quotes/validators';
+import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { QUOTES_CONSTANTS } from './constants';
-import { validateQuoteData, trimQuoteData, canSendQuote as canSendQuoteUtil, canAcceptQuote, canRejectQuote, canConvertToShipment } from './utils';
+import {
+  validateQuoteData,
+  trimQuoteData,
+  buildSearchableText,
+  canSendQuote as canSendQuoteUtil,
+  canAcceptQuote,
+  canRejectQuote,
+  canConvertToShipment,
+} from './utils';
 import {
   requireEditQuoteAccess,
   requireDeleteQuoteAccess,
@@ -14,27 +24,12 @@ import {
   requireConvertQuoteAccess,
 } from './permissions';
 import type { QuoteId } from './types';
-import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { baseFields, baseValidators } from '@/schema/base.validators';
 
 /**
- * Get current user - helper function for authentication
- */
-async function requireCurrentUser(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
-  return {
-    _id: identity.subject,
-    email: identity.email,
-    name: identity.name,
-    role: identity.role,
-  };
-}
-
-/**
  * Create new quote
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User with CREATE permission
  */
 export const createQuote = mutation({
   args: {
@@ -74,20 +69,26 @@ export const createQuote = mutation({
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
-    // 2. VALIDATE: Check data validity
-    const errors = validateQuoteData(data);
+    // 2. TRIM: Trim string fields first
+    const trimmedData = trimQuoteData(data);
+
+    // 3. VALIDATE: Check data validity
+    const errors = validateQuoteData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 3. PROCESS: Trim and prepare data
-    const trimmedData = trimQuoteData(data);
+    // 4. PROCESS: Generate ID and prepare data
     const publicId = await generateUniquePublicId(ctx, 'yourobcQuotes');
     const now = Date.now();
 
-    // 4. CREATE: Insert into database
+    // Build searchable text
+    const searchableText = buildSearchableText(trimmedData);
+
+    // 5. CREATE: Insert into database
     const quoteId = await ctx.db.insert('yourobcQuotes', {
       publicId,
+      searchableText,
       quoteNumber: trimmedData.quoteNumber,
       customerReference: trimmedData.customerReference,
       serviceType: trimmedData.serviceType,
@@ -116,20 +117,18 @@ export const createQuote = mutation({
       quoteText: trimmedData.quoteText,
       notes: trimmedData.notes,
       tags: trimmedData.tags || [],
-      category: trimmedData.category,
-      customFields: {},
       ownerId: user._id,
       createdAt: now,
       updatedAt: now,
       createdBy: user._id,
     });
 
-    // 5. AUDIT: Create audit log
+    // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.created',
-      entityType: 'yourobc_quote',
+      action: 'quotes.created',
+      entityType: 'yourobcQuotes',
       entityId: publicId,
       entityTitle: trimmedData.quoteNumber,
       description: `Created quote: ${trimmedData.quoteNumber}`,
@@ -143,13 +142,15 @@ export const createQuote = mutation({
       updatedAt: now,
     });
 
-    // 6. RETURN: Return entity ID
+    // 7. RETURN: Return entity ID
     return quoteId;
   },
 });
 
 /**
  * Update existing quote
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
 export const updateQuote = mutation({
   args: {
@@ -197,16 +198,31 @@ export const updateQuote = mutation({
     // 3. AUTHZ: Check edit permission
     await requireEditQuoteAccess(ctx, quote, user);
 
-    // 4. VALIDATE: Check update data validity
-    const errors = validateQuoteData(updates);
+    // 4. TRIM: Trim string fields first
+    const trimmedUpdates = trimQuoteData(updates);
+
+    // 5. VALIDATE: Check update data validity
+    const errors = validateQuoteData(trimmedUpdates);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 5. PROCESS: Trim and prepare update data
-    const trimmedUpdates = trimQuoteData(updates);
+    // 6. PROCESS: Prepare update data
     const now = Date.now();
+
+    // Rebuild searchableText with merged data
+    const searchableText = buildSearchableText({
+      quoteNumber: quote.quoteNumber,
+      customerReference: trimmedUpdates.customerReference ?? quote.customerReference,
+      description: trimmedUpdates.description ?? quote.description,
+      specialInstructions: trimmedUpdates.specialInstructions ?? quote.specialInstructions,
+      quoteText: trimmedUpdates.quoteText ?? quote.quoteText,
+      notes: trimmedUpdates.notes ?? quote.notes,
+      tags: trimmedUpdates.tags ?? quote.tags,
+    });
+
     const updateData: any = {
+      searchableText,
       updatedAt: now,
       updatedBy: user._id,
     };
@@ -240,15 +256,15 @@ export const updateQuote = mutation({
     if (trimmedUpdates.tags !== undefined) updateData.tags = trimmedUpdates.tags;
     if (trimmedUpdates.category !== undefined) updateData.category = trimmedUpdates.category;
 
-    // 6. UPDATE: Apply changes
+    // 7. UPDATE: Apply changes
     await ctx.db.patch(quoteId, updateData);
 
-    // 7. AUDIT: Create audit log
+    // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.updated',
-      entityType: 'yourobc_quote',
+      action: 'quotes.updated',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Updated quote: ${quote.quoteNumber}`,
@@ -296,8 +312,8 @@ export const deleteQuote = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.deleted',
-      entityType: 'yourobc_quote',
+      action: 'quotes.deleted',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Deleted quote: ${quote.quoteNumber}`,
@@ -353,8 +369,8 @@ export const restoreQuote = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.restored',
-      entityType: 'yourobc_quote',
+      action: 'quotes.restored',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Restored quote: ${quote.quoteNumber}`,
@@ -406,8 +422,8 @@ export const sendQuote = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.sent',
-      entityType: 'yourobc_quote',
+      action: 'quotes.sent',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Sent quote: ${quote.quoteNumber}`,
@@ -458,8 +474,8 @@ export const acceptQuote = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.accepted',
-      entityType: 'yourobc_quote',
+      action: 'quotes.accepted',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Accepted quote: ${quote.quoteNumber}`,
@@ -512,8 +528,8 @@ export const rejectQuote = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.rejected',
-      entityType: 'yourobc_quote',
+      action: 'quotes.rejected',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Rejected quote: ${quote.quoteNumber}${rejectionReason ? ` - Reason: ${rejectionReason}` : ''}`,
@@ -579,8 +595,8 @@ export const convertQuoteToShipment = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'quote.converted',
-      entityType: 'yourobc_quote',
+      action: 'quotes.converted',
+      entityType: 'yourobcQuotes',
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Converted quote ${quote.quoteNumber} to shipment`,

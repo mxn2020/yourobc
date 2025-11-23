@@ -48,3 +48,9 @@ export const TASKS_CONSTANTS = {
     TITLE_PATTERN: /^[a-zA-Z0-9\s\-_.,!?()]+$/,
   },
 } as const;
+
+export const TASKS_VALUES = {
+  status: Object.values(TASKS_CONSTANTS.STATUS),
+  priority: Object.values(TASKS_CONSTANTS.PRIORITY),
+  taskType: Object.values(TASKS_CONSTANTS.TASK_TYPE),
+} as const;

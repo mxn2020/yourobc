@@ -84,3 +84,11 @@ export const COURIERS_CONSTANTS = {
     API_URL_PATTERN: /^https?:\/\/.+$/,
   },
 } as const;
+
+export const COURIERS_VALUES = {
+  status: Object.values(COURIERS_CONSTANTS.STATUS),
+  serviceType: Object.values(COURIERS_CONSTANTS.SERVICE_TYPE),
+  deliverySpeed: Object.values(COURIERS_CONSTANTS.DELIVERY_SPEED),
+  pricingModel: Object.values(COURIERS_CONSTANTS.PRICING_MODEL),
+  apiType: Object.values(COURIERS_CONSTANTS.API_TYPE),
+} as const;

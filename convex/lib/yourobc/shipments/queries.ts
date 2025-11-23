@@ -4,18 +4,21 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { shipmentsValidators } from '@/schema/yourobc/shipments/validators';
 import { filterShipmentsByAccess, requireViewShipmentAccess } from './permissions';
 import type { ShipmentListResponse, ShipmentFilters } from './types';
 import { baseValidators } from '@/schema/base.validators';
 
 /**
- * Get paginated list of shipments with filtering
+ * Get paginated list of shipments with filtering (cursor-based)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User sees own items, admins see all
  */
 export const getShipments = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       status: v.optional(v.array(shipmentsValidators.status)),
       serviceType: v.optional(v.array(baseValidators.serviceType)),
@@ -29,65 +32,91 @@ export const getShipments = query({
       dateTo: v.optional(v.number()),
     })),
   },
-  handler: async (ctx, args): Promise<ShipmentListResponse> => {
+  handler: async (ctx, args): Promise<ShipmentListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
-    // Query with index
-    let shipments = await ctx.db
-      .query('yourobcShipments')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+    const isAdmin = user.role === 'admin' || user.role === 'superadmin';
 
-    // Apply access filtering
-    shipments = await filterShipmentsByAccess(ctx, shipments, user);
+    // Build indexed query - use compound index if available
+    const q = (() => {
+      // Admin global listing
+      if (isAdmin) {
+        return ctx.db
+          .query('yourobcShipments')
+          .withIndex('by_created_at', iq => iq.gte('createdAt', 0))
+          .filter(notDeleted);
+      }
 
-    // Apply status filter
-    if (filters.status?.length) {
-      shipments = shipments.filter(item =>
-        filters.status!.includes(item.currentStatus)
-      );
+      // Single status filter with owner
+      if (filters.status?.length === 1) {
+        return ctx.db
+          .query('yourobcShipments')
+          .withIndex('by_owner_and_status', iq =>
+            iq.eq('ownerId', user._id).eq('currentStatus', filters.status![0])
+          )
+          .filter(notDeleted);
+      }
+
+      // Default: owner only
+      return ctx.db
+        .query('yourobcShipments')
+        .withIndex('by_owner_id', iq => iq.eq('ownerId', user._id))
+        .filter(notDeleted);
+    })();
+
+    // Paginate
+    const page = await q.order('desc').paginate({
+      numItems: limit,
+      cursor: cursor ?? null,
+    });
+
+    // Apply permission filtering
+    let items = await filterShipmentsByAccess(ctx, page.page, user);
+
+    // Apply additional filters in-memory (for multiple values)
+    if (filters.status && filters.status.length > 1) {
+      items = items.filter(i => filters.status!.includes(i.currentStatus));
     }
 
     // Apply service type filter
     if (filters.serviceType?.length) {
-      shipments = shipments.filter(item =>
+      items = items.filter(item =>
         filters.serviceType!.includes(item.serviceType)
       );
     }
 
     // Apply priority filter
     if (filters.priority?.length) {
-      shipments = shipments.filter(item =>
+      items = items.filter(item =>
         filters.priority!.includes(item.priority)
       );
     }
 
     // Apply customer filter
     if (filters.customerId) {
-      shipments = shipments.filter(item => item.customerId === filters.customerId);
+      items = items.filter(item => item.customerId === filters.customerId);
     }
 
     // Apply courier filter
     if (filters.assignedCourierId) {
-      shipments = shipments.filter(item => item.assignedCourierId === filters.assignedCourierId);
+      items = items.filter(item => item.assignedCourierId === filters.assignedCourierId);
     }
 
     // Apply employee filter
     if (filters.employeeId) {
-      shipments = shipments.filter(item => item.employeeId === filters.employeeId);
+      items = items.filter(item => item.employeeId === filters.employeeId);
     }
 
     // Apply partner filter
     if (filters.partnerId) {
-      shipments = shipments.filter(item => item.partnerId === filters.partnerId);
+      items = items.filter(item => item.partnerId === filters.partnerId);
     }
 
     // Apply search filter
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      shipments = shipments.filter(item =>
+      items = items.filter(item =>
         item.shipmentNumber.toLowerCase().includes(term) ||
         item.awbNumber?.toLowerCase().includes(term) ||
         item.customerReference?.toLowerCase().includes(term) ||
@@ -97,23 +126,17 @@ export const getShipments = query({
 
     // Apply date filters
     if (filters.dateFrom) {
-      shipments = shipments.filter(item => item.createdAt >= filters.dateFrom!);
+      items = items.filter(item => item.createdAt >= filters.dateFrom!);
     }
     if (filters.dateTo) {
-      shipments = shipments.filter(item => item.createdAt <= filters.dateTo!);
+      items = items.filter(item => item.createdAt <= filters.dateTo!);
     }
-
-    // Sort by creation date (newest first)
-    shipments.sort((a, b) => b.createdAt - a.createdAt);
-
-    // Paginate
-    const total = shipments.length;
-    const items = shipments.slice(offset, offset + limit);
 
     return {
       items,
-      total,
-      hasMore: total > offset + limit,
+      returnedCount: items.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
@@ -152,7 +175,7 @@ export const getShipmentByPublicId = query({
     const shipment = await ctx.db
       .query('yourobcShipments')
       .withIndex('by_public_id', q => q.eq('publicId', publicId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!shipment) {
@@ -178,7 +201,7 @@ export const getShipmentByNumber = query({
     const shipment = await ctx.db
       .query('yourobcShipments')
       .withIndex('by_shipmentNumber', q => q.eq('shipmentNumber', shipmentNumber))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!shipment) {
@@ -236,7 +259,7 @@ export const getShipmentsByCustomer = query({
     let shipments = await ctx.db
       .query('yourobcShipments')
       .withIndex('by_customer', q => q.eq('customerId', customerId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -261,8 +284,8 @@ export const getShipmentsByCourier = query({
 
     let shipments = await ctx.db
       .query('yourobcShipments')
-      .withIndex('by_assignedCourier', q => q.eq('assignedCourierId', courierId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_assigned_courier', q => q.eq('assignedCourierId', courierId))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -285,7 +308,7 @@ export const getShipmentsByEmployee = query({
     let shipments = await ctx.db
       .query('yourobcShipments')
       .withIndex('by_employee', q => q.eq('employeeId', employeeId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     // Apply access filtering
@@ -305,8 +328,8 @@ export const getShipmentStats = query({
 
     const shipments = await ctx.db
       .query('yourobcShipments')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_owner_id', q => q.eq('ownerId', user._id))
+      .filter(notDeleted)
       .collect();
 
     const accessible = await filterShipmentsByAccess(ctx, shipments, user);

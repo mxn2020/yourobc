@@ -12,8 +12,9 @@ import { analyticsFields, analyticsValidators } from './validators';
  */
 export const analyticsEventsTable = defineTable({
   // Required: Core fields
+  name: v.string(),
   publicId: v.string(),
-  ownerId: v.id('userProfiles'), // Account/workspace owner (resource owner)
+  actorId: v.optional(v.id('userProfiles')), // Actor initiating or owning the event (optional for anonymous events)
 
   // Event Identity
   eventName: v.string(), // 'page_view', 'button_click', 'ai_request', etc.
@@ -61,17 +62,18 @@ export const analyticsEventsTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_name', ['name'])
+  .index('by_actor_id', ['actorId'])
   .index('by_event_name', ['eventName'])
   .index('by_event_type', ['eventType'])
-  .index('by_user', ['userId'])
+  .index('by_user_id', ['userId'])
   .index('by_session', ['sessionId'])
   .index('by_timestamp', ['timestamp'])
-  .index('by_owner_and_timestamp', ['ownerId', 'timestamp'])
+  .index('by_actor_and_timestamp', ['actorId', 'timestamp'])
   .index('by_user_timestamp', ['userId', 'timestamp'])
   .index('by_sync_status', ['syncStatus'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
 
 /**
  * Analytics Metrics Table
@@ -79,8 +81,9 @@ export const analyticsEventsTable = defineTable({
  */
 export const analyticsMetricsTable = defineTable({
   // Required: Core fields
+  name: v.string(),
   publicId: v.string(),
-  ownerId: v.id('userProfiles'), // Account/workspace owner (resource owner)
+  actorId: v.optional(v.id('userProfiles')), // Actor owning the metric aggregation
 
   // Metric Identity
   metricType: v.string(), // 'daily_active_users', 'ai_requests_count', etc.
@@ -106,13 +109,14 @@ export const analyticsMetricsTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_name', ['name'])
+  .index('by_actor_id', ['actorId'])
   .index('by_metric_period', ['metricType', 'period', 'periodStart'])
-  .index('by_metric_owner', ['metricType', 'ownerId'])
+  .index('by_metric_actor', ['metricType', 'actorId'])
   .index('by_period_start', ['periodStart'])
   .index('by_metric_dimension', ['metricType', 'dimension'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
 
 /**
  * Analytics Dashboards Table
@@ -125,8 +129,8 @@ export const analyticsDashboardsTable = defineTable({
   // Required: Core fields
   publicId: v.string(),
   slug: v.string(),
-  ownerId: v.id('userProfiles'), // User who owns this dashboard
-  ownerName: v.string(),
+  actorId: v.id('userProfiles'), // User who owns this dashboard
+  actorName: v.string(),
 
   // Dashboard information
   description: v.optional(v.string()),
@@ -149,12 +153,12 @@ export const analyticsDashboardsTable = defineTable({
   .index('by_slug', ['slug'])
   .index('by_name', ['name'])
   .index('by_type', ['type'])
-  .index('by_owner_id', ['ownerId'])
-  .index('by_owner_and_type', ['ownerId', 'type'])
+  .index('by_actor_id', ['actorId'])
+  .index('by_actor_and_type', ['actorId', 'type'])
   .index('by_public', ['isPublic'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
 
 /**
  * Analytics Reports Table
@@ -166,7 +170,7 @@ export const analyticsReportsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'), // User who owns this report
+  actorId: v.id('userProfiles'), // User who owns this report
   status: v.union(v.literal('active'), v.literal('archived'), v.literal('scheduled')),
 
   // Report information
@@ -194,11 +198,11 @@ export const analyticsReportsTable = defineTable({
 })
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_actor_id', ['actorId'])
   .index('by_type', ['reportType'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
 
 /**
  * Analytics Provider Sync Table
@@ -210,8 +214,8 @@ export const analyticsProviderSyncTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'), // User who configured this provider sync
-  ownerName: v.string(),
+  actorId: v.id('userProfiles'), // User who configured this provider sync
+  actorName: v.string(),
   status: v.union(v.literal('active'), v.literal('inactive'), v.literal('error')),
 
   // Configuration - Discriminated union by provider
@@ -237,10 +241,10 @@ export const analyticsProviderSyncTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_actor_id', ['actorId'])
   .index('by_provider', ['provider'])
-  .index('by_owner_and_provider', ['ownerId', 'provider'])
+  .index('by_actor_and_provider', ['actorId', 'provider'])
   .index('by_enabled', ['enabled'])
   .index('by_status', ['status'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);

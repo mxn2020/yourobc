@@ -3,6 +3,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { entityTypes } from './entityTypes';
 import { AUDIT_LOG_CONSTANTS } from './constants';
 
@@ -39,7 +40,8 @@ export const getAuditLogs = query({
     // ✅ Use indexed query for current user
     let logs = await ctx.db
       .query('auditLogs')
-      .withIndex('by_user', (q) => q.eq('userId', user._id))
+      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .filter(notDeleted)
       .order('desc')
       .take(
         Math.min(limit + offset, AUDIT_LOG_CONSTANTS.LIMITS.MAX_LOGS_PER_QUERY)
@@ -105,6 +107,7 @@ export const getEntityAuditLogs = query({
       .withIndex('by_entity', (q) =>
         q.eq('entityType', entityType).eq('entityId', entityId)
       )
+      .filter(notDeleted)
       .order('desc')
       .take(limit);
 
@@ -126,7 +129,8 @@ export const getUserAuditLogs = query({
     // ✅ Use indexed query
     const logs = await ctx.db
       .query('auditLogs')
-      .withIndex('by_user', (q) => q.eq('userId', user._id))
+      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .filter(notDeleted)
       .order('desc')
       .take(limit);
 
@@ -174,7 +178,8 @@ export const getMyAuditLogStats = query({
     // ✅ Get logs for current user
     const allUserLogs = await ctx.db
       .query('auditLogs')
-      .withIndex('by_user', (q) => q.eq('userId', user._id))
+      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .filter(notDeleted)
       .order('desc')
       .collect();
 

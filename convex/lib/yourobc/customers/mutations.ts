@@ -7,7 +7,7 @@ import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { customersValidators } from '@/schema/yourobc/customers/validators';
 import { CUSTOMERS_CONSTANTS } from './constants';
-import { validateCustomerData } from './utils';
+import { validateCustomerData, trimCustomerData, buildSearchableText } from './utils';
 import { requireEditCustomerAccess, requireDeleteCustomerAccess, canEditCustomer, canDeleteCustomer } from './permissions';
 import type { CustomerId } from './types';
 import { baseFields, baseValidators } from '@/schema/base.validators';
@@ -15,6 +15,8 @@ import { Id } from '@/generated/dataModel';
 
 /**
  * Create new customer
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User with CREATE permission
  */
 export const createCustomer = mutation({
   args: {
@@ -52,15 +54,21 @@ export const createCustomer = mutation({
       allowAdmin: true,
     });
 
-    // 3. VALIDATE: Check data validity
-    const errors = validateCustomerData(data);
+    // 3. TRIM: Trim string fields first
+    const trimmedData = trimCustomerData(data);
+
+    // 4. VALIDATE: Check data validity
+    const errors = validateCustomerData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Generate IDs and prepare data
+    // 5. PROCESS: Generate IDs and prepare data
     const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
     const now = Date.now();
+
+    // Build searchable text
+    const searchableText = buildSearchableText(trimmedData);
 
     // Initialize stats
     const stats = {
@@ -69,59 +77,32 @@ export const createCustomer = mutation({
       totalRevenue: 0,
     };
 
-    // 5. CREATE: Insert into database
+    // 6. CREATE: Insert into database
     const customerId = await ctx.db.insert('yourobcCustomers', {
       publicId,
-      companyName: data.companyName.trim(),
-      shortName: data.shortName?.trim(),
-      website: data.website?.trim(),
-      primaryContact: {
-        ...data.primaryContact,
-        name: data.primaryContact.name.trim(),
-        email: data.primaryContact.email?.trim(),
-        phone: data.primaryContact.phone?.trim(),
-        mobile: data.primaryContact.mobile?.trim(),
-        notes: data.primaryContact.notes?.trim(),
-      },
-      additionalContacts: (data.additionalContacts || []).map(contact => ({
-        ...contact,
-        name: contact.name.trim(),
-        email: contact.email?.trim(),
-        phone: contact.phone?.trim(),
-        mobile: contact.mobile?.trim(),
-        notes: contact.notes?.trim(),
-      })),
-      billingAddress: {
-        ...data.billingAddress,
-        street: data.billingAddress.street?.trim(),
-        city: data.billingAddress.city.trim(),
-        postalCode: data.billingAddress.postalCode?.trim(),
-        country: data.billingAddress.country.trim(),
-        countryCode: data.billingAddress.countryCode.trim().toUpperCase(),
-      },
-      shippingAddress: data.shippingAddress ? {
-        ...data.shippingAddress,
-        street: data.shippingAddress.street?.trim(),
-        city: data.shippingAddress.city.trim(),
-        postalCode: data.shippingAddress.postalCode?.trim(),
-        country: data.shippingAddress.country.trim(),
-        countryCode: data.shippingAddress.countryCode.trim().toUpperCase(),
-      } : undefined,
-      defaultCurrency: data.defaultCurrency,
-      paymentTerms: data.paymentTerms,
-      paymentMethod: data.paymentMethod,
-      margin: data.margin,
-      status: data.status || 'active',
-      inquirySourceId: data.inquirySourceId,
-      serviceSuspended: data.serviceSuspended,
-      serviceSuspendedDate: data.serviceSuspendedDate,
-      serviceSuspendedReason: data.serviceSuspendedReason?.trim(),
-      serviceReactivatedDate: data.serviceReactivatedDate,
+      searchableText,
+      companyName: trimmedData.companyName,
+      shortName: trimmedData.shortName,
+      website: trimmedData.website,
+      primaryContact: trimmedData.primaryContact || data.primaryContact,
+      additionalContacts: trimmedData.additionalContacts || data.additionalContacts || [],
+      billingAddress: trimmedData.billingAddress || data.billingAddress,
+      shippingAddress: trimmedData.shippingAddress,
+      defaultCurrency: trimmedData.defaultCurrency || data.defaultCurrency,
+      paymentTerms: trimmedData.paymentTerms ?? data.paymentTerms,
+      paymentMethod: trimmedData.paymentMethod || data.paymentMethod,
+      margin: trimmedData.margin ?? data.margin,
+      status: trimmedData.status || 'active',
+      inquirySourceId: trimmedData.inquirySourceId,
+      serviceSuspended: trimmedData.serviceSuspended,
+      serviceSuspendedDate: trimmedData.serviceSuspendedDate,
+      serviceSuspendedReason: trimmedData.serviceSuspendedReason,
+      serviceReactivatedDate: trimmedData.serviceReactivatedDate,
       stats,
-      notes: data.notes?.trim(),
-      internalNotes: data.internalNotes?.trim(),
-      tags: (data.tags || []).map(tag => tag.trim()),
-      category: data.category?.trim(),
+      notes: trimmedData.notes,
+      internalNotes: trimmedData.internalNotes,
+      tags: trimmedData.tags || [],
+      category: trimmedData.category,
       customFields: data.customFields,
       ownerId: user._id,
       createdAt: now,
@@ -129,26 +110,26 @@ export const createCustomer = mutation({
       createdBy: user._id,
     });
 
-    // 6. AUDIT: Create audit log
+    // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.created',
-      entityType: 'system_customer',
+      action: 'customers.created',
+      entityType: 'yourobcCustomers',
       entityId: publicId,
-      entityTitle: data.companyName.trim(),
-      description: `Created customer: ${data.companyName.trim()}`,
+      entityTitle: trimmedData.companyName,
+      description: `Created customer: ${trimmedData.companyName}`,
       metadata: {
-        status: data.status || 'active',
-        currency: data.defaultCurrency,
-        margin: data.margin,
+        status: trimmedData.status || 'active',
+        currency: trimmedData.defaultCurrency || data.defaultCurrency,
+        margin: trimmedData.margin ?? data.margin,
       },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
     });
 
-    // 7. RETURN: Return entity ID
+    // 8. RETURN: Return entity ID
     return customerId;
   },
 });
@@ -312,8 +293,8 @@ export const updateCustomer = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.updated',
-      entityType: 'system_customer',
+      action: 'customers.updated',
+      entityType: 'yourobcCustomers',
       entityId: customer.publicId,
       entityTitle: updateData.companyName || customer.companyName,
       description: `Updated customer: ${updateData.companyName || customer.companyName}`,
@@ -361,8 +342,8 @@ export const deleteCustomer = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.deleted',
-      entityType: 'system_customer',
+      action: 'customers.deleted',
+      entityType: 'yourobcCustomers',
       entityId: customer.publicId,
       entityTitle: customer.companyName,
       description: `Deleted customer: ${customer.companyName}`,
@@ -418,8 +399,8 @@ export const restoreCustomer = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.restored',
-      entityType: 'system_customer',
+      action: 'customers.restored',
+      entityType: 'yourobcCustomers',
       entityId: customer.publicId,
       entityTitle: customer.companyName,
       description: `Restored customer: ${customer.companyName}`,
@@ -465,8 +446,8 @@ export const archiveCustomer = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.archived',
-      entityType: 'system_customer',
+      action: 'customers.archived',
+      entityType: 'yourobcCustomers',
       entityId: customer.publicId,
       entityTitle: customer.companyName,
       description: `Archived customer: ${customer.companyName}`,
@@ -554,8 +535,8 @@ export const bulkUpdateCustomers = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.bulk_updated',
-      entityType: 'system_customer',
+      action: 'customers.bulk_updated',
+      entityType: 'yourobcCustomers',
       entityId: 'bulk',
       entityTitle: `${results.length} customers`,
       description: `Bulk updated ${results.length} customers`,
@@ -635,8 +616,8 @@ export const bulkDeleteCustomers = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'customer.bulk_deleted',
-      entityType: 'system_customer',
+      action: 'customers.bulk_deleted',
+      entityType: 'yourobcCustomers',
       entityId: 'bulk',
       entityTitle: `${results.length} customers`,
       description: `Bulk deleted ${results.length} customers`,

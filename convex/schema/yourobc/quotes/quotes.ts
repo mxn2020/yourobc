@@ -16,7 +16,10 @@ export const quotesTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId - following yourobc pattern
+  ownerId: v.id('userProfiles'),
+
+  // Denormalized search field (ONLY if a searchIndex exists)
+  searchableText: v.string(),
 
   // Identification
   customerReference: v.optional(v.string()),
@@ -62,7 +65,7 @@ export const quotesTable = defineTable({
 
   // Assignment
   assignedCourierId: v.optional(v.id('yourobcCouriers')),
-  employeeId: v.optional(v.id('yourobcEmployees')), // Employee tracking for KPIs
+  employeeId: v.optional(v.id('yourobcEmployees')),
 
   // Status & Conversion
   status: quotesValidators.status,
@@ -77,18 +80,26 @@ export const quotesTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
-  // Required indexes
+  // Full-text search indexes
+  .searchIndex('search_all', {
+    searchField: 'searchableText',
+    filterFields: ['ownerId', 'status', 'deletedAt', 'serviceType'],
+  })
+
+  // Standard indexes (required)
   .index('by_public_id', ['publicId'])
-  .index('by_quoteNumber', ['quoteNumber'])
-  .index('by_owner', ['ownerId'])
+  .index('by_quote_number', ['quoteNumber'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
-  .index('by_customer', ['customerId'])
-  .index('by_serviceType', ['serviceType'])
+  .index('by_customer_id', ['customerId'])
+  .index('by_service_type', ['serviceType'])
   .index('by_status', ['status'])
+  .index('by_owner_and_status', ['ownerId', 'status'])
+  .index('by_owner_and_customer', ['ownerId', 'customerId'])
   .index('by_deadline', ['deadline'])
-  .index('by_validUntil', ['validUntil'])
-  .index('by_assignedCourier', ['assignedCourierId'])
-  .index('by_employee', ['employeeId'])
-  .index('by_created', ['createdAt']);
+  .index('by_valid_until', ['validUntil'])
+  .index('by_assigned_courier_id', ['assignedCourierId'])
+  .index('by_employee_id', ['employeeId'])
+  .index('by_created_at', ['createdAt']);

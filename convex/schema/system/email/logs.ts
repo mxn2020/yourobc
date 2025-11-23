@@ -62,7 +62,6 @@ export const emailLogsTable = defineTable({
   // Module-specific indexes
   .index('by_provider', ['provider'])
   .index('by_delivery_status', ['deliveryStatus'])
-  .index('by_to', ['to'])
   .index('by_context', ['context'])
   .index('by_created_at', ['createdAt'])
   .index('by_last_activity_at', ['lastActivityAt'])

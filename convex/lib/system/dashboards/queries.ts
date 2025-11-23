@@ -34,7 +34,7 @@ export const getDashboards = query({
     // Query with index - get user's dashboards
     let dashboards = await ctx.db
       .query('dashboards')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 
@@ -137,7 +137,7 @@ export const getUserDashboards = query({
 
     return await ctx.db
       .query('dashboards')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .order('desc')
       .take(limit);
@@ -204,7 +204,7 @@ export const getDashboardStats = query({
 
     const dashboards = await ctx.db
       .query('dashboards')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 

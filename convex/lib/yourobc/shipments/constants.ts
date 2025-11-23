@@ -85,3 +85,16 @@ export const SHIPMENTS_CONSTANTS = {
     CURRENCY: 'EUR',
   },
 } as const;
+
+/**
+ * Canonical values derived from SHIPMENTS_CONSTANTS
+ * Used for validators and filter options
+ */
+export const SHIPMENTS_VALUES = {
+  status: Object.values(SHIPMENTS_CONSTANTS.STATUS),
+  priority: Object.values(SHIPMENTS_CONSTANTS.PRIORITY),
+  serviceType: Object.values(SHIPMENTS_CONSTANTS.SERVICE_TYPE),
+  slaStatus: Object.values(SHIPMENTS_CONSTANTS.SLA_STATUS),
+  documentStatus: Object.values(SHIPMENTS_CONSTANTS.DOCUMENT_STATUS),
+  communicationChannel: Object.values(SHIPMENTS_CONSTANTS.COMMUNICATION_CHANNEL),
+} as const;

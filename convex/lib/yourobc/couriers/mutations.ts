@@ -8,7 +8,7 @@ import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { couriersValidators } from '@/schema/yourobc/couriers/validators';
 import { currencyValidator } from '@/schema/base';
 import { COURIERS_CONSTANTS } from './constants';
-import { validateCourierData } from './utils';
+import { validateCourierData, trimCourierData, buildSearchableText } from './utils';
 import {
   requireEditCourierAccess,
   requireDeleteCourierAccess,
@@ -20,6 +20,8 @@ import { baseFields } from '@/schema/base.validators';
 
 /**
  * Create new courier
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User with CREATE permission
  */
 export const createCourier = mutation({
   args: {
@@ -121,59 +123,35 @@ export const createCourier = mutation({
       allowAdmin: true,
     });
 
-    // 3. VALIDATE: Check data validity
-    const errors = validateCourierData(data);
+    // 3. TRIM: Trim string fields first
+    const trimmedData = trimCourierData(data);
+
+    // 4. VALIDATE: Check data validity
+    const errors = validateCourierData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Generate IDs and prepare data
+    // 5. PROCESS: Generate IDs and prepare data
     const publicId = await generateUniquePublicId(ctx, 'yourobcCouriers');
     const now = Date.now();
 
-    // Trim string fields
-    const trimmedData = {
-      ...data,
-      name: data.name.trim(),
-      shortName: data.shortName?.trim(),
-      website: data.website?.trim(),
-      email: data.email?.trim(),
-      phone: data.phone?.trim(),
-      notes: data.notes?.trim(),
-      internalNotes: data.internalNotes?.trim(),
-      tags: data.tags?.map((tag) => tag.trim()) || [],
-      primaryContact: {
-        ...data.primaryContact,
-        name: data.primaryContact.name.trim(),
-        email: data.primaryContact.email?.trim(),
-        phone: data.primaryContact.phone?.trim(),
-      },
-      additionalContacts: data.additionalContacts?.map((contact) => ({
-        ...contact,
-        name: contact.name.trim(),
-        email: contact.email?.trim(),
-        phone: contact.phone?.trim(),
-      })) || [],
-      serviceCoverage: {
-        countries: data.serviceCoverage.countries.map((c) => c.trim().toUpperCase()),
-        regions: data.serviceCoverage.regions?.map((r) => r.trim()),
-        cities: data.serviceCoverage.cities?.map((c) => c.trim()),
-        airports: data.serviceCoverage.airports?.map((a) => a.trim().toUpperCase()),
-      },
-    };
+    // Build searchable text
+    const searchableText = buildSearchableText(trimmedData);
 
-    // 5. CREATE: Insert into database
+    // 6. CREATE: Insert into database
     const courierId = await ctx.db.insert('yourobcCouriers', {
       publicId,
+      searchableText,
       name: trimmedData.name,
       shortName: trimmedData.shortName,
       website: trimmedData.website,
       email: trimmedData.email,
       phone: trimmedData.phone,
-      primaryContact: trimmedData.primaryContact,
-      additionalContacts: trimmedData.additionalContacts,
+      primaryContact: trimmedData.primaryContact || data.primaryContact,
+      additionalContacts: trimmedData.additionalContacts || data.additionalContacts || [],
       headquartersAddress: data.headquartersAddress,
-      serviceCoverage: trimmedData.serviceCoverage,
+      serviceCoverage: data.serviceCoverage,
       serviceTypes: data.serviceTypes,
       deliverySpeeds: data.deliverySpeeds,
       maxWeightKg: data.maxWeightKg,
@@ -188,12 +166,12 @@ export const createCourier = mutation({
       apiIntegration: data.apiIntegration,
       apiCredentials: data.apiCredentials,
       metrics: data.metrics,
-      status: data.status || 'active',
+      status: trimmedData.status || 'active',
       isPreferred: data.isPreferred || false,
       isActive: data.isActive !== undefined ? data.isActive : true,
       notes: trimmedData.notes,
       internalNotes: trimmedData.internalNotes,
-      tags: trimmedData.tags,
+      tags: trimmedData.tags || [],
       category: data.category,
       customFields: data.customFields,
       ownerId: user._id,
@@ -202,17 +180,17 @@ export const createCourier = mutation({
       createdBy: user._id,
     });
 
-    // 6. AUDIT: Create audit log
+    // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.created',
-      entityType: 'system_courier',
+      action: 'couriers.created',
+      entityType: 'yourobcCouriers',
       entityId: publicId,
       entityTitle: trimmedData.name,
       description: `Created courier: ${trimmedData.name}`,
       metadata: {
-        status: data.status || 'active',
+        status: trimmedData.status || 'active',
         serviceTypes: data.serviceTypes,
         pricingModel: data.pricingModel,
       },
@@ -221,7 +199,7 @@ export const createCourier = mutation({
       updatedAt: now,
     });
 
-    // 7. RETURN: Return entity ID
+    // 8. RETURN: Return entity ID
     return courierId;
   },
 });
@@ -428,8 +406,8 @@ export const updateCourier = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.updated',
-      entityType: 'system_courier',
+      action: 'couriers.updated',
+      entityType: 'yourobcCouriers',
       entityId: courier.publicId,
       entityTitle: updateData.name || courier.name,
       description: `Updated courier: ${updateData.name || courier.name}`,
@@ -477,8 +455,8 @@ export const deleteCourier = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.deleted',
-      entityType: 'system_courier',
+      action: 'couriers.deleted',
+      entityType: 'yourobcCouriers',
       entityId: courier.publicId,
       entityTitle: courier.name,
       description: `Deleted courier: ${courier.name}`,
@@ -534,8 +512,8 @@ export const restoreCourier = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.restored',
-      entityType: 'system_courier',
+      action: 'couriers.restored',
+      entityType: 'yourobcCouriers',
       entityId: courier.publicId,
       entityTitle: courier.name,
       description: `Restored courier: ${courier.name}`,
@@ -582,8 +560,8 @@ export const archiveCourier = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.archived',
-      entityType: 'system_courier',
+      action: 'couriers.archived',
+      entityType: 'yourobcCouriers',
       entityId: courier.publicId,
       entityTitle: courier.name,
       description: `Archived courier: ${courier.name}`,
@@ -669,8 +647,8 @@ export const bulkUpdateCouriers = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.bulk_updated',
-      entityType: 'system_courier',
+      action: 'couriers.bulk_updated',
+      entityType: 'yourobcCouriers',
       entityId: 'bulk',
       entityTitle: `${results.length} couriers`,
       description: `Bulk updated ${results.length} couriers`,
@@ -747,8 +725,8 @@ export const bulkDeleteCouriers = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'courier.bulk_deleted',
-      entityType: 'system_courier',
+      action: 'couriers.bulk_deleted',
+      entityType: 'yourobcCouriers',
       entityId: 'bulk',
       entityTitle: `${results.length} couriers`,
       description: `Bulk deleted ${results.length} couriers`,

@@ -110,3 +110,72 @@ export function calculateTaskCompletion(task: { checklist?: Array<{ completed: b
   const completed = task.checklist.filter(item => item.completed).length;
   return Math.round((completed / task.checklist.length) * 100);
 }
+
+/**
+ * Trim all string fields in task data
+ * Generic typing ensures type safety without `any`
+ */
+export function trimTaskData<T extends Partial<CreateTaskData | UpdateTaskData>>(
+  data: T
+): T {
+  // Clone to avoid mutating caller data
+  const trimmed: T = { ...data };
+
+  // Trim string fields
+  if (typeof trimmed.title === "string") {
+    trimmed.title = trimmed.title.trim() as T["title"];
+  }
+
+  if (typeof trimmed.description === "string") {
+    trimmed.description = trimmed.description.trim() as T["description"];
+  }
+
+  if (typeof trimmed.completionNotes === "string") {
+    trimmed.completionNotes = trimmed.completionNotes.trim() as T["completionNotes"];
+  }
+
+  if (typeof trimmed.cancellationReason === "string") {
+    trimmed.cancellationReason = trimmed.cancellationReason.trim() as T["cancellationReason"];
+  }
+
+  // Trim array of strings (tags)
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t): t is string => typeof t === "string")
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    trimmed.tags = nextTags as T["tags"];
+  }
+
+  // Trim checklist items
+  if (Array.isArray(trimmed.checklist)) {
+    const nextChecklist = trimmed.checklist
+      .filter((item): item is typeof trimmed.checklist[number] => item !== undefined && item !== null)
+      .map(item => ({
+        ...item,
+        text: typeof item.text === "string" ? item.text.trim() : item.text,
+      }));
+
+    trimmed.checklist = nextChecklist as T["checklist"];
+  }
+
+  return trimmed;
+}
+
+/**
+ * Build searchable text for full-text search
+ */
+export function buildSearchableText(
+  data: Partial<CreateTaskData | UpdateTaskData>
+): string {
+  const parts: string[] = [];
+
+  if (data.title) parts.push(data.title);
+  if (data.description) parts.push(data.description);
+  if (data.completionNotes) parts.push(data.completionNotes);
+  if (data.cancellationReason) parts.push(data.cancellationReason);
+  if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
+
+  return parts.join(' ').toLowerCase().trim();
+}

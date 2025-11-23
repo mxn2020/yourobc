@@ -4,6 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { partnersValidators, partnersFields } from '@/schema/yourobc/partners/validators';
 import { filterPartnersByAccess, requireViewPartnerAccess } from './permissions';
 import type { PartnerListResponse } from './types';
@@ -14,30 +15,35 @@ import type { PartnerListResponse } from './types';
 export const getPartners = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       status: v.optional(v.array(partnersValidators.status)),
       search: v.optional(v.string()),
       country: v.optional(v.string()),
     })),
   },
-  handler: async (ctx, args): Promise<PartnerListResponse> => {
+  handler: async (ctx, args): Promise<PartnerListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
     // Query with index
-    let partners = await ctx.db
+    const q = ctx.db
       .query('yourobcPartners')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+      .withIndex('by_owner_id', iq => iq.eq('ownerId', user._id))
+      .filter(notDeleted);
+
+    // Paginate
+    const page = await q.order('desc').paginate({
+      numItems: limit,
+      cursor: cursor ?? null,
+    });
 
     // Apply access filtering
-    partners = await filterPartnersByAccess(ctx, partners, user);
+    let items = await filterPartnersByAccess(ctx, page.page, user);
 
     // Apply status filter
     if (filters.status?.length) {
-      partners = partners.filter(item =>
+      items = items.filter(item =>
         filters.status!.includes(item.status)
       );
     }
@@ -45,7 +51,7 @@ export const getPartners = query({
     // Apply search filter
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      partners = partners.filter(item =>
+      items = items.filter(item =>
         item.companyName.toLowerCase().includes(term) ||
         (item.shortName && item.shortName.toLowerCase().includes(term)) ||
         (item.notes && item.notes.toLowerCase().includes(term))
@@ -54,19 +60,16 @@ export const getPartners = query({
 
     // Apply country filter
     if (filters.country) {
-      partners = partners.filter(item =>
+      items = items.filter(item =>
         item.serviceCoverage.countries.includes(filters.country!)
       );
     }
 
-    // Paginate
-    const total = partners.length;
-    const items = partners.slice(offset, offset + limit);
-
     return {
       items,
-      total,
-      hasMore: total > offset + limit,
+      returnedCount: items.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
@@ -105,7 +108,7 @@ export const getPartnerByPublicId = query({
     const partner = await ctx.db
       .query('yourobcPartners')
       .withIndex('by_public_id', q => q.eq('publicId', publicId))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .first();
 
     if (!partner) {
@@ -128,8 +131,8 @@ export const getPartnerStats = query({
 
     const partners = await ctx.db
       .query('yourobcPartners')
-      .withIndex('by_owner', q => q.eq('ownerId', user._id))
-      .filter(q => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_owner_id', q => q.eq('ownerId', user._id))
+      .filter(notDeleted)
       .collect();
 
     const accessible = await filterPartnersByAccess(ctx, partners, user);

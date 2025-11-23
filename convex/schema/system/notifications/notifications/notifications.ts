@@ -3,15 +3,8 @@
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { softDeleteFields } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 import { notificationsFields, notificationsValidators } from './validators';
-
-const notificationsAuditFields = {
-  createdAt: v.number(),
-  createdBy: v.id('userProfiles'),
-  updatedAt: v.number(),
-  updatedBy: v.optional(v.id('userProfiles')),
-};
 
 export const notificationsTable = defineTable({
   displayName: v.string(),
@@ -21,11 +14,11 @@ export const notificationsTable = defineTable({
   type: notificationsValidators.type,
   content: notificationsFields.content,
   isRead: notificationsValidators.isRead,
-  entityType: notificationsValidators.entityType,
-  entityId: notificationsValidators.entityId,
+  entityType: v.optional(notificationsValidators.entityType),
+  entityId: v.optional(notificationsValidators.entityId),
   metadata: notificationsFields.metadata,
 
-  ...notificationsAuditFields,
+  ...auditFields,
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])

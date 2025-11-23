@@ -7,12 +7,14 @@ import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { tasksValidators, tasksFields } from '@/schema/yourobc/tasks/validators';
 import { TASKS_CONSTANTS } from './constants';
-import { validateTaskData } from './utils';
+import { validateTaskData, trimTaskData, buildSearchableText } from './utils';
 import { requireEditTaskAccess, requireDeleteTaskAccess, canEditTask, canDeleteTask } from './permissions';
 import type { TaskId } from './types';
 
 /**
  * Create new task
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: User with CREATE permission
  */
 export const createTask = mutation({
   args: {
@@ -42,70 +44,75 @@ export const createTask = mutation({
       allowAdmin: true,
     });
 
-    // 3. VALIDATE: Check data validity
-    const errors = validateTaskData(data);
+    // 3. TRIM: Trim string fields first
+    const trimmedData = trimTaskData(data);
+
+    // 4. VALIDATE: Check data validity
+    const errors = validateTaskData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Generate IDs and prepare data
+    // 5. PROCESS: Generate IDs and prepare data
     const publicId = await generateUniquePublicId(ctx, 'yourobcTasks');
     const now = Date.now();
 
-    // 5. CREATE: Insert into database
+    // Build searchable text
+    const searchableText = buildSearchableText(trimmedData);
+
+    // 6. CREATE: Insert into database
     const taskId = await ctx.db.insert('yourobcTasks', {
       publicId,
-      title: data.title.trim(),
-      description: data.description?.trim(),
-      status: data.status || 'draft',
-      priority: data.priority,
-      taskType: data.taskType,
-      assignedTo: data.assignedTo,
-      assignedBy: data.assignedTo ? user._id : undefined,
-      assignedAt: data.assignedTo ? now : undefined,
-      dueDate: data.dueDate,
-      relatedShipmentId: data.relatedShipmentId,
-      relatedQuoteId: data.relatedQuoteId,
-      relatedCustomerId: data.relatedCustomerId,
-      relatedPartnerId: data.relatedPartnerId,
-      checklist: data.checklist?.map(item => ({
-        ...item,
-        text: item.text.trim(),
-      })),
-      tags: data.tags?.map(tag => tag.trim()),
-      category: data.category?.trim(),
+      searchableText,
+      title: trimmedData.title,
+      description: trimmedData.description,
+      status: trimmedData.status || 'draft',
+      priority: trimmedData.priority,
+      taskType: trimmedData.taskType,
+      assignedTo: trimmedData.assignedTo,
+      assignedBy: trimmedData.assignedTo ? user._id : undefined,
+      assignedAt: trimmedData.assignedTo ? now : undefined,
+      dueDate: trimmedData.dueDate,
+      relatedShipmentId: trimmedData.relatedShipmentId,
+      relatedQuoteId: trimmedData.relatedQuoteId,
+      relatedCustomerId: trimmedData.relatedCustomerId,
+      relatedPartnerId: trimmedData.relatedPartnerId,
+      checklist: trimmedData.checklist,
+      tags: trimmedData.tags,
       ownerId: user._id,
       createdAt: now,
       updatedAt: now,
       createdBy: user._id,
     });
 
-    // 6. AUDIT: Create audit log
+    // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.created',
-      entityType: 'system_task',
+      action: 'tasks.created',
+      entityType: 'yourobcTasks',
       entityId: publicId,
-      entityTitle: data.title.trim(),
-      description: `Created task: ${data.title.trim()}`,
+      entityTitle: trimmedData.title,
+      description: `Created task: ${trimmedData.title}`,
       metadata: {
-        status: data.status || 'draft',
-        priority: data.priority,
-        assignedTo: data.assignedTo,
+        status: trimmedData.status || 'draft',
+        priority: trimmedData.priority,
+        assignedTo: trimmedData.assignedTo,
       },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
     });
 
-    // 7. RETURN: Return entity ID
+    // 8. RETURN: Return entity ID
     return taskId;
   },
 });
 
 /**
  * Update existing task
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
 export const updateTask = mutation({
   args: {
@@ -138,86 +145,94 @@ export const updateTask = mutation({
     // 3. AUTHZ: Check edit permission
     await requireEditTaskAccess(ctx, task, user);
 
-    // 4. VALIDATE: Check update data validity
-    const errors = validateTaskData(updates);
+    // 4. TRIM: Trim string fields first
+    const trimmedUpdates = trimTaskData(updates);
+
+    // 5. VALIDATE: Check update data validity
+    const errors = validateTaskData(trimmedUpdates);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 5. PROCESS: Prepare update data
+    // 6. PROCESS: Prepare update data
     const now = Date.now();
+
+    // Rebuild searchableText with merged data
+    const searchableText = buildSearchableText({
+      title: trimmedUpdates.title ?? task.title,
+      description: trimmedUpdates.description ?? task.description,
+      completionNotes: trimmedUpdates.completionNotes ?? task.completionNotes,
+      cancellationReason: trimmedUpdates.cancellationReason ?? task.cancellationReason,
+      tags: trimmedUpdates.tags ?? task.tags,
+    });
+
     const updateData: any = {
+      searchableText,
       updatedAt: now,
       updatedBy: user._id,
     };
 
-    if (updates.title !== undefined) {
-      updateData.title = updates.title.trim();
+    if (trimmedUpdates.title !== undefined) {
+      updateData.title = trimmedUpdates.title;
     }
-    if (updates.description !== undefined) {
-      updateData.description = updates.description?.trim();
+    if (trimmedUpdates.description !== undefined) {
+      updateData.description = trimmedUpdates.description;
     }
-    if (updates.status !== undefined) {
-      updateData.status = updates.status;
+    if (trimmedUpdates.status !== undefined) {
+      updateData.status = trimmedUpdates.status;
       // Auto-track completion
-      if (updates.status === 'completed') {
+      if (trimmedUpdates.status === 'completed') {
         updateData.completedAt = now;
         updateData.completedBy = user._id;
       }
       // Auto-track cancellation
-      if (updates.status === 'cancelled') {
+      if (trimmedUpdates.status === 'cancelled') {
         updateData.cancelledAt = now;
         updateData.cancelledBy = user._id;
       }
       // Auto-track start
-      if (updates.status === 'active' && !task.startedAt) {
+      if (trimmedUpdates.status === 'active' && !task.startedAt) {
         updateData.startedAt = now;
       }
     }
-    if (updates.priority !== undefined) {
-      updateData.priority = updates.priority;
+    if (trimmedUpdates.priority !== undefined) {
+      updateData.priority = trimmedUpdates.priority;
     }
-    if (updates.taskType !== undefined) {
-      updateData.taskType = updates.taskType;
+    if (trimmedUpdates.taskType !== undefined) {
+      updateData.taskType = trimmedUpdates.taskType;
     }
-    if (updates.assignedTo !== undefined) {
-      updateData.assignedTo = updates.assignedTo;
-      if (updates.assignedTo !== task.assignedTo) {
+    if (trimmedUpdates.assignedTo !== undefined) {
+      updateData.assignedTo = trimmedUpdates.assignedTo;
+      if (trimmedUpdates.assignedTo !== task.assignedTo) {
         updateData.assignedBy = user._id;
         updateData.assignedAt = now;
       }
     }
-    if (updates.dueDate !== undefined) {
-      updateData.dueDate = updates.dueDate;
+    if (trimmedUpdates.dueDate !== undefined) {
+      updateData.dueDate = trimmedUpdates.dueDate;
     }
-    if (updates.checklist !== undefined) {
-      updateData.checklist = updates.checklist.map(item => ({
-        ...item,
-        text: item.text.trim(),
-      }));
+    if (trimmedUpdates.checklist !== undefined) {
+      updateData.checklist = trimmedUpdates.checklist;
     }
-    if (updates.tags !== undefined) {
-      updateData.tags = updates.tags.map(tag => tag.trim());
+    if (trimmedUpdates.tags !== undefined) {
+      updateData.tags = trimmedUpdates.tags;
     }
-    if (updates.category !== undefined) {
-      updateData.category = updates.category?.trim();
+    if (trimmedUpdates.completionNotes !== undefined) {
+      updateData.completionNotes = trimmedUpdates.completionNotes;
     }
-    if (updates.completionNotes !== undefined) {
-      updateData.completionNotes = updates.completionNotes?.trim();
-    }
-    if (updates.cancellationReason !== undefined) {
-      updateData.cancellationReason = updates.cancellationReason?.trim();
+    if (trimmedUpdates.cancellationReason !== undefined) {
+      updateData.cancellationReason = trimmedUpdates.cancellationReason;
     }
 
-    // 6. UPDATE: Apply changes
+    // 7. UPDATE: Apply changes
     await ctx.db.patch(taskId, updateData);
 
-    // 7. AUDIT: Create audit log
+    // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.updated',
-      entityType: 'system_task',
+      action: 'tasks.updated',
+      entityType: 'yourobcTasks',
       entityId: task.publicId,
       entityTitle: updateData.title || task.title,
       description: `Updated task: ${updateData.title || task.title}`,
@@ -265,8 +280,8 @@ export const deleteTask = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.deleted',
-      entityType: 'system_task',
+      action: 'tasks.deleted',
+      entityType: 'yourobcTasks',
       entityId: task.publicId,
       entityTitle: task.title,
       description: `Deleted task: ${task.title}`,
@@ -322,8 +337,8 @@ export const restoreTask = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.restored',
-      entityType: 'system_task',
+      action: 'tasks.restored',
+      entityType: 'yourobcTasks',
       entityId: task.publicId,
       entityTitle: task.title,
       description: `Restored task: ${task.title}`,
@@ -413,8 +428,8 @@ export const bulkUpdateTasks = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.bulk_updated',
-      entityType: 'system_task',
+      action: 'tasks.bulk_updated',
+      entityType: 'yourobcTasks',
       entityId: 'bulk',
       entityTitle: `${results.length} tasks`,
       description: `Bulk updated ${results.length} tasks`,
@@ -491,8 +506,8 @@ export const bulkDeleteTasks = mutation({
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
-      action: 'task.bulk_deleted',
-      entityType: 'system_task',
+      action: 'tasks.bulk_deleted',
+      entityType: 'yourobcTasks',
       entityId: 'bulk',
       entityTitle: `${results.length} tasks`,
       description: `Bulk deleted ${results.length} tasks`,

@@ -12,13 +12,17 @@ import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import { entityTypes } from '@/config/entityTypes'
 import { supportingValidators, supportingFields } from './validators'
-import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 
 /**
  * Followup reminders table
  * Tracks reminders and tasks assigned to team members with recurrence support
  */
 export const followupRemindersTable = defineTable({
+  // Required fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Core fields
   title: v.string(),
   description: v.optional(v.string()),
@@ -58,9 +62,11 @@ export const followupRemindersTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_assignedTo', ['assignedTo'])
   .index('by_dueDate', ['dueDate'])
   .index('by_entity', ['entityType', 'entityId'])
   .index('by_status', ['status'])
-  .index('by_deleted', ['deletedAt'])
-  .index('by_created', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt'])
+  .index('by_created_at', ['createdAt'])

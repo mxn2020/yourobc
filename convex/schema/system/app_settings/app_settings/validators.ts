@@ -1,17 +1,22 @@
 // convex/schema/system/app_settings/app_settings/validators.ts
-// Grouped validators for appSettings module (schema implementation template)
+// Grouped validators and complex fields for app_settings module
 
 import { v } from 'convex/values';
-import { categoryTypes } from '@/schema/base';
 
-// =============================================================================
-// Primitive Validators
-// =============================================================================
+// Inline category enum to avoid schema import cycles
+const settingCategory = v.union(
+  v.literal('ai'),
+  v.literal('general'),
+  v.literal('security'),
+  v.literal('notifications'),
+  v.literal('billing'),
+  v.literal('integrations')
+);
 
 export const appSettingsValidators = {
   // Identification & organization
   key: v.string(),
-  category: categoryTypes.settingCategory,
+  category: settingCategory,
 
   // Value typing and access control
   valueType: v.union(

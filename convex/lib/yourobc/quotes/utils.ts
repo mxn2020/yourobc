@@ -230,19 +230,75 @@ export function canConvertToShipment(quote: Quote): boolean {
 
 /**
  * Trim all string fields in quote data
+ * Generic typing ensures type safety without `any`
  */
-export function trimQuoteData<T extends Partial<CreateQuoteData | UpdateQuoteData>>(data: T): T {
-  const trimmed = { ...data };
+export function trimQuoteData<T extends Partial<CreateQuoteData | UpdateQuoteData>>(
+  data: T
+): T {
+  // Clone to avoid mutating caller data
+  const trimmed: T = { ...data };
 
-  if (trimmed.quoteNumber) trimmed.quoteNumber = trimmed.quoteNumber.trim();
-  if (trimmed.customerReference) trimmed.customerReference = trimmed.customerReference.trim();
-  if (trimmed.description) trimmed.description = trimmed.description.trim();
-  if (trimmed.specialInstructions) trimmed.specialInstructions = trimmed.specialInstructions.trim();
-  if (trimmed.quoteText) trimmed.quoteText = trimmed.quoteText.trim();
-  if (trimmed.notes) trimmed.notes = trimmed.notes.trim();
-  if (trimmed.rejectionReason) trimmed.rejectionReason = trimmed.rejectionReason.trim();
-  if (trimmed.incoterms) trimmed.incoterms = trimmed.incoterms.trim().toUpperCase();
-  if (trimmed.tags) trimmed.tags = trimmed.tags.map(tag => tag.trim());
+  // Trim string fields
+  if (typeof trimmed.quoteNumber === "string") {
+    trimmed.quoteNumber = trimmed.quoteNumber.trim() as T["quoteNumber"];
+  }
+
+  if (typeof trimmed.customerReference === "string") {
+    trimmed.customerReference = trimmed.customerReference.trim() as T["customerReference"];
+  }
+
+  if (typeof trimmed.description === "string") {
+    trimmed.description = trimmed.description.trim() as T["description"];
+  }
+
+  if (typeof trimmed.specialInstructions === "string") {
+    trimmed.specialInstructions = trimmed.specialInstructions.trim() as T["specialInstructions"];
+  }
+
+  if (typeof trimmed.quoteText === "string") {
+    trimmed.quoteText = trimmed.quoteText.trim() as T["quoteText"];
+  }
+
+  if (typeof trimmed.notes === "string") {
+    trimmed.notes = trimmed.notes.trim() as T["notes"];
+  }
+
+  if (typeof trimmed.rejectionReason === "string") {
+    trimmed.rejectionReason = trimmed.rejectionReason.trim() as T["rejectionReason"];
+  }
+
+  if (typeof trimmed.incoterms === "string") {
+    trimmed.incoterms = trimmed.incoterms.trim().toUpperCase() as T["incoterms"];
+  }
+
+  // Trim array of strings
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t): t is string => typeof t === "string")
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    trimmed.tags = nextTags as T["tags"];
+  }
 
   return trimmed;
+}
+
+/**
+ * Build searchable text for full-text search
+ */
+export function buildSearchableText(
+  data: Partial<CreateQuoteData | UpdateQuoteData>
+): string {
+  const parts: string[] = [];
+
+  if (data.quoteNumber) parts.push(data.quoteNumber);
+  if (data.customerReference) parts.push(data.customerReference);
+  if (data.description) parts.push(data.description);
+  if (data.specialInstructions) parts.push(data.specialInstructions);
+  if (data.quoteText) parts.push(data.quoteText);
+  if (data.notes) parts.push(data.notes);
+  if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
+
+  return parts.join(' ').toLowerCase().trim();
 }

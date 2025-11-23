@@ -15,6 +15,17 @@ import {
 import { validateAppThemeSettingData } from './utils';
 import type { AppThemeSettingId } from './types';
 
+const themeValueValidator = v.union(
+  v.string(),
+  v.number(),
+  v.boolean(),
+  v.null(),
+  v.object({}),
+  v.array(v.union(v.string(), v.number(), v.boolean()))
+);
+
+const themeMetadataValidator = v.object({});
+
 /**
  * Create a new theme setting
  */
@@ -22,11 +33,11 @@ export const createAppThemeSetting = mutation({
   args: {
     data: v.object({
       key: v.string(),
-      value: v.any(),
+      value: themeValueValidator,
       category: v.string(),
       description: v.optional(v.string()),
       isEditable: v.optional(v.boolean()),
-      metadata: v.optional(v.any()),
+      metadata: v.optional(themeMetadataValidator),
     }),
   },
   handler: async (ctx, { data }): Promise<AppThemeSettingId> => {
@@ -66,6 +77,7 @@ export const createAppThemeSetting = mutation({
 
     // 6. CREATE: Insert into database
     const settingId = await ctx.db.insert('appThemeSettings', {
+      name: trimmedData.key,
       publicId,
       key: trimmedData.key,
       value: data.value,
@@ -106,11 +118,11 @@ export const updateAppThemeSetting = mutation({
   args: {
     settingId: v.id('appThemeSettings'),
     updates: v.object({
-      value: v.optional(v.any()),
+      value: v.optional(themeValueValidator),
       category: v.optional(v.string()),
       description: v.optional(v.string()),
       isEditable: v.optional(v.boolean()),
-      metadata: v.optional(v.any()),
+      metadata: v.optional(themeMetadataValidator),
     }),
   },
   handler: async (ctx, { settingId, updates }): Promise<AppThemeSettingId> => {
