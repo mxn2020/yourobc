@@ -1,10 +1,10 @@
-// convex/schema/system/appSettings/appSettings.ts
-// Table definitions for appSettings module
+// convex/schema/system/app_settings/app_settings/appSettings.ts
+// Table definitions for appSettings module (template-compliant)
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { appSettingsValidators, appSettingsFields } from './validators';
+import { appSettingsFields, appSettingsValidators } from './validators';
 
 export const appSettingsTable = defineTable({
   // Required: Main display field
@@ -15,11 +15,14 @@ export const appSettingsTable = defineTable({
   ownerId: v.optional(v.id('userProfiles')),
 
   // Setting identification
-  key: v.string(),
-  value: appSettingsFields.settingValue,
+  key: appSettingsValidators.key,
+  category: appSettingsValidators.category,
 
-  // Organization
-  category: v.string(),
+  // Setting value & typing
+  value: appSettingsFields.settingValue,
+  valueType: appSettingsValidators.valueType,
+
+  // Descriptive context
   description: v.optional(v.string()),
 
   // Access control
@@ -41,5 +44,6 @@ export const appSettingsTable = defineTable({
   // Module-specific indexes
   .index('by_key', ['key'])
   .index('by_category', ['category'])
+  .index('by_value_type', ['valueType'])
   .index('by_public', ['isPublic'])
   .index('by_created_at', ['createdAt']);
