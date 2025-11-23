@@ -6,9 +6,6 @@ import { yourobcCouriersSchemas } from './couriers/schemas';
 import { yourobcCustomerMarginsSchemas } from './customerMargins/schemas';
 import { yourobcCustomersSchemas } from './customers/schemas';
 import { yourobcDashboardSchemas } from './dashboard/schemas';
-import { yourobcEmployeeCommissionsSchemas } from './employeeCommissions/schemas';
-import { yourobcEmployeeKpisSchemas } from './employeeKPIs/schemas';
-import { yourobcEmployeeSessionsSchemas } from './employeeSessions/schemas';
 import { yourobcEmployeesSchemas } from './employees/schemas';
 import { yourobcInvoicesSchemas } from './invoices/schemas';
 import { yourobcPartnersSchemas } from './partners/schemas';
@@ -35,9 +32,6 @@ export const yourobcSchemas = {
 
   // Employees
   ...yourobcEmployeesSchemas,
-  ...yourobcEmployeeCommissionsSchemas,
-  ...yourobcEmployeeKpisSchemas,
-  ...yourobcEmployeeSessionsSchemas,
 
   // Invoices
   ...yourobcInvoicesSchemas,
