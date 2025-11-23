@@ -1,15 +1,19 @@
-// convex/lib/yourobc/customerMargins/mutations.ts
+// convex/lib/yourobc/customers/margins.mutations.ts
 // Write operations for customerMargins module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { customerMarginsValidators } from '@/schema/yourobc/customerMargins/validators';
-import { CUSTOMER_MARGINS_CONSTANTS } from './constants';
-import { validateCustomerMarginData, generateMarginId } from './utils';
-import { requireEditCustomerMarginAccess, requireDeleteCustomerMarginAccess, requireApproveCustomerMarginAccess } from './permissions';
-import type { CustomerMarginId } from './types';
+import { customerMarginsValidators } from '@/schema/yourobc/customers/validators';
+import { CUSTOMER_MARGINS_CONSTANTS } from './margins.constants';
+import { validateCustomerMarginData, generateMarginId } from './margins.utils';
+import {
+  requireEditCustomerMarginAccess,
+  requireDeleteCustomerMarginAccess,
+  requireApproveCustomerMarginAccess,
+} from './margins.permissions';
+import type { CustomerMarginId } from './margins.types';
 
 /**
  * Create new customer margin

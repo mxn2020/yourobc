@@ -1,11 +1,10 @@
-// convex/schema/yourobc/customerMargins/contactLog.ts
+// convex/schema/yourobc/customers/contactLog.ts
 // Table definitions for contactLog module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 import { customerMarginsValidators } from './validators';
-import { customerIdSchema } from '../customers/schemas';
 import { quoteIdSchema } from '../quotes/schemas';
 import { shipmentIdSchema } from '../shipments/schemas';
 import { invoiceIdSchema } from '../invoices/schemas';
@@ -16,7 +15,7 @@ export const contactLogTable = defineTable({
   ownerId: userProfileIdSchema,
 
   // Customer & Contact Person
-  customerId: customerIdSchema,
+  customerId: v.id('yourobcCustomers'),
   contactPersonId: v.optional(v.id('contactPersons')),
 
   // Contact Method & Direction

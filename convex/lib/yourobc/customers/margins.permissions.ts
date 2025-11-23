@@ -1,8 +1,8 @@
-// convex/lib/yourobc/customerMargins/permissions.ts
+// convex/lib/yourobc/customers/margins.permissions.ts
 // Access control and authorization logic for customerMargins module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
-import type { CustomerMargin } from './types';
+import type { CustomerMargin } from './margins.types';
 import type { Doc } from '@/generated/dataModel';
 
 type UserProfile = Doc<'userProfiles'>;
