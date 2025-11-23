@@ -1,4 +1,4 @@
-// convex/lib/yourobc/convex/lib/yourobc/couriers/types.ts
+// convex/lib/yourobc/couriers/types.ts
 // TypeScript type definitions for couriers module
 
 import type { Doc, Id } from '@/generated/dataModel';
@@ -8,11 +8,47 @@ import type {
   CourierDeliverySpeed,
   CourierPricingModel,
   CourierApiType,
+  CourierCommissionType,
+  CourierCommissionSimpleStatus,
 } from '@/schema/yourobc/couriers/types';
 
 // Entity types
 export type Courier = Doc<'yourobcCouriers'>;
 export type CourierId = Id<'yourobcCouriers'>;
+export type CourierCommission = Doc<'yourobcCourierCommissions'>;
+export type CourierCommissionId = Id<'yourobcCourierCommissions'>;
+
+// Commission data interfaces
+export interface CreateCourierCommissionData {
+  courierId: CourierId;
+  shipmentId: Id<'yourobcShipments'>;
+  type: CourierCommissionType;
+  rate: number;
+  baseAmount: number;
+  commissionAmount: number;
+  currency?: string;
+  status: CourierCommissionSimpleStatus;
+  paidDate?: number;
+  paymentReference?: string;
+  paymentMethod?: string;
+  approvedBy?: string;
+  approvedDate?: number;
+  notes?: string;
+}
+
+export interface UpdateCourierCommissionData {
+  rate?: number;
+  baseAmount?: number;
+  commissionAmount?: number;
+  currency?: string;
+  status?: CourierCommissionSimpleStatus;
+  paidDate?: number;
+  paymentReference?: string;
+  paymentMethod?: string;
+  approvedBy?: string;
+  approvedDate?: number;
+  notes?: string;
+}
 
 // Contact interface (matching schema)
 export interface ContactData {

@@ -8,6 +8,7 @@ import {
   auditFields,
   softDeleteFields,
   classificationFields,
+  userProfileIdSchema,
 } from '@/schema/base';
 import { couriersValidators, couriersFields } from './validators';
 import { baseFields } from '@/schema/base.validators';
@@ -18,7 +19,7 @@ export const couriersTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId - following yourobc pattern
+  ownerId: userProfileIdSchema,
 
   // Core Identity
   shortName: v.optional(v.string()),
