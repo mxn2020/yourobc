@@ -16,11 +16,16 @@ export const DASHBOARD_TABLES = {
  * Common alert IDs used in the system
  */
 export const ALERT_IDS = {
-  OVERDUE_SHIPMENTS: 'alert-overdue-shipments',
+ OVERDUE_SHIPMENTS: 'alert-overdue-shipments',
   OVERDUE_INVOICES: 'alert-overdue-invoices',
   LOW_INVENTORY: 'alert-low-inventory',
   PENDING_APPROVALS: 'alert-pending-approvals',
 } as const;
+
+/**
+ * Regex for validating dashboard alert identifiers
+ */
+export const ALERT_ID_PATTERN = /^alert-[a-z0-9-]+$/;
 
 /**
  * Error messages

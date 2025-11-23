@@ -2,226 +2,184 @@
 /**
  * Dashboard Query Functions
  *
- * Database query operations for dashboard alert acknowledgments.
+ * Database query operations for dashboard alert acknowledgments following the
+ * standardized Convex template.
  */
 
-import { QueryCtx } from '../../../_generated/server';
+import { query } from '@/generated/server';
+import { v } from 'convex/values';
+
+import { userProfileIdSchema } from '@/schema/base';
+import { DASHBOARD_ERROR_MESSAGES, DASHBOARD_TABLES } from './constants';
 import {
   DashboardAlertAcknowledgmentDoc,
   DashboardAlertAcknowledgmentId,
   DashboardAlertAcknowledgmentQueryOptions,
+  DashboardAlertAcknowledgmentUserId,
   DashboardAlertStatus,
 } from './types';
-import { DASHBOARD_ERROR_MESSAGES } from './constants';
+import { assertCanReadDashboardAlertAcknowledgment, requireDashboardUser } from './permissions';
 
-/**
- * Get a dashboard alert acknowledgment by its internal ID
- */
-export async function getDashboardAlertAcknowledgmentById(
-  ctx: QueryCtx,
+async function fetchAcknowledgmentById(
+  ctx: any,
   id: DashboardAlertAcknowledgmentId
 ): Promise<DashboardAlertAcknowledgmentDoc | null> {
-  return await ctx.db.get(id);
+  return ctx.db.get(id);
 }
 
-/**
- * Get a dashboard alert acknowledgment by its public ID
- */
-export async function getDashboardAlertAcknowledgmentByPublicId(
-  ctx: QueryCtx,
+async function fetchAcknowledgmentByPublicId(
+  ctx: any,
   publicId: string
 ): Promise<DashboardAlertAcknowledgmentDoc | null> {
-  const acknowledgment = await ctx.db
-    .query('dashboardAlertAcknowledgments')
-    .withIndex('by_publicId', (q) => q.eq('publicId', publicId))
+  return ctx.db
+    .query(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS)
+    .withIndex('by_publicId', (q: any) => q.eq('publicId', publicId))
     .first();
-
-  return acknowledgment;
 }
 
-/**
- * Get a dashboard alert acknowledgment by user and alert ID
- */
-export async function getDashboardAlertAcknowledgmentByUserAndAlert(
-  ctx: QueryCtx,
-  userId: string,
+async function fetchAcknowledgmentByUserAndAlert(
+  ctx: any,
+  userId: DashboardAlertAcknowledgmentUserId,
   alertId: string
 ): Promise<DashboardAlertAcknowledgmentDoc | null> {
-  const acknowledgment = await ctx.db
-    .query('dashboardAlertAcknowledgments')
-    .withIndex('by_userId_and_alertId', (q) =>
+  return ctx.db
+    .query(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS)
+    .withIndex('by_userId_and_alertId', (q: any) =>
       q.eq('userId', userId).eq('alertId', alertId)
     )
-    .filter((q) => q.eq(q.field('deletedAt'), undefined))
     .first();
+}
+
+function applySoftDeleteFilter(queryBuilder: any, includeDeleted?: boolean) {
+  if (includeDeleted) {
+    return queryBuilder;
+  }
+
+  return queryBuilder.filter((q: any) => q.eq(q.field('deletedAt'), undefined));
+}
+
+export const getDashboardAlertAcknowledgmentById = query({
+  args: { id: v.id(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS) },
+  handler: async (ctx, { id }) => {
+    const acknowledgment = await fetchAcknowledgmentById(ctx, id);
+    return acknowledgment && acknowledgment.deletedAt === undefined ? acknowledgment : null;
+  },
+});
+
+export const getDashboardAlertAcknowledgmentByPublicId = query({
+  args: { publicId: v.string() },
+  handler: async (ctx, { publicId }) => {
+    const acknowledgment = await fetchAcknowledgmentByPublicId(ctx, publicId);
+    return acknowledgment && acknowledgment.deletedAt === undefined ? acknowledgment : null;
+  },
+});
+
+export const getDashboardAlertAcknowledgmentByUserAndAlert = query({
+  args: {
+    userId: userProfileIdSchema,
+    alertId: v.string(),
+  },
+  handler: async (ctx, { userId, alertId }) => {
+    await requireDashboardUser(ctx, userId);
+    const acknowledgment = await fetchAcknowledgmentByUserAndAlert(ctx, userId, alertId);
+
+    if (!acknowledgment || acknowledgment.deletedAt !== undefined) {
+      return null;
+    }
+
+    await assertCanReadDashboardAlertAcknowledgment(ctx, acknowledgment);
+    return acknowledgment;
+  },
+});
+
+export const listDashboardAlertAcknowledgments = query({
+  args: {
+    userId: v.optional(userProfileIdSchema),
+    alertId: v.optional(v.string()),
+    ownerId: v.optional(userProfileIdSchema),
+    includeDeleted: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args): Promise<DashboardAlertAcknowledgmentDoc[]> => {
+    const { userId, alertId, ownerId, includeDeleted = false } =
+      args satisfies DashboardAlertAcknowledgmentQueryOptions;
+
+    let queryBuilder = ctx.db.query(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS);
+
+    if (userId) {
+      await requireDashboardUser(ctx, userId);
+      queryBuilder = queryBuilder.withIndex('by_userId_and_deletedAt', (q: any) =>
+        q.eq('userId', userId)
+      );
+    } else if (ownerId) {
+      await requireDashboardUser(ctx, ownerId);
+      queryBuilder = queryBuilder.withIndex('by_ownerId_and_deletedAt', (q: any) =>
+        q.eq('ownerId', ownerId)
+      );
+    } else if (alertId) {
+      queryBuilder = queryBuilder.withIndex('by_alertId', (q: any) => q.eq('alertId', alertId));
+    }
+
+    const acknowledgments = await applySoftDeleteFilter(queryBuilder, includeDeleted).collect();
+    return acknowledgments;
+  },
+});
+
+export const getAlertStatus = query({
+  args: {
+    userId: userProfileIdSchema,
+    alertId: v.string(),
+  },
+  handler: async (ctx, { userId, alertId }): Promise<DashboardAlertStatus> => {
+    await requireDashboardUser(ctx, userId);
+    const acknowledgment = await fetchAcknowledgmentByUserAndAlert(ctx, userId, alertId);
+
+    return {
+      alertId,
+      isAcknowledged: acknowledgment !== null && acknowledgment.deletedAt === undefined,
+      acknowledgedAt: acknowledgment?.acknowledgedAt,
+    } satisfies DashboardAlertStatus;
+  },
+});
+
+export const getAlertStatuses = query({
+  args: {
+    userId: userProfileIdSchema,
+    alertIds: v.array(v.string()),
+  },
+  handler: async (ctx, { userId, alertIds }) => {
+    await requireDashboardUser(ctx, userId);
+
+    const statuses = await Promise.all(
+      alertIds.map((alertId) =>
+        getAlertStatus.handler(ctx, {
+          userId,
+          alertId,
+        })
+      )
+    );
+
+    return statuses;
+  },
+});
+
+export async function findDashboardAlertAcknowledgmentForMutation(
+  ctx: any,
+  publicId: string
+): Promise<DashboardAlertAcknowledgmentDoc> {
+  const acknowledgment = await fetchAcknowledgmentByPublicId(ctx, publicId);
+
+  if (!acknowledgment || acknowledgment.deletedAt !== undefined) {
+    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_NOT_FOUND);
+  }
 
   return acknowledgment;
 }
 
-/**
- * List dashboard alert acknowledgments by user
- */
-export async function listDashboardAlertAcknowledgmentsByUser(
-  ctx: QueryCtx,
-  userId: string,
-  includeDeleted: boolean = false
-): Promise<DashboardAlertAcknowledgmentDoc[]> {
-  let query = ctx.db
-    .query('dashboardAlertAcknowledgments')
-    .withIndex('by_userId_and_deletedAt', (q) => q.eq('userId', userId));
-
-  if (!includeDeleted) {
-    query = query.filter((q) => q.eq(q.field('deletedAt'), undefined));
-  }
-
-  return await query.collect();
-}
-
-/**
- * List dashboard alert acknowledgments by alert ID
- */
-export async function listDashboardAlertAcknowledgmentsByAlert(
-  ctx: QueryCtx,
-  alertId: string,
-  includeDeleted: boolean = false
-): Promise<DashboardAlertAcknowledgmentDoc[]> {
-  let query = ctx.db
-    .query('dashboardAlertAcknowledgments')
-    .withIndex('by_alertId', (q) => q.eq('alertId', alertId));
-
-  if (!includeDeleted) {
-    query = query.filter((q) => q.eq(q.field('deletedAt'), undefined));
-  }
-
-  return await query.collect();
-}
-
-/**
- * List dashboard alert acknowledgments by owner
- */
-export async function listDashboardAlertAcknowledgmentsByOwner(
-  ctx: QueryCtx,
-  ownerId: string,
-  includeDeleted: boolean = false
-): Promise<DashboardAlertAcknowledgmentDoc[]> {
-  let query = ctx.db
-    .query('dashboardAlertAcknowledgments')
-    .withIndex('by_ownerId_and_deletedAt', (q) => q.eq('ownerId', ownerId));
-
-  if (!includeDeleted) {
-    query = query.filter((q) => q.eq(q.field('deletedAt'), undefined));
-  }
-
-  return await query.collect();
-}
-
-/**
- * List all dashboard alert acknowledgments with optional filters
- */
-export async function listDashboardAlertAcknowledgments(
-  ctx: QueryCtx,
-  options: DashboardAlertAcknowledgmentQueryOptions = {}
-): Promise<DashboardAlertAcknowledgmentDoc[]> {
-  const { userId, alertId, ownerId, includeDeleted = false } = options;
-
-  // Use the most specific index available
-  if (userId && alertId) {
-    return await getDashboardAlertAcknowledgmentByUserAndAlert(ctx, userId, alertId).then(
-      (ack) => (ack ? [ack] : [])
-    );
-  }
-
-  if (userId) {
-    return await listDashboardAlertAcknowledgmentsByUser(ctx, userId, includeDeleted);
-  }
-
-  if (ownerId) {
-    return await listDashboardAlertAcknowledgmentsByOwner(ctx, ownerId, includeDeleted);
-  }
-
-  if (alertId) {
-    return await listDashboardAlertAcknowledgmentsByAlert(ctx, alertId, includeDeleted);
-  }
-
-  // No filters - return all active acknowledgments
-  let query = ctx.db.query('dashboardAlertAcknowledgments');
-
-  if (!includeDeleted) {
-    query = query.filter((q) => q.eq(q.field('deletedAt'), undefined));
-  }
-
-  return await query.collect();
-}
-
-/**
- * Check if an alert has been acknowledged by a user
- */
-export async function isAlertAcknowledged(
-  ctx: QueryCtx,
-  userId: string,
+export async function findActiveAcknowledgmentByUserAndAlert(
+  ctx: any,
+  userId: DashboardAlertAcknowledgmentUserId,
   alertId: string
-): Promise<boolean> {
-  const acknowledgment = await getDashboardAlertAcknowledgmentByUserAndAlert(
-    ctx,
-    userId,
-    alertId
-  );
-  return acknowledgment !== null && acknowledgment.deletedAt === undefined;
-}
-
-/**
- * Get alert acknowledgment status for a user
- */
-export async function getAlertStatus(
-  ctx: QueryCtx,
-  userId: string,
-  alertId: string
-): Promise<DashboardAlertStatus> {
-  const acknowledgment = await getDashboardAlertAcknowledgmentByUserAndAlert(
-    ctx,
-    userId,
-    alertId
-  );
-
-  return {
-    alertId,
-    isAcknowledged: acknowledgment !== null && acknowledgment.deletedAt === undefined,
-    acknowledgedAt: acknowledgment?.acknowledgedAt,
-  };
-}
-
-/**
- * Get alert statuses for multiple alerts for a user
- */
-export async function getAlertStatuses(
-  ctx: QueryCtx,
-  userId: string,
-  alertIds: string[]
-): Promise<DashboardAlertStatus[]> {
-  const statuses = await Promise.all(
-    alertIds.map((alertId) => getAlertStatus(ctx, userId, alertId))
-  );
-  return statuses;
-}
-
-/**
- * Count dashboard alert acknowledgments by user
- */
-export async function countDashboardAlertAcknowledgmentsByUser(
-  ctx: QueryCtx,
-  userId: string
-): Promise<number> {
-  const acknowledgments = await listDashboardAlertAcknowledgmentsByUser(ctx, userId, false);
-  return acknowledgments.length;
-}
-
-/**
- * Count dashboard alert acknowledgments by alert
- */
-export async function countDashboardAlertAcknowledgmentsByAlert(
-  ctx: QueryCtx,
-  alertId: string
-): Promise<number> {
-  const acknowledgments = await listDashboardAlertAcknowledgmentsByAlert(ctx, alertId, false);
-  return acknowledgments.length;
+): Promise<DashboardAlertAcknowledgmentDoc | null> {
+  const acknowledgment = await fetchAcknowledgmentByUserAndAlert(ctx, userId, alertId);
+  return acknowledgment && acknowledgment.deletedAt === undefined ? acknowledgment : null;
 }

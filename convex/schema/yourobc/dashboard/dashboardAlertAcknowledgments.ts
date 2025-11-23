@@ -1,8 +1,8 @@
 // convex/schema/yourobc/dashboard/dashboardAlertAcknowledgments.ts
-// convex/schema/yourobc/dashboard/dashboardAlertAcknowledgments.ts
 // Table definitions for dashboard module
 
 import { defineTable } from 'convex/server';
+
 import { auditFields, softDeleteFields } from '@/schema/base';
 import { dashboardFields } from './validators';
 

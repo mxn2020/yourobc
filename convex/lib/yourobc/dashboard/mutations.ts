@@ -2,267 +2,218 @@
 /**
  * Dashboard Mutation Functions
  *
- * Database mutation operations for dashboard alert acknowledgments.
+ * Database mutation operations for dashboard alert acknowledgments following
+ * the standardized Convex template.
  */
 
-import { MutationCtx } from '../../../_generated/server';
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+
+import { userProfileIdSchema } from '@/schema/base';
+import { dashboardValidators } from '@/schema/yourobc/dashboard/validators';
+import { DASHBOARD_ERROR_MESSAGES, DASHBOARD_TABLES } from './constants';
 import {
   DashboardAlertAcknowledgmentDoc,
   DashboardAlertAcknowledgmentId,
+  DashboardAlertAcknowledgmentUserId,
   CreateDashboardAlertAcknowledgmentInput,
   UpdateDashboardAlertAcknowledgmentInput,
 } from './types';
-import { DASHBOARD_ERROR_MESSAGES } from './constants';
-import {
-  getDashboardAlertAcknowledgmentByPublicId,
-  getDashboardAlertAcknowledgmentByUserAndAlert,
-} from './queries';
-import {
-  generateDashboardAlertAcknowledgmentPublicId,
-  isValidAlertId,
-} from './utils';
 import {
   assertCanCreateDashboardAlertAcknowledgment,
-  assertCanUpdateDashboardAlertAcknowledgment,
   assertCanDeleteDashboardAlertAcknowledgment,
+  assertCanUpdateDashboardAlertAcknowledgment,
 } from './permissions';
+import {
+  findActiveAcknowledgmentByUserAndAlert,
+  findDashboardAlertAcknowledgmentForMutation,
+} from './queries';
+import { generateDashboardAlertAcknowledgmentPublicId } from './utils';
+import { assertValidAlertId } from './validation';
 
-/**
- * Create a new dashboard alert acknowledgment
- */
-export async function createDashboardAlertAcknowledgment(
-  ctx: MutationCtx,
-  input: CreateDashboardAlertAcknowledgmentInput
-): Promise<DashboardAlertAcknowledgmentId> {
-  const { userId, alertId } = input;
-
-  // Validate alert ID format
-  if (!isValidAlertId(alertId)) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.INVALID_ALERT_ID);
-  }
-
-  // Check permissions
-  await assertCanCreateDashboardAlertAcknowledgment(ctx, userId);
-
-  // Check if acknowledgment already exists
-  const existingAcknowledgment = await getDashboardAlertAcknowledgmentByUserAndAlert(
-    ctx,
-    userId,
-    alertId
-  );
-
-  if (existingAcknowledgment) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_ALREADY_EXISTS);
-  }
-
-  // Generate public ID
-  const publicId = generateDashboardAlertAcknowledgmentPublicId(userId, alertId);
-
-  // Get current timestamp
-  const now = Date.now();
-
-  // Create the acknowledgment
-  const acknowledgmentId = await ctx.db.insert('dashboardAlertAcknowledgments', {
-    publicId,
-    ownerId: userId, // Owner is the user who acknowledged
-    userId,
-    alertId,
-    acknowledgedAt: now,
-    createdAt: now,
-    updatedAt: now,
-  });
-
-  return acknowledgmentId;
-}
-
-/**
- * Update an existing dashboard alert acknowledgment
- */
-export async function updateDashboardAlertAcknowledgment(
-  ctx: MutationCtx,
-  input: UpdateDashboardAlertAcknowledgmentInput
-): Promise<void> {
-  const { publicId, acknowledgedAt } = input;
-
-  // Get the acknowledgment
-  const acknowledgment = await getDashboardAlertAcknowledgmentByPublicId(ctx, publicId);
-
-  if (!acknowledgment || acknowledgment.deletedAt !== undefined) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_NOT_FOUND);
-  }
-
-  // Check permissions
-  await assertCanUpdateDashboardAlertAcknowledgment(ctx, acknowledgment);
-
-  // Prepare update data
-  const updates: Partial<DashboardAlertAcknowledgmentDoc> = {
+function buildUpdatePayload(
+  acknowledgment: DashboardAlertAcknowledgmentDoc,
+  updates: Partial<DashboardAlertAcknowledgmentDoc>
+): Partial<DashboardAlertAcknowledgmentDoc> {
+  return {
+    ...updates,
     updatedAt: Date.now(),
+    createdAt: acknowledgment.createdAt,
   };
-
-  if (acknowledgedAt !== undefined) {
-    updates.acknowledgedAt = acknowledgedAt;
-  }
-
-  // Update the acknowledgment
-  await ctx.db.patch(acknowledgment._id, updates);
 }
 
-/**
- * Soft delete a dashboard alert acknowledgment
- */
-export async function deleteDashboardAlertAcknowledgment(
-  ctx: MutationCtx,
-  publicId: string
-): Promise<void> {
-  // Get the acknowledgment
-  const acknowledgment = await getDashboardAlertAcknowledgmentByPublicId(ctx, publicId);
+export const createDashboardAlertAcknowledgment = mutation({
+  args: { input: dashboardValidators.createAlertAcknowledgmentInput },
+  handler: async (ctx, { input }): Promise<DashboardAlertAcknowledgmentId> => {
+    const validatedUserId = await assertCanCreateDashboardAlertAcknowledgment(
+      ctx,
+      input.userId
+    );
+    const normalizedAlertId = assertValidAlertId(input.alertId);
 
-  if (!acknowledgment || acknowledgment.deletedAt !== undefined) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_NOT_FOUND);
-  }
+    const existingAcknowledgment = await findActiveAcknowledgmentByUserAndAlert(
+      ctx,
+      validatedUserId,
+      normalizedAlertId
+    );
 
-  // Check permissions
-  await assertCanDeleteDashboardAlertAcknowledgment(ctx, acknowledgment);
+    if (existingAcknowledgment) {
+      throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_ALREADY_EXISTS);
+    }
 
-  // Soft delete the acknowledgment
-  await ctx.db.patch(acknowledgment._id, {
-    deletedAt: Date.now(),
-    updatedAt: Date.now(),
-  });
-}
+    const publicId = generateDashboardAlertAcknowledgmentPublicId(
+      validatedUserId,
+      normalizedAlertId
+    );
+    const now = Date.now();
 
-/**
- * Hard delete a dashboard alert acknowledgment (permanent)
- */
-export async function hardDeleteDashboardAlertAcknowledgment(
-  ctx: MutationCtx,
-  publicId: string
-): Promise<void> {
-  // Get the acknowledgment
-  const acknowledgment = await getDashboardAlertAcknowledgmentByPublicId(ctx, publicId);
-
-  if (!acknowledgment) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_NOT_FOUND);
-  }
-
-  // Check permissions
-  await assertCanDeleteDashboardAlertAcknowledgment(ctx, acknowledgment);
-
-  // Permanently delete the acknowledgment
-  await ctx.db.delete(acknowledgment._id);
-}
-
-/**
- * Restore a soft-deleted dashboard alert acknowledgment
- */
-export async function restoreDashboardAlertAcknowledgment(
-  ctx: MutationCtx,
-  publicId: string
-): Promise<void> {
-  // Get the acknowledgment
-  const acknowledgment = await getDashboardAlertAcknowledgmentByPublicId(ctx, publicId);
-
-  if (!acknowledgment) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.ACKNOWLEDGMENT_NOT_FOUND);
-  }
-
-  if (acknowledgment.deletedAt === undefined) {
-    // Already active, nothing to do
-    return;
-  }
-
-  // Check permissions
-  await assertCanUpdateDashboardAlertAcknowledgment(ctx, acknowledgment);
-
-  // Restore the acknowledgment
-  await ctx.db.patch(acknowledgment._id, {
-    deletedAt: undefined,
-    updatedAt: Date.now(),
-  });
-}
-
-/**
- * Acknowledge an alert (create or update acknowledgment)
- */
-export async function acknowledgeAlert(
-  ctx: MutationCtx,
-  userId: string,
-  alertId: string
-): Promise<DashboardAlertAcknowledgmentId> {
-  // Check if acknowledgment already exists
-  const existingAcknowledgment = await getDashboardAlertAcknowledgmentByUserAndAlert(
-    ctx,
-    userId,
-    alertId
-  );
-
-  if (existingAcknowledgment) {
-    // Update the acknowledgment timestamp
-    await updateDashboardAlertAcknowledgment(ctx, {
-      publicId: existingAcknowledgment.publicId,
-      acknowledgedAt: Date.now(),
+    return ctx.db.insert(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS, {
+      publicId,
+      ownerId: validatedUserId,
+      userId: validatedUserId,
+      alertId: normalizedAlertId,
+      acknowledgedAt: now,
+      createdAt: now,
+      updatedAt: now,
     });
-    return existingAcknowledgment._id;
-  }
+  },
+});
 
-  // Create new acknowledgment
-  return await createDashboardAlertAcknowledgment(ctx, {
-    userId,
-    alertId,
-  });
-}
+export const updateDashboardAlertAcknowledgment = mutation({
+  args: { input: dashboardValidators.updateAlertAcknowledgmentInput },
+  handler: async (ctx, { input }): Promise<void> => {
+    const acknowledgment = await findDashboardAlertAcknowledgmentForMutation(ctx, input.publicId);
+    await assertCanUpdateDashboardAlertAcknowledgment(ctx, acknowledgment);
 
-/**
- * Unacknowledge an alert (soft delete acknowledgment)
- */
-export async function unacknowledgeAlert(
-  ctx: MutationCtx,
-  userId: string,
-  alertId: string
-): Promise<void> {
-  // Get the acknowledgment
-  const acknowledgment = await getDashboardAlertAcknowledgmentByUserAndAlert(
-    ctx,
-    userId,
-    alertId
-  );
+    const updates: Partial<DashboardAlertAcknowledgmentDoc> = {};
 
-  if (!acknowledgment) {
-    // Nothing to unacknowledge
-    return;
-  }
+    if (input.acknowledgedAt !== undefined) {
+      updates.acknowledgedAt = input.acknowledgedAt;
+    }
 
-  // Soft delete the acknowledgment
-  await deleteDashboardAlertAcknowledgment(ctx, acknowledgment.publicId);
-}
+    await ctx.db.patch(
+      acknowledgment._id,
+      buildUpdatePayload(acknowledgment, updates)
+    );
+  },
+});
 
-/**
- * Bulk acknowledge multiple alerts for a user
- */
-export async function acknowledgeAlerts(
-  ctx: MutationCtx,
-  userId: string,
-  alertIds: string[]
-): Promise<DashboardAlertAcknowledgmentId[]> {
-  const acknowledgmentIds: DashboardAlertAcknowledgmentId[] = [];
+export const deleteDashboardAlertAcknowledgment = mutation({
+  args: { publicId: v.string() },
+  handler: async (ctx, { publicId }): Promise<void> => {
+    const acknowledgment = await findDashboardAlertAcknowledgmentForMutation(ctx, publicId);
+    await assertCanDeleteDashboardAlertAcknowledgment(ctx, acknowledgment);
 
-  for (const alertId of alertIds) {
-    const acknowledgmentId = await acknowledgeAlert(ctx, userId, alertId);
-    acknowledgmentIds.push(acknowledgmentId);
-  }
+    await ctx.db.patch(
+      acknowledgment._id,
+      buildUpdatePayload(acknowledgment, { deletedAt: Date.now() })
+    );
+  },
+});
 
-  return acknowledgmentIds;
-}
+export const restoreDashboardAlertAcknowledgment = mutation({
+  args: { publicId: v.string() },
+  handler: async (ctx, { publicId }): Promise<void> => {
+    const acknowledgment = await findDashboardAlertAcknowledgmentForMutation(ctx, publicId);
+    await assertCanUpdateDashboardAlertAcknowledgment(ctx, acknowledgment);
 
-/**
- * Bulk unacknowledge multiple alerts for a user
- */
-export async function unacknowledgeAlerts(
-  ctx: MutationCtx,
-  userId: string,
-  alertIds: string[]
-): Promise<void> {
-  for (const alertId of alertIds) {
-    await unacknowledgeAlert(ctx, userId, alertId);
-  }
-}
+    await ctx.db.patch(
+      acknowledgment._id,
+      buildUpdatePayload(acknowledgment, { deletedAt: undefined })
+    );
+  },
+});
+
+export const acknowledgeAlert = mutation({
+  args: {
+    userId: userProfileIdSchema,
+    alertId: v.string(),
+  },
+  handler: async (ctx, { userId, alertId }): Promise<DashboardAlertAcknowledgmentId> => {
+    const normalizedAlertId = assertValidAlertId(alertId);
+    const validatedUserId = await assertCanCreateDashboardAlertAcknowledgment(ctx, userId);
+
+    const existingAcknowledgment = await findActiveAcknowledgmentByUserAndAlert(
+      ctx,
+      validatedUserId,
+      normalizedAlertId
+    );
+
+    if (existingAcknowledgment) {
+      await updateDashboardAlertAcknowledgment.handler(ctx, {
+        input: {
+          publicId: existingAcknowledgment.publicId,
+          acknowledgedAt: Date.now(),
+        },
+      });
+
+      return existingAcknowledgment._id;
+    }
+
+    return createDashboardAlertAcknowledgment.handler(ctx, {
+      input: {
+        userId: validatedUserId,
+        alertId: normalizedAlertId,
+      } satisfies CreateDashboardAlertAcknowledgmentInput,
+    });
+  },
+});
+
+export const unacknowledgeAlert = mutation({
+  args: {
+    userId: userProfileIdSchema,
+    alertId: v.string(),
+  },
+  handler: async (ctx, { userId, alertId }): Promise<void> => {
+    const normalizedAlertId = assertValidAlertId(alertId);
+    const validatedUserId = await assertCanCreateDashboardAlertAcknowledgment(ctx, userId);
+    const acknowledgment = await findActiveAcknowledgmentByUserAndAlert(
+      ctx,
+      validatedUserId,
+      normalizedAlertId
+    );
+
+    if (!acknowledgment) {
+      return;
+    }
+
+    await deleteDashboardAlertAcknowledgment.handler(ctx, {
+      publicId: acknowledgment.publicId,
+    });
+  },
+});
+
+export const acknowledgeAlerts = mutation({
+  args: {
+    userId: userProfileIdSchema,
+    alertIds: v.array(v.string()),
+  },
+  handler: async (ctx, { userId, alertIds }) => {
+    const acknowledgmentIds: DashboardAlertAcknowledgmentId[] = [];
+
+    for (const alertId of alertIds) {
+      const acknowledgmentId = await acknowledgeAlert.handler(ctx, {
+        userId,
+        alertId,
+      });
+      acknowledgmentIds.push(acknowledgmentId);
+    }
+
+    return acknowledgmentIds;
+  },
+});
+
+export const unacknowledgeAlerts = mutation({
+  args: {
+    userId: userProfileIdSchema,
+    alertIds: v.array(v.string()),
+  },
+  handler: async (ctx, { userId, alertIds }) => {
+    for (const alertId of alertIds) {
+      await unacknowledgeAlert.handler(ctx, {
+        userId,
+        alertId,
+      });
+    }
+  },
+});

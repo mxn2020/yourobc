@@ -6,6 +6,10 @@
  */
 
 import { Doc, Id } from '@/generated/dataModel';
+import type {
+  CreateDashboardAlertAcknowledgmentInput as SchemaCreateDashboardAlertAcknowledgmentInput,
+  UpdateDashboardAlertAcknowledgmentInput as SchemaUpdateDashboardAlertAcknowledgmentInput,
+} from '@/schema/yourobc/dashboard';
 
 /**
  * Dashboard Alert Acknowledgment Document Type
@@ -17,29 +21,25 @@ export type DashboardAlertAcknowledgmentDoc = Doc<'dashboardAlertAcknowledgments
  */
 export type DashboardAlertAcknowledgmentId = Id<'dashboardAlertAcknowledgments'>;
 
+export type DashboardAlertAcknowledgmentUserId = Id<'userProfiles'>;
+
 /**
  * Create Dashboard Alert Acknowledgment Input
  */
-export interface CreateDashboardAlertAcknowledgmentInput {
-  userId: string;
-  alertId: string;
-}
+export type CreateDashboardAlertAcknowledgmentInput = SchemaCreateDashboardAlertAcknowledgmentInput;
 
 /**
  * Update Dashboard Alert Acknowledgment Input
  */
-export interface UpdateDashboardAlertAcknowledgmentInput {
-  publicId: string;
-  acknowledgedAt?: number;
-}
+export type UpdateDashboardAlertAcknowledgmentInput = SchemaUpdateDashboardAlertAcknowledgmentInput;
 
 /**
  * Dashboard Alert Acknowledgment Query Options
  */
 export interface DashboardAlertAcknowledgmentQueryOptions {
-  userId?: string;
+  userId?: DashboardAlertAcknowledgmentUserId;
   alertId?: string;
-  ownerId?: string;
+  ownerId?: DashboardAlertAcknowledgmentUserId;
   includeDeleted?: boolean;
 }
 
