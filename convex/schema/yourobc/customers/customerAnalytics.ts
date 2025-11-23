@@ -1,11 +1,10 @@
-// convex/schema/yourobc/customerMargins/customerAnalytics.ts
+// convex/schema/yourobc/customers/customerAnalytics.ts
 // Table definitions for customerAnalytics module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 import { customerMarginsFields } from './validators';
-import { customerIdSchema } from '../customers/schemas';
 
 export const customerAnalyticsTable = defineTable({
   // Required: Core fields
@@ -13,7 +12,7 @@ export const customerAnalyticsTable = defineTable({
   ownerId: userProfileIdSchema,
 
   // Identity
-  customerId: customerIdSchema,
+  customerId: v.id('yourobcCustomers'),
   
   // Time Period
   year: v.number(),

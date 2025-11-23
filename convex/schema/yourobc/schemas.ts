@@ -3,7 +3,6 @@
 // Core yourobc table imports
 import { yourobcAccountingSchemas } from './accounting/schemas';
 import { yourobcCouriersSchemas } from './couriers/schemas';
-import { yourobcCustomerMarginsSchemas } from './customerMargins/schemas';
 import { yourobcCustomersSchemas } from './customers/schemas';
 import { yourobcDashboardSchemas } from './dashboard/schemas';
 import { yourobcEmployeeCommissionsSchemas } from './employeeCommissions/schemas';
@@ -28,7 +27,6 @@ export const yourobcSchemas = {
 
   // Customers
   ...yourobcCustomersSchemas,
-  ...yourobcCustomerMarginsSchemas,
 
   // Dashboard
   ...yourobcDashboardSchemas,

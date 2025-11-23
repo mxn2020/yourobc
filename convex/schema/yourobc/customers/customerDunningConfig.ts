@@ -1,11 +1,10 @@
-// convex/schema/yourobc/customerMargins/customerDunningConfig.ts
+// convex/schema/yourobc/customers/customerDunningConfig.ts
 // Table definitions for customerDunningConfig module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 import { customerMarginsValidators } from './validators';
-import { customerIdSchema } from '../customers/schemas';
 
 export const customerDunningConfigTable = defineTable({
   // Required: Core fields
@@ -13,7 +12,7 @@ export const customerDunningConfigTable = defineTable({
   ownerId: userProfileIdSchema,
 
   // Identity
-  customerId: customerIdSchema,
+  customerId: v.id('yourobcCustomers'),
 
   // Dunning Level 1 (First Reminder)
   level1DaysOverdue: v.number(), // Default: 7 days

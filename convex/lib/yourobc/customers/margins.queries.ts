@@ -1,12 +1,12 @@
-// convex/lib/yourobc/customerMargins/queries.ts
+// convex/lib/yourobc/customers/margins.queries.ts
 // Read operations for customerMargins module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
-import { customerMarginsValidators } from '@/schema/yourobc/customerMargins/validators';
-import { filterCustomerMarginsByAccess, requireViewCustomerMarginAccess } from './permissions';
-import type { CustomerMarginListResponse } from './types';
+import { customerMarginsValidators } from '@/schema/yourobc/customers/validators';
+import { filterCustomerMarginsByAccess, requireViewCustomerMarginAccess } from './margins.permissions';
+import type { CustomerMarginListResponse } from './margins.types';
 
 /**
  * Get paginated list of customer margins with filtering

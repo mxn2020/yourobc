@@ -1,4 +1,4 @@
-// convex/lib/yourobc/customerMargins/types.ts
+// convex/lib/yourobc/customers/margins.types.ts
 // TypeScript type definitions for customerMargins module
 
 import type { Doc, Id } from '@/generated/dataModel';
@@ -7,7 +7,7 @@ import type {
   CustomerMarginsServiceType,
   CustomerMarginsType,
   CustomerMarginsApprovalStatus,
-} from '@/schema/yourobc/customerMargins/types';
+} from '@/schema/yourobc/customers/types';
 
 // Entity types
 export type CustomerMargin = Doc<'yourobcCustomerMargins'>;

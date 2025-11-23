@@ -1,8 +1,8 @@
-// convex/lib/yourobc/customerMargins/utils.ts
+// convex/lib/yourobc/customers/margins.utils.ts
 // Validation functions and utility helpers for customerMargins module
 
-import { CUSTOMER_MARGINS_CONSTANTS } from './constants';
-import type { CreateCustomerMarginData, UpdateCustomerMarginData } from './types';
+import { CUSTOMER_MARGINS_CONSTANTS } from './margins.constants';
+import type { CreateCustomerMarginData, UpdateCustomerMarginData } from './margins.types';
 
 /**
  * Validate customer margin data for creation/update

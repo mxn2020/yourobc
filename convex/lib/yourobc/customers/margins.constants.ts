@@ -1,4 +1,4 @@
-// convex/lib/yourobc/customerMargins/constants.ts
+// convex/lib/yourobc/customers/margins.constants.ts
 // Business constants, permissions, and limits for customerMargins module
 
 export const CUSTOMER_MARGINS_CONSTANTS = {

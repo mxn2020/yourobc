@@ -3,9 +3,11 @@
 
 // Constants
 export { CUSTOMERS_CONSTANTS } from './constants';
+export { CUSTOMER_MARGINS_CONSTANTS } from './margins.constants';
 
 // Types
 export type * from './types';
+export type * from './margins.types';
 
 // Utilities
 export {
@@ -17,6 +19,16 @@ export {
   calculateAverageMargin,
   calculateAveragePaymentTerms,
 } from './utils';
+export {
+  validateCustomerMarginData,
+  formatCustomerMarginDisplayName,
+  generateMarginId,
+  isCustomerMarginEditable,
+  isCustomerMarginActive,
+  calculateMarginAmount,
+  calculatePriceWithMargin,
+  getApplicableVolumeTier,
+} from './margins.utils';
 
 // Permissions
 export {
@@ -28,6 +40,17 @@ export {
   requireDeleteCustomerAccess,
   filterCustomersByAccess,
 } from './permissions';
+export {
+  canViewCustomerMargin,
+  canEditCustomerMargin,
+  canDeleteCustomerMargin,
+  canApproveCustomerMargin,
+  requireViewCustomerMarginAccess,
+  requireEditCustomerMarginAccess,
+  requireDeleteCustomerMarginAccess,
+  requireApproveCustomerMarginAccess,
+  filterCustomerMarginsByAccess,
+} from './margins.permissions';
 
 // Queries
 export {
@@ -36,6 +59,13 @@ export {
   getCustomerByPublicId,
   getCustomerStats,
 } from './queries';
+export {
+  getCustomerMargins,
+  getCustomerMargin,
+  getCustomerMarginByPublicId,
+  getCustomerMarginByMarginId,
+  getCustomerMarginStats,
+} from './margins.queries';
 
 // Mutations
 export {
@@ -47,3 +77,10 @@ export {
   bulkUpdateCustomers,
   bulkDeleteCustomers,
 } from './mutations';
+export {
+  createCustomerMargin,
+  updateCustomerMargin,
+  deleteCustomerMargin,
+  restoreCustomerMargin,
+  approveCustomerMargin,
+} from './margins.mutations';

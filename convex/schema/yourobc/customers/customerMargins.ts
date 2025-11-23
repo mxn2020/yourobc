@@ -1,14 +1,10 @@
-// convex/schema/yourobc/customerMargins/customerMargins.ts
+// convex/schema/yourobc/customers/customerMargins.ts
 // Table definitions for customerMargins module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, classificationFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
-import {
-  customerMarginsValidators,
-  customerMarginsFields
-} from './validators';
-import { customerIdSchema } from '../customers/schemas';
+import { customerMarginsValidators, customerMarginsFields } from './validators';
 
 export const customerMarginsTable = defineTable({
   // Required: Main display field
@@ -27,7 +23,7 @@ export const customerMarginsTable = defineTable({
   marginType: customerMarginsValidators.marginType,
 
   // Customer reference
-  customerId: customerIdSchema,
+  customerId: v.id('yourobcCustomers'),
   customerName: v.optional(v.string()),
 
   // Margin values
