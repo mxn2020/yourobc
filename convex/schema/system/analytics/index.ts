@@ -21,4 +21,12 @@ export type {
   ChartFormat,
   ColorScheme,
   LastSyncStatus,
+  AnalyticsDashboardWidget,
+  AnalyticsEventMappings,
+  AnalyticsEventProperties,
+  AnalyticsFilterGroup,
+  AnalyticsProviderConfig,
+  AnalyticsReportQuery,
+  AnalyticsReportResult,
+  AnalyticsReportSchedule,
 } from './types';
