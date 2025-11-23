@@ -9,26 +9,28 @@
  * @module convex/schema/yourobc/accounting/accountingDashboardCache
  */
 
-import { defineTable } from 'convex/server'
-import { v } from 'convex/values'
-import { currencyAmountSchema, auditFields, softDeleteFields } from '@/schema/base'
-import { accountingFields } from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, currencyAmountSchema, softDeleteFields } from '@/schema/base';
+import { accountingFields } from './validators';
 
 /**
  * Accounting Dashboard Cache Table
  * Pre-calculated metrics for dashboard performance (invalidates daily)
  */
 export const accountingDashboardCacheTable = defineTable({
-  // Identity fields
-  publicId: v.string(), // Unique public identifier (e.g., "ADC-2025-11-20")
-  ownerId: v.string(), // Organization owner
+  // Required: Main display field
+  publicId: v.string(),
+
+  // Required: Core fields
+  ownerId: v.id('userProfiles'),
 
   // Period
-  date: v.number(), // Date this cache is for (daily)
+  date: v.number(),
 
   // Receivables (money owed to us)
   totalReceivables: currencyAmountSchema,
-  currentReceivables: currencyAmountSchema, // Not overdue
+  currentReceivables: currencyAmountSchema,
   overdueReceivables: currencyAmountSchema,
   overdueBreakdown: v.object({
     overdue1to30: currencyAmountSchema,
@@ -62,14 +64,14 @@ export const accountingDashboardCacheTable = defineTable({
 
   // Cache control
   calculatedAt: v.number(),
-  validUntil: v.number(), // Cache expiry
+  validUntil: v.number(),
 
   // Audit & Soft Delete
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_publicId', ['publicId'])
-  .index('by_ownerId', ['ownerId'])
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_date', ['date'])
-  .index('by_ownerId_date', ['ownerId', 'date'])
-  .index('by_created', ['createdAt'])
+  .index('by_owner_date', ['ownerId', 'date'])
+  .index('by_created_at', ['createdAt']);

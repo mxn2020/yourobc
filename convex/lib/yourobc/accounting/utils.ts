@@ -114,6 +114,52 @@ export function validateAccountingEntryData(
 }
 
 /**
+ * Normalize accounting entry input data (trim strings, uppercase codes, remove empty tags)
+ */
+export function normalizeAccountingEntryData<
+  T extends Partial<CreateAccountingEntryData | UpdateAccountingEntryData>
+>(data: T): T {
+  const normalized: Partial<CreateAccountingEntryData & UpdateAccountingEntryData> = { ...data };
+
+  const trimIfString = (value?: string | null) =>
+    value !== undefined && value !== null ? value.trim() : value;
+
+  normalized.journalEntryNumber = trimIfString(data.journalEntryNumber) ?? undefined;
+  normalized.referenceNumber = trimIfString(data.referenceNumber) ?? undefined;
+  normalized.debitAccountId = trimIfString(data.debitAccountId) ?? undefined;
+  normalized.creditAccountId = trimIfString(data.creditAccountId) ?? undefined;
+  normalized.accountCode = trimIfString(data.accountCode) ?? undefined;
+  normalized.relatedExpenseId = trimIfString(data.relatedExpenseId) ?? undefined;
+  normalized.memo = trimIfString(data.memo) ?? undefined;
+  normalized.description = trimIfString(data.description) ?? undefined;
+  normalized.taxCategory = trimIfString(data.taxCategory) ?? undefined;
+  normalized.approvalNotes = trimIfString((data as UpdateAccountingEntryData).approvalNotes) ?? undefined;
+  normalized.rejectionReason = trimIfString((data as UpdateAccountingEntryData).rejectionReason) ?? undefined;
+  normalized.category = trimIfString(data.category) ?? undefined;
+
+  if (data.currency) {
+    normalized.currency = data.currency.toUpperCase();
+  }
+
+  if (data.tags) {
+    const trimmedTags = data.tags.map(tag => tag.trim()).filter(Boolean);
+    normalized.tags = trimmedTags;
+  }
+
+  if (data.attachments) {
+    normalized.attachments = data.attachments.map(attachment => ({
+      ...attachment,
+      id: attachment.id.trim(),
+      name: attachment.name.trim(),
+      url: attachment.url.trim(),
+      type: attachment.type.trim(),
+    }));
+  }
+
+  return normalized as T;
+}
+
+/**
  * Format accounting entry display name
  */
 export function formatAccountingEntryDisplayName(entry: { journalEntryNumber: string; status?: string }): string {

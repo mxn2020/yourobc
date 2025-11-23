@@ -9,19 +9,21 @@
  * @module convex/schema/yourobc/accounting/statementOfAccounts
  */
 
-import { defineTable } from 'convex/server'
-import { v } from 'convex/values'
-import { currencyAmountSchema, auditFields, softDeleteFields } from '@/schema/base'
-import { accountingValidators, accountingFields } from './validators'
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, currencyAmountSchema, softDeleteFields } from '@/schema/base';
+import { accountingFields, accountingValidators } from './validators';
 
 /**
  * Statement of Accounts Table
  * Per-customer account statements with transaction history
  */
 export const statementOfAccountsTable = defineTable({
-  // Identity fields
-  publicId: v.string(), // Unique public identifier (e.g., "SOA-2025-00001")
-  ownerId: v.string(), // Organization owner
+  // Required: Main display field
+  publicId: v.string(),
+
+  // Required: Core fields
+  ownerId: v.id('userProfiles'),
 
   // Customer reference
   customerId: v.id('yourobcCustomers'),
@@ -41,24 +43,22 @@ export const statementOfAccountsTable = defineTable({
   transactions: v.array(accountingFields.statementTransaction),
 
   // Outstanding invoices
-  outstandingInvoices: v.array(v.object({
-    ...accountingFields.outstandingInvoice.fields,
-  })),
+  outstandingInvoices: v.array(accountingFields.outstandingInvoice),
 
   // Export tracking
   exportedAt: v.optional(v.number()),
-  exportedBy: v.optional(v.string()),
+  exportedBy: v.optional(v.id('userProfiles')),
   exportFormat: v.optional(accountingValidators.exportFormat),
 
   // Audit & Soft Delete
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('by_publicId', ['publicId'])
-  .index('by_ownerId', ['ownerId'])
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_customer', ['customerId'])
-  .index('by_ownerId_customer', ['ownerId', 'customerId'])
+  .index('by_owner_customer', ['ownerId', 'customerId'])
   .index('by_period', ['startDate', 'endDate'])
-  .index('by_generatedDate', ['generatedDate'])
-  .index('by_created', ['createdAt'])
-  .index('by_deleted', ['deletedAt'])
+  .index('by_generated_date', ['generatedDate'])
+  .index('by_created_at', ['createdAt'])
+  .index('by_deleted_at', ['deletedAt']);
