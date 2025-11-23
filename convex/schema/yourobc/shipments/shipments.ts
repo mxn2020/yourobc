@@ -20,7 +20,7 @@ export const shipmentsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId - following yourobc pattern
+  ownerId: v.id('userProfiles'), // User who owns/manages this shipment record
 
   // Additional Identification
   awbNumber: v.optional(v.string()),

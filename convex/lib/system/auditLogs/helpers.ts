@@ -26,6 +26,52 @@ import { getCurrentUser } from '@/shared/auth.helper';
  * - logEntityCreation(ctx, 'website', websiteId, website.name)
  * - logEntityUpdate(ctx, 'user_profile', userId, user.displayName, oldData, newData)
  */
+/**
+ * Audit Log Metadata
+ *
+ * Flexible metadata object that captures operation-specific details.
+ * The index signature allows additional operation-specific fields beyond the standard ones.
+ *
+ * STANDARD FIELDS:
+ * - operation: Type of operation ('create', 'update', 'delete', 'reset', 'soft_delete', etc.)
+ * - oldValues: Previous state before the operation (for change tracking)
+ * - newValues: New state after the operation (for change tracking)
+ * - source: Origin of the action ('web', 'api', 'system', 'webhook')
+ * - ipAddress: IP address of the requester
+ * - userAgent: Browser user agent string
+ * - impersonatedBy: Admin email if an admin is impersonating a user
+ * - batchId: ID for grouping related bulk operations
+ * - affectedCount: Number of items affected in bulk operations
+ * - errorDetails: Error information (code, message, stack)
+ *
+ * OPERATION-SPECIFIC FIELDS (via index signature):
+ * - changedFields: Array of field names that were changed
+ * - settingKey: Name of a specific setting being updated
+ * - oldValue/newValue: Previous and new value for single field updates
+ * - testDetails: Details about a test operation (provider, success, error)
+ * - deletedSettings: Snapshot of settings being deleted
+ * - deletedPreferences: Snapshot of preferences being deleted
+ * - And any other operation-specific context
+ */
+export interface AuditLogMetadata {
+  operation?: string;
+  oldValues?: Record<string, any>;
+  newValues?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+  source?: 'web' | 'api' | 'system' | 'webhook';
+  impersonatedBy?: string;
+  batchId?: string;
+  affectedCount?: number;
+  errorDetails?: {
+    code?: string;
+    message?: string;
+    stack?: string;
+  };
+  // Allow operation-specific metadata fields
+  [key: string]: any;
+}
+
 export interface CreateAuditLogData {
   action: string;
   entityType: string;
@@ -44,14 +90,7 @@ export interface CreateAuditLogData {
    */
   entityTitle?: string;
   description: string;
-  metadata?: {
-    source?: string;
-    operation?: string;
-    oldValues?: Record<string, any>;
-    newValues?: Record<string, any>;
-    ipAddress?: string;
-    userAgent?: string;
-  };
+  metadata?: AuditLogMetadata;
 }
 
 export async function createAuditLog(

@@ -3,6 +3,6 @@
 
 import { notificationsTable } from './notifications';
 
-export const systemSystemNotificationsSchemas = {
+export const systemNotificationsSchemas = {
   notifications: notificationsTable,
 };

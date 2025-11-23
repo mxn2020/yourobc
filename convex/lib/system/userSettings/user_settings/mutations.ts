@@ -1,9 +1,10 @@
-// convex/lib/system/user_settings/user_settings/mutations.ts
+// convex/lib/system/userSettings/user_settings/mutations.ts
 // Write operations for user settings module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { userSettingsValidators } from '@/schema/system/userSettings/user_settings/validators';
 import {
   getDefaultUserSettings,
@@ -12,6 +13,7 @@ import {
   generateUserSettingsDisplayName,
 } from './utils';
 import { USER_SETTINGS_CONSTANTS } from './constants';
+import type { UpdateUserSettingsData, UserSettingsId } from './types';
 
 /**
  * Update user settings
@@ -47,13 +49,17 @@ export const updateUserSettings = mutation({
     const existing = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const now = Date.now();
 
     // 5. Prepare update data, excluding undefined values
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
+    const updateData: Partial<UpdateUserSettingsData> & { updatedAt: number; updatedBy: typeof user._id; version?: number } = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
     if (trimmedArgs.theme !== undefined) updateData.theme = trimmedArgs.theme;
     if (trimmedArgs.language !== undefined) updateData.language = trimmedArgs.language;
     if (trimmedArgs.timezone !== undefined) updateData.timezone = trimmedArgs.timezone;
@@ -62,7 +68,7 @@ export const updateUserSettings = mutation({
     if (trimmedArgs.notificationPreferences !== undefined) updateData.notificationPreferences = trimmedArgs.notificationPreferences;
     if (trimmedArgs.dashboardPreferences !== undefined) updateData.dashboardPreferences = trimmedArgs.dashboardPreferences;
 
-    let settingsId: any;
+    let settingsId: UserSettingsId;
 
     if (existing) {
       // 6. Update existing settings
@@ -96,8 +102,22 @@ export const updateUserSettings = mutation({
       entityId: settingsId,
       description: 'Updated user settings',
       metadata: {
-        updates: trimmedArgs,
         operation: existing ? 'update' : 'create',
+        ...(existing && {
+          oldValues: {
+            theme: existing.theme,
+            language: existing.language,
+            timezone: existing.timezone,
+            dateFormat: existing.dateFormat,
+          },
+          newValues: {
+            theme: updateData.theme ?? existing.theme,
+            language: updateData.language ?? existing.language,
+            timezone: updateData.timezone ?? existing.timezone,
+            dateFormat: updateData.dateFormat ?? existing.dateFormat,
+          },
+        }),
+        changedFields: Object.keys(trimmedArgs),
       },
       createdAt: now,
     });
@@ -123,7 +143,7 @@ export const resetUserSettings = mutation({
     const existing = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const defaults = getDefaultUserSettings();
@@ -151,6 +171,18 @@ export const resetUserSettings = mutation({
         description: 'Reset user settings to defaults',
         metadata: {
           operation: 'reset',
+          oldValues: {
+            theme: existing.theme,
+            language: existing.language,
+            timezone: existing.timezone,
+            dateFormat: existing.dateFormat,
+          },
+          newValues: {
+            theme: defaults.theme,
+            language: defaults.language,
+            timezone: defaults.timezone,
+            dateFormat: defaults.dateFormat,
+          },
         },
         createdAt: now,
       });
@@ -196,12 +228,22 @@ export const resetUserSettings = mutation({
  * Update a single user setting by key
  * Authentication: Required
  * Authorization: Users can only update their own settings
+ * Validation: Applied with type checking
  * Audit Log: Created for update
  */
 export const updateUserSetting = mutation({
   args: {
     key: v.string(),
-    value: v.any(),
+    value: v.union(
+      v.string(),
+      v.number(),
+      v.boolean(),
+      v.null(),
+      userSettingsValidators.theme,
+      userSettingsValidators.layoutPreferences,
+      userSettingsValidators.notificationPreferences,
+      userSettingsValidators.dashboardPreferences
+    ),
   },
   handler: async (ctx, { key, value }) => {
     // 1. Authentication
@@ -211,22 +253,27 @@ export const updateUserSetting = mutation({
     const existing = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const now = Date.now();
 
-    // 3. Prepare update data
-    const updateData: any = {
+    // 3. Prepare update data with proper typing
+    const updateData: Partial<UpdateUserSettingsData> & {
+      updatedAt: number;
+      updatedBy: typeof user._id;
+      version?: number;
+    } & Record<string, any> = {
       updatedAt: now,
       updatedBy: user._id,
-      [key]: value
+      [key]: value,
     };
 
     if (existing) {
       // 4. Update existing settings
       updateData.version = existing.version + 1;
-      await ctx.db.patch(existing._id, updateData);
+      const settingsId = existing._id;
+      await ctx.db.patch(settingsId, updateData);
 
       // 5. Create audit log
       await ctx.db.insert('auditLogs', {
@@ -234,17 +281,18 @@ export const updateUserSetting = mutation({
         userName: user.name || user.email || 'Unknown User',
         action: 'user.setting_updated',
         entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-        entityId: existing._id,
+        entityId: settingsId,
         description: `Updated user setting: ${key}`,
         metadata: {
-          key,
-          value,
           operation: 'update',
+          settingKey: key,
+          oldValue: (existing as Record<string, any>)[key],
+          newValue: value,
         },
         createdAt: now,
       });
 
-      return existing._id;
+      return settingsId;
     } else {
       // 4. Create new settings
       const defaults = getDefaultUserSettings();
@@ -271,9 +319,9 @@ export const updateUserSetting = mutation({
         entityId: settingsId,
         description: `Created and set user setting: ${key}`,
         metadata: {
-          key,
-          value,
           operation: 'create',
+          settingKey: key,
+          newValue: value,
         },
         createdAt: now,
       });
@@ -299,7 +347,7 @@ export const deleteUserSettings = mutation({
     const existing = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     if (!existing) {
@@ -309,7 +357,8 @@ export const deleteUserSettings = mutation({
     const now = Date.now();
 
     // 3. Soft delete (set deletedAt and deletedBy)
-    await ctx.db.patch(existing._id, {
+    const settingsId = existing._id;
+    await ctx.db.patch(settingsId, {
       deletedAt: now,
       deletedBy: user._id,
       updatedAt: now,
@@ -322,14 +371,19 @@ export const deleteUserSettings = mutation({
       userName: user.name || user.email || 'Unknown User',
       action: 'user.settings_deleted',
       entityType: USER_SETTINGS_CONSTANTS.ENTITY_TYPE,
-      entityId: existing._id,
+      entityId: settingsId,
       description: 'Deleted user settings',
       metadata: {
         operation: 'soft_delete',
+        deletedSettings: {
+          theme: existing.theme,
+          language: existing.language,
+          timezone: existing.timezone,
+        },
       },
       createdAt: now,
     });
 
-    return existing._id;
+    return settingsId;
   },
 });

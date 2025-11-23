@@ -6,8 +6,8 @@ import { auditFields, softDeleteFields } from '@/schema/base';
 import { notificationsValidators } from './validators';
 
 export const notificationsTable = defineTable({
-  // User receiving the notification
-  userId: notificationsValidators.userId,
+  // User who owns/receives this notification
+  ownerId: notificationsValidators.ownerId,
 
   // Notification type and content
   type: notificationsValidators.type,
@@ -30,9 +30,9 @@ export const notificationsTable = defineTable({
   ...softDeleteFields,
 })
   // Required indexes
-  .index('by_user', ['userId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
-  .index('by_user_read', ['userId', 'isRead'])
+  .index('by_owner_and_read', ['ownerId', 'isRead'])
   .index('by_created_at', ['createdAt']);

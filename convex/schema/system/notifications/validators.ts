@@ -9,8 +9,8 @@ export const notificationsValidators = {
   // Notification type
   type: statusTypes.notificationType,
 
-  // User receiving the notification
-  userId: v.id('userProfiles'),
+  // User who owns/receives this notification
+  ownerId: v.id('userProfiles'),
 
   // Notification content
   title: v.string(),

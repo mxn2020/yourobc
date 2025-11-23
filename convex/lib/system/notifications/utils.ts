@@ -60,14 +60,14 @@ export function validateCreateNotificationData(data: Partial<CreateNotificationD
  * Check if user can read notification
  */
 export function canReadNotification(userId: string, notification: Notification): boolean {
-  return notification.userId === userId;
+  return notification.ownerId === userId;
 }
 
 /**
  * Check if user can delete notification
  */
 export function canDeleteNotification(userId: string, notification: Notification): boolean {
-  return notification.userId === userId;
+  return notification.ownerId === userId;
 }
 
 /**

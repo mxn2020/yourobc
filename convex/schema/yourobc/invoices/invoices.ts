@@ -16,7 +16,7 @@ export const invoicesTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId - user who owns/manages this invoice
+  ownerId: v.id('userProfiles'), // User who owns/manages this invoice
 
   // Invoice identification
   externalInvoiceNumber: v.optional(v.string()),

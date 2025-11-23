@@ -14,14 +14,14 @@ import { baseValidators } from '@/schema/base.validators';
 export const analyticsEventsTable = defineTable({
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // Account/workspace owner (resource owner)
 
   // Event Identity
   eventName: v.string(), // 'page_view', 'button_click', 'ai_request', etc.
   eventType: analyticsValidators.eventType,
 
   // User Context
-  userId: v.optional(v.id('userProfiles')),
+  userId: v.optional(v.id('userProfiles')), // The user who performed the tracked action (actor)
   sessionId: v.string(),
   anonymousId: v.optional(v.string()), // For non-logged-in users
 
@@ -144,7 +144,7 @@ export const analyticsEventsTable = defineTable({
 export const analyticsMetricsTable = defineTable({
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // Account/workspace owner (resource owner)
 
   // Metric Identity
   metricType: v.string(), // 'daily_active_users', 'ai_requests_count', etc.
@@ -189,7 +189,7 @@ export const analyticsDashboardsTable = defineTable({
   // Required: Core fields
   publicId: v.string(),
   slug: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // User who owns this dashboard
   ownerName: v.string(),
 
   // Dashboard information
@@ -330,7 +330,7 @@ export const analyticsReportsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // User who owns this report
   status: v.union(v.literal('active'), v.literal('archived'), v.literal('scheduled')),
 
   // Report information
@@ -416,7 +416,7 @@ export const analyticsProviderSyncTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // User who configured this provider sync
   ownerName: v.string(),
   status: v.union(v.literal('active'), v.literal('inactive'), v.literal('error')),
 

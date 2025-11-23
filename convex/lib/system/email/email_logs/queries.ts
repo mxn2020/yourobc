@@ -39,7 +39,7 @@ export const getEmailLogs = query({
       if (args.deliveryStatus) {
         return ctx.db
           .query('emailLogs')
-          .withIndex('by_delivery_status', q => q.eq('deliveryStatus', args.deliveryStatus!));
+          .withIndex('by_delivery_status', q => q.eq('deliveryStatus', args.deliveryStatus!))
       }
       if (args.context) {
         return ctx.db

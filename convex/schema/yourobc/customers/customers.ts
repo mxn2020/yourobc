@@ -17,7 +17,7 @@ export const customersTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.string(), // authUserId - following yourobc pattern
+  ownerId: v.id('userProfiles'), // User who owns/manages this customer record
 
   // Core Identity
   shortName: v.optional(v.string()),

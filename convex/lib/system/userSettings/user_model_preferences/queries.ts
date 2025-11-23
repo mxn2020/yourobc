@@ -1,10 +1,12 @@
-// convex/lib/system/user_settings/user_model_preferences/queries.ts
+// convex/lib/system/userSettings/user_model_preferences/queries.ts
 // Read operations for user model preferences module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { getCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { getDefaultModelPreferences } from './utils';
+import { getDefaultUserSettings } from '../user_settings/utils';
 import { USER_MODEL_PREFERENCES_CONSTANTS } from './constants';
 
 /**
@@ -24,7 +26,7 @@ export const getUserModelPreferences = query({
     const preferences = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     // 3. Return preferences or defaults
@@ -51,7 +53,7 @@ export const getDefaultModel = query({
     const preferences = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     if (!preferences) return undefined;
@@ -92,12 +94,12 @@ export const getCombinedUserPreferences = query({
       ctx.db
         .query('userSettings')
         .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
+        .filter(notDeleted)
         .unique(),
       ctx.db
         .query('userModelPreferences')
         .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-        .filter((q) => q.eq(q.field('deletedAt'), undefined))
+        .filter(notDeleted)
         .unique()
     ]);
 
@@ -127,7 +129,7 @@ export const getModelPreferencesByPublicId = query({
     const preferences = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     // 3. Authorization check
@@ -138,6 +140,3 @@ export const getModelPreferencesByPublicId = query({
     return preferences;
   },
 });
-
-// Import getDefaultUserSettings for combined query
-import { getDefaultUserSettings } from '../user_settings/utils';

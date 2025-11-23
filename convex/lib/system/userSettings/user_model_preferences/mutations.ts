@@ -4,6 +4,7 @@
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { userModelPreferencesValidators } from '@/schema/system/userSettings/user_model_preferences/validators';
 import {
   getDefaultModelPreferences,
@@ -12,6 +13,7 @@ import {
   generateModelPreferencesDisplayName,
 } from './utils';
 import { USER_MODEL_PREFERENCES_CONSTANTS } from './constants';
+import type { UpdateModelPreferencesData } from './types';
 
 /**
  * Update user model preferences
@@ -49,13 +51,21 @@ export const updateUserModelPreferences = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const now = Date.now();
 
     // 5. Prepare update data, excluding undefined values
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
+    const updateData: Partial<UpdateModelPreferencesData> & {
+      updatedAt: number;
+      updatedBy: typeof user._id;
+      version?: number;
+    } = {
+      updatedAt: now,
+      updatedBy: user._id,
+    };
+
     if (trimmedArgs.defaultLanguageModel !== undefined) updateData.defaultLanguageModel = trimmedArgs.defaultLanguageModel;
     if (trimmedArgs.defaultEmbeddingModel !== undefined) updateData.defaultEmbeddingModel = trimmedArgs.defaultEmbeddingModel;
     if (trimmedArgs.defaultImageModel !== undefined) updateData.defaultImageModel = trimmedArgs.defaultImageModel;
@@ -66,7 +76,7 @@ export const updateUserModelPreferences = mutation({
     if (trimmedArgs.sortPreference !== undefined) updateData.sortPreference = trimmedArgs.sortPreference;
     if (trimmedArgs.testingDefaults !== undefined) updateData.testingDefaults = trimmedArgs.testingDefaults;
 
-    let preferencesId: any;
+    let preferencesId: string;
 
     if (existing) {
       // 6. Update existing preferences
@@ -100,8 +110,20 @@ export const updateUserModelPreferences = mutation({
       entityId: preferencesId,
       description: 'Updated user model preferences',
       metadata: {
-        updates: trimmedArgs,
         operation: existing ? 'update' : 'create',
+        ...(existing && {
+          oldValues: {
+            preferredView: existing.preferredView,
+            defaultLanguageModel: existing.defaultLanguageModel,
+            defaultEmbeddingModel: existing.defaultEmbeddingModel,
+          },
+          newValues: {
+            preferredView: updateData.preferredView ?? existing.preferredView,
+            defaultLanguageModel: updateData.defaultLanguageModel ?? existing.defaultLanguageModel,
+            defaultEmbeddingModel: updateData.defaultEmbeddingModel ?? existing.defaultEmbeddingModel,
+          },
+        }),
+        changedFields: Object.keys(trimmedArgs),
       },
       createdAt: now,
     });
@@ -134,11 +156,15 @@ export const setDefaultModel = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const now = Date.now();
-    const updateData: any = { updatedAt: now, updatedBy: user._id };
+    const updateData: Partial<UpdateModelPreferencesData> & {
+      updatedAt: number;
+      updatedBy: typeof user._id;
+      version?: number;
+    } = { updatedAt: now, updatedBy: user._id };
 
     // 4. Set default model based on type
     switch (trimmedModelType) {
@@ -158,7 +184,7 @@ export const setDefaultModel = mutation({
         throw new Error(`Invalid model type: ${trimmedModelType}`);
     }
 
-    let preferencesId: any;
+    let preferencesId: string;
 
     if (existing) {
       // 5. Update existing preferences
@@ -226,7 +252,7 @@ export const toggleFavoriteModel = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     // 4. Toggle favorite
@@ -243,7 +269,7 @@ export const toggleFavoriteModel = mutation({
     }
 
     const now = Date.now();
-    let preferencesId: any;
+    let preferencesId: string;
 
     if (existing) {
       // 6. Update existing preferences
@@ -283,9 +309,17 @@ export const toggleFavoriteModel = mutation({
       entityId: preferencesId,
       description: `${isFavorite ? 'Removed' : 'Added'} ${trimmedModelId} ${isFavorite ? 'from' : 'to'} favorites`,
       metadata: {
+        operation: existing ? 'update' : 'create',
         modelId: trimmedModelId,
         action: isFavorite ? 'remove' : 'add',
-        operation: existing ? 'update' : 'create',
+        ...(existing && {
+          oldValues: {
+            favoriteModels: existing.favoriteModels,
+          },
+          newValues: {
+            favoriteModels: newFavorites,
+          },
+        }),
       },
       createdAt: now,
     });
@@ -318,13 +352,17 @@ export const clearDefaultModel = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     if (!existing) return null;
 
     const now = Date.now();
-    const updateData: any = {
+    const updateData: Partial<UpdateModelPreferencesData> & {
+      updatedAt: number;
+      updatedBy: typeof user._id;
+      version: number;
+    } = {
       updatedAt: now,
       updatedBy: user._id,
       version: existing.version + 1,
@@ -350,6 +388,16 @@ export const clearDefaultModel = mutation({
     await ctx.db.patch(existing._id, updateData);
 
     // 5. Create audit log
+    const getModelFieldValue = (type: string) => {
+      switch (type) {
+        case 'language': return existing.defaultLanguageModel;
+        case 'embedding': return existing.defaultEmbeddingModel;
+        case 'image': return existing.defaultImageModel;
+        case 'multimodal': return existing.defaultMultimodalModel;
+        default: return undefined;
+      }
+    };
+
     await ctx.db.insert('auditLogs', {
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
@@ -358,8 +406,10 @@ export const clearDefaultModel = mutation({
       entityId: existing._id,
       description: `Cleared default ${modelType} model`,
       metadata: {
-        modelType,
         operation: 'clear',
+        modelType,
+        oldValue: getModelFieldValue(modelType),
+        newValue: null,
       },
       createdAt: now,
     });
@@ -384,7 +434,7 @@ export const resetUserModelPreferences = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     const defaults = getDefaultModelPreferences();
@@ -412,6 +462,16 @@ export const resetUserModelPreferences = mutation({
         description: 'Reset user model preferences to defaults',
         metadata: {
           operation: 'reset',
+          oldValues: {
+            preferredView: existing.preferredView,
+            defaultLanguageModel: existing.defaultLanguageModel,
+            defaultEmbeddingModel: existing.defaultEmbeddingModel,
+          },
+          newValues: {
+            preferredView: defaults.preferredView,
+            defaultLanguageModel: defaults.defaultLanguageModel,
+            defaultEmbeddingModel: defaults.defaultEmbeddingModel,
+          },
         },
         createdAt: now,
       });
@@ -469,7 +529,7 @@ export const deleteUserModelPreferences = mutation({
     const existing = await ctx.db
       .query('userModelPreferences')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     if (!existing) {
@@ -477,9 +537,10 @@ export const deleteUserModelPreferences = mutation({
     }
 
     const now = Date.now();
+    const preferencesId = existing._id;
 
     // 3. Soft delete (set deletedAt and deletedBy)
-    await ctx.db.patch(existing._id, {
+    await ctx.db.patch(preferencesId, {
       deletedAt: now,
       deletedBy: user._id,
       updatedAt: now,
@@ -492,14 +553,20 @@ export const deleteUserModelPreferences = mutation({
       userName: user.name || user.email || 'Unknown User',
       action: 'user.model_preferences_deleted',
       entityType: USER_MODEL_PREFERENCES_CONSTANTS.ENTITY_TYPE,
-      entityId: existing._id,
+      entityId: preferencesId,
       description: 'Deleted user model preferences',
       metadata: {
         operation: 'soft_delete',
+        deletedPreferences: {
+          preferredView: existing.preferredView,
+          defaultLanguageModel: existing.defaultLanguageModel,
+          defaultEmbeddingModel: existing.defaultEmbeddingModel,
+          favoriteModelsCount: existing.favoriteModels.length,
+        },
       },
       createdAt: now,
     });
 
-    return existing._id;
+    return preferencesId;
   },
 });

@@ -260,7 +260,20 @@ export const updateEmailConfig = mutation({
       entityId: configId,
       entityTitle: updateData.name || config.name,
       description: `Updated email configuration: ${updateData.name || config.name}`,
-      // metadata: { changes: updates },
+      metadata: {
+        operation: 'update_email_config',
+        oldValues: {
+          name: config.name,
+          status: config.status,
+          isActive: config.isActive,
+        },
+        newValues: {
+          name: updateData.name,
+          status: updateData.status,
+          isActive: updateData.isActive,
+        },
+        changedFields: Object.keys(updates),
+      },
     });
 
     // 8. RETURN: Config ID
@@ -383,9 +396,20 @@ export const updateTestStatus = mutation({
       description: `Email configuration test ${success ? 'succeeded' : 'failed'}: ${config.name}`,
       metadata: {
         operation: 'test_email_config',
-        provider: config.provider,
-        success,
-        error: trimmedError,
+        oldValues: {
+          isVerified: config.isVerified,
+          lastTestStatus: config.lastTestStatus,
+        },
+        newValues: {
+          isVerified: success,
+          lastTestStatus: success ? 'success' : 'failed',
+          lastTestError: trimmedError,
+        },
+        testDetails: {
+          provider: config.provider,
+          success,
+          error: trimmedError || null,
+        },
       },
     });
 

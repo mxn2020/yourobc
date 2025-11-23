@@ -16,7 +16,7 @@ import { entityTypes } from '@/config/entityTypes';
 export const createNotification = mutation({
   args: {
     data: v.object({
-      userId: v.id('userProfiles'),
+      ownerId: v.id('userProfiles'),
       type: vNotificationType(),
       title: v.string(),
       message: v.string(),
@@ -43,7 +43,7 @@ export const createNotification = mutation({
 
     // 4. Prepare notification data with trimmed strings
     const notificationData = {
-      userId: data.userId,
+      ownerId: data.ownerId,
       type: data.type,
       title: data.title.trim(),
       message: data.message.trim(),
@@ -106,7 +106,7 @@ export const markAsRead = mutation({
     }
 
     // Check ownership
-    if (notification.userId !== user._id) {
+    if (notification.ownerId !== user._id) {
       throw new Error('Access denied: Can only mark your own notifications as read');
     }
 
@@ -146,7 +146,7 @@ export const markAllAsRead = mutation({
 
     const unreadNotifications = await ctx.db
       .query('notifications')
-      .withIndex('by_user_read', (q) => q.eq('userId', user._id).eq('isRead', false))
+      .withIndex('by_owner_and_read', (q) => q.eq('ownerId', user._id).eq('isRead', false))
       .collect();
 
     const now = Date.now();

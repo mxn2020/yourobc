@@ -18,12 +18,12 @@ export const employeeSessionsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'), // User who created/owns this session record
 
-  // Employee References
-  employeeId: v.id('yourobcEmployees'),
-  userProfileId: v.id('userProfiles'),
-  authUserId: v.string(),
+  // Employee References (Multiple user references for different purposes)
+  employeeId: v.id('yourobcEmployees'), // The employee record this session belongs to
+  userProfileId: v.id('userProfiles'), // The Convex user profile for this employee
+  authUserId: v.string(), // External auth system ID (BetterAuth)
 
   // Session Times
   startTime: v.number(),

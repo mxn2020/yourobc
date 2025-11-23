@@ -32,7 +32,7 @@ export const auditLogsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'), // The user who performed the action
+  userId: v.id('userProfiles'), // The user who performed the action (actor)
 
   // User information (denormalized for history)
   userName: v.string(),
@@ -61,7 +61,7 @@ export const auditLogsTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_description', ['description'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_user_id', ['userId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

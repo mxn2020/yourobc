@@ -15,7 +15,7 @@ export function canViewNotification(notification: Notification, user: UserProfil
     return true;
   }
 
-  return notification.userId === user._id;
+  return notification.ownerId === user._id;
 }
 
 export function requireViewNotificationAccess(notification: Notification, user: UserProfile): void {
@@ -33,7 +33,7 @@ export function canMarkNotificationAsRead(notification: Notification, user: User
     return true;
   }
 
-  return notification.userId === user._id;
+  return notification.ownerId === user._id;
 }
 
 export function requireMarkNotificationAsReadAccess(notification: Notification, user: UserProfile): void {
@@ -51,7 +51,7 @@ export function canDeleteNotification(notification: Notification, user: UserProf
     return true;
   }
 
-  return notification.userId === user._id;
+  return notification.ownerId === user._id;
 }
 
 export function requireDeleteNotificationAccess(notification: Notification, user: UserProfile): void {

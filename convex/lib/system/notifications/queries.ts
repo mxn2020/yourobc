@@ -28,7 +28,7 @@ export const getNotifications = query({
     // ✅ Use indexed query for user's notifications
     let notificationQuery = ctx.db
       .query('notifications')
-      .withIndex('by_user', (q) => q.eq('userId', user._id));
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id));
 
     if (options.isRead !== undefined) {
       notificationQuery = notificationQuery.filter((q) =>
@@ -63,7 +63,7 @@ export const getUnreadCount = query({
 
     const unreadNotifications = await ctx.db
       .query('notifications')
-      .withIndex('by_user_read', (q) => q.eq('userId', user._id).eq('isRead', false))
+      .withIndex('by_owner_and_read', (q) => q.eq('ownerId', user._id).eq('isRead', false))
       .collect();
 
     return unreadNotifications.length;
@@ -89,7 +89,7 @@ export const getNotification = query({
     }
 
     // Check ownership
-    if (notification.userId !== user._id) {
+    if (notification.ownerId !== user._id) {
       throw new Error('Access denied: Can only access your own notifications');
     }
 

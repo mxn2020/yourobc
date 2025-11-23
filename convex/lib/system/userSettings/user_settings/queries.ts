@@ -1,9 +1,10 @@
-// convex/lib/system/user_settings/user_settings/queries.ts
+// convex/lib/system/userSettings/user_settings/queries.ts
 // Read operations for user settings module
 
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { getCurrentUser } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { getDefaultUserSettings } from './utils';
 
 /**
@@ -23,7 +24,7 @@ export const getUserSettings = query({
     const settings = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     // 3. Return settings or defaults
@@ -50,7 +51,7 @@ export const getUserSetting = query({
     const settings = await ctx.db
       .query('userSettings')
       .withIndex('by_user_id', (q) => q.eq('userId', user._id))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     if (!settings) return null;
@@ -79,7 +80,7 @@ export const getUserSettingsByPublicId = query({
     const settings = await ctx.db
       .query('userSettings')
       .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .unique();
 
     // 3. Authorization check

@@ -2,8 +2,8 @@
 
 // Core system table imports
 import { userProfilesTable } from './userProfiles/user_profiles'
-import { systemSystemAuditLogsSchemas } from './auditLogs/schemas'
-import { systemSystemNotificationsSchemas } from './notifications/schemas'
+import { systemAuditLogsSchemas } from './auditLogs/schemas'
+import { systemNotificationsSchemas } from './notifications/schemas'
 import { systemAppSettingsSchemas } from './appSettings/schemas'
 import { systemSystemSystemMetricsSchemas } from './systemMetrics/schemas'
 import { systemSystemAppThemeSettingsSchemas } from './appThemeSettings/schemas'
@@ -23,8 +23,8 @@ export const systemSchemas = {
   userModelPreferences: userModelPreferencesTable,
   
   // System
-  ...systemSystemAuditLogsSchemas,
-  ...systemSystemNotificationsSchemas,
+  ...systemAuditLogsSchemas,
+  ...systemNotificationsSchemas,
   ...systemAppSettingsSchemas,
   ...systemSystemSystemMetricsSchemas,
   ...systemSystemAppThemeSettingsSchemas,

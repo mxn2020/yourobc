@@ -13,7 +13,7 @@ export const emailLogsTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  userId: v.id('userProfiles'), // The user associated with this email log (for filtering)
 
   // Provider info
   provider: emailValidators.provider,
@@ -56,7 +56,7 @@ export const emailLogsTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_subject', ['subject'])
-  .index('by_owner_id', ['ownerId'])
+  .index('by_user_id', ['userId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

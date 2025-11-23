@@ -4,6 +4,7 @@
 import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { getCurrentUser, requireCurrentUser, requireAdmin } from '@/shared/auth.helper';
+import { notDeleted } from '@/shared/db.helper';
 import { USER_PROFILES_CONSTANTS } from './constants';
 import { hasPermission } from './utils';
 import { getPublicProfileView } from './permissions';
@@ -28,7 +29,7 @@ export const getUserProfile = query({
     // Direct O(1) lookup
     const profile = await ctx.db.get(targetUserId);
 
-    if (!profile) {
+    if (!profile || profile.deletedAt) {
       return null;
     }
 
@@ -80,6 +81,7 @@ export const getProfileByEmail = query({
     return await ctx.db
       .query('userProfiles')
       .withIndex('by_email', (q) => q.eq('email', email))
+      .filter(notDeleted)
       .first();
   },
 });
@@ -109,7 +111,8 @@ export const getAllProfiles = query({
 
     const { limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = options;
 
-    let profilesQuery = ctx.db.query('userProfiles');
+    let profilesQuery = ctx.db.query('userProfiles')
+      .filter(notDeleted);
 
     // Apply filters
     if (options.role) {
@@ -165,24 +168,28 @@ export const getProfileStats = query({
       profiles = await ctx.db
         .query('userProfiles')
         .withIndex('by_created_at', (q) => q.gte('createdAt', oneWeekAgo))
+        .filter(notDeleted)
         .take(10000);
     } else if (timeWindow === 'month') {
       const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
       profiles = await ctx.db
         .query('userProfiles')
         .withIndex('by_created_at', (q) => q.gte('createdAt', oneMonthAgo))
+        .filter(notDeleted)
         .take(10000);
     } else {
       // For 'all', get active users only to limit data
       profiles = await ctx.db
         .query('userProfiles')
         .withIndex('by_is_active', (q) => q.eq('isActive', true))
+        .filter(notDeleted)
         .take(10000);
 
       // Also get inactive users up to limit
       const inactiveProfiles = await ctx.db
         .query('userProfiles')
         .withIndex('by_is_active', (q) => q.eq('isActive', false))
+        .filter(notDeleted)
         .take(5000);
 
       profiles = [...profiles, ...inactiveProfiles];
@@ -229,6 +236,7 @@ export const searchUsers = query({
     const profiles = await ctx.db
       .query('userProfiles')
       .withIndex('by_is_active', (q) => q.eq('isActive', true))
+      .filter(notDeleted)
       .take(1000);
 
     const searchLower = searchTerm.toLowerCase();
