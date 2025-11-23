@@ -5,8 +5,8 @@
  * Helper functions for dashboard-related operations.
  */
 
-import { v } from 'convex/values';
 import { DashboardAlertAcknowledgmentDoc } from './types';
+import { normalizeAlertId } from './validation';
 
 /**
  * Generate a unique public ID for a dashboard alert acknowledgment
@@ -17,7 +17,7 @@ export function generateDashboardAlertAcknowledgmentPublicId(
 ): string {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 9);
-  return `ack_${userId.substring(0, 8)}_${alertId}_${timestamp}_${random}`;
+  return `ack_${userId.substring(0, 8)}_${normalizeAlertId(alertId)}_${timestamp}_${random}`;
 }
 
 /**
@@ -43,15 +43,6 @@ export function isAlertAcknowledgedByUser(
  */
 export function formatAcknowledgmentTimestamp(timestamp: number): string {
   return new Date(timestamp).toISOString();
-}
-
-/**
- * Validate alert ID format
- */
-export function isValidAlertId(alertId: string): boolean {
-  // Alert IDs should follow the pattern: alert-{category}-{description}
-  const alertIdPattern = /^alert-[a-z0-9-]+$/;
-  return alertIdPattern.test(alertId);
 }
 
 /**

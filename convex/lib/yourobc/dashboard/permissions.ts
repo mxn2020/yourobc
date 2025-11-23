@@ -5,118 +5,73 @@
  * Permission checking and authorization logic for dashboard operations.
  */
 
-import { QueryCtx, MutationCtx } from '../../../_generated/server';
-import { DashboardAlertAcknowledgmentDoc } from './types';
+import { MutationCtx, QueryCtx } from '../../../_generated/server';
+
 import { DASHBOARD_ERROR_MESSAGES } from './constants';
+import { DashboardAlertAcknowledgmentDoc, DashboardAlertAcknowledgmentUserId } from './types';
 
 /**
  * Check if user can create a dashboard alert acknowledgment
  */
-export async function canCreateDashboardAlertAcknowledgment(
+export async function requireDashboardUser(
   ctx: QueryCtx | MutationCtx,
-  userId: string
-): Promise<boolean> {
-  // Users can only create acknowledgments for themselves
-  // In a real implementation, you would check the authenticated user
-  return true;
+  expectedUserId?: DashboardAlertAcknowledgmentUserId
+): Promise<DashboardAlertAcknowledgmentUserId> {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) {
+    throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+  }
+
+  const authenticatedUserId = identity.subject as DashboardAlertAcknowledgmentUserId;
+
+  if (expectedUserId && authenticatedUserId !== expectedUserId) {
+    throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+  }
+
+  return authenticatedUserId;
 }
 
 /**
  * Check if user can read a dashboard alert acknowledgment
  */
-export async function canReadDashboardAlertAcknowledgment(
-  ctx: QueryCtx | MutationCtx,
+function canAccessAcknowledgment(
   acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
-): Promise<boolean> {
-  // Users can only read their own acknowledgments
-  if (userId && acknowledgment.userId !== userId && acknowledgment.ownerId !== userId) {
-    return false;
-  }
-  return true;
+  userId: DashboardAlertAcknowledgmentUserId
+): boolean {
+  return acknowledgment.userId === userId || acknowledgment.ownerId === userId;
 }
 
-/**
- * Check if user can update a dashboard alert acknowledgment
- */
-export async function canUpdateDashboardAlertAcknowledgment(
-  ctx: QueryCtx | MutationCtx,
-  acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
-): Promise<boolean> {
-  // Users can only update their own acknowledgments
-  if (userId && acknowledgment.userId !== userId && acknowledgment.ownerId !== userId) {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Check if user can delete a dashboard alert acknowledgment
- */
-export async function canDeleteDashboardAlertAcknowledgment(
-  ctx: QueryCtx | MutationCtx,
-  acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
-): Promise<boolean> {
-  // Users can only delete their own acknowledgments
-  if (userId && acknowledgment.userId !== userId && acknowledgment.ownerId !== userId) {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Assert user can create a dashboard alert acknowledgment
- */
 export async function assertCanCreateDashboardAlertAcknowledgment(
   ctx: QueryCtx | MutationCtx,
-  userId: string
-): Promise<void> {
-  const canCreate = await canCreateDashboardAlertAcknowledgment(ctx, userId);
-  if (!canCreate) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-  }
+  userId: DashboardAlertAcknowledgmentUserId
+): Promise<DashboardAlertAcknowledgmentUserId> {
+  return requireDashboardUser(ctx, userId);
 }
 
-/**
- * Assert user can read a dashboard alert acknowledgment
- */
 export async function assertCanReadDashboardAlertAcknowledgment(
   ctx: QueryCtx | MutationCtx,
-  acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
-): Promise<void> {
-  const canRead = await canReadDashboardAlertAcknowledgment(ctx, acknowledgment, userId);
-  if (!canRead) {
+  acknowledgment: DashboardAlertAcknowledgmentDoc
+): Promise<DashboardAlertAcknowledgmentUserId> {
+  const userId = await requireDashboardUser(ctx);
+
+  if (!canAccessAcknowledgment(acknowledgment, userId)) {
     throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
   }
+
+  return userId;
 }
 
-/**
- * Assert user can update a dashboard alert acknowledgment
- */
 export async function assertCanUpdateDashboardAlertAcknowledgment(
   ctx: QueryCtx | MutationCtx,
-  acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
+  acknowledgment: DashboardAlertAcknowledgmentDoc
 ): Promise<void> {
-  const canUpdate = await canUpdateDashboardAlertAcknowledgment(ctx, acknowledgment, userId);
-  if (!canUpdate) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-  }
+  await assertCanReadDashboardAlertAcknowledgment(ctx, acknowledgment);
 }
 
-/**
- * Assert user can delete a dashboard alert acknowledgment
- */
 export async function assertCanDeleteDashboardAlertAcknowledgment(
   ctx: QueryCtx | MutationCtx,
-  acknowledgment: DashboardAlertAcknowledgmentDoc,
-  userId?: string
+  acknowledgment: DashboardAlertAcknowledgmentDoc
 ): Promise<void> {
-  const canDelete = await canDeleteDashboardAlertAcknowledgment(ctx, acknowledgment, userId);
-  if (!canDelete) {
-    throw new Error(DASHBOARD_ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-  }
+  await assertCanReadDashboardAlertAcknowledgment(ctx, acknowledgment);
 }

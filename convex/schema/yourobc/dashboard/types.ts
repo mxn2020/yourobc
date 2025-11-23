@@ -7,6 +7,7 @@
  */
 
 import { Infer } from 'convex/values';
+
 import { dashboardFields, dashboardValidators } from './validators';
 
 /**
@@ -24,7 +25,7 @@ export type DashboardAlertAcknowledgment = Infer<
  * Input data required to create a new dashboard alert acknowledgment.
  */
 export type CreateDashboardAlertAcknowledgmentInput = Infer<
-  typeof dashboardValidators.createAlertAcknowledgment
+  typeof dashboardValidators.createAlertAcknowledgmentInput
 >;
 
 /**
@@ -33,5 +34,5 @@ export type CreateDashboardAlertAcknowledgmentInput = Infer<
  * Input data for updating an existing dashboard alert acknowledgment.
  */
 export type UpdateDashboardAlertAcknowledgmentInput = Infer<
-  typeof dashboardValidators.updateAlertAcknowledgment
+  typeof dashboardValidators.updateAlertAcknowledgmentInput
 >;
