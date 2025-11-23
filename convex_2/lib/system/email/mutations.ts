@@ -402,7 +402,7 @@ export const updateEmailStatus = mutation({
     // 3. Get email log by message ID
     const log = await ctx.db
       .query('emailLogs')
-      .withIndex('by_messageId', (q) => q.eq('messageId', trimmedMessageId))
+      .withIndex('by_message_id', (q) => q.eq('messageId', trimmedMessageId))
       .first();
 
     if (!log) {

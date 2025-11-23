@@ -6,42 +6,36 @@ import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { emailValidators } from '@/schema/system/email/validators';
 import { filterEmailConfigsByAccess, requireViewEmailConfigAccess } from './permissions';
+import { notDeleted } from '@/shared/db.helper';
 import type { EmailConfigListResponse } from './types';
 
 /**
  * Get the active email configuration
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getActiveConfig = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireCurrentUser(ctx);
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
-    const config = await ctx.db
+    return ctx.db
       .query('emailConfigs')
-      .withIndex('by_active', (q) => q.eq('isActive', true))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_active', q => q.eq('isActive', true))
+      .filter(notDeleted)
       .first();
-
-    return config;
   },
 });
 
 /**
- * Get paginated list of email configs with filtering
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
+ * Get paginated list of email configs with filtering (cursor based)
  */
 export const getEmailConfigs = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       provider: v.optional(v.array(emailValidators.provider)),
       status: v.optional(v.array(emailValidators.status)),
@@ -50,74 +44,79 @@ export const getEmailConfigs = query({
       search: v.optional(v.string()),
     })),
   },
-  handler: async (ctx, args): Promise<EmailConfigListResponse> => {
+  handler: async (ctx, args): Promise<EmailConfigListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
-    // Query all configs
-    let configs = await ctx.db
-      .query('emailConfigs')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+    const configsQuery = (() => {
+      if (filters.provider?.length === 1) {
+        return ctx.db
+          .query('emailConfigs')
+          .withIndex('by_provider', q => q.eq('provider', filters.provider![0]))
+          .filter(notDeleted);
+      }
 
-    // Apply provider filter
+      if (filters.status?.length === 1) {
+        return ctx.db
+          .query('emailConfigs')
+          .withIndex('by_status', q => q.eq('status', filters.status![0]))
+          .filter(notDeleted);
+      }
+
+      return ctx.db
+        .query('emailConfigs')
+        .filter(notDeleted);
+    })();
+
+    const page = await configsQuery
+      .order('desc')
+      .paginate({
+        numItems: limit,
+        cursor: cursor ?? null, // <-- fix #2
+      });
+
+    let configs = await filterEmailConfigsByAccess(ctx, page.page, user);
+
     if (filters.provider?.length) {
-      configs = configs.filter((config) =>
-        filters.provider!.includes(config.provider)
-      );
+      configs = configs.filter(c => filters.provider!.includes(c.provider));
     }
 
-    // Apply status filter
     if (filters.status?.length) {
-      configs = configs.filter((config) =>
-        filters.status!.includes(config.status)
-      );
+      configs = configs.filter(c => filters.status!.includes(c.status));
     }
 
-    // Apply isActive filter
     if (filters.isActive !== undefined) {
-      configs = configs.filter((config) => config.isActive === filters.isActive);
+      configs = configs.filter(c => c.isActive === filters.isActive);
     }
 
-    // Apply isVerified filter
     if (filters.isVerified !== undefined) {
-      configs = configs.filter((config) => config.isVerified === filters.isVerified);
+      configs = configs.filter(c => c.isVerified === filters.isVerified);
     }
 
-    // Apply search filter
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      configs = configs.filter((config) =>
-        config.name.toLowerCase().includes(term) ||
-        config.provider.toLowerCase().includes(term) ||
-        config.config.fromEmail.toLowerCase().includes(term)
+      configs = configs.filter(c =>
+        c.name.toLowerCase().includes(term) ||
+        c.provider.toLowerCase().includes(term) ||
+        c.config.fromEmail.toLowerCase().includes(term)
       );
     }
 
-    // Sort by created date descending
-    configs.sort((a, b) => b.createdAt - a.createdAt);
-
-    // Paginate
-    const total = configs.length;
-    const items = configs.slice(offset, offset + limit);
-
     return {
-      items,
-      total,
-      hasMore: total > offset + limit,
+      items: configs,
+      total: configs.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
 
 /**
  * Get single email config by ID
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getEmailConfig = query({
   args: {
@@ -132,15 +131,12 @@ export const getEmailConfig = query({
     }
 
     await requireViewEmailConfigAccess(ctx, config, user);
-
     return config;
   },
 });
 
 /**
  * Get email config by public ID
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getEmailConfigByPublicId = query({
   args: {
@@ -151,8 +147,8 @@ export const getEmailConfigByPublicId = query({
 
     const config = await ctx.db
       .query('emailConfigs')
-      .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(notDeleted)
       .first();
 
     if (!config) {
@@ -160,74 +156,63 @@ export const getEmailConfigByPublicId = query({
     }
 
     await requireViewEmailConfigAccess(ctx, config, user);
-
     return config;
   },
 });
 
 /**
  * Get configuration by provider
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getConfigByProvider = query({
-  args: {
-    provider: emailValidators.provider,
-  },
+  args: { provider: emailValidators.provider },
   handler: async (ctx, { provider }) => {
     const user = await requireCurrentUser(ctx);
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
-    const config = await ctx.db
+    return ctx.db
       .query('emailConfigs')
-      .withIndex('by_provider', (q) => q.eq('provider', provider))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_provider', q => q.eq('provider', provider))
+      .filter(notDeleted)
       .first();
-
-    return config;
   },
 });
 
 /**
  * Get email config statistics
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getEmailConfigStats = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireCurrentUser(ctx);
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
     const configs = await ctx.db
       .query('emailConfigs')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
     return {
       total: configs.length,
       byStatus: {
-        active: configs.filter((c) => c.status === 'active').length,
-        inactive: configs.filter((c) => c.status === 'inactive').length,
-        archived: configs.filter((c) => c.status === 'archived').length,
+        active: configs.filter(c => c.status === 'active').length,
+        inactive: configs.filter(c => c.status === 'inactive').length,
+        archived: configs.filter(c => c.status === 'archived').length,
       },
       byProvider: {
-        resend: configs.filter((c) => c.provider === 'resend').length,
-        sendgrid: configs.filter((c) => c.provider === 'sendgrid').length,
-        ses: configs.filter((c) => c.provider === 'ses').length,
-        postmark: configs.filter((c) => c.provider === 'postmark').length,
-        mailgun: configs.filter((c) => c.provider === 'mailgun').length,
+        resend: configs.filter(c => c.provider === 'resend').length,
+        sendgrid: configs.filter(c => c.provider === 'sendgrid').length,
+        ses: configs.filter(c => c.provider === 'ses').length,
+        postmark: configs.filter(c => c.provider === 'postmark').length,
+        mailgun: configs.filter(c => c.provider === 'mailgun').length,
       },
-      verified: configs.filter((c) => c.isVerified).length,
-      activeCount: configs.filter((c) => c.isActive).length,
+      verified: configs.filter(c => c.isVerified).length,
+      activeCount: configs.filter(c => c.isActive).length,
     };
   },
 });

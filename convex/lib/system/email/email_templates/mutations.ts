@@ -1,20 +1,20 @@
-// convex/lib/system/email/templates/mutations.ts
+// convex/lib/system/email/email_templates/mutations.ts
 // Write operations for email templates module
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { emailValidators } from '@/schema/system/email/validators';
+import { emailValidators, emailFields } from '@/schema/system/email/validators';
 import { EMAIL_TEMPLATES_CONSTANTS } from './constants';
-import { validateEmailTemplateData } from './utils';
+import { validateEmailTemplateData, trimEmailTemplateData } from './utils';
 import {
   requireCreateEmailTemplateAccess,
   requireEditEmailTemplateAccess,
   requireDeleteEmailTemplateAccess,
 } from './permissions';
 import type { EmailTemplateId } from './types';
-import { createAuditLog } from '../../audit_logs/helpers';
+import { createAuditLog } from '../../auditLogs/helpers';
 
 /**
  * Create or update email template
@@ -42,7 +42,7 @@ export const saveEmailTemplate = mutation({
     previewData: v.optional(v.any()),
     isActive: v.boolean(),
     category: v.optional(v.string()),
-    metadata: v.optional(v.any()),
+    metadata: v.optional(emailFields.templateMetadata),
   },
   handler: async (ctx, args): Promise<EmailTemplateId> => {
     // 1. AUTH: Get authenticated user
@@ -52,87 +52,80 @@ export const saveEmailTemplate = mutation({
     requireCreateEmailTemplateAccess(user);
 
     // 3. VALIDATE: Check data validity
-    const errors = validateEmailTemplateData(args);
+    const trimmedData = trimEmailTemplateData(args);
+    const errors = validateEmailTemplateData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Trim string fields
-    const trimmedName = args.name.trim();
-    const trimmedSlug = args.slug.trim();
-    const trimmedDescription = args.description?.trim();
-    const trimmedSubject = args.subject.trim();
-    const trimmedReactComponentPath = args.reactComponentPath?.trim();
-    const trimmedCategory = args.category?.trim();
-
-    // 5. CHECK: If template with this slug already exists
+    // 4. CHECK: If template with this slug already exists
     const existingTemplate = await ctx.db
       .query('emailTemplates')
-      .withIndex('by_slug', (q) => q.eq('slug', trimmedSlug))
+      .withIndex('by_slug', (q) => q.eq('slug', trimmedData.slug))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .first();
 
     const now = Date.now();
 
     if (existingTemplate) {
-      // 6a. UPDATE: Existing template
+      // 5a. UPDATE: Existing template
       await ctx.db.patch(existingTemplate._id, {
-        name: trimmedName,
-        description: trimmedDescription,
-        subject: trimmedSubject,
-        htmlTemplate: args.htmlTemplate,
-        textTemplate: args.textTemplate,
-        reactComponentPath: trimmedReactComponentPath,
+        name: trimmedData.name,
+        description: trimmedData.description,
+        subject: trimmedData.subject,
+        htmlTemplate: trimmedData.htmlTemplate,
+        textTemplate: trimmedData.textTemplate,
+        reactComponentPath: trimmedData.reactComponentPath,
         variables: args.variables,
         previewData: args.previewData,
         isActive: args.isActive,
-        category: trimmedCategory,
+        category: trimmedData.category,
         updatedAt: now,
         lastActivityAt: now,
         updatedBy: user._id,
       });
 
-      // 7a. AUDIT: Create audit log
+      // 6a. AUDIT: Create audit log
       await createAuditLog(ctx, {
         action: 'email_template.updated',
         entityType: 'system_email_template',
         entityId: existingTemplate._id,
-        entityTitle: trimmedName,
-        description: `Updated email template: ${trimmedName}`,
+        entityTitle: trimmedData.name,
+        description: `Updated email template: ${trimmedData.name}`,
         metadata: {
           operation: 'update_email_template',
-          newValues: trimmedCategory
+          newValues: trimmedData.category
             ? {
-                slug: trimmedSlug,
-                category: trimmedCategory,
+                slug: trimmedData.slug,
+                category: trimmedData.category,
               }
             : {
-                slug: trimmedSlug,
+                slug: trimmedData.slug,
               },
         },
       });
 
-      // 8a. RETURN: Template ID
+      // 7a. RETURN: Template ID
       return existingTemplate._id;
     } else {
-      // 6b. CREATE: Generate publicId and prepare data
+      // 5b. CREATE: Generate publicId and prepare data
       const publicId = await generateUniquePublicId(ctx, 'emailTemplates');
 
-      // 7b. CREATE: Insert new template
+      // 6b. CREATE: Insert new template
       const templateId = await ctx.db.insert('emailTemplates', {
         publicId,
-        name: trimmedName,
-        slug: trimmedSlug,
-        description: trimmedDescription,
-        subject: trimmedSubject,
-        htmlTemplate: args.htmlTemplate,
-        textTemplate: args.textTemplate,
-        reactComponentPath: trimmedReactComponentPath,
+        name: trimmedData.name,
+        slug: trimmedData.slug,
+        description: trimmedData.description,
+        subject: trimmedData.subject,
+        htmlTemplate: trimmedData.htmlTemplate,
+        textTemplate: trimmedData.textTemplate,
+        reactComponentPath: trimmedData.reactComponentPath,
         variables: args.variables,
         previewData: args.previewData,
         isActive: args.isActive,
         status: 'active',
-        category: trimmedCategory,
+        category: trimmedData.category,
         settings: {},
         ownerId: user._id,
         createdBy: user._id,
@@ -143,27 +136,27 @@ export const saveEmailTemplate = mutation({
         timesUsed: 0,
       });
 
-      // 8b. AUDIT: Create audit log
+      // 7b. AUDIT: Create audit log
       await createAuditLog(ctx, {
         action: 'email_template.created',
         entityType: 'system_email_template',
         entityId: templateId,
-        entityTitle: trimmedName,
-        description: `Created email template: ${trimmedName}`,
+        entityTitle: trimmedData.name,
+        description: `Created email template: ${trimmedData.name}`,
         metadata: {
           operation: 'create_email_template',
-          newValues: trimmedCategory
+          newValues: trimmedData.category
             ? {
-                slug: trimmedSlug,
-                category: trimmedCategory,
+                slug: trimmedData.slug,
+                category: trimmedData.category,
               }
             : {
-                slug: trimmedSlug,
+                slug: trimmedData.slug,
               },
         },
       });
 
-      // 9b. RETURN: Template ID
+      // 8b. RETURN: Template ID
       return templateId;
     }
   },
@@ -213,7 +206,8 @@ export const updateEmailTemplate = mutation({
     await requireEditEmailTemplateAccess(ctx, template, user);
 
     // 4. VALIDATE: Check update data validity
-    const errors = validateEmailTemplateData(updates);
+    const trimmedUpdates = trimEmailTemplateData(updates);
+    const errors = validateEmailTemplateData(trimmedUpdates);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -226,23 +220,23 @@ export const updateEmailTemplate = mutation({
       lastActivityAt: now,
     };
 
-    if (updates.name !== undefined) {
-      updateData.name = updates.name.trim();
+    if (trimmedUpdates.name !== undefined) {
+      updateData.name = trimmedUpdates.name;
     }
-    if (updates.description !== undefined) {
-      updateData.description = updates.description?.trim();
+    if (trimmedUpdates.description !== undefined) {
+      updateData.description = trimmedUpdates.description;
     }
-    if (updates.subject !== undefined) {
-      updateData.subject = updates.subject.trim();
+    if (trimmedUpdates.subject !== undefined) {
+      updateData.subject = trimmedUpdates.subject;
     }
-    if (updates.htmlTemplate !== undefined) {
-      updateData.htmlTemplate = updates.htmlTemplate;
+    if (trimmedUpdates.htmlTemplate !== undefined) {
+      updateData.htmlTemplate = trimmedUpdates.htmlTemplate;
     }
-    if (updates.textTemplate !== undefined) {
-      updateData.textTemplate = updates.textTemplate;
+    if (trimmedUpdates.textTemplate !== undefined) {
+      updateData.textTemplate = trimmedUpdates.textTemplate;
     }
-    if (updates.reactComponentPath !== undefined) {
-      updateData.reactComponentPath = updates.reactComponentPath?.trim();
+    if (trimmedUpdates.reactComponentPath !== undefined) {
+      updateData.reactComponentPath = trimmedUpdates.reactComponentPath;
     }
     if (updates.variables !== undefined) {
       updateData.variables = updates.variables;
@@ -253,8 +247,8 @@ export const updateEmailTemplate = mutation({
     if (updates.isActive !== undefined) {
       updateData.isActive = updates.isActive;
     }
-    if (updates.category !== undefined) {
-      updateData.category = updates.category?.trim();
+    if (trimmedUpdates.category !== undefined) {
+      updateData.category = trimmedUpdates.category;
     }
     if (updates.status !== undefined) {
       updateData.status = updates.status;
@@ -387,14 +381,17 @@ export const restoreEmailTemplate = mutation({
 
 /**
  * Increment template usage counter
- * 🔒 Authentication: Optional (can be called by system)
+ * 🔒 Authentication: Required
+ *
+ * Note: Currently requires authentication. If system-level tracking is needed
+ * without user context, create a separate internal mutation.
  */
 export const incrementTemplateUsage = mutation({
   args: {
     templateId: v.id('emailTemplates'),
   },
   handler: async (ctx, { templateId }) => {
-    // 1. AUTH: Optional - can be called by system
+    // 1. AUTH: Require authentication
     const user = await requireCurrentUser(ctx);
 
     // 2. CHECK: Get template
@@ -410,7 +407,7 @@ export const incrementTemplateUsage = mutation({
       timesUsed: (template.timesUsed || 0) + 1,
       lastUsedAt: now,
       updatedAt: now,
-      updatedBy: user?._id,
+      updatedBy: user._id,
     });
   },
 });

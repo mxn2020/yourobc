@@ -69,6 +69,34 @@ export function validateEmailConfigData(
 }
 
 /**
+ * Trim all string fields in email config data
+ */
+export function trimEmailConfigData<
+  T extends Partial<CreateEmailConfigData | UpdateEmailConfigData>
+>(data: T): T {
+  const trimmed = { ...data } as T;
+
+  // Trim main fields
+  if (data.name) trimmed.name = data.name.trim();
+
+  // Trim config object fields
+  if (data.config) {
+    trimmed.config = {
+      ...data.config,
+      apiKey: data.config.apiKey?.trim(),
+      apiSecret: data.config.apiSecret?.trim(),
+      domain: data.config.domain?.trim(),
+      region: data.config.region?.trim(),
+      fromEmail: data.config.fromEmail?.trim(),
+      fromName: data.config.fromName?.trim(),
+      replyToEmail: data.config.replyToEmail?.trim(),
+    };
+  }
+
+  return trimmed;
+}
+
+/**
  * Validate email address format
  */
 export function isValidEmail(email: string): boolean {

@@ -1,4 +1,4 @@
-// convex/lib/system/analytics/analytics/utils.ts
+// convex/lib/system/analytics/utils.ts
 // Utility functions for analytics module
 
 import { ANALYTICS_CONSTANTS } from './constants';
@@ -280,7 +280,7 @@ export function isSessionExpired(lastActivityTime: number): boolean {
 }
 
 /**
- * Sanitize event properties to remove sensitive data
+ * Sanitize and trim event properties to remove sensitive data and trim strings
  */
 export function sanitizeEventProperties(
   properties: Record<string, any>
@@ -299,8 +299,27 @@ export function sanitizeEventProperties(
 
   for (const key of Object.keys(sanitized)) {
     const lowerKey = key.toLowerCase();
+
+    // Check if sensitive data
     if (sensitiveKeys.some((sensitive) => lowerKey.includes(sensitive))) {
       sanitized[key] = '[REDACTED]';
+    }
+    // Trim string values
+    else if (typeof sanitized[key] === 'string') {
+      sanitized[key] = sanitized[key].trim();
+    }
+    // Recursively sanitize nested objects
+    else if (typeof sanitized[key] === 'object' && sanitized[key] !== null && !Array.isArray(sanitized[key])) {
+      sanitized[key] = sanitizeEventProperties(sanitized[key]);
+    }
+    // Trim strings in arrays
+    else if (Array.isArray(sanitized[key])) {
+      sanitized[key] = sanitized[key].map((item) => {
+        if (typeof item === 'string') {
+          return item.trim();
+        }
+        return item;
+      });
     }
   }
 
@@ -403,4 +422,41 @@ export function validateReportName(name: string): boolean {
  */
 export function generateAnalyticsPublicId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+}
+
+/**
+ * Validate dashboard slug format
+ * Rules: lowercase, hyphens only, 3-100 characters, no leading/trailing hyphens
+ */
+export function validateDashboardSlug(slug: string): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  const trimmed = slug.trim();
+
+  // Check length
+  if (trimmed.length < 3) {
+    errors.push('Slug must be at least 3 characters');
+  }
+  if (trimmed.length > 100) {
+    errors.push('Slug must not exceed 100 characters');
+  }
+
+  // Check format: only lowercase letters, numbers, and hyphens
+  if (!/^[a-z0-9-]+$/.test(trimmed)) {
+    errors.push('Slug can only contain lowercase letters, numbers, and hyphens');
+  }
+
+  // Check for leading/trailing hyphens
+  if (trimmed.startsWith('-') || trimmed.endsWith('-')) {
+    errors.push('Slug cannot start or end with a hyphen');
+  }
+
+  // Check for consecutive hyphens
+  if (trimmed.includes('--')) {
+    errors.push('Slug cannot contain consecutive hyphens');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }

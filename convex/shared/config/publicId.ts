@@ -47,8 +47,19 @@ export const PUBLIC_ID_PREFIXES = {
   appThemeSettings: 'theme',
   dashboards: 'dash',
 
+  emailLogs: 'emlog',
   emailConfigs: 'emcfg',
   emailTemplates: 'emtpl',
+  auditLogs: 'aulog',
+
+  // Analytics - System module
+  analyticsEvents: 'aevt',
+  analyticsMetrics: 'mtrc',
+  analyticsDashboards: 'adsh',
+  analyticsReports: 'arep',
+  analyticsProviderSync: 'prov',
+  appConfigs: 'cfg',
+  appSettings: 'set',
 
   // Medium Priority - Events & Scheduling
   scheduledEvents: 'evt',

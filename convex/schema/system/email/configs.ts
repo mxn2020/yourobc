@@ -4,7 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators } from './validators';
+import { emailValidators, emailFields } from './validators';
 
 export const emailConfigsTable = defineTable({
   // Required: Main display field
@@ -20,18 +20,7 @@ export const emailConfigsTable = defineTable({
   status: emailValidators.status,
 
   // Provider-specific configuration (encrypted sensitive data)
-  config: v.object({
-    apiKey: v.optional(v.string()), // For most providers
-    apiSecret: v.optional(v.string()), // For providers needing secret
-    domain: v.optional(v.string()), // For Mailgun, SES
-    region: v.optional(v.string()), // For AWS SES
-    fromEmail: v.string(), // Default sender email
-    fromName: v.string(), // Default sender name
-    replyToEmail: v.optional(v.string()),
-
-    // Additional provider-specific settings
-    additionalSettings: v.optional(v.any()),
-  }),
+  config: emailFields.providerConfig,
 
   // Connection status
   isVerified: v.boolean(), // Has the connection been tested
@@ -40,11 +29,10 @@ export const emailConfigsTable = defineTable({
   lastTestError: v.optional(v.string()),
 
   // Settings (flexible configuration)
-  settings: v.optional(v.object({
-    enableLogging: v.optional(v.boolean()),
-    rateLimitPerHour: v.optional(v.number()),
-    maxRetries: v.optional(v.number()),
-  })),
+  settings: v.optional(emailFields.configSettings),
+
+  // Metadata (typed provider-specific settings)
+  metadata: v.optional(emailFields.configMetadata),
 
   // Audit fields
   ...auditFields,
@@ -53,7 +41,7 @@ export const emailConfigsTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

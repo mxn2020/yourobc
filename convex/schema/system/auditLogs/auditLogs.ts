@@ -1,12 +1,11 @@
-// convex/schema/system/system/auditLogs/auditLogs.ts
+// convex/schema/system/auditLogs/auditLogs.ts
 // Table definitions for auditLogs module
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { auditLogsValidators } from './validators';
-import { entityTypes } from '@/config/entityTypes'
-import { baseFields } from '@/schema/base.validators';
+import { auditLogsValidators, auditLogsFields } from './validators';
+import { entityTypes } from '@/config/entityTypes';
 
 /**
  * Audit Logs Table
@@ -28,8 +27,14 @@ import { baseFields } from '@/schema/base.validators';
  * - What matters: pass the entity's chosen display field to entityTitle
  */
 export const auditLogsTable = defineTable({
-  // User who performed the action
-  userId: v.id('userProfiles'),
+  // Required: Main display field
+  description: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'), // The user who performed the action
+
+  // User information (denormalized for history)
   userName: v.string(),
 
   // Action performed
@@ -46,19 +51,21 @@ export const auditLogsTable = defineTable({
    */
   entityTitle: v.optional(v.string()),
 
-  // Action description
-  description: v.string(),
+  // Metadata (typed audit operation details)
+  metadata: v.optional(auditLogsFields.auditMetadata),
 
   // Audit fields
-  metadata: baseFields.metadata,
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
-  .index('by_user', ['userId'])
+  .index('by_public_id', ['publicId'])
+  .index('by_description', ['description'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_entity', ['entityType', 'entityId'])
   .index('by_action', ['action'])
-  .index('by_created_at', ['createdAt']);
+  .index('by_created_at', ['createdAt'])
+  .index('by_created_by', ['createdBy']); // For filtering by who created the audit log

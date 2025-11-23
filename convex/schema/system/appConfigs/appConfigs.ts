@@ -1,4 +1,4 @@
-// convex/schema/system/system/appConfigs/appConfigs.ts
+// convex/schema/system/appConfigs/appConfigs.ts
 // Table definitions for appConfigs module
 
 import { v } from 'convex/values';
@@ -25,11 +25,25 @@ import { appConfigsValidators, appConfigsFields } from './validators';
  * - Tenant-specific overrides (multi-tenant apps)
  */
 export const appConfigsTable = defineTable({
+  // Required: Main display field
+  name: v.string(),
+
+  // Required: Core fields for GUIDE compliance
+  publicId: v.string(),
+  ownerId: v.optional(v.id('userProfiles')),
+
   // Configuration identification
   feature: v.string(),
   featureKey: v.string(),
   key: v.string(),
-  value: v.any(),
+  value: v.union(
+    v.string(),
+    v.number(),
+    v.boolean(),
+    v.null(),
+    v.array(v.union(v.string(), v.number(), v.boolean())),
+    v.object({})
+  ),
 
   // Value type and validation
   valueType: appConfigsValidators.valueType,
@@ -61,11 +75,17 @@ export const appConfigsTable = defineTable({
   // Change tracking
   changeHistory: v.optional(v.array(appConfigsFields.changeHistoryEntry)),
 
+  // Metadata
+  metadata: v.optional(appConfigsFields.configMetadata),
+
   // Audit fields
   ...auditFields,
   ...softDeleteFields,
 })
   // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_name', ['name'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
@@ -74,7 +94,6 @@ export const appConfigsTable = defineTable({
   .index('by_category', ['category'])
   .index('by_scope', ['scope'])
   .index('by_tenant', ['tenantId'])
-  .index('by_owner', ['ownerId'])
   .index('by_visible', ['isVisible'])
   .index('by_editable', ['isEditable'])
   .index('by_created_at', ['createdAt'])

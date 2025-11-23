@@ -1,4 +1,4 @@
-// convex/lib/system/analytics/analytics/mutations.ts
+// convex/lib/system/analytics/mutations.ts
 // Mutation functions for analytics module
 
 import { v } from 'convex/values';
@@ -11,6 +11,7 @@ import {
   sanitizeEventProperties,
   getPeriodBoundaries,
   generateAnalyticsPublicId,
+  validateDashboardSlug,
 } from './utils';
 import { ANALYTICS_CONSTANTS } from './constants';
 import { Id } from '@/generated/dataModel';
@@ -422,16 +423,38 @@ export const createDashboard = mutation({
 
     // 2. Trim string fields
     const name = args.name.trim();
-    const slug = args.slug.trim();
+    const slug = args.slug.trim().toLowerCase();
     const description = args.description?.trim();
     const ownerName = (user.name || user.email || 'Unknown').trim();
 
+    // 3. Validate inputs
+    if (!name) {
+      throw new Error('Dashboard name is required');
+    }
+
+    const slugValidation = validateDashboardSlug(slug);
+    if (!slugValidation.valid) {
+      throw new Error(`Invalid slug: ${slugValidation.errors.join(', ')}`);
+    }
+
+    // Check slug uniqueness per owner
+    const existingDashboard = await ctx.db
+      .query('analyticsDashboards')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
+      .filter((q) => q.eq(q.field('ownerId'), user._id))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .first();
+
+    if (existingDashboard) {
+      throw new Error('A dashboard with this slug already exists');
+    }
+
     const now = Date.now();
 
-    // 3. Generate public ID
+    // 4. Generate public ID
     const publicId = generateAnalyticsPublicId('dash');
 
-    // 4. Create dashboard
+    // 5. Create dashboard
     const dashboardId = await ctx.db.insert('analyticsDashboards', {
       name,
       publicId,
@@ -443,10 +466,10 @@ export const createDashboard = mutation({
       ownerId: user._id,
       ownerName,
       status: 'active',
-      // metadata: {
-      //   source: 'dashboard_mutation',
-      //   operation: 'create',
-      // },
+      metadata: {
+        source: 'dashboard_mutation',
+        operation: 'create',
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -458,8 +481,8 @@ export const createDashboard = mutation({
       userId: user._id,
       userName: ownerName,
       action: AUDIT_ACTIONS.DASHBOARD_CREATED,
-      entityType: 'analytics_dashboard',
-      entityId: dashboardId,
+      entityType: 'analyticsDashboards',
+      entityId: publicId,
       entityTitle: name,
       description: `Created analytics dashboard: ${name}`,
       metadata: {
@@ -559,8 +582,8 @@ export const updateDashboard = mutation({
       userId: user._id,
       userName,
       action: AUDIT_ACTIONS.DASHBOARD_UPDATED,
-      entityType: 'analytics_dashboard',
-      entityId: dashboardId,
+      entityType: 'analyticsDashboards',
+      entityId: dashboard.publicId,
       entityTitle: trimmedUpdates.name || dashboard.name,
       description: `Updated analytics dashboard: ${dashboard.name}`,
       metadata: {
@@ -612,8 +635,8 @@ export const deleteDashboard = mutation({
       userId: user._id,
       userName,
       action: AUDIT_ACTIONS.DASHBOARD_DELETED,
-      entityType: 'analytics_dashboard',
-      entityId: dashboardId,
+      entityType: 'analyticsDashboards',
+      entityId: dashboard.publicId,
       entityTitle: dashboard.name,
       description: `Deleted analytics dashboard: ${dashboard.name}`,
       metadata: {
@@ -700,10 +723,10 @@ export const createReport = mutation({
       ownerId: user._id,
       isPublic: args.isPublic,
       status: args.schedule?.enabled ? 'scheduled' : 'active',
-      // metadata: {
-      //   source: 'report_mutation',
-      //   operation: 'create',
-      // },
+      metadata: {
+        source: 'report_mutation',
+        operation: 'create',
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -715,8 +738,8 @@ export const createReport = mutation({
       userId: user._id,
       userName,
       action: AUDIT_ACTIONS.REPORT_CREATED,
-      entityType: 'analytics_report',
-      entityId: reportId,
+      entityType: 'analyticsReports',
+      entityId: publicId,
       entityTitle: name,
       description: `Created analytics report: ${name}`,
       metadata: {
@@ -814,8 +837,8 @@ export const updateReport = mutation({
       userId: user._id,
       userName,
       action: AUDIT_ACTIONS.REPORT_UPDATED,
-      entityType: 'analytics_report',
-      entityId: reportId,
+      entityType: 'analyticsReports',
+      entityId: report.publicId,
       entityTitle: trimmedUpdates.name || report.name,
       description: `Updated analytics report: ${report.name}`,
       metadata: {
@@ -867,8 +890,8 @@ export const deleteReport = mutation({
       userId: user._id,
       userName,
       action: AUDIT_ACTIONS.REPORT_DELETED,
-      entityType: 'analytics_report',
-      entityId: reportId,
+      entityType: 'analyticsReports',
+      entityId: report.publicId,
       entityTitle: report.name,
       description: `Deleted analytics report: ${report.name}`,
       metadata: {
@@ -968,6 +991,7 @@ export const upsertProviderConfig = mutation({
       .first();
 
     let configId: Id<'analyticsProviderSync'>;
+    let configPublicId: string;
     let action: string;
 
     if (existing) {
@@ -982,6 +1006,7 @@ export const upsertProviderConfig = mutation({
         updatedBy: admin._id,
       });
       configId = existing._id;
+      configPublicId = existing.publicId;
       action = AUDIT_ACTIONS.PROVIDER_CONFIG_UPDATED;
     } else {
       // 4b. Create new
@@ -989,21 +1014,24 @@ export const upsertProviderConfig = mutation({
       configId = await ctx.db.insert('analyticsProviderSync', {
         provider,
         publicId,
+        ownerId: admin._id,
+        ownerName: adminName,
         enabled: args.enabled,
         config: args.config,
         autoSync: args.autoSync,
         syncDirection: args.syncDirection,
         eventMappings: args.eventMappings,
         status: args.enabled ? 'active' : 'inactive',
-        // metadata: {
-         //  source: 'provider_config_mutation',
-          // operation: 'create',
-        // },
+        metadata: {
+          source: 'provider_config_mutation',
+          operation: 'create',
+        },
         createdAt: now,
         createdBy: admin._id,
         updatedAt: now,
         updatedBy: admin._id,
       });
+      configPublicId = publicId;
       action = AUDIT_ACTIONS.PROVIDER_CONFIG_CREATED;
     }
 
@@ -1012,16 +1040,16 @@ export const upsertProviderConfig = mutation({
       userId: admin._id,
       userName: adminName,
       action,
-      entityType: 'analytics_provider_config',
-      entityId: configId,
+      entityType: 'analyticsProviderSync',
+      entityId: configPublicId,
       entityTitle: `${provider} provider config`,
       description: `${existing ? 'Updated' : 'Created'} analytics provider config: ${provider}`,
-      // metadata: {
-       //  provider,
-       //  enabled: args.enabled,
-       //  autoSync: args.autoSync,
-       //  syncDirection: args.syncDirection,
-      // },
+      metadata: {
+        provider,
+        enabled: args.enabled,
+        autoSync: args.autoSync,
+        syncDirection: args.syncDirection,
+      },
       createdAt: now,
       createdBy: admin._id,
       updatedAt: now,
@@ -1088,13 +1116,13 @@ export const updateProviderSyncStatus = mutation({
       entityId: config._id,
       entityTitle: `${provider} provider sync`,
       description: `Updated ${provider} sync status: ${args.lastSyncStatus}`,
-      // metadata: {
-       //  provider,
-       //  lastSyncStatus: args.lastSyncStatus,
-       //  lastSyncError: lastSyncError ?? null,
-       //  eventsSynced: args.eventsSynced ?? 0,
-       //  eventsSkipped: args.eventsSkipped ?? 0,
-      // },
+      metadata: {
+        provider,
+        lastSyncStatus: args.lastSyncStatus,
+        lastSyncError: lastSyncError ?? null,
+        eventsSynced: args.eventsSynced ?? 0,
+        eventsSkipped: args.eventsSkipped ?? 0,
+      },
       createdAt: now,
       createdBy: user?._id,
       updatedAt: now,
@@ -1141,7 +1169,29 @@ export const markEventsSynced = mutation({
       });
     }
 
-    // 4. Return success
+    // 4. Create audit log
+    if (user) {
+      const userName = (user.name || user.email || 'Unknown').trim();
+      await ctx.db.insert('auditLogs', {
+        userId: user._id,
+        userName,
+        action: 'analytics.events.synced',
+        entityType: 'analyticsEvents',
+        entityId: provider,
+        entityTitle: `Events synced to ${provider}`,
+        description: `Marked ${args.eventIds.length} events as synced to ${provider}`,
+        metadata: {
+          provider,
+          eventCount: args.eventIds.length,
+          externalEventIds: externalEventIds?.length ?? 0,
+        },
+        createdAt: now,
+        createdBy: user._id,
+        updatedAt: now,
+      });
+    }
+
+    // 5. Return success
     return true;
   },
 });

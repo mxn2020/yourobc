@@ -1,4 +1,4 @@
-// convex/lib/system/analytics/analytics/permissions.ts
+// convex/lib/system/analytics/permissions.ts
 // Access control functions for analytics module
 
 import { QueryCtx, MutationCtx } from '@/generated/server';
@@ -12,13 +12,14 @@ export async function canViewAnalyticsEvents(
   ctx: QueryCtx | MutationCtx,
   user: Doc<'userProfiles'>
 ): Promise<boolean> {
-  // Admins and superadmins can always view
+  // Admins and superadmins can always view all events
   if (user.role === 'admin' || user.role === 'superadmin') {
     return true;
   }
 
-  // Regular users can view their own analytics events
-  return true;
+  // Regular users can only view their own events (must be checked at query level)
+  // This function assumes filtering by userId is done in the query
+  return user.role !== undefined;
 }
 
 /**

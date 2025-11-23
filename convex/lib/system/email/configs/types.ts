@@ -2,7 +2,7 @@
 // TypeScript type definitions for email configs module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { EmailProvider, EmailConfigStatus } from '@/schema/system/email/configs/types';
+import type { EmailProvider, EmailStatus } from '@/schema/system/email/types';
 
 // Entity types
 export type EmailConfig = Doc<'emailConfigs'>;
@@ -23,7 +23,7 @@ export interface CreateEmailConfigData {
     additionalSettings?: any;
   };
   setAsActive?: boolean;
-  status?: EmailConfigStatus;
+  status?: EmailStatus;
 }
 
 export interface UpdateEmailConfigData {
@@ -31,7 +31,7 @@ export interface UpdateEmailConfigData {
   config?: EmailConfig['config'];
   isActive?: boolean;
   isVerified?: boolean;
-  status?: EmailConfigStatus;
+  status?: EmailStatus;
   settings?: EmailConfig['settings'];
 }
 
@@ -45,7 +45,7 @@ export interface EmailConfigListResponse {
 // Filter types
 export interface EmailConfigFilters {
   provider?: EmailProvider[];
-  status?: EmailConfigStatus[];
+  status?: EmailStatus[];
   isActive?: boolean;
   isVerified?: boolean;
   search?: string;

@@ -1,4 +1,4 @@
-// convex/lib/system/email/templates/queries.ts
+// convex/lib/system/email/email_templates/queries.ts
 // Read operations for email templates module
 
 import { query } from '@/generated/server';
@@ -6,6 +6,7 @@ import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { emailValidators } from '@/schema/system/email/validators';
 import { filterEmailTemplatesByAccess, requireViewEmailTemplateAccess } from './permissions';
+import { notDeleted } from '@/shared/db.helper';
 import type { EmailTemplateListResponse, TemplateStats } from './types';
 
 /**
@@ -16,7 +17,7 @@ import type { EmailTemplateListResponse, TemplateStats } from './types';
 export const getEmailTemplates = query({
   args: {
     limit: v.optional(v.number()),
-    offset: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     filters: v.optional(v.object({
       category: v.optional(v.string()),
       isActive: v.optional(v.boolean()),
@@ -24,57 +25,66 @@ export const getEmailTemplates = query({
       search: v.optional(v.string()),
     })),
   },
-  handler: async (ctx, args): Promise<EmailTemplateListResponse> => {
+  handler: async (ctx, args): Promise<EmailTemplateListResponse & { cursor?: string }> => {
     const user = await requireCurrentUser(ctx);
-    const { limit = 50, offset = 0, filters = {} } = args;
+    const { limit = 50, cursor, filters = {} } = args;
 
-    // Check admin access
+    // Admin-only
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
-    // Query all templates
-    let templates = await ctx.db
-      .query('emailTemplates')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+    // Build final ordered query without reassigning across types
+    const templatesQuery = (() => {
+      if (filters.status?.length === 1) {
+        return ctx.db
+          .query('emailTemplates')
+          .withIndex('by_status', q => q.eq('status', filters.status![0]))
+          .filter(notDeleted);
+      }
 
-    // Apply category filter
+      return ctx.db
+        .query('emailTemplates')
+        .filter(notDeleted);
+    })();
+
+    const page = await templatesQuery
+      .order('desc')
+      .paginate({
+        numItems: limit,
+        cursor: cursor ?? null, // <-- fix #2
+      });
+
+    // Access filter (page only)
+    let templates = await filterEmailTemplatesByAccess(ctx, page.page, user);
+
+    // In-memory filters on the page
     if (filters.category) {
-      templates = templates.filter((t) => t.category === filters.category);
+      templates = templates.filter(t => t.category === filters.category);
     }
 
-    // Apply isActive filter
     if (filters.isActive !== undefined) {
-      templates = templates.filter((t) => t.isActive === filters.isActive);
+      templates = templates.filter(t => t.isActive === filters.isActive);
     }
 
-    // Apply status filter
     if (filters.status?.length) {
-      templates = templates.filter((t) => filters.status!.includes(t.status));
+      templates = templates.filter(t => filters.status!.includes(t.status));
     }
 
-    // Apply search filter
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      templates = templates.filter((t) =>
+      templates = templates.filter(t =>
         t.name.toLowerCase().includes(term) ||
         t.slug.toLowerCase().includes(term) ||
         (t.description && t.description.toLowerCase().includes(term))
       );
     }
 
-    // Sort by created date descending
-    templates.sort((a, b) => b.createdAt - a.createdAt);
-
-    // Paginate
-    const total = templates.length;
-    const items = templates.slice(offset, offset + limit);
-
     return {
-      items,
-      total,
-      hasMore: total > offset + limit,
+      items: templates,
+      total: templates.length,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
     };
   },
 });
@@ -97,15 +107,12 @@ export const getEmailTemplate = query({
     }
 
     await requireViewEmailTemplateAccess(ctx, template, user);
-
     return template;
   },
 });
 
 /**
  * Get email template by public ID
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getEmailTemplateByPublicId = query({
   args: {
@@ -116,8 +123,8 @@ export const getEmailTemplateByPublicId = query({
 
     const template = await ctx.db
       .query('emailTemplates')
-      .withIndex('by_public_id', (q) => q.eq('publicId', publicId))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_public_id', q => q.eq('publicId', publicId))
+      .filter(notDeleted)
       .first();
 
     if (!template) {
@@ -125,98 +132,97 @@ export const getEmailTemplateByPublicId = query({
     }
 
     await requireViewEmailTemplateAccess(ctx, template, user);
-
     return template;
   },
 });
 
 /**
  * Get template by slug
- * 🔒 Authentication: Optional (templates can be used by system)
+ * 🔒 Authentication: None (internal-only for email sending system)
+ *
+ * This query is used by the email sending system to fetch templates
+ * without user context. For management operations, use getEmailTemplate instead.
  */
 export const getTemplateBySlug = query({
   args: {
     slug: v.string(),
   },
   handler: async (ctx, { slug }) => {
-    const template = await ctx.db
+    return ctx.db
       .query('emailTemplates')
-      .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .withIndex('by_slug', q => q.eq('slug', slug))
+      .filter(notDeleted)
       .first();
-
-    return template;
   },
 });
 
 /**
- * Search templates
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
+ * Search templates (simple search; admin-only)
  */
 export const searchTemplates = query({
   args: {
     searchTerm: v.string(),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
   },
-  handler: async (ctx, { searchTerm }) => {
+  handler: async (ctx, { searchTerm, limit = 50, cursor }) => {
     const user = await requireCurrentUser(ctx);
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
-    const allTemplates = await ctx.db
+    const page = await ctx.db
       .query('emailTemplates')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
-      .collect();
+      .filter(notDeleted)
+      .order('desc')
+      .paginate({
+        numItems: limit,
+        cursor: cursor ?? null, // <-- fix #2
+      });
 
-    const searchLower = searchTerm.toLowerCase();
-
-    const filtered = allTemplates.filter(
-      (template) =>
-        template.name.toLowerCase().includes(searchLower) ||
-        template.slug.toLowerCase().includes(searchLower) ||
-        template.description?.toLowerCase().includes(searchLower)
+    const term = searchTerm.toLowerCase();
+    const filtered = page.page.filter(t =>
+      t.name.toLowerCase().includes(term) ||
+      t.slug.toLowerCase().includes(term) ||
+      t.description?.toLowerCase().includes(term)
     );
 
-    return filtered;
+    return {
+      items: filtered,
+      hasMore: !page.isDone,
+      cursor: page.continueCursor,
+    };
   },
 });
 
 /**
  * Get email template statistics
- * 🔒 Authentication: Required
- * 🔒 Authorization: Admin only
  */
 export const getEmailTemplateStats = query({
   args: {},
   handler: async (ctx): Promise<TemplateStats> => {
     const user = await requireCurrentUser(ctx);
 
-    // Check admin access
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       throw new Error('Permission denied: Admin access required');
     }
 
     const templates = await ctx.db
       .query('emailTemplates')
-      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .filter(notDeleted)
       .collect();
 
-    // Group by category
     const byCategory: Record<string, number> = {};
-    templates.forEach((template) => {
-      if (template.category) {
-        byCategory[template.category] = (byCategory[template.category] || 0) + 1;
-      }
+    templates.forEach(t => {
+      if (t.category) byCategory[t.category] = (byCategory[t.category] || 0) + 1;
     });
 
     return {
       total: templates.length,
-      active: templates.filter((t) => t.status === 'active').length,
-      inactive: templates.filter((t) => t.status === 'inactive').length,
-      archived: templates.filter((t) => t.status === 'archived').length,
+      active: templates.filter(t => t.status === 'active').length,
+      inactive: templates.filter(t => t.status === 'inactive').length,
+      archived: templates.filter(t => t.status === 'archived').length,
       byCategory,
     };
   },

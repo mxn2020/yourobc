@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/analytics.ts
+// convex/schema/system/analytics/analytics.ts
 // Table definitions for analytics module
 
 import { defineTable } from 'convex/server';
@@ -12,6 +12,10 @@ import { baseValidators } from '@/schema/base.validators';
  * Stores all tracked events (page views, user actions, AI usage, payments, etc.)
  */
 export const analyticsEventsTable = defineTable({
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Event Identity
   eventName: v.string(), // 'page_view', 'button_click', 'ai_request', etc.
   eventType: analyticsValidators.eventType,
@@ -120,11 +124,14 @@ export const analyticsEventsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_event_name', ['eventName'])
   .index('by_event_type', ['eventType'])
   .index('by_user', ['userId'])
   .index('by_session', ['sessionId'])
   .index('by_timestamp', ['timestamp'])
+  .index('by_owner_and_timestamp', ['ownerId', 'timestamp'])
   .index('by_user_timestamp', ['userId', 'timestamp'])
   .index('by_sync_status', ['syncStatus'])
   .index('by_created', ['createdAt'])
@@ -135,6 +142,10 @@ export const analyticsEventsTable = defineTable({
  * Stores pre-aggregated metrics for faster querying
  */
 export const analyticsMetricsTable = defineTable({
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
   // Metric Identity
   metricType: v.string(), // 'daily_active_users', 'ai_requests_count', etc.
   dimension: v.optional(v.string()), // 'country:US', 'feature:chat', etc.
@@ -158,7 +169,10 @@ export const analyticsMetricsTable = defineTable({
   ...auditFields,
   ...softDeleteFields,
 })
+  .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_metric_period', ['metricType', 'period', 'periodStart'])
+  .index('by_metric_owner', ['metricType', 'ownerId'])
   .index('by_period_start', ['periodStart'])
   .index('by_metric_dimension', ['metricType', 'dimension'])
   .index('by_created', ['createdAt'])
@@ -299,7 +313,8 @@ export const analyticsDashboardsTable = defineTable({
   .index('by_slug', ['slug'])
   .index('by_name', ['name'])
   .index('by_type', ['type'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
+  .index('by_owner_and_type', ['ownerId', 'type'])
   .index('by_public', ['isPublic'])
   .index('by_status', ['status'])
   .index('by_created', ['createdAt'])
@@ -385,7 +400,7 @@ export const analyticsReportsTable = defineTable({
 })
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_type', ['reportType'])
   .index('by_status', ['status'])
   .index('by_created', ['createdAt'])
@@ -401,6 +416,8 @@ export const analyticsProviderSyncTable = defineTable({
 
   // Required: Core fields
   publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+  ownerName: v.string(),
   status: v.union(v.literal('active'), v.literal('inactive'), v.literal('error')),
 
   // Configuration - Discriminated union by provider
@@ -473,7 +490,9 @@ export const analyticsProviderSyncTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_provider', ['provider'])
+  .index('by_owner_and_provider', ['ownerId', 'provider'])
   .index('by_enabled', ['enabled'])
   .index('by_status', ['status'])
   .index('by_created', ['createdAt'])

@@ -1,4 +1,4 @@
-// convex/lib/system/email/templates/utils.ts
+// convex/lib/system/email/email_templates/utils.ts
 // Validation functions and utility helpers for email templates module
 
 import { EMAIL_TEMPLATES_CONSTANTS } from './constants';
@@ -87,6 +87,27 @@ export function validateEmailTemplateData(
   }
 
   return errors;
+}
+
+/**
+ * Trim all string fields in email template data
+ */
+export function trimEmailTemplateData<
+  T extends Partial<CreateEmailTemplateData | UpdateEmailTemplateData>
+>(data: T): T {
+  const trimmed = { ...data } as T;
+
+  // Trim text fields
+  if (data.name) trimmed.name = data.name.trim();
+  if (data.slug) trimmed.slug = data.slug.trim();
+  if (data.description) trimmed.description = data.description.trim();
+  if (data.subject) trimmed.subject = data.subject.trim();
+  if (data.htmlTemplate) trimmed.htmlTemplate = data.htmlTemplate.trim();
+  if (data.textTemplate) trimmed.textTemplate = data.textTemplate.trim();
+  if (data.reactComponentPath) trimmed.reactComponentPath = data.reactComponentPath.trim();
+  if (data.category) trimmed.category = data.category.trim();
+
+  return trimmed;
 }
 
 /**

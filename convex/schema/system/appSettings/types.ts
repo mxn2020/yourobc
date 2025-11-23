@@ -1,4 +1,8 @@
-// convex/schema/system/system/appSettings/types.ts
+// convex/schema/system/appSettings/types.ts
 // Type extractions from validators for appSettings module
 
-// No custom types to extract - all validators use standard types
+import { Infer } from 'convex/values';
+import { appSettingsValidators } from './validators';
+
+export type AppSettingValueType = Infer<typeof appSettingsValidators.valueType>;
+export type AppSettingIsPublic = Infer<typeof appSettingsValidators.isPublic>;

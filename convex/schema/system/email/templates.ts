@@ -4,7 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators } from './validators';
+import { emailValidators, emailFields } from './validators';
 
 export const emailTemplatesTable = defineTable({
   // Required: Main display field
@@ -28,13 +28,7 @@ export const emailTemplatesTable = defineTable({
   reactComponentPath: v.optional(v.string()),
 
   // Template variables
-  variables: v.array(v.object({
-    name: v.string(),
-    type: emailValidators.variableType,
-    required: v.boolean(),
-    defaultValue: v.optional(v.string()),
-    description: v.optional(v.string()),
-  })),
+  variables: v.array(emailFields.templateVariable),
 
   // Preview data for testing
   previewData: v.optional(v.any()),
@@ -44,14 +38,14 @@ export const emailTemplatesTable = defineTable({
   category: v.optional(v.string()), // e.g., 'auth', 'crm', 'notifications'
 
   // Settings (flexible configuration)
-  settings: v.optional(v.object({
-    allowHtmlOnly: v.optional(v.boolean()),
-    requireApproval: v.optional(v.boolean()),
-  })),
+  settings: v.optional(emailFields.templateSettings),
 
   // Usage stats
   timesUsed: v.optional(v.number()),
   lastUsedAt: v.optional(v.number()),
+
+  // Metadata (typed versioning/testing tracking)
+  metadata: v.optional(emailFields.templateMetadata),
 
   // Audit fields
   ...auditFields,
@@ -60,7 +54,7 @@ export const emailTemplatesTable = defineTable({
   // Required indexes
   .index('by_public_id', ['publicId'])
   .index('by_name', ['name'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner_id', ['ownerId'])
   .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes

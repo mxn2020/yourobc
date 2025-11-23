@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/schemas.ts
+// convex/schema/system/analytics/schemas.ts
 // Schema exports for analytics module
 
 import {
@@ -9,7 +9,7 @@ import {
   analyticsProviderSyncTable,
 } from './analytics';
 
-export const systemAnalyticsAnalyticsSchemas = {
+export const systemAnalyticsSchemas = {
   analyticsEvents: analyticsEventsTable,
   analyticsMetrics: analyticsMetricsTable,
   analyticsDashboards: analyticsDashboardsTable,

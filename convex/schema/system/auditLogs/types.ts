@@ -5,4 +5,4 @@ import { Infer } from 'convex/values';
 import { auditLogsValidators } from './validators';
 
 // Extract types from validators
-export type AuditLogEntityType = Infer<typeof auditLogsValidators.entityType>;
+

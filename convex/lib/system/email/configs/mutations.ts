@@ -5,16 +5,16 @@ import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { emailValidators } from '@/schema/system/email/validators';
+import { emailValidators, emailFields } from '@/schema/system/email/validators';
 import { EMAIL_CONFIGS_CONSTANTS } from './constants';
-import { validateEmailConfigData } from './utils';
+import { validateEmailConfigData, trimEmailConfigData } from './utils';
 import {
   requireCreateEmailConfigAccess,
   requireEditEmailConfigAccess,
   requireDeleteEmailConfigAccess,
 } from './permissions';
 import type { EmailConfigId } from './types';
-import { createAuditLog } from '../../audit_logs/helpers';
+import { createAuditLog } from '../../auditLogs/helpers';
 
 /**
  * Create or update email provider configuration
@@ -36,7 +36,7 @@ export const saveEmailConfig = mutation({
       additionalSettings: v.optional(v.any()),
     }),
     setAsActive: v.optional(v.boolean()),
-    metadata: v.optional(v.any()),
+    metadata: v.optional(emailFields.configMetadata),
   },
   handler: async (ctx, args): Promise<EmailConfigId> => {
     // 1. AUTH: Get authenticated user
@@ -48,22 +48,14 @@ export const saveEmailConfig = mutation({
     // 3. VALIDATE: Check data validity
     const configName = args.name?.trim() || `${args.provider} Configuration`;
     const data = { name: configName, provider: args.provider, config: args.config };
-    const errors = validateEmailConfigData(data);
+    const trimmedData = trimEmailConfigData(data);
+    const errors = validateEmailConfigData(trimmedData);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
 
-    // 4. PROCESS: Trim string fields in config
-    const trimmedConfig = {
-      ...args.config,
-      apiKey: args.config.apiKey?.trim(),
-      apiSecret: args.config.apiSecret?.trim(),
-      domain: args.config.domain?.trim(),
-      region: args.config.region?.trim(),
-      fromEmail: args.config.fromEmail.trim(),
-      fromName: args.config.fromName.trim(),
-      replyToEmail: args.config.replyToEmail?.trim(),
-    };
+    // 4. PROCESS: Extract trimmed values
+    const trimmedConfig = trimmedData.config;
 
     const now = Date.now();
 
@@ -209,7 +201,8 @@ export const updateEmailConfig = mutation({
     await requireEditEmailConfigAccess(ctx, config, user);
 
     // 4. VALIDATE: Check update data validity
-    const errors = validateEmailConfigData(updates);
+    const trimmedUpdates = trimEmailConfigData(updates);
+    const errors = validateEmailConfigData(trimmedUpdates);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -222,20 +215,11 @@ export const updateEmailConfig = mutation({
       lastActivityAt: now,
     };
 
-    if (updates.name !== undefined) {
-      updateData.name = updates.name.trim();
+    if (trimmedUpdates.name !== undefined) {
+      updateData.name = trimmedUpdates.name;
     }
-    if (updates.config !== undefined) {
-      updateData.config = {
-        ...updates.config,
-        apiKey: updates.config.apiKey?.trim(),
-        apiSecret: updates.config.apiSecret?.trim(),
-        domain: updates.config.domain?.trim(),
-        region: updates.config.region?.trim(),
-        fromEmail: updates.config.fromEmail.trim(),
-        fromName: updates.config.fromName.trim(),
-        replyToEmail: updates.config.replyToEmail?.trim(),
-      };
+    if (trimmedUpdates.config !== undefined) {
+      updateData.config = trimmedUpdates.config;
     }
     if (updates.status !== undefined) {
       updateData.status = updates.status;
@@ -390,7 +374,22 @@ export const updateTestStatus = mutation({
       updatedBy: user._id,
     });
 
-    // 6. RETURN: Success
+    // 6. AUDIT: Create audit log
+    await createAuditLog(ctx, {
+      action: 'email_config.test_updated',
+      entityType: 'system_email_config',
+      entityId: configId,
+      entityTitle: config.name,
+      description: `Email configuration test ${success ? 'succeeded' : 'failed'}: ${config.name}`,
+      metadata: {
+        operation: 'test_email_config',
+        provider: config.provider,
+        success,
+        error: trimmedError,
+      },
+    });
+
+    // 7. RETURN: Success
     return { success: true };
   },
 });

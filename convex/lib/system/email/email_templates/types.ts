@@ -1,8 +1,8 @@
-// convex/lib/system/email/templates/types.ts
+// convex/lib/system/email/email_templates/types.ts
 // TypeScript type definitions for email templates module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { EmailTemplateStatus, EmailTemplateVariableType } from '@/schema/system/email/email_templates/types';
+import type { EmailStatus, EmailVariableType } from '@/schema/system/email/types';
 
 // Entity types
 export type EmailTemplate = Doc<'emailTemplates'>;
@@ -11,7 +11,7 @@ export type EmailTemplateId = Id<'emailTemplates'>;
 // Variable interface
 export interface EmailTemplateVariable {
   name: string;
-  type: EmailTemplateVariableType;
+  type: EmailVariableType;
   required: boolean;
   defaultValue?: string;
   description?: string;
@@ -30,7 +30,7 @@ export interface CreateEmailTemplateData {
   previewData?: any;
   isActive: boolean;
   category?: string;
-  status?: EmailTemplateStatus;
+  status?: EmailStatus;
 }
 
 export interface UpdateEmailTemplateData {
@@ -44,7 +44,7 @@ export interface UpdateEmailTemplateData {
   previewData?: any;
   isActive?: boolean;
   category?: string;
-  status?: EmailTemplateStatus;
+  status?: EmailStatus;
 }
 
 // Response types
@@ -58,7 +58,7 @@ export interface EmailTemplateListResponse {
 export interface EmailTemplateFilters {
   category?: string;
   isActive?: boolean;
-  status?: EmailTemplateStatus[];
+  status?: EmailStatus[];
   search?: string;
 }
 

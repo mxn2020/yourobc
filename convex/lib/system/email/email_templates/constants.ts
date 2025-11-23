@@ -1,4 +1,4 @@
-// convex/lib/system/email/templates/constants.ts
+// convex/lib/system/email/email_templates/constants.ts
 // Business constants, permissions, and limits for email templates module
 
 export const EMAIL_TEMPLATES_CONSTANTS = {
@@ -30,4 +30,8 @@ export const EMAIL_TEMPLATES_CONSTANTS = {
     SLUG_PATTERN: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
     VARIABLE_PATTERN: /\{\{(\w+)\}\}/g,
   },
+} as const;
+
+export const EMAIL_TEMPLATES_VALUES = {
+  status: Object.values(EMAIL_TEMPLATES_CONSTANTS.STATUS),
 } as const;

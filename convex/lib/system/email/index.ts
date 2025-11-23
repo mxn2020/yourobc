@@ -1,8 +1,7 @@
 // convex/lib/system/email/index.ts
-// convex/lib/email/index.ts
+// Consolidated exports for all email module components
 
-export * from './constants';
-export * from './types';
-export * from './mutations';
-export * from './queries';
-export * from './utils';
+// Export all three modules
+export * as configs from './configs';
+export * as templates from './email_templates';
+export * as logs from './email_logs';

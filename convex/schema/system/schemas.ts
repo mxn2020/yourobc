@@ -1,18 +1,18 @@
 // convex/schema/system/schemas.ts
 
 // Core system table imports
-import { userProfilesTable } from './user_profiles/user_profiles'
+import { userProfilesTable } from './userProfiles/user_profiles'
 import { systemSystemAuditLogsSchemas } from './auditLogs/schemas'
 import { systemSystemNotificationsSchemas } from './notifications/schemas'
-import { systemSystemAppSettingsSchemas } from './appSettings/schemas'
+import { systemAppSettingsSchemas } from './appSettings/schemas'
 import { systemSystemSystemMetricsSchemas } from './systemMetrics/schemas'
 import { systemSystemAppThemeSettingsSchemas } from './appThemeSettings/schemas'
-import { systemSystemAppConfigsSchemas } from './appConfigs/schemas'
+import { systemAppConfigsSchemas } from './appConfigs/schemas'
 import { systemSystemPermissionRequestsSchemas } from './permissionRequests/schemas'
-import { userSettingsTable } from './user_settings/user_settings/user_settings'
-import { userModelPreferencesTable } from './user_settings/user_model_preferences/user_model_preferences'
+import { userSettingsTable } from './userSettings/user_settings/user_settings'
+import { userModelPreferencesTable } from './userSettings/user_model_preferences/user_model_preferences'
 import { systemDashboardsSchemas } from './dashboards/schemas'
-import { systemAnalyticsAnalyticsSchemas } from './analytics/schemas'
+import { systemAnalyticsSchemas } from './analytics/schemas'
 import { systemEmailSchemas } from './email/schemas'
 import { systemSupportingSchemas } from './supporting/schemas'
 
@@ -25,10 +25,10 @@ export const systemSchemas = {
   // System
   ...systemSystemAuditLogsSchemas,
   ...systemSystemNotificationsSchemas,
-  ...systemSystemAppSettingsSchemas,
+  ...systemAppSettingsSchemas,
   ...systemSystemSystemMetricsSchemas,
   ...systemSystemAppThemeSettingsSchemas,
-  ...systemSystemAppConfigsSchemas,
+  ...systemAppConfigsSchemas,
   ...systemSystemPermissionRequestsSchemas,
 
   // Supporting
@@ -38,7 +38,7 @@ export const systemSchemas = {
   ...systemDashboardsSchemas,
 
   // Analytics
-  ...systemAnalyticsAnalyticsSchemas,
+  ...systemAnalyticsSchemas,
 
   // Email
   ...systemEmailSchemas,

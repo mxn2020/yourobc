@@ -3,18 +3,6 @@
 
 import { v } from 'convex/values';
 
-
-// Common metadata schema
-// Note: Uses flexible types for extensibility, but with validation
-const metadataValue = v.union(
-  v.string(),
-  v.number(),
-  v.boolean(),
-  v.null(),
-  v.array(v.union(v.string(), v.number(), v.boolean())),
-  v.object({}) // For nested objects - can be extended
-)
-
 /**
  * Simple union base validators
  * Used for status fields, enums, and simple type constraints
@@ -90,15 +78,7 @@ export const baseFields = {
     exchangeRateDate: v.optional(v.number()),
   }),
 
-  metadata: v.optional(v.union(
-    v.object({
-      source: v.optional(v.string()),
-      operation: v.optional(v.string()),
-      oldValues: v.optional(v.record(v.string(), metadataValue)),
-      newValues: v.optional(v.record(v.string(), metadataValue)),
-      ipAddress: v.optional(v.string()),
-      userAgent: v.optional(v.string()),
-    }),
-    v.record(v.string(), metadataValue)
-  ))
+  // Note: metadata has been removed from baseFields
+  // Each module should define its own typed metadata in validators.ts
+  // See GUIDE.md "Metadata Pattern" section for details
 } as const;

@@ -51,3 +51,9 @@ export const EMAIL_PROVIDER_NAMES = {
   postmark: 'Postmark',
   mailgun: 'Mailgun',
 } as const;
+
+export const EMAIL_CONFIGS_VALUES = {
+  status: Object.values(EMAIL_CONFIGS_CONSTANTS.STATUS),
+  testStatus: Object.values(EMAIL_CONFIGS_CONSTANTS.TEST_STATUS),
+  providers: Object.values(EMAIL_CONFIGS_CONSTANTS.PROVIDERS),
+} as const;

@@ -1,4 +1,4 @@
-// convex/lib/system/email/templates/index.ts
+// convex/lib/system/email/email_templates/index.ts
 // Public API exports for email templates module
 
 // Constants
@@ -10,6 +10,7 @@ export type * from './types';
 // Utilities
 export {
   validateEmailTemplateData,
+  trimEmailTemplateData,
   extractTemplateVariables,
   replaceTemplateVariables,
   sanitizeHtml,

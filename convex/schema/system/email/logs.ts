@@ -4,53 +4,67 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators } from './validators';
+import { emailValidators, emailFields } from './validators';
 
 // Email logs (track all sent emails for debugging and auditing)
 export const emailLogsTable = defineTable({
-  id: v.string(),
+  // Required: Main display field
+  subject: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  ownerId: v.id('userProfiles'),
+
+  // Provider info
   provider: emailValidators.provider,
 
   // Email details
   to: v.array(v.string()), // Recipient emails
   from: v.string(),
   replyTo: v.optional(v.string()),
-  subject: v.string(),
 
   // Content (store first 500 chars for debugging)
   htmlPreview: v.optional(v.string()),
   textPreview: v.optional(v.string()),
 
   // Template info (if using templates)
-  templateId: v.optional(v.string()),
+  templateId: v.optional(v.id('emailTemplates')),
   templateData: v.optional(v.any()),
 
   // Status tracking
-  status: emailValidators.status,
+  deliveryStatus: emailValidators.deliveryStatus,
   messageId: v.optional(v.string()), // Provider's message ID
   error: v.optional(v.string()),
 
   // Provider response
   providerResponse: v.optional(v.any()),
 
-  // Metadata
+  // Metadata (typed operational tracking)
+  metadata: v.optional(emailFields.logMetadata),
   sentAt: v.optional(v.number()),
   deliveredAt: v.optional(v.number()),
   failedAt: v.optional(v.number()),
 
   // Context
-  triggeredBy: v.optional(v.string()), // userId or system
+  triggeredBy: v.optional(v.id('userProfiles')), // User who triggered the email
   context: v.optional(v.string()), // e.g., 'user_signup', 'password_reset', 'yourobc_quote'
 
   // Audit fields
   ...auditFields,
   ...softDeleteFields,
 })
-  .index('id', ['id'])
-  .index('provider', ['provider'])
-  .index('status', ['status'])
-  .index('to', ['to'])
-  .index('context', ['context'])
-  .index('created', ['createdAt'])
-  .index('lastActivity', ['lastActivityAt'])
-  .index('messageId', ['messageId'])
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_subject', ['subject'])
+  .index('by_owner_id', ['ownerId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_provider', ['provider'])
+  .index('by_delivery_status', ['deliveryStatus'])
+  .index('by_to', ['to'])
+  .index('by_context', ['context'])
+  .index('by_created_at', ['createdAt'])
+  .index('by_last_activity_at', ['lastActivityAt'])
+  .index('by_message_id', ['messageId'])
+  .index('by_triggered_by', ['triggeredBy']);

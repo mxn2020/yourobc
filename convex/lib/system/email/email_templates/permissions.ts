@@ -1,4 +1,4 @@
-// convex/lib/system/email/templates/permissions.ts
+// convex/lib/system/email/email_templates/permissions.ts
 // Access control and authorization logic for email templates module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';

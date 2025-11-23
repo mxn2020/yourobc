@@ -1,4 +1,4 @@
-// convex/lib/system/analytics/analytics/types.ts
+// convex/lib/system/analytics/types.ts
 // Type definitions for analytics library functions
 
 import { Doc, Id } from '@/generated/dataModel';

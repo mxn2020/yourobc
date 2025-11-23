@@ -160,7 +160,7 @@ export const getEmailLogByMessageId = query({
   handler: async (ctx, { messageId }) => {
     const log = await ctx.db
       .query('emailLogs')
-      .withIndex('by_messageId', (q) => q.eq('messageId', messageId))
+      .withIndex('by_message_id', (q) => q.eq('messageId', messageId))
       .first();
 
     return log;

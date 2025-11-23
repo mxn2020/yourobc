@@ -1,4 +1,4 @@
-// convex/lib/system/analytics/analytics/queries.ts
+// convex/lib/system/analytics/queries.ts
 // Query functions for analytics module
 
 import { v } from 'convex/values';

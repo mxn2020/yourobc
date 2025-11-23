@@ -10,6 +10,7 @@ export type * from './types';
 // Utilities
 export {
   validateEmailConfigData,
+  trimEmailConfigData,
   isValidEmail,
   formatEmailConfigDisplayName,
   getProviderDisplayName,

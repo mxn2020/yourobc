@@ -1,8 +1,8 @@
-// convex/schema/system/system/appConfigs/schemas.ts
+// convex/schema/system/appConfigs/schemas.ts
 // Schema exports for appConfigs module
 
 import { appConfigsTable } from './appConfigs';
 
-export const systemSystemAppConfigsSchemas = {
+export const systemAppConfigsSchemas = {
   appConfigs: appConfigsTable,
 };
