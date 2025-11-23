@@ -80,7 +80,7 @@ export const COURIERS_CONSTANTS = {
     NAME_PATTERN: /^[a-zA-Z0-9\s\-_.,&()']+$/,
     WEBSITE_PATTERN: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
     EMAIL_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    PHONE_PATTERN: /^[\d\s\-+()\.]+ $/,
+    PHONE_PATTERN: /^[\d\s\-+()\.]+$/,
     API_URL_PATTERN: /^https?:\/\/.+$/,
   },
 } as const;

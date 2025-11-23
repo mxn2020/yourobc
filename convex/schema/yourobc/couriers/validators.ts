@@ -1,56 +1,52 @@
-// Grouped validators for couriers module
+// convex/schema/yourobc/couriers/validators.ts
+/**
+ * Couriers Validators
+ *
+ * Shared enums and complex validators for the couriers module.
+ * Aligns with the Convex template structure for clarity and reusability.
+ */
 
 import { v } from 'convex/values';
 
+const courierStatuses = ['active', 'inactive', 'archived'] as const;
+const courierServiceTypes = [
+  'OBC',
+  'NFO',
+  'express',
+  'standard',
+  'freight',
+  'international',
+  'domestic',
+] as const;
+const courierDeliverySpeeds = [
+  'same_day',
+  'next_day',
+  '2_3_days',
+  '3_5_days',
+  '5_7_days',
+  '7_14_days',
+] as const;
+const courierPricingModels = [
+  'weight_based',
+  'zone_based',
+  'flat_rate',
+  'volumetric',
+  'custom',
+] as const;
+const courierApiTypes = ['rest', 'soap', 'graphql', 'xml', 'none'] as const;
+
+// Grouped validators for couriers module
 export const couriersValidators = {
-  status: v.union(
-    v.literal('active'),
-    v.literal('inactive'),
-    v.literal('archived')
-  ),
-
-  serviceType: v.union(
-    v.literal('OBC'),
-    v.literal('NFO'),
-    v.literal('express'),
-    v.literal('standard'),
-    v.literal('freight'),
-    v.literal('international'),
-    v.literal('domestic')
-  ),
-
-  deliverySpeed: v.union(
-    v.literal('same_day'),
-    v.literal('next_day'),
-    v.literal('2_3_days'),
-    v.literal('3_5_days'),
-    v.literal('5_7_days'),
-    v.literal('7_14_days')
-  ),
-
-  pricingModel: v.union(
-    v.literal('weight_based'),
-    v.literal('zone_based'),
-    v.literal('flat_rate'),
-    v.literal('volumetric'),
-    v.literal('custom')
-  ),
-
-  apiType: v.union(
-    v.literal('rest'),
-    v.literal('soap'),
-    v.literal('graphql'),
-    v.literal('xml'),
-    v.literal('none')
-  ),
-
+  status: v.union(...courierStatuses.map(value => v.literal(value))),
+  serviceType: v.union(...courierServiceTypes.map(value => v.literal(value))),
+  deliverySpeed: v.union(...courierDeliverySpeeds.map(value => v.literal(value))),
+  pricingModel: v.union(...courierPricingModels.map(value => v.literal(value))),
+  apiType: v.union(...courierApiTypes.map(value => v.literal(value))),
   commissionType: v.union(v.literal('percentage'), v.literal('fixed')),
   commissionSimpleStatus: v.union(v.literal('pending'), v.literal('paid')),
 } as const;
 
-/**
- * Complex object schemas for couriers module
- */
+// Complex object schemas for couriers module
 export const couriersFields = {
   serviceCoverage: v.object({
     countries: v.array(v.string()),
@@ -108,4 +104,12 @@ export const couriersFields = {
     averageTransitDays: v.optional(v.number()),
     lastUpdated: v.optional(v.number()),
   }),
+} as const;
+
+export const couriersEnumValues = {
+  status: courierStatuses,
+  serviceType: courierServiceTypes,
+  deliverySpeed: courierDeliverySpeeds,
+  pricingModel: courierPricingModels,
+  apiType: courierApiTypes,
 } as const;
