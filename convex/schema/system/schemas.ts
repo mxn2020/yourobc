@@ -4,7 +4,7 @@
 import { systemUserProfilesUserProfilesSchemas } from './user_profiles/user_profiles/schemas'
 import { systemAuditLogsSchemas } from './auditLogs/schemas'
 import { systemNotificationsSchemas } from './notifications/schemas'
-import { systemAppSettingsSchemas } from './appSettings/schemas'
+import { systemAppSettingsAppSettingsSchemas } from './app_settings/app_settings/schemas'
 import { systemSystemMetricsSystemMetricsSchemas } from './system_metrics/system_metrics/schemas'
 import { systemSystemAppThemeSettingsSchemas } from './appThemeSettings/schemas'
 import { systemAppConfigsSchemas } from './appConfigs/schemas'
@@ -25,7 +25,7 @@ export const systemSchemas = {
   // System
   ...systemAuditLogsSchemas,
   ...systemNotificationsSchemas,
-  ...systemAppSettingsSchemas,
+  ...systemAppSettingsAppSettingsSchemas,
   ...systemSystemMetricsSystemMetricsSchemas,
   ...systemSystemAppThemeSettingsSchemas,
   ...systemAppConfigsSchemas,
