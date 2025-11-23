@@ -44,6 +44,9 @@ export const appConfigsValidators = {
  * Complex object schemas for appConfigs module
  */
 export const appConfigsFields = {
+  // Shared config value type for all config value storage
+  configValue,
+
   // Validation and constraints
   validationRules: v.object({
     min: v.optional(v.number()),

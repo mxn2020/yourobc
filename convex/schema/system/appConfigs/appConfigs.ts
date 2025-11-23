@@ -36,14 +36,7 @@ export const appConfigsTable = defineTable({
   feature: v.string(),
   featureKey: v.string(),
   key: v.string(),
-  value: v.union(
-    v.string(),
-    v.number(),
-    v.boolean(),
-    v.null(),
-    v.array(v.union(v.string(), v.number(), v.boolean())),
-    v.object({})
-  ),
+  value: appConfigsFields.configValue,
 
   // Value type and validation
   valueType: appConfigsValidators.valueType,
@@ -56,13 +49,12 @@ export const appConfigsTable = defineTable({
   // Access control
   scope: appConfigsValidators.scope,
   tenantId: v.optional(v.string()),
-  ownerId: v.optional(v.id('userProfiles')),
 
   // Validation and constraints
   validationRules: v.optional(appConfigsFields.validationRules),
 
   // Default and override tracking
-  defaultValue: v.any(),
+  defaultValue: appConfigsFields.configValue,
   isOverridden: v.boolean(),
   overrideSource: v.optional(appConfigsValidators.overrideSource),
 
