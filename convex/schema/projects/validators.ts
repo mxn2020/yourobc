@@ -2,6 +2,7 @@
 // Grouped validators for projects module
 
 import { v } from 'convex/values';
+import { statusTypes } from '@/schema/base';
 
 // Projects validators
 export const projectsValidators = {
@@ -127,5 +128,20 @@ export const projectMilestonesFields = {
     budget: v.optional(v.number()),
     actualCost: v.optional(v.number()),
     notes: v.optional(v.string()),
+  }),
+};
+
+// Project tasks validators
+export const projectTasksValidators = {
+  status: statusTypes.task,
+  priority: statusTypes.priority,
+} as const;
+
+// Project tasks complex field definitions
+export const projectTasksFields = {
+  metadata: v.object({
+    attachments: v.optional(v.array(v.string())),
+    externalLinks: v.optional(v.array(v.string())),
+    customFields: v.optional(v.any()),
   }),
 };

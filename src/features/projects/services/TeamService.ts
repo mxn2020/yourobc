@@ -24,32 +24,32 @@ export class TeamService {
   // ==========================================
 
   getProjectMembersQueryOptions(projectId: Id<"projects">, options?: TeamListOptions) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getProjectMembers, {
+    return convexQuery(api.lib.projects.team.queries.getProjectMembers, {
       projectId,
       options,
     });
   }
 
   getMemberQueryOptions(memberId: Id<"projectMembers">) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getMember, {
+    return convexQuery(api.lib.projects.team.queries.getMember, {
       memberId,
     });
   }
 
   getUserMembershipsQueryOptions(targetUserId?: Id<"userProfiles">) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getUserMemberships, {
+    return convexQuery(api.lib.projects.team.queries.getUserMemberships, {
       targetUserId,
     });
   }
 
   getTeamStatsQueryOptions(projectId: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getTeamStats, {
+    return convexQuery(api.lib.projects.team.queries.getTeamStats, {
       projectId,
     });
   }
 
   getCheckMembershipQueryOptions(projectId: Id<"projects">, userId?: Id<"userProfiles">) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.checkMembership, {
+    return convexQuery(api.lib.projects.team.queries.checkMembership, {
       projectId,
       userId,
     });
@@ -64,14 +64,14 @@ export class TeamService {
       filterByMember?: Id<"userProfiles">;
     }
   ) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getProjectActivity, {
+    return convexQuery(api.lib.projects.team.queries.getProjectActivity, {
       projectId,
       ...options,
     });
   }
 
   getMemberWorkloadQueryOptions(projectId: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.team.queries.getMemberWorkload, {
+    return convexQuery(api.lib.projects.team.queries.getMemberWorkload, {
       projectId,
     });
   }
@@ -171,27 +171,27 @@ export class TeamService {
   // ==========================================
 
   useAddMember() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.team.mutations.addMember);
+    const mutationFn = useConvexMutation(api.lib.projects.team.mutations.addMember);
     return useMutation({ mutationFn });
   }
 
   useUpdateMember() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.team.mutations.updateMember);
+    const mutationFn = useConvexMutation(api.lib.projects.team.mutations.updateMember);
     return useMutation({ mutationFn });
   }
 
   useRemoveMember() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.team.mutations.removeMember);
+    const mutationFn = useConvexMutation(api.lib.projects.team.mutations.removeMember);
     return useMutation({ mutationFn });
   }
 
   useUpdateMemberRole() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.team.mutations.updateMemberRole);
+    const mutationFn = useConvexMutation(api.lib.projects.team.mutations.updateMemberRole);
     return useMutation({ mutationFn });
   }
 
   useUpdateMemberActivity() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.team.mutations.updateMemberActivity);
+    const mutationFn = useConvexMutation(api.lib.projects.team.mutations.updateMemberActivity);
     return useMutation({ mutationFn });
   }
 }

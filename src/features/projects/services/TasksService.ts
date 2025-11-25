@@ -26,31 +26,31 @@ export class TasksService {
   // ==========================================
 
   getTasksQueryOptions(options?: TasksListOptions) {
-    return convexQuery(api.lib.boilerplate.projects.tasks.queries.getTasks, {
+    return convexQuery(api.lib.projects.tasks.queries.getTasks, {
       options,
     });
   }
 
   getTaskQueryOptions(taskId: Id<"projectTasks">) {
-    return convexQuery(api.lib.boilerplate.projects.tasks.queries.getTask, {
+    return convexQuery(api.lib.projects.tasks.queries.getTask, {
       taskId,
     });
   }
 
   getUserTasksQueryOptions(targetUserId?: Id<"userProfiles">) {
-    return convexQuery(api.lib.boilerplate.projects.tasks.queries.getUserTasks, {
+    return convexQuery(api.lib.projects.tasks.queries.getUserTasks, {
       targetUserId,
     });
   }
 
   getTaskStatsQueryOptions(projectId?: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.tasks.queries.getTaskStats, {
+    return convexQuery(api.lib.projects.tasks.queries.getTaskStats, {
       projectId,
     });
   }
 
   getProjectTasksQueryOptions(projectId: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.tasks.queries.getProjectTasks, {
+    return convexQuery(api.lib.projects.tasks.queries.getProjectTasks, {
       projectId,
     });
   }
@@ -101,27 +101,27 @@ export class TasksService {
   // ==========================================
 
   useCreateTask() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.tasks.mutations.createTask);
+    const mutationFn = useConvexMutation(api.lib.projects.tasks.mutations.createTask);
     return useMutation({ mutationFn });
   }
 
   useUpdateTask() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.tasks.mutations.updateTask);
+    const mutationFn = useConvexMutation(api.lib.projects.tasks.mutations.updateTask);
     return useMutation({ mutationFn });
   }
 
   useDeleteTask() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.tasks.mutations.deleteTask);
+    const mutationFn = useConvexMutation(api.lib.projects.tasks.mutations.deleteTask);
     return useMutation({ mutationFn });
   }
 
   useUpdateTaskStatus() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.tasks.mutations.updateTaskStatus);
+    const mutationFn = useConvexMutation(api.lib.projects.tasks.mutations.updateTaskStatus);
     return useMutation({ mutationFn });
   }
 
   useUpdateTaskOrder() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.tasks.mutations.updateTaskOrder);
+    const mutationFn = useConvexMutation(api.lib.projects.tasks.mutations.updateTaskOrder);
     return useMutation({ mutationFn });
   }
 }

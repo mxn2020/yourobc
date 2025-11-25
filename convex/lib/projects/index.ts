@@ -72,3 +72,4 @@ export {
 // Sub-modules (milestones and team)
 export * as milestones from './milestones';
 export * as team from './team';
+export * as tasks from './tasks';

@@ -16,6 +16,7 @@ import { query, mutation, MutationCtx } from '@/generated/server';
 import type { Id } from '@/generated/dataModel';
 import { FEATURES } from '../../config/features';
 import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 // ============================================
 // TYPES
@@ -73,7 +74,7 @@ async function setConfigValueHelper(
   const existing = await ctx.db
     .query('appConfigs')
     .withIndex('by_feature_key', (q) =>
-      q.eq('feature', args.feature).eq('key', args.key)
+      q.eq('feature', args.feature).eq('featureKey', args.key).eq('key', args.key)
     )
     .filter((q) => {
       let filter = q.eq(q.field('scope'), scope);
@@ -117,7 +118,10 @@ async function setConfigValueHelper(
   } else {
     // Create new override
     const configId = await ctx.db.insert('appConfigs', {
+      name: args.key,
+      publicId: await generateUniquePublicId(ctx, 'appConfigs'),
       feature: args.feature,
+      featureKey: args.key,
       key: args.key,
       value: args.value,
       valueType: args.valueType,
@@ -232,7 +236,7 @@ export const getConfigValue = query({
     const dbConfig = await ctx.db
       .query('appConfigs')
       .withIndex('by_feature_key', (q) =>
-        q.eq('feature', args.feature).eq('key', args.key)
+        q.eq('feature', args.feature).eq('featureKey', args.key).eq('key', args.key)
       )
       .filter((q) => {
         let filter = q.eq(q.field('scope'), scope);
@@ -369,7 +373,12 @@ export const getFeaturesOverview = query({
 export const validateAllConfigs = query({
   args: {},
   handler: async () => {
-    const results = [];
+    const results: {
+      feature: string;
+      valid: boolean;
+      errors: string[];
+      warnings: string[];
+    }[] = [];
 
     for (const [featureKey, featureInfo] of Object.entries(FEATURES)) {
       if (featureInfo.validate) {
@@ -469,7 +478,7 @@ export const resetConfigValue = mutation({
     const override = await ctx.db
       .query('appConfigs')
       .withIndex('by_feature_key', (q) =>
-        q.eq('feature', args.feature).eq('key', args.key)
+        q.eq('feature', args.feature).eq('featureKey', args.key).eq('key', args.key)
       )
       .filter((q) => {
         let filter = q.eq(q.field('scope'), scope);
@@ -584,7 +593,20 @@ export const batchUpdateConfigs = mutation({
     // Get current user from context
     const currentUser = await requireCurrentUser(ctx);
 
-    const results = [];
+    const results: Array<
+      {
+        feature: string;
+        key: string;
+        value: unknown;
+        valueType: ValueType;
+        scope?: ConfigScope;
+        tenantId?: string;
+        userId?: Id<'userProfiles'>;
+        success: boolean;
+        result?: { id: Id<'appConfigs'>; action: 'updated' | 'created' };
+        error?: string;
+      }
+    > = [];
 
     // Process each update using the helper function
     for (const update of args.updates) {

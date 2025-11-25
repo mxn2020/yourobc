@@ -26,10 +26,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/_projects/')({
 
         if (convexClient) {
           const [projects, stats] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.projects.queries.getProjects, {
+            convexClient.query(api.lib.projects.queries.getProjects, {
               options: { limit: 100 }
             }),
-            convexClient.query(api.lib.boilerplate.projects.queries.getProjectStats, {})
+            convexClient.query(api.lib.projects.queries.getProjectStats, {})
           ])
 
           // Cache data using service query options (ensures same keys as hooks)

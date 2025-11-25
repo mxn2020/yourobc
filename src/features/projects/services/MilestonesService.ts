@@ -26,31 +26,31 @@ export class MilestonesService {
   // ==========================================
 
   getMilestonesQueryOptions(options?: MilestonesListOptions) {
-    return convexQuery(api.lib.boilerplate.projects.milestones.queries.getMilestones, {
+    return convexQuery(api.lib.projects.milestones.queries.getMilestones, {
       options,
     });
   }
 
   getMilestoneQueryOptions(milestoneId: Id<"projectMilestones">) {
-    return convexQuery(api.lib.boilerplate.projects.milestones.queries.getMilestone, {
+    return convexQuery(api.lib.projects.milestones.queries.getMilestone, {
       milestoneId,
     });
   }
 
   getProjectMilestonesQueryOptions(projectId: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.milestones.queries.getProjectMilestones, {
+    return convexQuery(api.lib.projects.milestones.queries.getProjectMilestones, {
       projectId,
     });
   }
 
   getMilestoneStatsQueryOptions(projectId?: Id<"projects">) {
-    return convexQuery(api.lib.boilerplate.projects.milestones.queries.getMilestoneStats, {
+    return convexQuery(api.lib.projects.milestones.queries.getMilestoneStats, {
       projectId,
     });
   }
 
   getUpcomingMilestonesQueryOptions(limit?: number) {
-    return convexQuery(api.lib.boilerplate.projects.milestones.queries.getUpcomingMilestones, {
+    return convexQuery(api.lib.projects.milestones.queries.getUpcomingMilestones, {
       limit,
     });
   }
@@ -101,27 +101,27 @@ export class MilestonesService {
   // ==========================================
 
   useCreateMilestone() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.milestones.mutations.createMilestone);
+    const mutationFn = useConvexMutation(api.lib.projects.milestones.mutations.createMilestone);
     return useMutation({ mutationFn });
   }
 
   useUpdateMilestone() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.milestones.mutations.updateMilestone);
+    const mutationFn = useConvexMutation(api.lib.projects.milestones.mutations.updateMilestone);
     return useMutation({ mutationFn });
   }
 
   useDeleteMilestone() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.milestones.mutations.deleteMilestone);
+    const mutationFn = useConvexMutation(api.lib.projects.milestones.mutations.deleteMilestone);
     return useMutation({ mutationFn });
   }
 
   useUpdateMilestoneProgress() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.milestones.mutations.updateMilestoneProgress);
+    const mutationFn = useConvexMutation(api.lib.projects.milestones.mutations.updateMilestoneProgress);
     return useMutation({ mutationFn });
   }
 
   useUpdateMilestoneStatus() {
-    const mutationFn = useConvexMutation(api.lib.boilerplate.projects.milestones.mutations.updateMilestoneStatus);
+    const mutationFn = useConvexMutation(api.lib.projects.milestones.mutations.updateMilestoneStatus);
     return useMutation({ mutationFn });
   }
 }

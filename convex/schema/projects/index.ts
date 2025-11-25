@@ -7,5 +7,6 @@ export {
   projectIdSchema,
   projectMemberIdSchema,
   projectMilestoneIdSchema,
+  projectTaskIdSchema,
   projectsSchemas,
 } from './schemas';

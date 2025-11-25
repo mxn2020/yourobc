@@ -15,6 +15,7 @@ export interface CreateAppSettingData {
 
 export interface UpdateAppSettingData {
   name?: string;
+  key?: string;
   value?: any;
   description?: string;
   isPublic?: boolean;

@@ -53,7 +53,13 @@ export function validateSystemCounterData(
   return errors;
 }
 
-export function formatSystemCounterNumber(prefix: string | undefined, value: number, year?: number, padLength = SYSTEM_COUNTERS_CONSTANTS.DEFAULTS.PAD_LENGTH, suffix?: string): string {
+export function formatSystemCounterNumber(
+  prefix: string | undefined,
+  value: number,
+  year?: number,
+  padLength: number = SYSTEM_COUNTERS_CONSTANTS.DEFAULTS.PAD_LENGTH,
+  suffix?: string
+): string {
   const padded = value.toString().padStart(padLength, '0');
   const parts = [prefix, year, padded, suffix].filter((p) => p !== undefined && p !== '');
   return parts.join('-');

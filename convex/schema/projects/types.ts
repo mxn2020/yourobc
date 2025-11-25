@@ -7,6 +7,8 @@ import {
   projectsFields,
   projectMembersValidators,
   projectMembersFields,
+  projectTasksValidators,
+  projectTasksFields,
 } from './validators';
 
 // Projects types from validators
@@ -26,3 +28,10 @@ export type ProjectMemberStatus = Infer<typeof projectMembersValidators.status>;
 
 // Project members types from fields
 export type ProjectMemberSettings = Infer<typeof projectMembersFields.settings>;
+
+// Project tasks types from validators
+export type ProjectTaskStatus = Infer<typeof projectTasksValidators.status>;
+export type ProjectTaskPriority = Infer<typeof projectTasksValidators.priority>;
+
+// Project tasks types from fields
+export type ProjectTaskMetadata = Infer<typeof projectTasksFields.metadata>;

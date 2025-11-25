@@ -7,6 +7,8 @@ import { TEAM_CONSTANTS } from './constants';
 import { requireViewTeamAccess, filterMembersByAccess } from './permissions';
 import type { TeamStats } from './types';
 import { getMemberActivityStatus } from './utils';
+import { TASK_CONSTANTS } from '../tasks/constants';
+import type { Id } from '@/generated/dataModel';
 
 /**
  * Get all members of a project
@@ -336,7 +338,7 @@ export const getTeamStats = query({
         (m) => m.status === TEAM_CONSTANTS.STATUS.INVITED
       ).length,
       inactiveMembers: members.filter(
-        (m) => m.status === TEAM_CONSTANTS.STATUS.INACTIVE
+        (m) => m.status === TEAM_CONSTANTS.STATUS.REMOVED
       ).length,
       byRole: {
         owners: members.filter((m) => m.role === TEAM_CONSTANTS.ROLE.OWNER)
@@ -423,25 +425,23 @@ export const getProjectActivity = query({
       .order('desc')
       .collect();
 
-    // Also get audit logs for milestones and members in this project
-    // TODO: Add task audit logs when projectTasks table is created
-    // const tasks = await ctx.db
-    //   .query('projectTasks')
-    //   .withIndex('by_project_id', (q) => q.eq('projectId', projectId))
-    //   .collect();
+    // Also get audit logs for milestones and tasks in this project
+    const tasks = await ctx.db
+      .query('projectTasks')
+      .withIndex('by_project_id', (q) => q.eq('projectId', projectId))
+      .collect();
 
-    // const taskIds = tasks.map(t => t.publicId || t._id);
-    // const taskAuditLogs = await Promise.all(
-    //   taskIds.map(taskId =>
-    //     ctx.db
-    //       .query('auditLogs')
-    //       .withIndex('by_entity', (q) =>
-    //         q.eq('entityType', 'task').eq('entityId', taskId)
-    //       )
-    //       .collect()
-    //   )
-    // );
-    const taskAuditLogs: any[] = [];
+    const taskIds = tasks.map(t => t.publicId || t._id);
+    const taskAuditLogs = await Promise.all(
+      taskIds.map(taskId =>
+        ctx.db
+          .query('auditLogs')
+          .withIndex('by_entity', (q) =>
+            q.eq('entityType', 'project_task').eq('entityId', taskId)
+          )
+          .collect()
+      )
+    );
 
     const milestones = await ctx.db
       .query('projectMilestones')
@@ -505,7 +505,9 @@ export const getProjectActivity = query({
     // Enrich with user profiles
     const enrichedLogs = await Promise.all(
       paginatedLogs.map(async (log) => {
-        const userProfile = await ctx.db.get(log.userId);
+        const userProfile = log.userId
+          ? await ctx.db.get(log.userId as Id<'userProfiles'>)
+          : null;
         return {
           ...log,
           userProfile: userProfile
@@ -561,14 +563,12 @@ export const getMemberWorkload = query({
       )
       .collect();
 
-    // TODO: Add task workload when projectTasks table is created
     // Get all tasks for this project
-    // const allTasks = await ctx.db
-    //   .query('projectTasks')
-    //   .withIndex('by_project_id', (q) => q.eq('projectId', projectId))
-    //   .filter((q) => q.eq(q.field('deletedAt'), undefined))
-    //   .collect();
-    const allTasks: any[] = [];
+    const allTasks = await ctx.db
+      .query('projectTasks')
+      .withIndex('by_project_id', (q) => q.eq('projectId', projectId))
+      .filter((q) => q.eq(q.field('deletedAt'), undefined))
+      .collect();
 
     // Calculate workload for each member
     const memberWorkloads = await Promise.all(
@@ -577,16 +577,19 @@ export const getMemberWorkload = query({
         const assignedTasks = allTasks.filter(task => task.assignedTo === member.userId);
 
         const tasksByStatus = {
-          todo: assignedTasks.filter(t => t.status === 'todo').length,
-          inProgress: assignedTasks.filter(t => t.status === 'in_progress').length,
-          inReview: assignedTasks.filter(t => t.status === 'in_review').length,
-          completed: assignedTasks.filter(t => t.status === 'completed').length,
-          blocked: assignedTasks.filter(t => t.status === 'blocked').length,
-          cancelled: assignedTasks.filter(t => t.status === 'cancelled').length,
+          todo: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.TODO).length,
+          inProgress: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.IN_PROGRESS).length,
+          inReview: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.IN_REVIEW).length,
+          completed: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.COMPLETED).length,
+          blocked: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.BLOCKED).length,
+          cancelled: assignedTasks.filter(t => t.status === TASK_CONSTANTS.STATUS.CANCELLED).length,
         };
 
         const overdueTasks = assignedTasks.filter(task =>
-          task.dueDate && task.dueDate < Date.now() && task.status !== 'completed' && task.status !== 'cancelled'
+          task.dueDate &&
+          task.dueDate < Date.now() &&
+          task.status !== TASK_CONSTANTS.STATUS.COMPLETED &&
+          task.status !== TASK_CONSTANTS.STATUS.CANCELLED
         ).length;
 
         const totalEstimatedHours = assignedTasks.reduce((sum, task) => sum + (task.estimatedHours || 0), 0);

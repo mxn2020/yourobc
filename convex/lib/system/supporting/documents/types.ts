@@ -26,13 +26,7 @@ export interface CreateSystemDocumentData {
   version?: number;
 }
 
-export interface UpdateSystemDocumentData {
-  name?: string;
-  status?: DocumentStatus;
-  description?: string;
-  tags?: string[];
-  version?: number;
-}
+export type UpdateSystemDocumentData = Partial<CreateSystemDocumentData>;
 
 export interface SystemDocumentFilters {
   entityType?: string;

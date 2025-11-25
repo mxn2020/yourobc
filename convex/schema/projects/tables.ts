@@ -11,6 +11,8 @@ import {
   projectMembersFields,
   projectMilestonesValidators,
   projectMilestonesFields,
+  projectTasksValidators,
+  projectTasksFields,
 } from './validators';
 
 export const projectsTable = defineTable({
@@ -79,6 +81,7 @@ export const projectMembersTable = defineTable({
   invitationAcceptedAt: v.optional(v.number()),
 
   // Member-specific settings
+  permissions: v.optional(v.array(v.string())),
   settings: v.optional(projectMembersFields.settings),
 
   // Additional member information
@@ -158,3 +161,55 @@ export const projectMilestonesTable = defineTable({
   .index('by_project_and_due_date', ['projectId', 'dueDate'])
   .index('by_order', ['order'])
   .index('by_created_at', ['createdAt']);
+
+export const projectTasksTable = defineTable({
+  // Required: Main display field
+  title: v.string(),
+
+  // Required: Core fields
+  publicId: v.string(),
+  projectId: v.id('projects'),
+
+  // Task information
+  description: v.optional(v.string()),
+  status: projectTasksValidators.status,
+  priority: projectTasksValidators.priority,
+
+  // Assignment & organization
+  assignedTo: v.optional(v.id('userProfiles')),
+  tags: v.optional(v.array(v.string())),
+  order: v.optional(v.number()),
+
+  // Timeline
+  startDate: v.optional(v.number()),
+  dueDate: v.optional(v.number()),
+  completedAt: v.optional(v.number()),
+
+  // Time tracking
+  estimatedHours: v.optional(v.number()),
+  actualHours: v.optional(v.number()),
+
+  // Dependencies
+  blockedBy: v.optional(v.array(v.id('projectTasks'))),
+  dependsOn: v.optional(v.array(v.id('projectTasks'))),
+
+  // Extended metadata
+  metadata: v.optional(projectTasksFields.metadata),
+
+  // Standard metadata and audit fields
+  ...auditFields,
+  ...softDeleteFields,
+})
+  // Required indexes
+  .index('by_public_id', ['publicId'])
+  .index('by_project_id', ['projectId'])
+  .index('by_deleted_at', ['deletedAt'])
+
+  // Module-specific indexes
+  .index('by_status', ['status'])
+  .index('by_priority', ['priority'])
+  .index('by_due_date', ['dueDate'])
+  .index('by_assigned_to', ['assignedTo'])
+  .index('by_project_and_status', ['projectId', 'status'])
+  .index('by_created_at', ['createdAt'])
+  .index('by_order', ['order']);

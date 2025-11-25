@@ -139,7 +139,7 @@ export const updateSystemFollowupReminder = mutation({
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: 'Updated followup reminder',
-      metadata: { updates: trimmed },
+      metadata: { updates: JSON.stringify(trimmed) },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,

@@ -27,19 +27,10 @@ export interface CreateSystemFollowupReminderData {
   recurrencePattern?: RecurrencePattern;
 }
 
-export interface UpdateSystemFollowupReminderData {
-  name?: string;
-  description?: string;
-  status?: ReminderStatus;
-  priority?: ReminderPriority;
-  dueDate?: number;
-  assignedTo?: Id<'userProfiles'> | null;
-  notes?: string;
-  isRecurring?: boolean;
-  recurrencePattern?: RecurrencePattern;
+export type UpdateSystemFollowupReminderData = Partial<CreateSystemFollowupReminderData> & {
   completedAt?: number | null;
   snoozeUntil?: number | null;
-}
+};
 
 export interface SystemFollowupReminderFilters {
   entityType?: string;

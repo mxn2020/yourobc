@@ -20,9 +20,10 @@ export interface CreateSystemNotificationData {
   entityId?: string;
 }
 
-export interface UpdateSystemNotificationData {
+export type UpdateSystemNotificationData = Partial<CreateSystemNotificationData> & {
   isRead?: boolean;
-}
+  readAt?: number;
+};
 
 export interface SystemNotificationFilters {
   type?: SystemSupportingNotificationType;

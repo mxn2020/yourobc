@@ -19,15 +19,7 @@ export interface CreateSystemExchangeRateData {
   isAutomatic?: boolean;
 }
 
-export interface UpdateSystemExchangeRateData {
-  name?: string;
-  rate?: number;
-  inverseRate?: number;
-  validFrom?: number;
-  validTo?: number;
-  source?: string;
-  isAutomatic?: boolean;
-}
+export type UpdateSystemExchangeRateData = Partial<CreateSystemExchangeRateData>;
 
 export interface SystemExchangeRateFilters {
   fromCurrency?: Currency;

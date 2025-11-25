@@ -29,7 +29,7 @@ console.log(`🔄 Edit Project Loader STARTED (${isServer ? 'SERVER' : 'CLIENT'}
 
         if (convexClient) {
           // Fetch project data for editing
-          const project = await convexClient.query(api.lib.boilerplate.projects.queries.getProject, {
+          const project = await convexClient.query(api.lib.projects.queries.getProject, {
             projectId
           })
 

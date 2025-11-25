@@ -31,10 +31,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/_projects/$projectI
         if (convexClient) {
           // Fetch project and members in parallel
           const [project, members] = await Promise.all([
-            convexClient.query(api.lib.boilerplate.projects.queries.getProject, {
+            convexClient.query(api.lib.projects.queries.getProject, {
               projectId
             }),
-            convexClient.query(api.lib.boilerplate.projects.queries.getProjectMembers, {
+            convexClient.query(api.lib.projects.queries.getProjectMembers, {
               projectId
             })
           ])

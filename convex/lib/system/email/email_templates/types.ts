@@ -35,6 +35,7 @@ export interface CreateEmailTemplateData {
 
 export interface UpdateEmailTemplateData {
   name?: string;
+  slug?: string;
   description?: string;
   subject?: string;
   htmlTemplate?: string;

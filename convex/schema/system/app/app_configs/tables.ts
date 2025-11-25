@@ -48,6 +48,7 @@ export const appConfigsTable = defineTable({
   // Access control
   scope: appConfigsValidators.scope,
   tenantId: v.optional(v.string()),
+  userId: v.optional(v.id('userProfiles')),
 
   // Validation and constraints
   validationRules: v.optional(appConfigsFields.validationRules),
@@ -81,7 +82,7 @@ export const appConfigsTable = defineTable({
   // Module-specific indexes
   .index('by_feature', ['feature'])
   .index('by_feature_key', ['feature', 'featureKey', 'key'])
-  // Note: category is optional, can't index it
+  .index('by_category', ['category'])
   .index('by_scope', ['scope'])
   // Note: tenantId is optional, can't index it
   .index('by_visible', ['isVisible'])

@@ -15,7 +15,7 @@ import {
   updateExtendedMetadata
 } from './utils';
 import { vUserRole } from '@/shared/validators';
-import type { UserRole } from 'types';
+import type { UserRole } from './types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**

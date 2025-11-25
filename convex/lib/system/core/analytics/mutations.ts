@@ -19,6 +19,7 @@ import { Id } from '@/generated/dataModel';
 import { requireCurrentUser, requireOwnershipOrAdmin, requireAdmin } from '@/shared/auth.helper';
 import type { EventProperties, DimensionBreakdown } from './types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { analyticsFields } from '@/schema/system/core/analytics/validators';
 
 /**
  * Audit Actions
@@ -60,14 +61,7 @@ const filtersValidator = v.object({
   combinator: v.union(v.literal('and'), v.literal('or')),
 });
 
-const eventPropertiesValidator = v.union(
-  v.object({ eventType: v.literal('page_view'), duration: v.optional(v.number()), scrollDepth: v.optional(v.number()), exitPage: v.optional(v.boolean()) }),
-  v.object({ eventType: v.literal('user_action'), action: v.string(), category: v.optional(v.string()), label: v.optional(v.string()), target: v.optional(v.string()), buttonText: v.optional(v.string()), formId: v.optional(v.string()) }),
-  v.object({ eventType: v.literal('ai_usage'), modelId: v.string(), modelName: v.string(), provider: v.string(), promptTokens: v.number(), completionTokens: v.number(), totalTokens: v.number(), cost: v.number(), latency: v.number(), success: v.boolean(), errorCode: v.optional(v.string()), errorMessage: v.optional(v.string()) }),
-  v.object({ eventType: v.literal('payment'), transactionId: v.string(), amount: v.number(), currency: v.string(), paymentMethod: v.string(), status: v.union(v.literal('pending'), v.literal('completed'), v.literal('failed'), v.literal('refunded')), subscriptionId: v.optional(v.string()), planName: v.optional(v.string()) }),
-  v.object({ eventType: v.literal('error'), errorType: v.string(), errorMessage: v.string(), errorStack: v.optional(v.string()), statusCode: v.optional(v.number()), url: v.optional(v.string()), componentName: v.optional(v.string()), severity: v.union(v.literal('low'), v.literal('medium'), v.literal('high'), v.literal('critical')) }),
-  v.object({ eventType: v.literal('custom'), category: v.string(), data: v.record(v.string(), v.union(v.string(), v.number(), v.boolean())) })
-);
+const eventPropertiesValidator = analyticsFields.eventProperties;
 
 const widgetConfigValidator = v.union(
   v.object({ type: v.literal('line_chart'), showLegend: v.optional(v.boolean()), showGrid: v.optional(v.boolean()), colors: v.optional(v.array(v.string())), smooth: v.optional(v.boolean()), stacked: v.optional(v.boolean()) }),

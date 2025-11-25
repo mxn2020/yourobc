@@ -8,7 +8,7 @@ import type { UserModelPreferences, CreateModelPreferencesData, UpdateModelPrefe
 /**
  * Get default model preferences values
  */
-export function getDefaultModelPreferences(): Omit<UserModelPreferences, '_id' | '_creationTime' | 'userId' | 'publicId' | 'displayName'> {
+export function getDefaultModelPreferences(): Omit<UserModelPreferences, '_id' | '_creationTime' | 'userId' | 'ownerId' | 'publicId' | 'displayName'> {
   const now = Date.now();
 
   return {

@@ -6,11 +6,12 @@ import { notificationsValidators } from './validators';
 export const notificationsTable = defineTable({
   name: v.string(),
   publicId: v.string(),
-  ownerId: v.id('userProfiles'),
+  recipientId: v.id('userProfiles'),
+  ownerId: v.optional(v.id('userProfiles')),
   type: notificationsValidators.notificationType,
   priority: notificationsValidators.priority,
-  entityType: v.string(),
-  entityId: v.string(),
+  entityType: v.optional(v.string()),
+  entityId: v.optional(v.string()),
   message: v.string(),
   isRead: v.optional(v.boolean()),
   readAt: v.optional(v.number()),
@@ -18,7 +19,7 @@ export const notificationsTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])
-  .index('by_owner', ['ownerId'])
+  .index('by_owner', ['recipientId'])
   .index('by_entity', ['entityType', 'entityId'])
   .index('by_is_read', ['isRead'])
   .index('by_created_at', ['createdAt']);

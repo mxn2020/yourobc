@@ -29,7 +29,7 @@ export const getSystemNotifications = query({
     const { limit = 50, cursor, filters = {} as SystemNotificationFilters } = args;
 
     const page = await ctx.db
-      .query('notifications')
+      .query('systemSupportingNotifications')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -38,7 +38,7 @@ export const getSystemNotifications = query({
     let items = await filterSystemNotificationsByAccess(ctx, page.page, user);
 
     if (filters.type) {
-      items = items.filter((item) => item.notificationType === filters.type);
+      items = items.filter((item) => item.type === filters.type);
     }
 
     if (filters.priority) {
@@ -59,7 +59,7 @@ export const getSystemNotifications = query({
 });
 
 export const getSystemNotification = query({
-  args: { id: v.id('notifications') },
+  args: { id: v.id('systemSupportingNotifications') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);
