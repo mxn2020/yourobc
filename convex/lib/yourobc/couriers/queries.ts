@@ -208,7 +208,7 @@ export const getPreferredCouriers = query({
 
     let couriers = await ctx.db
       .query('yourobcCouriers')
-      .withIndex('by_isPreferred', (q) => q.eq('isPreferred', true))
+      .withIndex('by_is_preferred', (q) => q.eq('isPreferred', true))
       .filter(notDeleted)
       .collect();
 

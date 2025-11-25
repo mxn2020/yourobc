@@ -25,6 +25,7 @@ export interface CreateSystemFollowupReminderData {
   notes?: string;
   isRecurring?: boolean;
   recurrencePattern?: RecurrencePattern;
+  snoozeUntil?: number | null;
 }
 
 export type UpdateSystemFollowupReminderData = Partial<CreateSystemFollowupReminderData> & {

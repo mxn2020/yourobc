@@ -7,6 +7,8 @@ import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { NOTIFICATIONS_CONSTANTS } from './constants';
 import { validateNotificationData } from './utils';
 import { requireDeleteNotificationAccess } from './permissions';
+import { notDeleted } from '@/shared/db.helper';
+import { notificationsValidators } from '@/schema/yourobc/supporting/notifications/validators';
 
 /**
  * Create a notification (internal - for system use)
@@ -14,13 +16,13 @@ import { requireDeleteNotificationAccess } from './permissions';
 export const createNotification = internalMutation({
   args: {
     data: v.object({
-      userId: v.string(),
-      type: v.string(),
+      userId: v.id('userProfiles'),
+      type: notificationsValidators.notificationType,
       title: v.string(),
       message: v.string(),
       entityType: v.string(),
       entityId: v.string(),
-      priority: v.optional(v.string()),
+      priority: v.optional(notificationsValidators.notificationPriority),
       actionUrl: v.optional(v.string()),
     }),
   },
@@ -32,10 +34,11 @@ export const createNotification = internalMutation({
 
     return await ctx.db.insert('yourobcNotifications', {
       ...data,
+      priority: data.priority ?? 'normal',
       isRead: NOTIFICATIONS_CONSTANTS.DEFAULTS.IS_READ,
       createdAt: now,
       updatedAt: now,
-      createdBy: 'system',
+      createdBy: data.userId,
     });
   },
 });
@@ -137,7 +140,7 @@ export const deleteAllNotifications = mutation({
     const notifications = await ctx.db
       .query('yourobcNotifications')
       .withIndex('by_user', iq => iq.eq('userId', user._id))
-      .filter(doc => !doc.deletedAt)
+      .filter(notDeleted)
       .collect();
 
     for (const notif of notifications) {

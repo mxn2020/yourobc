@@ -33,6 +33,8 @@ export interface CreateTaskData {
   checklist?: ChecklistItem[];
   tags?: string[];
   category?: string;
+  completionNotes?: string;
+  cancellationReason?: string;
 }
 
 export interface UpdateTaskData {
@@ -63,6 +65,7 @@ export interface TaskListResponse {
   items: Task[];
   total: number;
   hasMore: boolean;
+  returnedCount?: number;
 }
 
 // Filter types

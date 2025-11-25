@@ -16,7 +16,15 @@ import {
   canEditEmployee,
   canDeleteEmployee,
 } from './permissions';
-import type { Employee, EmployeeId, VacationDaysId, VacationRequest } from './types';
+import type {
+  Employee,
+  EmployeeId,
+  UpdateEmployeeData,
+  VacationDaysId,
+  VacationRequest,
+} from './types';
+
+type EmployeeUpdatePatch = Partial<UpdateEmployeeData> & Pick<Employee, 'updatedAt' | 'updatedBy'>;
 
 // ============================================================================
 // Employee Operations
@@ -206,7 +214,7 @@ export const updateEmployee = mutation({
     // 5. PROCESS: Sanitize and prepare update data
     const sanitized = sanitizeEmployeeData(updates);
     const now = Date.now();
-    const updateData: any = {
+    const updateData: EmployeeUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

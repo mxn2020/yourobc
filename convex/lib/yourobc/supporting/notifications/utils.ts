@@ -4,7 +4,13 @@
 /**
  * Trim notification data
  */
-export function trimNotificationData<T extends Record<string, any>>(data: T): T {
+export function trimNotificationData<
+  T extends Record<string, any> & {
+    title?: string;
+    message?: string;
+    actionUrl?: string;
+  }
+>(data: T): T {
   const trimmed: T = { ...data };
 
   if (typeof trimmed.title === 'string') {

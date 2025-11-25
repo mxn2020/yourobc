@@ -25,7 +25,7 @@ export async function canViewQuote(
   if (quote.createdBy === user._id) return true;
 
   // Assigned employee can view
-  if (quote.employeeId && quote.employeeId === user._id) return true;
+  if (quote.employeeId && (user as any).employeeId && quote.employeeId === (user as any).employeeId) return true;
 
   return false;
 }
@@ -56,7 +56,7 @@ export async function canEditQuote(
   if (quote.ownerId === user._id) return true;
 
   // Assigned employee can edit
-  if (quote.employeeId && quote.employeeId === user._id) return true;
+  if (quote.employeeId && (user as any).employeeId && quote.employeeId === (user as any).employeeId) return true;
 
   // Check if quote is locked (accepted, rejected, or expired quotes can only be edited by admins)
   if (quote.status === 'accepted' || quote.status === 'rejected' || quote.status === 'expired') {
@@ -115,7 +115,7 @@ export async function canSendQuote(
   if (quote.ownerId === user._id) return true;
 
   // Assigned employee can send
-  if (quote.employeeId && quote.employeeId === user._id) return true;
+  if (quote.employeeId && (user as any).employeeId && quote.employeeId === (user as any).employeeId) return true;
 
   return false;
 }
@@ -146,7 +146,7 @@ export async function canAcceptOrRejectQuote(
   if (quote.ownerId === user._id) return true;
 
   // Assigned employee can accept/reject
-  if (quote.employeeId && quote.employeeId === user._id) return true;
+  if (quote.employeeId && (user as any).employeeId && quote.employeeId === (user as any).employeeId) return true;
 
   return false;
 }
@@ -177,7 +177,7 @@ export async function canConvertQuote(
   if (quote.ownerId === user._id) return true;
 
   // Assigned employee can convert
-  if (quote.employeeId && quote.employeeId === user._id) return true;
+  if (quote.employeeId && (user as any).employeeId && quote.employeeId === (user as any).employeeId) return true;
 
   return false;
 }

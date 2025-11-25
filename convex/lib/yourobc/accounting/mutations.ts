@@ -15,7 +15,13 @@ import {
   normalizeAccountingEntryData,
 } from './utils';
 import { requireEditAccountingEntryAccess, requireDeleteAccountingEntryAccess, requireApproveAccountingEntryAccess } from './permissions';
-import type { AccountingEntryId } from './types';
+import type { AccountingEntry, AccountingEntryId, UpdateAccountingEntryData } from './types';
+
+type AccountingEntryUpdatePatch = Partial<UpdateAccountingEntryData> &
+  Pick<
+    AccountingEntry,
+    'updatedAt' | 'updatedBy' | 'reconciledDate' | 'reconciledBy' | 'approvedBy' | 'approvedDate' | 'rejectedBy' | 'rejectedDate'
+  >;
 
 /**
  * Create new accounting entry
@@ -199,7 +205,7 @@ export const updateAccountingEntry = mutation({
     }
 
     const now = Date.now();
-    const updateData: any = {
+    const updateData: AccountingEntryUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

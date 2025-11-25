@@ -14,8 +14,11 @@ import {
   canEditProject,
   canDeleteProject,
 } from './permissions';
-import type { ProjectId } from './types';
+import type { Project, ProjectId, UpdateProjectData } from './types';
 import { Id } from '@/generated/dataModel';
+
+type ProjectUpdatePatch = Partial<UpdateProjectData> &
+  Pick<Project, 'updatedAt' | 'updatedBy' | 'lastActivityAt' | 'completedAt'>;
 
 /**
  * Create new project
@@ -217,9 +220,10 @@ export const updateProject = mutation({
 
     // 6. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: ProjectUpdatePatch = {
       updatedAt: now,
       lastActivityAt: now,
+      updatedBy: user._id,
     };
 
     if (trimmedUpdates.title !== undefined) {
@@ -557,9 +561,10 @@ export const bulkUpdateProjects = mutation({
         }
 
         // Apply updates
-        const updateData: any = {
+        const updateData: ProjectUpdatePatch = {
           updatedAt: now,
           lastActivityAt: now,
+          updatedBy: user._id,
         };
 
         if (updates.status !== undefined) updateData.status = updates.status;

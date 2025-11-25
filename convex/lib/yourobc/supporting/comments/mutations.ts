@@ -150,10 +150,11 @@ export const updateComment = mutation({
       updatedBy: user._id,
     });
 
-    // Audit log
-    await ctx.db.insert('auditLogs', {
-      userId: user._id,
-      userName: user.name || user.email || 'Unknown',
+  // Audit log
+  await ctx.db.insert('auditLogs', {
+    publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+    userId: user._id,
+    userName: user.name || user.email || 'Unknown',
       action: 'comments.updated',
       entityType: 'yourobcComments',
       entityId: existing.entityId,

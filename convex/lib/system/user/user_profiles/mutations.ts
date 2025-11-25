@@ -15,8 +15,10 @@ import {
   updateExtendedMetadata
 } from './utils';
 import { vUserRole } from '@/shared/validators';
-import type { UserRole } from './types';
+import type { UserProfile, UserRole } from './types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
+
+type UserProfilePatch = Partial<UserProfile> & Pick<UserProfile, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create a new user profile
@@ -163,7 +165,7 @@ export const updateProfile = mutation({
     }
 
     const now = Date.now();
-    const updateData: any = {
+    const updateData: UserProfilePatch = {
       updatedAt: now,
       updatedBy: profile._id,
     };
@@ -268,7 +270,7 @@ export const updateUserRole = mutation({
     }
 
     const now = Date.now();
-    const updateData: any = {
+    const updateData: UserProfilePatch = {
       role: newRole,
       permissions: permissions || getRolePermissions(newRole),
       updatedAt: now,
@@ -328,7 +330,7 @@ export const updateActivity = mutation({
     }
 
     const now = Date.now();
-    const updateData: any = {
+    const updateData: UserProfilePatch = {
       lastActiveAt: now,
       updatedAt: now,
       updatedBy: profile._id,
@@ -496,7 +498,7 @@ export const syncProfileFromAuth = mutation({
 
     if (existing) {
       // 3. Update existing profile with fresh auth data
-      const updateData: any = {
+      const updateData: UserProfilePatch = {
         email,
         updatedAt: now,
         updatedBy: existing._id,

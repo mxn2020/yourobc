@@ -10,8 +10,10 @@ import { partnersValidators, partnersFields } from '@/schema/yourobc/partners/va
 import { PARTNERS_CONSTANTS } from './constants';
 import { trimPartnerData, validatePartnerData } from './utils';
 import { requireEditPartnerAccess, requireDeletePartnerAccess, canEditPartner, canDeletePartner } from './permissions';
-import type { PartnerId } from './types';
+import type { Partner, PartnerId, UpdatePartnerData } from './types';
 import { baseValidators } from '@/schema/base.validators';
+
+type PartnerUpdatePatch = Partial<UpdatePartnerData> & Pick<Partner, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new partner
@@ -171,7 +173,7 @@ export const updatePartner = mutation({
 
     // 7. UPDATE: Apply changes (use trimmed data)
     const now = Date.now();
-    const updateData: any = {
+    const updateData: PartnerUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

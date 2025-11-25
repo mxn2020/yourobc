@@ -18,7 +18,7 @@ export const createFollowupReminder = mutation({
     data: v.object({
       title: v.string(),
       description: v.optional(v.string()),
-      type: v.string(),
+      type: followupRemindersValidators.reminderType,
       entityType: v.string(),
       entityId: v.string(),
       dueDate: v.number(),

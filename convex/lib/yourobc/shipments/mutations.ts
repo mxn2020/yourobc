@@ -18,8 +18,26 @@ import {
   canEditShipment,
   canDeleteShipment,
 } from './permissions';
-import type { ShipmentId } from './types';
+
+const buildSearchableText = (data: {
+  shipmentNumber: string;
+  awbNumber?: string;
+  customerReference?: string;
+  description: string;
+}) =>
+  [
+    data.shipmentNumber,
+    data.awbNumber,
+    data.customerReference,
+    data.description,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+import type { Shipment, ShipmentId, UpdateShipmentData } from './types';
 import { baseValidators } from '@/schema/base.validators';
+
+type ShipmentUpdatePatch = Partial<UpdateShipmentData> & Pick<Shipment, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new shipment
@@ -101,6 +119,12 @@ export const createShipment = mutation({
       priority: trimmedData.priority,
       customerId: trimmedData.customerId,
       quoteId: trimmedData.quoteId,
+      searchableText: buildSearchableText({
+        shipmentNumber: trimmedData.shipmentNumber,
+        awbNumber: trimmedData.awbNumber,
+        customerReference: trimmedData.customerReference,
+        description: trimmedData.description,
+      }),
       origin: trimmedData.origin,
       destination: trimmedData.destination,
       dimensions,
@@ -138,6 +162,8 @@ export const createShipment = mutation({
 
     // Create initial status history entry
     await ctx.db.insert('yourobcShipmentStatusHistory', {
+      publicId: await generateUniquePublicId(ctx, 'yourobcShipmentStatusHistory'),
+      ownerId: user.authUserId || user._id,
       shipmentId,
       status: trimmedData.currentStatus || 'quoted',
       timestamp: now,
@@ -225,7 +251,7 @@ export const updateShipment = mutation({
     // 5. PROCESS: Prepare update data
     const now = Date.now();
     const trimmedUpdates = trimShipmentData(updates);
-    const updateData: any = {
+    const updateData: ShipmentUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };
@@ -356,11 +382,13 @@ export const updateShipmentStatus = mutation({
       updatedBy: user._id,
     });
 
-    // 5. CREATE: Add status history entry
-    await ctx.db.insert('yourobcShipmentStatusHistory', {
-      shipmentId,
-      status,
-      timestamp: now,
+  // 5. CREATE: Add status history entry
+  await ctx.db.insert('yourobcShipmentStatusHistory', {
+    publicId: await generateUniquePublicId(ctx, 'yourobcShipmentStatusHistory'),
+    ownerId: user.authUserId || user._id,
+    shipmentId,
+    status,
+    timestamp: now,
       location,
       notes,
       metadata,
@@ -549,7 +577,7 @@ export const bulkUpdateShipments = mutation({
         }
 
         // Apply updates
-        const updateData: any = {
+        const updateData: ShipmentUpdatePatch = {
           updatedAt: now,
           updatedBy: user._id,
         };

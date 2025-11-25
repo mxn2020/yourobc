@@ -2,7 +2,7 @@
 // TypeScript type definitions for exchange rates module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { ExchangeRateCurrency } from '@/schema/yourobc/supporting/exchange_rates/types';
+import type { Currency } from '@/schema/yourobc/supporting/exchange_rates/types';
 
 // Entity types
 export type ExchangeRate = Doc<'yourobcExchangeRates'>;
@@ -10,8 +10,8 @@ export type ExchangeRateId = Id<'yourobcExchangeRates'>;
 
 // Create operation
 export interface CreateExchangeRateData {
-  fromCurrency: ExchangeRateCurrency;
-  toCurrency: ExchangeRateCurrency;
+  fromCurrency: Currency;
+  toCurrency: Currency;
   rate: number;
   date: number;
   source?: string;
@@ -35,8 +35,8 @@ export interface ExchangeRateListResponse {
 
 // Filter options
 export interface ExchangeRateFilters {
-  fromCurrency?: ExchangeRateCurrency;
-  toCurrency?: ExchangeRateCurrency;
+  fromCurrency?: Currency;
+  toCurrency?: Currency;
   isActive?: boolean;
   dateFrom?: number;
   dateTo?: number;

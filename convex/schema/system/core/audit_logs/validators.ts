@@ -3,16 +3,6 @@
 
 import { v } from 'convex/values';
 
-// Metadata value type - supports common JSON-serializable types without v.any
-const metadataValue = v.union(
-  v.string(),
-  v.number(),
-  v.boolean(),
-  v.null(),
-  v.array(v.union(v.string(), v.number(), v.boolean())),
-  v.object({}) // For nested objects
-);
-
 export const auditLogsValidators = {
   source: v.union(
     v.literal('web'),
@@ -25,33 +15,6 @@ export const auditLogsValidators = {
 
 export const auditLogsFields = {
   // Audit logs metadata (for tracking audit operation details)
-  auditMetadata: v.object({
-    operation: v.optional(v.string()),
-
-    // Change tracking - what was modified
-    oldValues: v.optional(v.record(v.string(), metadataValue)),
-    newValues: v.optional(v.record(v.string(), metadataValue)),
-
-    // Request context
-    ipAddress: v.optional(v.string()),
-    userAgent: v.optional(v.string()),
-    source: v.optional(auditLogsValidators.source),
-
-    // Admin actions
-    impersonatedBy: v.optional(v.string()), // If admin acting as user
-
-    // Bulk operations
-    batchId: v.optional(v.string()), // For bulk operations
-    affectedCount: v.optional(v.number()), // How many items affected
-
-    // Error tracking
-    errorDetails: v.optional(v.object({
-      code: v.optional(v.string()),
-      message: v.optional(v.string()),
-      stack: v.optional(v.string()),
-    })),
-
-    // Arbitrary extra fields:
-    data: v.optional(v.record(v.string(), metadataValue)),
-  }),
+  // Allow flexible key/value pairs so feature modules can attach custom context
+  auditMetadata: v.record(v.string(), v.any()),
 } as const;

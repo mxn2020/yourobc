@@ -1,43 +1,21 @@
 // src/features/system/analytics/types/index.ts
 
 import { Id } from "@/generated/dataModel";
-import type {
-  AnalyticsEventType,
-  DeviceType,
-  MetricPeriod,
-  DashboardType,
-  WidgetType,
-  ReportType,
-  ReportFrequency,
-  ExportFormat,
-  AnalyticsProviderType,
-  SyncDirection,
-} from "@/convex/schema/system/core/analytics/types";
 
-import type {
-  EventProperties,
-  WidgetConfig,
-  Filters,
-} from "@/convex/lib/system/analytics/types";
-
-/**
- * Re-export backend types that are used in frontend
- */
-export type {
-  AnalyticsEventType,
-  DeviceType,
-  MetricPeriod,
-  DashboardType,
-  WidgetType,
-  ReportType,
-  ReportFrequency,
-  ExportFormat,
-  AnalyticsProviderType,
-  SyncDirection,
-  EventProperties,
-  WidgetConfig,
-  Filters,
-};
+// Local fallback types (backend analytics module not available in this build)
+export type AnalyticsEventType = string;
+export type DeviceType = string;
+export type MetricPeriod = string;
+export type DashboardType = string;
+export type WidgetType = string;
+export type ReportType = string;
+export type ReportFrequency = string;
+export type ExportFormat = string;
+export type AnalyticsProviderType = string;
+export type SyncDirection = string;
+export type EventProperties = Record<string, any>;
+export type WidgetConfig = Record<string, any>;
+export type Filters = Record<string, any>;
 
 /**
  * Provider Interface

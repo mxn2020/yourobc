@@ -103,7 +103,7 @@ export const listDashboardAlertAcknowledgments = query({
     const { userId, alertId, ownerId, includeDeleted = false } =
       args satisfies DashboardAlertAcknowledgmentQueryOptions;
 
-    let queryBuilder = ctx.db.query(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS);
+    let queryBuilder: any = ctx.db.query(DASHBOARD_TABLES.ALERT_ACKNOWLEDGMENTS);
 
     if (userId) {
       await requireDashboardUser(ctx, userId);
@@ -150,12 +150,14 @@ export const getAlertStatuses = query({
     await requireDashboardUser(ctx, userId);
 
     const statuses = await Promise.all(
-      alertIds.map((alertId) =>
-        getAlertStatus.handler(ctx, {
-          userId,
+      alertIds.map(async (alertId) => {
+        const acknowledgment = await fetchAcknowledgmentByUserAndAlert(ctx, userId, alertId);
+        return {
           alertId,
-        })
-      )
+          isAcknowledged: acknowledgment !== null && acknowledgment.deletedAt === undefined,
+          acknowledgedAt: acknowledgment?.acknowledgedAt,
+        } satisfies DashboardAlertStatus;
+      })
     );
 
     return statuses;

@@ -93,6 +93,7 @@ export const updateUserModelPreferences = mutation({
       preferencesId = await ctx.db.insert('userModelPreferences', {
         publicId,
         userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         ...updateData,
@@ -204,6 +205,7 @@ export const setDefaultModel = mutation({
       preferencesId = await ctx.db.insert('userModelPreferences', {
         publicId,
         userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         ...updateData,
@@ -296,6 +298,7 @@ export const toggleFavoriteModel = mutation({
       preferencesId = await ctx.db.insert('userModelPreferences', {
         publicId,
         userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         favoriteModels: newFavorites,
@@ -499,6 +502,7 @@ export const resetUserModelPreferences = mutation({
       const preferencesId = await ctx.db.insert('userModelPreferences', {
         publicId,
         userId: user._id,
+        ownerId: user._id,
         displayName,
         ...defaults,
         version: 1,

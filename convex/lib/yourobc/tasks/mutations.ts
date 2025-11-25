@@ -9,7 +9,22 @@ import { tasksValidators, tasksFields } from '@/schema/yourobc/tasks/validators'
 import { TASKS_CONSTANTS } from './constants';
 import { validateTaskData, trimTaskData, buildSearchableText } from './utils';
 import { requireEditTaskAccess, requireDeleteTaskAccess, canEditTask, canDeleteTask } from './permissions';
-import type { TaskId } from './types';
+import type { Task, TaskId, UpdateTaskData } from './types';
+
+type TaskUpdatePatch = Partial<UpdateTaskData> &
+  Pick<
+    Task,
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'searchableText'
+    | 'completedAt'
+    | 'completedBy'
+    | 'cancelledAt'
+    | 'cancelledBy'
+    | 'assignedAt'
+    | 'assignedBy'
+    | 'startedAt'
+  >;
 
 /**
  * Create new task
@@ -169,7 +184,7 @@ export const updateTask = mutation({
       tags: trimmedUpdates.tags ?? task.tags,
     });
 
-    const updateData: any = {
+    const updateData: TaskUpdatePatch = {
       searchableText,
       updatedAt: now,
       updatedBy: user._id,
@@ -387,8 +402,8 @@ export const bulkUpdateTasks = mutation({
     }
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: { id: (typeof taskIds)[number]; success: boolean }[] = [];
+    const failed: { id: (typeof taskIds)[number]; reason: string }[] = [];
 
     // 4. PROCESS: Update each entity
     for (const taskId of taskIds) {
@@ -407,10 +422,11 @@ export const bulkUpdateTasks = mutation({
         }
 
         // Apply updates
-        const updateData: any = {
-          updatedAt: now,
-          updatedBy: user._id,
-        };
+  const updateData: TaskUpdatePatch = {
+    updatedAt: now,
+    updatedBy: user._id,
+    searchableText: task.searchableText,
+  };
 
         if (updates.status !== undefined) updateData.status = updates.status;
         if (updates.priority !== undefined) updateData.priority = updates.priority;
@@ -478,8 +494,8 @@ export const bulkDeleteTasks = mutation({
     });
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: { id: (typeof taskIds)[number]; success: boolean }[] = [];
+    const failed: { id: (typeof taskIds)[number]; reason: string }[] = [];
 
     // 3. PROCESS: Delete each entity
     for (const taskId of taskIds) {

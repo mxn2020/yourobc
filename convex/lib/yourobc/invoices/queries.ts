@@ -8,22 +8,7 @@ import { filterInvoicesByAccess, requireViewInvoiceAccess } from './permissions'
 import type { InvoiceListResponse, InvoiceFilters, InvoiceStats } from './types';
 import { INVOICES_CONSTANTS } from './constants';
 import { isInvoiceOverdue, calculateDaysOverdue } from './utils';
-
-/**
- * Get current user - helper function for authentication
- */
-async function requireCurrentUser(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
-  return {
-    authUserId: identity.subject,
-    email: identity.email,
-    name: identity.name,
-    role: identity.role,
-  };
-}
+import { requireCurrentUser } from '@/shared/auth.helper';
 
 /**
  * Get paginated list of invoices with filtering
@@ -55,7 +40,7 @@ export const getInvoices = query({
     // Query with index - start with owner index for better performance
     let invoices = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_owner_id', (q) => q.eq('ownerId', user.authUserId))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 
@@ -231,7 +216,7 @@ export const getInvoiceStats = query({
     // Get all invoices
     let invoices = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_owner_id', (q) => q.eq('ownerId', user.authUserId))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user._id))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 

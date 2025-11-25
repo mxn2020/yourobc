@@ -9,7 +9,7 @@ export type NotificationId = Id<'yourobcNotifications'>;
 
 // Create operation
 export interface CreateNotificationData {
-  userId: string;
+  userId: Id<'userProfiles'>;
   type: string;
   title: string;
   message: string;

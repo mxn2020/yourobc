@@ -6,7 +6,7 @@ import { auditFields, softDeleteFields } from '@/schema/base';
 import { notificationsValidators } from './validators';
 
 export const notificationsTable = defineTable({
-  userId: v.string(),
+  userId: v.id('userProfiles'),
   type: notificationsValidators.notificationType,
   title: v.string(),
   message: v.string(),

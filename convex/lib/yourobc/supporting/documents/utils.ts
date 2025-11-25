@@ -127,7 +127,7 @@ export function getFileExtension(filename: string): string {
  */
 export function isMimeTypeAllowed(mimeType: string, documentType: string): boolean {
   // Basic MIME type validation - can be extended with specific rules per document type
-  return mimeType && mimeType.length > 0 && mimeType.includes('/');
+  return !!mimeType && mimeType.length > 0 && mimeType.includes('/');
 }
 
 /**

@@ -64,6 +64,7 @@ export interface CreateCustomerMarginData {
 }
 
 export interface UpdateCustomerMarginData {
+  marginId?: string;
   name?: string;
   status?: CustomerMarginsStatus;
   serviceType?: CustomerMarginsServiceType;

@@ -159,16 +159,18 @@ export const getPublicDocuments = query({
     const page = await ctx.db
       .query('yourobcDocuments')
       .withIndex('by_public', iq => iq.eq('isPublic', true))
-      .filter(doc => !doc.deletedAt && !doc.isConfidential)
+      .filter(notDeleted)
       .order('desc')
       .paginate({
         numItems: limit,
         cursor: cursor ?? null,
       });
 
+    const items = page.page.filter(doc => !doc.isConfidential);
+
     return {
-      items: page.page,
-      returnedCount: page.page.length,
+      items,
+      returnedCount: items.length,
       hasMore: !page.isDone,
       cursor: page.continueCursor,
     };

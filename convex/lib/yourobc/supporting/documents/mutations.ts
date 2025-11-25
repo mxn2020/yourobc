@@ -8,6 +8,7 @@ import { documentsValidators } from '@/schema/yourobc/supporting/documents/valid
 import { DOCUMENTS_CONSTANTS } from './constants';
 import { trimDocumentData, validateDocumentData } from './utils';
 import { requireEditDocumentAccess, requireDeleteDocumentAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create a new document
@@ -53,8 +54,8 @@ export const createDocument = mutation({
       ...trimmed,
       isPublic: trimmed.isPublic ?? DOCUMENTS_CONSTANTS.DEFAULTS.IS_PUBLIC,
       isConfidential: trimmed.isConfidential ?? DOCUMENTS_CONSTANTS.DEFAULTS.IS_CONFIDENTIAL,
-      status: trimmed.status ?? 'active',
-      uploadedBy: user._id,
+      status: trimmed.status ?? 'draft',
+      uploadedBy: user.authUserId || String(user._id),
       createdAt: now,
       updatedAt: now,
       createdBy: user._id,
@@ -62,6 +63,7 @@ export const createDocument = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'documents.created',
@@ -127,9 +129,10 @@ export const updateDocument = mutation({
       updatedBy: user._id,
     });
 
-    // Audit log
-    await ctx.db.insert('auditLogs', {
-      userId: user._id,
+  // Audit log
+  await ctx.db.insert('auditLogs', {
+    publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+    userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'documents.updated',
       entityType: 'yourobcDocuments',
@@ -175,9 +178,10 @@ export const deleteDocument = mutation({
       updatedBy: user._id,
     });
 
-    // Audit log
-    await ctx.db.insert('auditLogs', {
-      userId: user._id,
+  // Audit log
+  await ctx.db.insert('auditLogs', {
+    publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+    userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'documents.deleted',
       entityType: 'yourobcDocuments',

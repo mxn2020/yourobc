@@ -201,20 +201,20 @@ export type ShipmentStatusHistorySchema = Infer<typeof validators.shipmentStatus
 // ============================================================================
 
 // Full document types
-export type EmployeeCost = Doc<'yourobcEmployeeCosts'>;
-export type EmployeeCostId = Id<'yourobcEmployeeCosts'>;
+export type EmployeeCost = Doc<'yourobcStatisticsEmployeeCosts'>;
+export type EmployeeCostId = Id<'yourobcStatisticsEmployeeCosts'>;
 
-export type OfficeCost = Doc<'yourobcOfficeCosts'>;
-export type OfficeCostId = Id<'yourobcOfficeCosts'>;
+export type OfficeCost = Doc<'yourobcStatisticsOfficeCosts'>;
+export type OfficeCostId = Id<'yourobcStatisticsOfficeCosts'>;
 
-export type MiscExpense = Doc<'yourobcMiscExpenses'>;
-export type MiscExpenseId = Id<'yourobcMiscExpenses'>;
+export type MiscExpense = Doc<'yourobcStatisticsMiscExpenses'>;
+export type MiscExpenseId = Id<'yourobcStatisticsMiscExpenses'>;
 
-export type KpiTarget = Doc<'yourobcKpiTargets'>;
-export type KpiTargetId = Id<'yourobcKpiTargets'>;
+export type KpiTarget = Doc<'yourobcStatisticsKpiTargets'>;
+export type KpiTargetId = Id<'yourobcStatisticsKpiTargets'>;
 
-export type KpiCache = Doc<'yourobcKpiCache'>;
-export type KpiCacheId = Id<'yourobcKpiCache'>;
+export type KpiCache = Doc<'yourobcStatisticsKpiCache'>;
+export type KpiCacheId = Id<'yourobcStatisticsKpiCache'>;
 
 // Validator types
 export type EmployeeCostSchema = Infer<typeof validators.employeeCost>;
@@ -283,4 +283,3 @@ export type TrackingMessageId = Id<'yourobcTrackingMessages'>;
 
 // Validator types
 export type TrackingMessageSchema = Infer<typeof validators.trackingMessage>;
-

@@ -24,7 +24,7 @@ export function hasPublicId<T extends string>(
  * Extract public ID from a document if it exists
  */
 export function getPublicId<T extends PublicIdTable>(
-  doc: Doc<T> & { publicId?: string }
+  doc: { publicId?: string }
 ): string | undefined {
   return doc.publicId;
 }

@@ -49,6 +49,7 @@ export const PUBLIC_ID_PREFIXES = {
   permissionRequests: 'preq',
   projects: 'proj',
   projectMilestones: 'mile',
+  projectTasks: 'ptask',
   notifications: 'noti',
 
   systemSupportingComments: 'comm',
@@ -101,6 +102,7 @@ export const PUBLIC_ID_PREFIXES = {
   yourobcInvoices: 'inv',
   yourobcPartners: 'part',
   yourobcShipments: 'ship',
+  yourobcShipmentStatusHistory: 'shist',
   yourobcQuotes: 'quot',
   yourobcCustomers: 'cust',
   yourobcCustomerMargins: 'cmarg',

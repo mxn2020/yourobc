@@ -64,11 +64,14 @@ export interface CreateTrackingMessageData {
 }
 
 export interface UpdateTrackingMessageData {
+  messageId?: string;
   subject?: string;
   content?: string;
   status?: TrackingMessagesStatus;
   messageType?: TrackingMessagesType;
   priority?: TrackingMessagesPriority;
+  templateId?: string;
+  shipmentNumber?: string;
   recipients?: MessageRecipient[];
   deliveryChannel?: TrackingMessagesDeliveryChannel;
   attachments?: MessageAttachment[];

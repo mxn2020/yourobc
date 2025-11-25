@@ -15,8 +15,10 @@ import {
   canEditCourier,
   canDeleteCourier,
 } from './permissions';
-import type { CourierId } from './types';
+import type { Courier, CourierId, UpdateCourierData } from './types';
 import { baseFields } from '@/schema/base.validators';
+
+type CourierUpdatePatch = Partial<UpdateCourierData> & Pick<Courier, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new courier
@@ -182,6 +184,7 @@ export const createCourier = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.created',
@@ -322,9 +325,9 @@ export const updateCourier = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: CourierUpdatePatch = {
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     };
 
     // Trim and assign string fields
@@ -352,14 +355,15 @@ export const updateCourier = mutation({
     if (updates.tags !== undefined) {
       updateData.tags = updates.tags.map((tag) => tag.trim());
     }
-    if (updates.primaryContact !== undefined) {
-      updateData.primaryContact = {
-        ...updates.primaryContact,
-        name: updates.primaryContact.name.trim(),
-        email: updates.primaryContact.email?.trim(),
-        phone: updates.primaryContact.phone?.trim(),
-      };
-    }
+  if (updates.primaryContact !== undefined) {
+    updateData.primaryContact = {
+      ...updates.primaryContact,
+      role: updates.primaryContact.role as any,
+      name: updates.primaryContact.name.trim(),
+      email: updates.primaryContact.email?.trim(),
+      phone: updates.primaryContact.phone?.trim(),
+    } as any;
+  }
     if (updates.additionalContacts !== undefined) {
       updateData.additionalContacts = updates.additionalContacts.map((contact) => ({
         ...contact,
@@ -400,10 +404,11 @@ export const updateCourier = mutation({
     if (updates.customFields !== undefined) updateData.customFields = updates.customFields;
 
     // 6. UPDATE: Apply changes
-    await ctx.db.patch(courierId, updateData);
+    await ctx.db.patch(courierId, updateData as any);
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.updated',
@@ -453,6 +458,7 @@ export const deleteCourier = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.deleted',
@@ -510,6 +516,7 @@ export const restoreCourier = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.restored',
@@ -558,6 +565,7 @@ export const archiveCourier = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.archived',
@@ -604,8 +612,8 @@ export const bulkUpdateCouriers = mutation({
     }
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: { id: (typeof courierIds)[number]; success: boolean }[] = [];
+    const failed: { id: (typeof courierIds)[number]; reason: string }[] = [];
 
     // 4. PROCESS: Update each entity
     for (const courierId of courierIds) {
@@ -624,9 +632,9 @@ export const bulkUpdateCouriers = mutation({
         }
 
         // Apply updates
-        const updateData: any = {
+        const updateData: CourierUpdatePatch = {
           updatedAt: now,
-          updatedBy: user.authUserId,
+          updatedBy: user._id,
         };
 
         if (updates.status !== undefined) updateData.status = updates.status;
@@ -636,7 +644,7 @@ export const bulkUpdateCouriers = mutation({
           updateData.tags = updates.tags.map((tag) => tag.trim());
         }
 
-        await ctx.db.patch(courierId, updateData);
+        await ctx.db.patch(courierId, updateData as any);
         results.push({ id: courierId, success: true });
       } catch (error: any) {
         failed.push({ id: courierId, reason: error.message });
@@ -645,6 +653,7 @@ export const bulkUpdateCouriers = mutation({
 
     // 5. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.bulk_updated',
@@ -688,8 +697,8 @@ export const bulkDeleteCouriers = mutation({
     });
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: { id: (typeof courierIds)[number]; success: boolean }[] = [];
+    const failed: { id: (typeof courierIds)[number]; reason: string }[] = [];
 
     // 3. PROCESS: Delete each entity
     for (const courierId of courierIds) {
@@ -723,6 +732,7 @@ export const bulkDeleteCouriers = mutation({
 
     // 4. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'couriers.bulk_deleted',

@@ -29,6 +29,11 @@ export interface CreateDocumentData {
 export interface UpdateDocumentData {
   title?: string;
   description?: string;
+  filename?: string;
+  originalFilename?: string;
+  fileSize?: number;
+  mimeType?: string;
+  fileUrl?: string;
   isPublic?: boolean;
   isConfidential?: boolean;
   status?: DocumentStatus;

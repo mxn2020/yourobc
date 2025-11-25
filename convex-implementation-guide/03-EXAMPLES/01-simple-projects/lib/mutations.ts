@@ -141,7 +141,10 @@ export const updateProject = mutation({
     const now = Date.now();
 
     // Handle completion
-    const updateData: any = {
+    const updateData: Partial<typeof existing> & {
+      updatedAt: number;
+      updatedBy: typeof user._id;
+    } = {
       ...trimmed,
       updatedAt: now,
       updatedBy: user._id,

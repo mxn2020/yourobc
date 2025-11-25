@@ -7,9 +7,17 @@ import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { employeeKPIsValidators } from '@/schema/yourobc/employees/kpis/validators';
 import { EMPLOYEE_KPIS_CONSTANTS } from './constants';
-import { validateEmployeeKPIData, calculateAchievementPercentage, calculateChangePercentage, determineKPIStatus } from './utils';
+import {
+  validateEmployeeKPIData,
+  calculateAchievementPercentage,
+  calculateChangePercentage,
+  determineKPIStatus,
+} from './utils';
 import { requireEditEmployeeKPIAccess, requireDeleteEmployeeKPIAccess } from './permissions';
-import type { EmployeeKPIId } from './types';
+import type { EmployeeKPI, EmployeeKPIId, UpdateEmployeeKPIData } from './types';
+
+type EmployeeKPIUpdatePatch = Partial<UpdateEmployeeKPIData> &
+  Pick<EmployeeKPI, 'updatedAt' | 'updatedBy' | 'achievementPercentage' | 'changePercentage'>;
 
 /**
  * Create new employee KPI
@@ -163,11 +171,13 @@ export const updateEmployeeKPI = mutation({
     }
 
     // 5. PROCESS: Prepare update data
-    const now = Date.now();
-    const updateData: any = {
-      updatedAt: now,
-      updatedBy: user._id,
-    };
+  const now = Date.now();
+  const updateData: EmployeeKPIUpdatePatch = {
+    updatedAt: now,
+    updatedBy: user._id,
+    achievementPercentage: kpi.achievementPercentage,
+    changePercentage: kpi.changePercentage,
+  };
 
     if (updates.kpiName !== undefined) {
       updateData.kpiName = updates.kpiName.trim();

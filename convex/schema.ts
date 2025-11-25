@@ -8,7 +8,6 @@ import { v } from 'convex/values'
 import { systemSchemas } from './schema/system'
 import { yourobcSchemas } from './schema/yourobc'
 import { projectsSchemas } from './schema/projects'
-import { devProjectsSchemas } from './schema/devProjects'
 
 const schema = defineSchema({
   // System Tables
@@ -19,9 +18,6 @@ const schema = defineSchema({
 
   // Projects Module Tables
   ...projectsSchemas,
-
-  // Developer Projects Module Tables
-  ...devProjectsSchemas,
 
 })
 

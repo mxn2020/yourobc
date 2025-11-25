@@ -13,7 +13,13 @@ import {
   requireDeleteCustomerMarginAccess,
   requireApproveCustomerMarginAccess,
 } from './permissions';
-import type { CustomerMarginId } from './types';
+import type { CustomerMargin, CustomerMarginId, UpdateCustomerMarginData } from './types';
+
+type CustomerMarginUpdatePatch = Partial<UpdateCustomerMarginData> &
+  Pick<
+    CustomerMargin,
+    'updatedAt' | 'updatedBy' | 'approvedBy' | 'approvedDate' | 'rejectedBy' | 'rejectedDate' | 'previousMargin' | 'changeHistory'
+  >;
 
 /**
  * Create new customer margin
@@ -186,7 +192,7 @@ export const updateCustomerMargin = mutation({
     const now = Date.now();
     const publicId = await generateUniquePublicId(ctx, 'yourobcCustomerMargins');
 
-    const updateData: any = {
+    const updateData: CustomerMarginUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

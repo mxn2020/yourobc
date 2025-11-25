@@ -10,8 +10,15 @@ import { currencyValidator } from '@/schema/base';
 import { EMPLOYEE_COMMISSIONS_CONSTANTS } from './constants';
 import { validateEmployeeCommissionData, generateCommissionId } from './utils';
 import { requireEditEmployeeCommissionAccess, requireDeleteEmployeeCommissionAccess, requireApproveEmployeeCommissionAccess, requirePayEmployeeCommissionAccess } from './permissions';
-import type { EmployeeCommissionId } from './types';
+import type {
+  EmployeeCommission,
+  EmployeeCommissionId,
+  UpdateEmployeeCommissionData,
+} from './types';
 import { baseValidators } from '@/schema/base.validators';
+
+type EmployeeCommissionUpdatePatch = Partial<UpdateEmployeeCommissionData> &
+  Pick<EmployeeCommission, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new employee commission
@@ -187,7 +194,7 @@ export const updateEmployeeCommission = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: EmployeeCommissionUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

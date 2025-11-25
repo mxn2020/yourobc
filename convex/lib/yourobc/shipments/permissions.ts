@@ -31,12 +31,12 @@ export async function canViewShipment(
   if (shipment.createdBy === user._id) return true;
 
   // Assigned employee can view
-  if (shipment.employeeId === user._id) return true;
+  if (shipment.employeeId && (user as any).employeeId && shipment.employeeId === (user as any).employeeId) return true;
 
   // Check if user is the assigned courier
   if (shipment.assignedCourierId) {
     const courier = await ctx.db.get(shipment.assignedCourierId);
-    if (courier && courier.userId === user._id) return true;
+    if (courier && 'userId' in courier && (courier as any).userId === user._id) return true;
   }
 
   // Check if user has access through customer relationship
@@ -88,7 +88,7 @@ export async function canEditShipment(
   if (shipment.createdBy === user._id) return true;
 
   // Assigned employee can edit
-  if (shipment.employeeId === user._id) return true;
+  if (shipment.employeeId && (user as any).employeeId && shipment.employeeId === (user as any).employeeId) return true;
 
   return false;
 }
@@ -190,12 +190,12 @@ export async function canUpdateShipmentStatus(
   if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Assigned employee can update
-  if (shipment.employeeId === user._id) return true;
+  if (shipment.employeeId && (user as any).employeeId && shipment.employeeId === (user as any).employeeId) return true;
 
   // Check if user is the assigned courier
   if (shipment.assignedCourierId) {
     const courier = await ctx.db.get(shipment.assignedCourierId);
-    if (courier && courier.userId === user._id) return true;
+    if (courier && 'userId' in courier && (courier as any).userId === user._id) return true;
   }
 
   // Owner can update

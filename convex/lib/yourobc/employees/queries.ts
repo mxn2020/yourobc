@@ -111,8 +111,8 @@ export const getEmployees = query({
     const itemsWithFilteredSalary = await Promise.all(
       items.map(async (employee) => {
         const canView = await canViewSalary(ctx, employee, user);
-        if (!canView && employee.salary !== undefined) {
-          const { salary, ...rest } = employee;
+        if (!canView && 'salary' in employee) {
+          const { salary, ...rest } = employee as any;
           return rest as typeof employee;
         }
         return employee;
@@ -146,8 +146,8 @@ export const getEmployee = query({
 
     // Filter salary if user doesn't have permission
     const canView = await canViewSalary(ctx, employee, user);
-    if (!canView && employee.salary !== undefined) {
-      const { salary, ...rest } = employee;
+    if (!canView && 'salary' in employee) {
+      const { salary, ...rest } = employee as any;
       return rest as typeof employee;
     }
 
@@ -179,8 +179,8 @@ export const getEmployeeByPublicId = query({
 
     // Filter salary if user doesn't have permission
     const canView = await canViewSalary(ctx, employee, user);
-    if (!canView && employee.salary !== undefined) {
-      const { salary, ...rest } = employee;
+    if (!canView && 'salary' in employee) {
+      const { salary, ...rest } = employee as any;
       return rest as typeof employee;
     }
 
@@ -212,8 +212,8 @@ export const getEmployeeByUserProfileId = query({
 
     // Filter salary if user doesn't have permission
     const canView = await canViewSalary(ctx, employee, user);
-    if (!canView && employee.salary !== undefined) {
-      const { salary, ...rest } = employee;
+    if (!canView && 'salary' in employee) {
+      const { salary, ...rest } = employee as any;
       return rest as typeof employee;
     }
 

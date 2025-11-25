@@ -15,11 +15,12 @@ export async function canViewInvoice(
   invoice: Invoice,
   user: UserProfile
 ): Promise<boolean> {
+  const role = user.role as string;
   // Admins and superadmins can view all
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (role === 'admin' || role === 'superadmin') return true;
 
   // Finance and accounting roles can view all invoices
-  if (INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role || '')) return true;
+  if (INVOICES_CONSTANTS.VIEWER_ROLES.includes(role as any)) return true;
 
   // Owner can view their own invoices
   if (invoice.ownerId === user._id) return true;
@@ -73,11 +74,12 @@ export async function canEditInvoice(
   invoice: Invoice,
   user: UserProfile
 ): Promise<boolean> {
+  const role = user.role as string;
   // Admins can edit all
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
+  if (role === 'admin' || role === 'superadmin') return true;
 
   // Finance and accounting managers can edit all invoices
-  if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '')) return true;
+  if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(role as any)) return true;
 
   // Owner can edit their own invoices (if not paid or cancelled)
   if (invoice.ownerId === user._id) {
@@ -109,9 +111,10 @@ export async function requireEditInvoiceAccess(
 // ============================================================================
 
 export async function canDeleteInvoice(invoice: Invoice, user: UserProfile): Promise<boolean> {
+  const role = user.role as string;
   // Only admins and finance managers can delete invoices
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (user.role === 'finance_manager') return true;
+  if (role === 'admin' || role === 'superadmin') return true;
+  if (role === 'finance_manager') return true;
 
   // Cannot delete paid invoices (audit trail protection)
   if (invoice.status === INVOICES_CONSTANTS.STATUS.PAID) return false;
@@ -135,9 +138,10 @@ export async function requireDeleteInvoiceAccess(invoice: Invoice, user: UserPro
 // ============================================================================
 
 export async function canProcessPayment(invoice: Invoice, user: UserProfile): Promise<boolean> {
+  const role = user.role as string;
   // Only admins, finance, and accounting can process payments
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '')) return true;
+  if (role === 'admin' || role === 'superadmin') return true;
+  if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(role as any)) return true;
 
   return false;
 }
@@ -153,9 +157,10 @@ export async function requireProcessPaymentAccess(invoice: Invoice, user: UserPr
 // ============================================================================
 
 export async function canManageDunning(invoice: Invoice, user: UserProfile): Promise<boolean> {
+  const role = user.role as string;
   // Only admins, finance managers, and accountants can manage dunning
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (user.role === 'finance_manager' || user.role === 'accountant') return true;
+  if (role === 'admin' || role === 'superadmin') return true;
+  if (role === 'finance_manager' || role === 'accountant') return true;
 
   return false;
 }
@@ -199,9 +204,10 @@ export async function requireSendInvoiceAccess(
 // ============================================================================
 
 export async function canApproveInvoice(invoice: Invoice, user: UserProfile): Promise<boolean> {
+  const role = user.role as string;
   // Only admins and finance managers can approve incoming invoices
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (user.role === 'finance_manager') return true;
+  if (role === 'admin' || role === 'superadmin') return true;
+  if (role === 'finance_manager') return true;
 
   // Must be incoming invoice
   if (invoice.type !== INVOICES_CONSTANTS.TYPE.INCOMING) return false;
@@ -224,12 +230,13 @@ export async function filterInvoicesByAccess(
   invoices: Invoice[],
   user: UserProfile
 ): Promise<Invoice[]> {
+  const role = user.role as string;
   // Admins and viewer roles see everything
-  if (user.role === 'admin' || user.role === 'superadmin') {
+  if (role === 'admin' || role === 'superadmin') {
     return invoices;
   }
 
-  if (INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role || '')) {
+  if (INVOICES_CONSTANTS.VIEWER_ROLES.includes(role as any)) {
     return invoices;
   }
 
@@ -250,13 +257,14 @@ export async function filterInvoicesByAccess(
 // ============================================================================
 
 export function isFinanceRole(user: UserProfile): boolean {
-  return INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '');
+  return INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role as any);
 }
 
 export function isViewerRole(user: UserProfile): boolean {
-  return INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role || '');
+  return INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role as any);
 }
 
 export function isAdmin(user: UserProfile): boolean {
-  return user.role === 'admin' || user.role === 'superadmin';
+  const role = user.role as string;
+  return role === 'admin' || role === 'superadmin';
 }

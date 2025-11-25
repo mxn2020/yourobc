@@ -2,6 +2,12 @@
 // TypeScript type definitions for followup reminders module
 
 import type { Doc, Id } from '@/generated/dataModel';
+import type {
+  ReminderType,
+  ReminderStatus,
+  ServicePriority,
+  RecurrencePattern,
+} from '@/schema/yourobc/supporting/followup_reminders/types';
 
 // Entity types
 export type FollowupReminder = Doc<'yourobcFollowupReminders'>;
@@ -11,21 +17,18 @@ export type FollowupReminderId = Id<'yourobcFollowupReminders'>;
 export interface CreateFollowupReminderData {
   title: string;
   description?: string;
-  type: string;
+  type: ReminderType;
   entityType: string;
   entityId: string;
   dueDate: number;
   reminderDate?: number;
-  priority: string;
+  snoozeUntil?: number;
+  priority: ServicePriority;
   assignedTo: string;
-  status?: string;
+  status?: ReminderStatus;
+  completionNotes?: string;
   isRecurring?: boolean;
-  recurrencePattern?: {
-    frequency: string;
-    interval: number;
-    endDate?: number;
-    maxOccurrences?: number;
-  };
+  recurrencePattern?: RecurrencePattern;
   emailReminder?: boolean;
 }
 
@@ -35,8 +38,9 @@ export interface UpdateFollowupReminderData {
   description?: string;
   dueDate?: number;
   reminderDate?: number;
-  priority?: string;
-  status?: string;
+  snoozeUntil?: number;
+  priority?: ServicePriority;
+  status?: ReminderStatus;
   completionNotes?: string;
 }
 

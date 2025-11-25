@@ -9,7 +9,9 @@ import { dashboardsFields, dashboardsValidators } from '@/schema/system/dashboar
 import { DASHBOARDS_CONSTANTS } from './constants';
 import { validateDashboardData } from './utils';
 import { requireEditDashboardAccess, requireDeleteDashboardAccess } from './permissions';
-import type { DashboardId } from './types';
+import type { Dashboard, DashboardId, UpdateDashboardData } from './types';
+
+type DashboardUpdatePatch = Partial<UpdateDashboardData> & Pick<Dashboard, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new dashboard
@@ -124,7 +126,7 @@ export const updateDashboard = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: DashboardUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

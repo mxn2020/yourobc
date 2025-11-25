@@ -225,39 +225,24 @@ export function trimQuoteData<T extends Partial<CreateQuoteData | UpdateQuoteDat
 ): T {
   // Clone to avoid mutating caller data
   const trimmed: T = { ...data };
+  const t = trimmed as any;
 
   // Trim string fields
-  if ('quoteNumber' in trimmed && typeof trimmed.quoteNumber === "string") {
-    trimmed.quoteNumber = trimmed.quoteNumber.trim() as T["quoteNumber"];
-  }
+  if (typeof t.quoteNumber === 'string') t.quoteNumber = t.quoteNumber.trim();
 
-  if (typeof trimmed.customerReference === "string") {
-    trimmed.customerReference = trimmed.customerReference.trim() as T["customerReference"];
-  }
+  if (typeof t.customerReference === 'string') t.customerReference = t.customerReference.trim();
 
-  if (typeof trimmed.description === "string") {
-    trimmed.description = trimmed.description.trim() as T["description"];
-  }
+  if (typeof t.description === 'string') t.description = t.description.trim();
 
-  if (typeof trimmed.specialInstructions === "string") {
-    trimmed.specialInstructions = trimmed.specialInstructions.trim() as T["specialInstructions"];
-  }
+  if (typeof t.specialInstructions === 'string') t.specialInstructions = t.specialInstructions.trim();
 
-  if (typeof trimmed.quoteText === "string") {
-    trimmed.quoteText = trimmed.quoteText.trim() as T["quoteText"];
-  }
+  if (typeof t.quoteText === 'string') t.quoteText = t.quoteText.trim();
 
-  if (typeof trimmed.notes === "string") {
-    trimmed.notes = trimmed.notes.trim() as T["notes"];
-  }
+  if (typeof t.notes === 'string') t.notes = t.notes.trim();
 
-  if ('rejectionReason' in trimmed && typeof trimmed.rejectionReason === "string") {
-    trimmed.rejectionReason = trimmed.rejectionReason.trim() as T["rejectionReason"];
-  }
+  if (typeof t.rejectionReason === 'string') t.rejectionReason = t.rejectionReason.trim();
 
-  if (typeof trimmed.incoterms === "string") {
-    trimmed.incoterms = trimmed.incoterms.trim().toUpperCase() as T["incoterms"];
-  }
+  if (typeof t.incoterms === 'string') t.incoterms = t.incoterms.trim().toUpperCase();
 
   return trimmed;
 }

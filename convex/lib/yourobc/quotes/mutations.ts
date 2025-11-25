@@ -23,8 +23,11 @@ import {
   requireAcceptOrRejectQuoteAccess,
   requireConvertQuoteAccess,
 } from './permissions';
-import type { QuoteId } from './types';
+import type { Quote, QuoteId, UpdateQuoteData } from './types';
 import { baseFields, baseValidators } from '@/schema/base.validators';
+
+type QuoteUpdatePatch = Partial<UpdateQuoteData> &
+  Pick<Quote, 'updatedAt' | 'updatedBy' | 'searchableText'>;
 
 /**
  * Create new quote
@@ -218,7 +221,7 @@ export const updateQuote = mutation({
       notes: trimmedUpdates.notes ?? quote.notes,
     });
 
-    const updateData: any = {
+    const updateData: QuoteUpdatePatch = {
       searchableText,
       updatedAt: now,
       updatedBy: user._id,

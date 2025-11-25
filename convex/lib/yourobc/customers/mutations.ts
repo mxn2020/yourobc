@@ -9,9 +9,11 @@ import { customersValidators } from '@/schema/yourobc/customers/validators';
 import { CUSTOMERS_CONSTANTS } from './constants';
 import { validateCustomerData, trimCustomerData, buildSearchableText } from './utils';
 import { requireEditCustomerAccess, requireDeleteCustomerAccess, canEditCustomer, canDeleteCustomer } from './permissions';
-import type { CustomerId } from './types';
+import type { Customer, CustomerId, UpdateCustomerData } from './types';
 import { baseFields, baseValidators } from '@/schema/base.validators';
 import { Id } from '@/generated/dataModel';
+
+type CustomerUpdatePatch = Partial<UpdateCustomerData> & Pick<Customer, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new customer
@@ -191,7 +193,7 @@ export const updateCustomer = mutation({
     const now = Date.now();
     const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
 
-    const updateData: any = {
+    const updateData: CustomerUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };
@@ -205,14 +207,15 @@ export const updateCustomer = mutation({
     if (updates.website !== undefined) {
       updateData.website = updates.website?.trim();
     }
-    if (updates.primaryContact !== undefined) {
-      updateData.primaryContact = {
-        ...updates.primaryContact,
-        name: updates.primaryContact.name.trim(),
-        email: updates.primaryContact.email?.trim(),
-        phone: updates.primaryContact.phone?.trim(),
-        mobile: updates.primaryContact.mobile?.trim(),
-        notes: updates.primaryContact.notes?.trim(),
+  if (updates.primaryContact !== undefined) {
+    updateData.primaryContact = {
+      ...updates.primaryContact,
+      role: updates.primaryContact.role as any,
+      name: updates.primaryContact.name.trim(),
+      email: updates.primaryContact.email?.trim(),
+      phone: updates.primaryContact.phone?.trim(),
+      mobile: updates.primaryContact.mobile?.trim(),
+      notes: updates.primaryContact.notes?.trim(),
       };
     }
     if (updates.additionalContacts !== undefined) {
@@ -291,8 +294,8 @@ export const updateCustomer = mutation({
       updateData.customFields = updates.customFields;
     }
 
-    // 6. UPDATE: Apply changes
-    await ctx.db.patch(customerId, updateData);
+  // 6. UPDATE: Apply changes
+  await ctx.db.patch(customerId, updateData as any);
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {

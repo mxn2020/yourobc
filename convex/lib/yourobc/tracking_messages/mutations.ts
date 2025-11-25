@@ -12,7 +12,14 @@ import {
 import { TRACKING_MESSAGES_CONSTANTS } from './constants';
 import { validateTrackingMessageData, generateMessageId } from './utils';
 import { requireEditTrackingMessageAccess, requireDeleteTrackingMessageAccess } from './permissions';
-import type { TrackingMessageId } from './types';
+import type {
+  TrackingMessage,
+  TrackingMessageId,
+  UpdateTrackingMessageData,
+} from './types';
+
+type TrackingMessageUpdatePatch = Partial<UpdateTrackingMessageData> &
+  Pick<TrackingMessage, 'updatedAt' | 'updatedBy' | 'sentAt' | 'deliveredAt' | 'readAt' | 'readBy'>;
 
 /**
  * Create new tracking message
@@ -165,7 +172,7 @@ export const updateTrackingMessage = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: TrackingMessageUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

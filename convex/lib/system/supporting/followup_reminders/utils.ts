@@ -75,7 +75,7 @@ export function validateSystemFollowupReminderData(
     }
   }
 
-  if (data.snoozeUntil !== undefined && data.dueDate !== undefined) {
+  if (data.snoozeUntil != null && data.dueDate !== undefined) {
     if (data.snoozeUntil < data.dueDate) {
       errors.push('snoozeUntil must be after dueDate');
     }

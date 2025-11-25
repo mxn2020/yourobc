@@ -123,6 +123,7 @@ export const getTasks = query({
     return {
       items: tasks,
       returnedCount: tasks.length,
+      total: tasks.length,
       hasMore: !page.isDone,
       cursor: page.continueCursor,
     };

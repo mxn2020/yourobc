@@ -13,8 +13,11 @@ import {
   requireEditEmailTemplateAccess,
   requireDeleteEmailTemplateAccess,
 } from './permissions';
-import type { EmailTemplateId } from './types';
+import type { EmailTemplate, EmailTemplateId, UpdateEmailTemplateData } from './types';
 import { createAuditLog } from '../../core/audit_logs/helpers';
+
+type EmailTemplateUpdatePatch = Partial<UpdateEmailTemplateData> &
+  Pick<EmailTemplate, 'updatedAt' | 'updatedBy' | 'lastActivityAt'>;
 
 /**
  * Create or update email template
@@ -214,7 +217,7 @@ export const updateEmailTemplate = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: EmailTemplateUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
       lastActivityAt: now,

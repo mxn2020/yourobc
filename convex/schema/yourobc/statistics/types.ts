@@ -8,17 +8,17 @@ import { statisticsValidators, statisticsFields } from './validators';
 /**
  * Base entity document types
  */
-export type EmployeeCost = Doc<'yourobcEmployeeCosts'>;
-export type OfficeCost = Doc<'yourobcOfficeCosts'>;
-export type MiscExpense = Doc<'yourobcMiscExpenses'>;
-export type KpiTarget = Doc<'yourobcKpiTargets'>;
-export type KpiCache = Doc<'yourobcKpiCache'>;
+export type EmployeeCost = Doc<'yourobcStatisticsEmployeeCosts'>;
+export type OfficeCost = Doc<'yourobcStatisticsOfficeCosts'>;
+export type MiscExpense = Doc<'yourobcStatisticsMiscExpenses'>;
+export type KpiTarget = Doc<'yourobcStatisticsKpiTargets'>;
+export type KpiCache = Doc<'yourobcStatisticsKpiCache'>;
 
-export type EmployeeCostId = Id<'yourobcEmployeeCosts'>;
-export type OfficeCostId = Id<'yourobcOfficeCosts'>;
-export type MiscExpenseId = Id<'yourobcMiscExpenses'>;
-export type KpiTargetId = Id<'yourobcKpiTargets'>;
-export type KpiCacheId = Id<'yourobcKpiCache'>;
+export type EmployeeCostId = Id<'yourobcStatisticsEmployeeCosts'>;
+export type OfficeCostId = Id<'yourobcStatisticsOfficeCosts'>;
+export type MiscExpenseId = Id<'yourobcStatisticsMiscExpenses'>;
+export type KpiTargetId = Id<'yourobcStatisticsKpiTargets'>;
+export type KpiCacheId = Id<'yourobcStatisticsKpiCache'>;
 
 /**
  * Extract TypeScript types from validators
@@ -43,8 +43,8 @@ export type Stats = Infer<typeof statisticsFields.stats>;
  */
 export type StatisticsEntity = EmployeeCost | OfficeCost | MiscExpense | KpiTarget | KpiCache;
 export type StatisticsTableName =
-  | 'yourobcEmployeeCosts'
-  | 'yourobcOfficeCosts'
-  | 'yourobcMiscExpenses'
-  | 'yourobcKpiTargets'
-  | 'yourobcKpiCache';
+  | 'yourobcStatisticsEmployeeCosts'
+  | 'yourobcStatisticsOfficeCosts'
+  | 'yourobcStatisticsMiscExpenses'
+  | 'yourobcStatisticsKpiTargets'
+  | 'yourobcStatisticsKpiCache';

@@ -9,7 +9,10 @@ import { employeeSessionsValidators } from '@/schema/yourobc/employees/sessions/
 import { EMPLOYEE_SESSIONS_CONSTANTS } from './constants';
 import { validateEmployeeSessionData, generateSessionId, calculateSessionDuration } from './utils';
 import { requireEditEmployeeSessionAccess, requireDeleteEmployeeSessionAccess } from './permissions';
-import type { EmployeeSessionId } from './types';
+import type { EmployeeSession, EmployeeSessionId, UpdateEmployeeSessionData } from './types';
+
+type EmployeeSessionUpdatePatch = Partial<UpdateEmployeeSessionData> &
+  Pick<EmployeeSession, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new employee session
@@ -155,7 +158,7 @@ export const updateEmployeeSession = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: EmployeeSessionUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
     };

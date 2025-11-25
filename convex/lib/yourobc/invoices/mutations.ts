@@ -22,25 +22,19 @@ import {
   requireSendInvoiceAccess,
   isFinanceRole,
 } from './permissions';
-import type { InvoiceId, CreateInvoiceData, ProcessPaymentData, AddCollectionAttemptData } from './types';
+import type {
+  Invoice,
+  InvoiceId,
+  UpdateInvoiceData,
+  CreateInvoiceData,
+  ProcessPaymentData,
+  AddCollectionAttemptData,
+} from './types';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { baseValidators } from '@/schema/base.validators';
+import { requireCurrentUser } from '@/shared/auth.helper';
 
-/**
- * Get current user - helper function for authentication
- */
-async function requireCurrentUser(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error('Authentication required');
-  }
-  return {
-    authUserId: identity.subject,
-    email: identity.email,
-    name: identity.name,
-    role: identity.role,
-  };
-}
+type InvoiceUpdatePatch = Partial<UpdateInvoiceData> & Pick<Invoice, 'updatedAt' | 'updatedBy'>;
 
 /**
  * Create new invoice
@@ -114,17 +108,16 @@ export const createInvoice = mutation({
       status: trimmedData.status || INVOICES_CONSTANTS.STATUS.DRAFT,
       notes: trimmedData.notes,
       collectionAttempts: [],
-      tags: trimmedData.tags || [],
-      ownerId: user.authUserId,
+      ownerId: user._id,
       createdAt: now,
       updatedAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
     });
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.created',
       entityType: 'yourobc_invoice',
@@ -138,7 +131,7 @@ export const createInvoice = mutation({
         currency: trimmedData.totalAmount.currency,
       },
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -198,9 +191,9 @@ export const updateInvoice = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: InvoiceUpdatePatch = {
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     };
 
     if (trimmedUpdates.invoiceNumber !== undefined) updateData.invoiceNumber = trimmedUpdates.invoiceNumber;
@@ -232,7 +225,7 @@ export const updateInvoice = mutation({
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.updated',
       entityType: 'yourobc_invoice',
@@ -241,7 +234,7 @@ export const updateInvoice = mutation({
       description: `Updated invoice: ${updateData.invoiceNumber || invoice.invoiceNumber}`,
       metadata: { changes: updates },
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -274,15 +267,15 @@ export const deleteInvoice = mutation({
     const now = Date.now();
     await ctx.db.patch(invoiceId, {
       deletedAt: now,
-      deletedBy: user.authUserId,
+      deletedBy: user._id,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.deleted',
       entityType: 'yourobc_invoice',
@@ -290,7 +283,7 @@ export const deleteInvoice = mutation({
       entityTitle: invoice.invoiceNumber,
       description: `Deleted invoice: ${invoice.invoiceNumber}`,
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -321,7 +314,7 @@ export const restoreInvoice = mutation({
 
     // 3. AUTHZ: Check edit permission (owners and finance managers can restore)
     if (
-      invoice.ownerId !== user.authUserId &&
+      invoice.ownerId !== user._id &&
       !isFinanceRole(user) &&
       user.role !== 'admin' &&
       user.role !== 'superadmin'
@@ -335,13 +328,13 @@ export const restoreInvoice = mutation({
       deletedAt: undefined,
       deletedBy: undefined,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.restored',
       entityType: 'yourobc_invoice',
@@ -349,7 +342,7 @@ export const restoreInvoice = mutation({
       entityTitle: invoice.invoiceNumber,
       description: `Restored invoice: ${invoice.invoiceNumber}`,
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -384,13 +377,13 @@ export const sendInvoice = mutation({
       status: INVOICES_CONSTANTS.STATUS.SENT,
       sentAt: now,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.sent',
       entityType: 'yourobc_invoice',
@@ -398,7 +391,7 @@ export const sendInvoice = mutation({
       entityTitle: invoice.invoiceNumber,
       description: `Sent invoice: ${invoice.invoiceNumber}`,
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -450,13 +443,13 @@ export const processPayment = mutation({
       paymentReference: paymentData.paymentReference?.trim(),
       paidAmount: paymentData.paidAmount,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.payment_processed',
       entityType: 'yourobc_invoice',
@@ -470,7 +463,7 @@ export const processPayment = mutation({
         paymentReference: paymentData.paymentReference || '',
       },
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -519,7 +512,7 @@ export const addCollectionAttempt = mutation({
       date: now,
       method: attemptData.method,
       result: attemptData.result.trim(),
-      createdBy: user.authUserId,
+      createdBy: user._id,
     };
 
     const updatedAttempts = [...invoice.collectionAttempts, newAttempt];
@@ -527,13 +520,13 @@ export const addCollectionAttempt = mutation({
     await ctx.db.patch(invoiceId, {
       collectionAttempts: updatedAttempts,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.collection_attempt_added',
       entityType: 'yourobc_invoice',
@@ -545,7 +538,7 @@ export const addCollectionAttempt = mutation({
         result: attemptData.result,
       },
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -594,13 +587,13 @@ export const escalateDunning = mutation({
       lastDunningDate: now,
       status: INVOICES_CONSTANTS.STATUS.OVERDUE,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.dunning_escalated',
       entityType: 'yourobc_invoice',
@@ -615,7 +608,7 @@ export const escalateDunning = mutation({
         notes: notes || '',
       },
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 
@@ -656,13 +649,13 @@ export const markAsOverdue = mutation({
     await ctx.db.patch(invoiceId, {
       status: INVOICES_CONSTANTS.STATUS.OVERDUE,
       updatedAt: now,
-      updatedBy: user.authUserId,
+      updatedBy: user._id,
     });
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
       publicId: await generateUniquePublicId(ctx, 'auditLogs'),
-      userId: user.authUserId,
+      userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.marked_overdue',
       entityType: 'yourobc_invoice',
@@ -670,7 +663,7 @@ export const markAsOverdue = mutation({
       entityTitle: invoice.invoiceNumber,
       description: `Marked invoice as overdue: ${invoice.invoiceNumber}`,
       createdAt: now,
-      createdBy: user.authUserId,
+      createdBy: user._id,
       updatedAt: now,
     });
 

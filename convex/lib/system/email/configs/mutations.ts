@@ -13,8 +13,11 @@ import {
   requireEditEmailConfigAccess,
   requireDeleteEmailConfigAccess,
 } from './permissions';
-import type { EmailConfigId } from './types';
+import type { EmailConfig, EmailConfigId, UpdateEmailConfigData } from './types';
 import { createAuditLog } from '../../core/audit_logs/helpers';
+
+type EmailConfigUpdatePatch = Partial<UpdateEmailConfigData> &
+  Pick<EmailConfig, 'updatedAt' | 'updatedBy' | 'lastActivityAt'>;
 
 /**
  * Create or update email provider configuration
@@ -209,7 +212,7 @@ export const updateEmailConfig = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
-    const updateData: any = {
+    const updateData: EmailConfigUpdatePatch = {
       updatedAt: now,
       updatedBy: user._id,
       lastActivityAt: now,

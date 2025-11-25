@@ -126,7 +126,8 @@ export function validatePartnerData(
 
   // Validate primary contact email
   if ('primaryContact' in data && data.primaryContact) {
-    if (!PARTNERS_CONSTANTS.VALIDATION.EMAIL_PATTERN.test(data.primaryContact.email)) {
+    const email = data.primaryContact.email;
+    if (email && !PARTNERS_CONSTANTS.VALIDATION.EMAIL_PATTERN.test(email)) {
       errors.push('Invalid primary contact email format');
     }
   }
