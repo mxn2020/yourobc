@@ -31,7 +31,11 @@
       "@/components/*": ["src/components/*"],
       "@/routes/*": ["src/routes/*"],
       "@/convex/*": ["convex/*"],
-      "@/generated/*": ["convex/_generated/*"]
+      "@/generated/*": ["convex/_generated/*"],
+      "@/shared/*": ["convex/shared/*"],
+      "@/schema/*": ["convex/schema/*"],
+      "@/config/*": ["convex/config/*"],
+      "@/lib/*": ["convex/lib/*"]
     },
     "noEmit": true
   }

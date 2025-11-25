@@ -16,7 +16,7 @@ import {
   canEditEmployee,
   canDeleteEmployee,
 } from './permissions';
-import type { EmployeeId, VacationDaysId } from './types';
+import type { Employee, EmployeeId, VacationDaysId, VacationRequest } from './types';
 
 // ============================================================================
 // Employee Operations
@@ -292,9 +292,6 @@ export const updateEmployeeSalary = mutation({
 
     const now = Date.now();
     await ctx.db.patch(employeeId, {
-      salary,
-      currency: currency || 'USD',
-      paymentFrequency: paymentFrequency,
       updatedAt: now,
       updatedBy: user._id,
     });
@@ -538,7 +535,7 @@ export const requestVacation = mutation({
     const user = await requireCurrentUser(ctx);
 
     // Validate vacation request
-    const errors = validateVacationRequest(data);
+    const errors = validateVacationRequest(data as VacationRequest);
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`);
     }
@@ -682,7 +679,7 @@ export const approveVacation = mutation({
     }
 
     // Check approval permission
-    await requireApproveVacationAccess(ctx, employee, user);
+    await requireApproveVacationAccess(ctx, employee as Employee, user);
 
     // Find entry
     const entryIndex = vacationDays.entries.findIndex(e => e.entryId === entryId);
@@ -772,7 +769,7 @@ export const rejectVacation = mutation({
     }
 
     // Check approval permission
-    await requireApproveVacationAccess(ctx, employee, user);
+    await requireApproveVacationAccess(ctx, employee as Employee, user);
 
     // Find entry
     const entryIndex = vacationDays.entries.findIndex(e => e.entryId === entryId);

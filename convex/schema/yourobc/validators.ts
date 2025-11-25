@@ -82,11 +82,11 @@ export const shipmentStatusHistory = yourobcSchemas.yourobcShipmentStatusHistory
 // ============================================================================
 // Statistics validators
 // ============================================================================
-export const employeeCost = yourobcSchemas.yourobcEmployeeCosts.validator
-export const officeCost = yourobcSchemas.yourobcOfficeCosts.validator
-export const miscExpense = yourobcSchemas.yourobcMiscExpenses.validator
-export const kpiTarget = yourobcSchemas.yourobcKpiTargets.validator
-export const kpiCache = yourobcSchemas.yourobcKpiCache.validator
+export const employeeCost = yourobcSchemas.yourobcStatisticsEmployeeCosts.validator
+export const officeCost = yourobcSchemas.yourobcStatisticsOfficeCosts.validator
+export const miscExpense = yourobcSchemas.yourobcStatisticsMiscExpenses.validator
+export const kpiTarget = yourobcSchemas.yourobcStatisticsKpiTargets.validator
+export const kpiCache = yourobcSchemas.yourobcStatisticsKpiCache.validator
 
 // ============================================================================
 // Supporting validators

@@ -529,8 +529,8 @@ export const bulkUpdateShipments = mutation({
     }
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: Array<{ id: ShipmentId; success: boolean }> = [];
+    const failed: Array<{ id: ShipmentId; reason: string }> = [];
 
     // 4. PROCESS: Update each entity
     for (const shipmentId of shipmentIds) {
@@ -617,8 +617,8 @@ export const bulkDeleteShipments = mutation({
     });
 
     const now = Date.now();
-    const results = [];
-    const failed = [];
+    const results: Array<{ id: ShipmentId; success: boolean }> = [];
+    const failed: Array<{ id: ShipmentId; reason: string }> = [];
 
     // 3. PROCESS: Delete each entity
     for (const shipmentId of shipmentIds) {

@@ -61,8 +61,6 @@ export const createQuote = mutation({
       status: v.optional(quotesValidators.status),
       quoteText: v.optional(v.string()),
       notes: v.optional(v.string()),
-      tags: v.optional(v.array(v.string())),
-      category: v.optional(v.string()),
     }),
   },
   handler: async (ctx, { data }): Promise<QuoteId> => {
@@ -116,7 +114,6 @@ export const createQuote = mutation({
       status: trimmedData.status || 'draft',
       quoteText: trimmedData.quoteText,
       notes: trimmedData.notes,
-      tags: trimmedData.tags || [],
       ownerId: user._id,
       createdAt: now,
       updatedAt: now,
@@ -134,9 +131,11 @@ export const createQuote = mutation({
       entityTitle: trimmedData.quoteNumber,
       description: `Created quote: ${trimmedData.quoteNumber}`,
       metadata: {
-        status: trimmedData.status || 'draft',
-        serviceType: trimmedData.serviceType,
-        customerId: trimmedData.customerId,
+        data: {
+          status: trimmedData.status || 'draft',
+          serviceType: trimmedData.serviceType,
+          customerId: trimmedData.customerId,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -182,8 +181,6 @@ export const updateQuote = mutation({
       status: v.optional(quotesValidators.status),
       quoteText: v.optional(v.string()),
       notes: v.optional(v.string()),
-      tags: v.optional(v.array(v.string())),
-      category: v.optional(v.string()),
     }),
   },
   handler: async (ctx, { quoteId, updates }): Promise<QuoteId> => {
@@ -219,7 +216,6 @@ export const updateQuote = mutation({
       specialInstructions: trimmedUpdates.specialInstructions ?? quote.specialInstructions,
       quoteText: trimmedUpdates.quoteText ?? quote.quoteText,
       notes: trimmedUpdates.notes ?? quote.notes,
-      tags: trimmedUpdates.tags ?? quote.tags,
     });
 
     const updateData: any = {
@@ -254,8 +250,6 @@ export const updateQuote = mutation({
     if (trimmedUpdates.status !== undefined) updateData.status = trimmedUpdates.status;
     if (trimmedUpdates.quoteText !== undefined) updateData.quoteText = trimmedUpdates.quoteText;
     if (trimmedUpdates.notes !== undefined) updateData.notes = trimmedUpdates.notes;
-    if (trimmedUpdates.tags !== undefined) updateData.tags = trimmedUpdates.tags;
-    if (trimmedUpdates.category !== undefined) updateData.category = trimmedUpdates.category;
 
     // 7. UPDATE: Apply changes
     await ctx.db.patch(quoteId, updateData);
@@ -270,7 +264,11 @@ export const updateQuote = mutation({
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Updated quote: ${quote.quoteNumber}`,
-      metadata: { changes: updates },
+      metadata: {
+        data: {
+          changes: JSON.stringify(updates),
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -541,7 +539,9 @@ export const rejectQuote = mutation({
       entityTitle: quote.quoteNumber,
       description: `Rejected quote: ${quote.quoteNumber}${rejectionReason ? ` - Reason: ${rejectionReason}` : ''}`,
       metadata: {
-        rejectionReason: rejectionReason || 'No reason provided'
+        data: {
+          rejectionReason: rejectionReason || 'No reason provided',
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -608,7 +608,11 @@ export const convertQuoteToShipment = mutation({
       entityId: quote.publicId,
       entityTitle: quote.quoteNumber,
       description: `Converted quote ${quote.quoteNumber} to shipment`,
-      metadata: { shipmentId },
+      metadata: {
+        data: {
+          shipmentId: shipmentId,
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,

@@ -7,8 +7,8 @@ import type {
   SystemSupportingNotificationPriority,
 } from '@/schema/system/supporting/notifications/types';
 
-export type SystemNotification = Doc<'notifications'>;
-export type SystemNotificationId = Id<'notifications'>;
+export type SystemNotification = Doc<'systemSupportingNotifications'>;
+export type SystemNotificationId = Id<'systemSupportingNotifications'>;
 
 export interface CreateSystemNotificationData {
   name: string;

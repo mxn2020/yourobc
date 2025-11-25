@@ -55,7 +55,7 @@ export const getInvoices = query({
     // Query with index - start with owner index for better performance
     let invoices = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user.authUserId))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user.authUserId))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 
@@ -196,7 +196,7 @@ export const getInvoiceByNumber = query({
 
     const invoice = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_invoiceNumber', (q) => q.eq('invoiceNumber', invoiceNumber))
+      .withIndex('by_invoice_number', (q) => q.eq('invoiceNumber', invoiceNumber))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .first();
 
@@ -231,7 +231,7 @@ export const getInvoiceStats = query({
     // Get all invoices
     let invoices = await ctx.db
       .query('yourobcInvoices')
-      .withIndex('by_owner', (q) => q.eq('ownerId', user.authUserId))
+      .withIndex('by_owner_id', (q) => q.eq('ownerId', user.authUserId))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .collect();
 

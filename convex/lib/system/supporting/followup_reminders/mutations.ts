@@ -86,7 +86,7 @@ export const createSystemFollowupReminder = mutation({
 
 export const updateSystemFollowupReminder = mutation({
   args: {
-    id: v.id('followupReminders'),
+    id: v.id('systemSupportingFollowupReminders'),
     updates: v.object({
       name: v.optional(v.string()),
       description: v.optional(v.string()),
@@ -150,7 +150,7 @@ export const updateSystemFollowupReminder = mutation({
 });
 
 export const deleteSystemFollowupReminder = mutation({
-  args: { id: v.id('followupReminders') },
+  args: { id: v.id('systemSupportingFollowupReminders') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);

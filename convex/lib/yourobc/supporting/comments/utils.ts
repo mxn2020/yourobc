@@ -107,7 +107,7 @@ export function validateCommentData(
  */
 export function isValidReaction(reaction: string): boolean {
   // Allow any emoji-like string, at least 1 character, max 5 characters
-  return reaction && reaction.length <= 5 && reaction.length >= 1;
+  return Boolean(reaction && reaction.length <= 5 && reaction.length >= 1);
 }
 
 /**

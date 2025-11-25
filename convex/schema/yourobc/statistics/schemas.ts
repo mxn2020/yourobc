@@ -10,9 +10,9 @@ import {
 } from './tables';
 
 export const yourobcStatisticsSchemas = {
-  yourobcEmployeeCosts: employeeCostsTable,
-  yourobcOfficeCosts: officeCostsTable,
-  yourobcMiscExpenses: miscExpensesTable,
-  yourobcKpiTargets: kpiTargetsTable,
-  yourobcKpiCache: kpiCacheTable,
+  yourobcStatisticsEmployeeCosts: employeeCostsTable,
+  yourobcStatisticsOfficeCosts: officeCostsTable,
+  yourobcStatisticsMiscExpenses: miscExpensesTable,
+  yourobcStatisticsKpiTargets: kpiTargetsTable,
+  yourobcStatisticsKpiCache: kpiCacheTable,
 };

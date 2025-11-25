@@ -116,13 +116,13 @@ export const updateUserModelPreferences = mutation({
         ...(existing && {
           oldValues: {
             preferredView: existing.preferredView,
-            defaultLanguageModel: existing.defaultLanguageModel,
-            defaultEmbeddingModel: existing.defaultEmbeddingModel,
+            defaultLanguageModel: existing.defaultLanguageModel ?? null,
+            defaultEmbeddingModel: existing.defaultEmbeddingModel ?? null,
           },
           newValues: {
             preferredView: updateData.preferredView ?? existing.preferredView,
-            defaultLanguageModel: updateData.defaultLanguageModel ?? existing.defaultLanguageModel,
-            defaultEmbeddingModel: updateData.defaultEmbeddingModel ?? existing.defaultEmbeddingModel,
+            defaultLanguageModel: (updateData.defaultLanguageModel ?? existing.defaultLanguageModel) ?? null,
+            defaultEmbeddingModel: (updateData.defaultEmbeddingModel ?? existing.defaultEmbeddingModel) ?? null,
           },
         }),
         data: {
@@ -223,9 +223,11 @@ export const setDefaultModel = mutation({
       entityId: preferencesId,
       description: `Set default ${trimmedModelType} model to ${trimmedModelId}`,
       metadata: {
-        modelId: trimmedModelId,
-        modelType: trimmedModelType,
-        operation: existing ? 'update' : 'create',
+        data: {
+          modelId: trimmedModelId,
+          modelType: trimmedModelType,
+          operation: existing ? 'update' : 'create',
+        },
       },
       createdAt: now,
     });
@@ -316,16 +318,18 @@ export const toggleFavoriteModel = mutation({
       description: `${isFavorite ? 'Removed' : 'Added'} ${trimmedModelId} ${isFavorite ? 'from' : 'to'} favorites`,
       metadata: {
         operation: existing ? 'update' : 'create',
-        modelId: trimmedModelId,
-        action: isFavorite ? 'remove' : 'add',
-        ...(existing && {
-          oldValues: {
-            favoriteModels: existing.favoriteModels,
-          },
-          newValues: {
-            favoriteModels: newFavorites,
-          },
-        }),
+        data: {
+          modelId: trimmedModelId,
+          action: isFavorite ? 'remove' : 'add',
+          ...(existing && {
+            oldValues: {
+              favoriteModels: existing.favoriteModels,
+            },
+            newValues: {
+              favoriteModels: newFavorites,
+            },
+          }),
+        },
       },
       createdAt: now,
     });
@@ -414,9 +418,11 @@ export const clearDefaultModel = mutation({
       description: `Cleared default ${modelType} model`,
       metadata: {
         operation: 'clear',
-        modelType,
-        oldValue: getModelFieldValue(modelType),
-        newValue: null,
+        data: {
+          modelType,
+          oldValue: getModelFieldValue(modelType) || null,
+          newValue: null,
+        },
       },
       createdAt: now,
     });
@@ -472,13 +478,13 @@ export const resetUserModelPreferences = mutation({
           operation: 'reset',
           oldValues: {
             preferredView: existing.preferredView,
-            defaultLanguageModel: existing.defaultLanguageModel,
-            defaultEmbeddingModel: existing.defaultEmbeddingModel,
+            defaultLanguageModel: existing.defaultLanguageModel ?? null,
+            defaultEmbeddingModel: existing.defaultEmbeddingModel ?? null,
           },
           newValues: {
             preferredView: defaults.preferredView,
-            defaultLanguageModel: defaults.defaultLanguageModel,
-            defaultEmbeddingModel: defaults.defaultEmbeddingModel,
+            defaultLanguageModel: defaults.defaultLanguageModel ?? null,
+            defaultEmbeddingModel: defaults.defaultEmbeddingModel ?? null,
           },
         },
         createdAt: now,
@@ -567,11 +573,13 @@ export const deleteUserModelPreferences = mutation({
       description: 'Deleted user model preferences',
       metadata: {
         operation: 'soft_delete',
-        deletedPreferences: {
-          preferredView: existing.preferredView,
-          defaultLanguageModel: existing.defaultLanguageModel,
-          defaultEmbeddingModel: existing.defaultEmbeddingModel,
-          favoriteModelsCount: existing.favoriteModels.length,
+        data: {
+          deletedPreferences: {
+            preferredView: existing.preferredView,
+            defaultLanguageModel: existing.defaultLanguageModel,
+            defaultEmbeddingModel: existing.defaultEmbeddingModel,
+            favoriteModelsCount: existing.favoriteModels.length,
+          },
         },
       },
       createdAt: now,

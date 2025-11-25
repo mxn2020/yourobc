@@ -9,16 +9,16 @@ export function trimSystemNotificationData<
 >(data: T): T {
   const trimmed: T = { ...data };
 
-  if (typeof trimmed.name === 'string') {
-    trimmed.title = trimmed.title.trim() as T['title'];
+  if ('name' in trimmed && typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim() as T['name'];
   }
-  if (typeof trimmed.message === 'string') {
+  if ('message' in trimmed && typeof trimmed.message === 'string') {
     trimmed.message = trimmed.message.trim() as T['message'];
   }
-  if (typeof trimmed.entityType === 'string') {
+  if ('entityType' in trimmed && typeof trimmed.entityType === 'string') {
     trimmed.entityType = trimmed.entityType.trim() as T['entityType'];
   }
-  if (typeof trimmed.entityId === 'string') {
+  if ('entityId' in trimmed && typeof trimmed.entityId === 'string') {
     trimmed.entityId = trimmed.entityId.trim() as T['entityId'];
   }
 
@@ -30,11 +30,11 @@ export function validateSystemNotificationData(
 ): string[] {
   const errors: string[] = [];
 
-  if (data.title !== undefined && !data.title.trim()) {
-    errors.push('Title is required');
+  if ('name' in data && data.name !== undefined && !data.name.trim()) {
+    errors.push('Name is required');
   }
 
-  if (data.message !== undefined && !data.message.trim()) {
+  if ('message' in data && data.message !== undefined && !data.message.trim()) {
     errors.push('Message is required');
   }
 

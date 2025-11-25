@@ -79,7 +79,7 @@ export const getSystemFollowupReminders = query({
 });
 
 export const getSystemFollowupReminder = query({
-  args: { id: v.id('followupReminders') },
+  args: { id: v.id('systemSupportingFollowupReminders') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);

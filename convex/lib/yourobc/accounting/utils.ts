@@ -12,16 +12,19 @@ export function validateAccountingEntryData(
 ): string[] {
   const errors: string[] = [];
 
-  // Validate journal entry number if provided
-  if (data.journalEntryNumber !== undefined) {
-    const trimmed = data.journalEntryNumber.trim();
+  // Validate journal entry number if provided (only on CreateAccountingEntryData)
+  if ('journalEntryNumber' in data && data.journalEntryNumber !== undefined) {
+    const journalEntryNumber = (data as Partial<CreateAccountingEntryData>).journalEntryNumber;
+    if (journalEntryNumber) {
+      const trimmed = journalEntryNumber.trim();
 
-    if (trimmed.length < ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH) {
-      errors.push(`Journal entry number must be at least ${ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
-    } else if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH) {
-      errors.push(`Journal entry number cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
-    } else if (!ACCOUNTING_CONSTANTS.VALIDATION.JOURNAL_ENTRY_NUMBER_PATTERN.test(trimmed)) {
-      errors.push('Journal entry number contains invalid characters (use A-Z, 0-9, -, _)');
+      if (trimmed.length < ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH) {
+        errors.push(`Journal entry number must be at least ${ACCOUNTING_CONSTANTS.LIMITS.MIN_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
+      } else if (trimmed.length > ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH) {
+        errors.push(`Journal entry number cannot exceed ${ACCOUNTING_CONSTANTS.LIMITS.MAX_JOURNAL_ENTRY_NUMBER_LENGTH} characters`);
+      } else if (!ACCOUNTING_CONSTANTS.VALIDATION.JOURNAL_ENTRY_NUMBER_PATTERN.test(trimmed)) {
+        errors.push('Journal entry number contains invalid characters (use A-Z, 0-9, -, _)');
+      }
     }
   }
 
@@ -119,35 +122,48 @@ export function validateAccountingEntryData(
 export function normalizeAccountingEntryData<
   T extends Partial<CreateAccountingEntryData | UpdateAccountingEntryData>
 >(data: T): T {
-  const normalized: Partial<CreateAccountingEntryData & UpdateAccountingEntryData> = { ...data };
+  const normalized = { ...data } as any;
 
   const trimIfString = (value?: string | null) =>
     value !== undefined && value !== null ? value.trim() : value;
 
-  normalized.journalEntryNumber = trimIfString(data.journalEntryNumber) ?? undefined;
+  // Properties on both types
   normalized.referenceNumber = trimIfString(data.referenceNumber) ?? undefined;
   normalized.debitAccountId = trimIfString(data.debitAccountId) ?? undefined;
   normalized.creditAccountId = trimIfString(data.creditAccountId) ?? undefined;
   normalized.accountCode = trimIfString(data.accountCode) ?? undefined;
-  normalized.relatedExpenseId = trimIfString(data.relatedExpenseId) ?? undefined;
   normalized.memo = trimIfString(data.memo) ?? undefined;
   normalized.description = trimIfString(data.description) ?? undefined;
   normalized.taxCategory = trimIfString(data.taxCategory) ?? undefined;
-  normalized.approvalNotes = trimIfString((data as UpdateAccountingEntryData).approvalNotes) ?? undefined;
-  normalized.rejectionReason = trimIfString((data as UpdateAccountingEntryData).rejectionReason) ?? undefined;
   normalized.category = trimIfString(data.category) ?? undefined;
+
+  // Properties only on CreateAccountingEntryData
+  if ('journalEntryNumber' in data) {
+    normalized.journalEntryNumber = trimIfString((data as Partial<CreateAccountingEntryData>).journalEntryNumber) ?? undefined;
+  }
+  if ('relatedExpenseId' in data) {
+    normalized.relatedExpenseId = trimIfString((data as Partial<CreateAccountingEntryData>).relatedExpenseId) ?? undefined;
+  }
+
+  // Properties only on UpdateAccountingEntryData
+  if ('approvalNotes' in data) {
+    normalized.approvalNotes = trimIfString((data as Partial<UpdateAccountingEntryData>).approvalNotes) ?? undefined;
+  }
+  if ('rejectionReason' in data) {
+    normalized.rejectionReason = trimIfString((data as Partial<UpdateAccountingEntryData>).rejectionReason) ?? undefined;
+  }
 
   if (data.currency) {
     normalized.currency = data.currency.toUpperCase();
   }
 
   if (data.tags) {
-    const trimmedTags = data.tags.map(tag => tag.trim()).filter(Boolean);
+    const trimmedTags = data.tags.map((tag: string) => tag.trim()).filter(Boolean);
     normalized.tags = trimmedTags;
   }
 
   if (data.attachments) {
-    normalized.attachments = data.attachments.map(attachment => ({
+    normalized.attachments = data.attachments.map((attachment: any) => ({
       ...attachment,
       id: attachment.id.trim(),
       name: attachment.name.trim(),

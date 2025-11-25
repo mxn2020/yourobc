@@ -1,62 +1,435 @@
 // convex/lib/yourobc/statistics/utils.ts
 /**
- * Statistics Utility Functions
- *
- * Helper functions for cost calculations, KPI computations, and data transformations.
- * Provides reusable utilities for all 5 statistics tables.
- *
- * @module convex/lib/yourobc/statistics/utils
+ * Statistics Utilities
+ * Validation and helper functions for statistics operations.
  */
 
-import { CurrencyAmount } from './types'
-import { QUARTERS, DEFAULT_CURRENCY } from './constants'
+import { STATISTICS_CONSTANTS } from './constants';
+import type {
+  CreateEmployeeCostData,
+  UpdateEmployeeCostData,
+  CreateOfficeCostData,
+  UpdateOfficeCostData,
+  CreateMiscExpenseData,
+  UpdateMiscExpenseData,
+  CreateKpiTargetData,
+  UpdateKpiTargetData,
+  CreateKpiCacheData,
+  UpdateKpiCacheData,
+  CurrencyAmount,
+} from './types';
 
 // ============================================================================
-// Public ID Generation
+// Trim Functions
 // ============================================================================
 
 /**
- * Generate a unique public ID for statistics entities
+ * Trim employee cost data
  */
-export function generatePublicId(prefix: string): string {
-  const timestamp = Date.now().toString(36)
-  const random = Math.random().toString(36).substring(2, 10)
-  return `${prefix}_${timestamp}${random}`
+export function trimEmployeeCostData<
+  T extends Partial<CreateEmployeeCostData | UpdateEmployeeCostData>
+>(data: T): T {
+  const trimmed = { ...data } as any;
+
+  if (typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim();
+  }
+  if (typeof trimmed.description === 'string') {
+    trimmed.description = trimmed.description.trim();
+  }
+  if (typeof trimmed.employeeName === 'string') {
+    trimmed.employeeName = trimmed.employeeName.trim();
+  }
+  if (typeof trimmed.position === 'string') {
+    trimmed.position = trimmed.position.trim();
+  }
+  if (typeof trimmed.department === 'string') {
+    trimmed.department = trimmed.department.trim();
+  }
+  if (typeof trimmed.notes === 'string') {
+    trimmed.notes = trimmed.notes.trim();
+  }
+
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t: any): t is string => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+    trimmed.tags = nextTags;
+  }
+
+  return trimmed as T;
 }
 
 /**
- * Generate employee cost public ID
+ * Trim office cost data
  */
-export function generateEmployeeCostPublicId(): string {
-  return generatePublicId('ec')
+export function trimOfficeCostData<
+  T extends Partial<CreateOfficeCostData | UpdateOfficeCostData>
+>(data: T): T {
+  const trimmed = { ...data } as any;
+
+  if (typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim();
+  }
+  if (typeof trimmed.description === 'string') {
+    trimmed.description = trimmed.description.trim();
+  }
+  if (typeof trimmed.vendor === 'string') {
+    trimmed.vendor = trimmed.vendor.trim();
+  }
+  if (typeof trimmed.notes === 'string') {
+    trimmed.notes = trimmed.notes.trim();
+  }
+
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t: any): t is string => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+    trimmed.tags = nextTags;
+  }
+
+  return trimmed as T;
 }
 
 /**
- * Generate office cost public ID
+ * Trim misc expense data
  */
-export function generateOfficeCostPublicId(): string {
-  return generatePublicId('oc')
+export function trimMiscExpenseData<
+  T extends Partial<CreateMiscExpenseData | UpdateMiscExpenseData>
+>(data: T): T {
+  const trimmed = { ...data } as any;
+
+  if (typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim();
+  }
+  if (typeof trimmed.description === 'string') {
+    trimmed.description = trimmed.description.trim();
+  }
+  if (typeof trimmed.vendor === 'string') {
+    trimmed.vendor = trimmed.vendor.trim();
+  }
+  if (typeof trimmed.notes === 'string') {
+    trimmed.notes = trimmed.notes.trim();
+  }
+
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t: any): t is string => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+    trimmed.tags = nextTags;
+  }
+
+  return trimmed as T;
 }
 
 /**
- * Generate misc expense public ID
+ * Trim KPI target data
  */
-export function generateMiscExpensePublicId(): string {
-  return generatePublicId('me')
+export function trimKpiTargetData<
+  T extends Partial<CreateKpiTargetData | UpdateKpiTargetData>
+>(data: T): T {
+  const trimmed = { ...data } as any;
+
+  if (typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim();
+  }
+  if (typeof trimmed.description === 'string') {
+    trimmed.description = trimmed.description.trim();
+  }
+  if (typeof trimmed.teamName === 'string') {
+    trimmed.teamName = trimmed.teamName.trim();
+  }
+  if (typeof trimmed.notes === 'string') {
+    trimmed.notes = trimmed.notes.trim();
+  }
+
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t: any): t is string => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+    trimmed.tags = nextTags;
+  }
+
+  return trimmed as T;
 }
 
 /**
- * Generate KPI target public ID
+ * Trim KPI cache data
  */
-export function generateKpiTargetPublicId(): string {
-  return generatePublicId('kt')
+export function trimKpiCacheData<
+  T extends Partial<CreateKpiCacheData | UpdateKpiCacheData>
+>(data: T): T {
+  const trimmed = { ...data } as any;
+
+  if (typeof trimmed.name === 'string') {
+    trimmed.name = trimmed.name.trim();
+  }
+  if (typeof trimmed.description === 'string') {
+    trimmed.description = trimmed.description.trim();
+  }
+  if (typeof trimmed.entityName === 'string') {
+    trimmed.entityName = trimmed.entityName.trim();
+  }
+
+  if (Array.isArray(trimmed.tags)) {
+    const nextTags = trimmed.tags
+      .filter((t: any): t is string => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+    trimmed.tags = nextTags;
+  }
+
+  return trimmed as T;
+}
+
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate employee cost data
+ */
+export function validateEmployeeCostData(
+  data: Partial<CreateEmployeeCostData | UpdateEmployeeCostData>
+): string[] {
+  const errors: string[] = [];
+
+  // Name validation
+  if (data.name !== undefined) {
+    if (typeof data.name !== 'string') {
+      errors.push('Name must be a string');
+    } else {
+      const name = data.name.trim();
+      if (!name) {
+        errors.push('Name is required');
+      }
+      if (name.length < STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH) {
+        errors.push(`Name must be at least ${STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH} characters`);
+      }
+      if (name.length > STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH) {
+        errors.push(`Name cannot exceed ${STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH} characters`);
+      }
+    }
+  }
+
+  // Description validation
+  if (data.description !== undefined && typeof data.description === 'string') {
+    const desc = data.description.trim();
+    if (desc.length > STATISTICS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH) {
+      errors.push(`Description cannot exceed ${STATISTICS_CONSTANTS.LIMITS.MAX_DESCRIPTION_LENGTH} characters`);
+    }
+  }
+
+  // Position validation
+  if (data.position !== undefined) {
+    if (typeof data.position !== 'string') {
+      errors.push('Position must be a string');
+    } else if (!data.position.trim()) {
+      errors.push('Position is required');
+    }
+  }
+
+  // Date range validation
+  if (data.startDate !== undefined && data.endDate !== undefined) {
+    if (data.endDate <= data.startDate) {
+      errors.push('End date must be after start date');
+    }
+  }
+
+  // Tags validation
+  if (data.tags !== undefined) {
+    if (!Array.isArray(data.tags)) {
+      errors.push('Tags must be an array');
+    } else if (data.tags.length > STATISTICS_CONSTANTS.LIMITS.MAX_TAGS) {
+      errors.push(`Cannot exceed ${STATISTICS_CONSTANTS.LIMITS.MAX_TAGS} tags`);
+    }
+  }
+
+  // Currency amount validation
+  if (data.monthlySalary !== undefined) {
+    const salaryErrors = validateCurrencyAmount(data.monthlySalary);
+    errors.push(...salaryErrors);
+  }
+
+  return errors;
 }
 
 /**
- * Generate KPI cache public ID
+ * Validate office cost data
  */
-export function generateKpiCachePublicId(): string {
-  return generatePublicId('kc')
+export function validateOfficeCostData(
+  data: Partial<CreateOfficeCostData | UpdateOfficeCostData>
+): string[] {
+  const errors: string[] = [];
+
+  // Name validation
+  if (data.name !== undefined) {
+    if (typeof data.name !== 'string') {
+      errors.push('Name must be a string');
+    } else {
+      const name = data.name.trim();
+      if (!name) {
+        errors.push('Name is required');
+      }
+      if (name.length < STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH) {
+        errors.push(`Name must be at least ${STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH} characters`);
+      }
+      if (name.length > STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH) {
+        errors.push(`Name cannot exceed ${STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH} characters`);
+      }
+    }
+  }
+
+  // Date range validation
+  if (data.date !== undefined && data.endDate !== undefined) {
+    if (data.endDate <= data.date) {
+      errors.push('End date must be after start date');
+    }
+  }
+
+  // Amount validation
+  if (data.amount !== undefined) {
+    const amountErrors = validateCurrencyAmount(data.amount);
+    errors.push(...amountErrors);
+  }
+
+  return errors;
+}
+
+/**
+ * Validate misc expense data
+ */
+export function validateMiscExpenseData(
+  data: Partial<CreateMiscExpenseData | UpdateMiscExpenseData>
+): string[] {
+  const errors: string[] = [];
+
+  // Name validation
+  if (data.name !== undefined) {
+    if (typeof data.name !== 'string') {
+      errors.push('Name must be a string');
+    } else {
+      const name = data.name.trim();
+      if (!name) {
+        errors.push('Name is required');
+      }
+      if (name.length < STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH) {
+        errors.push(`Name must be at least ${STATISTICS_CONSTANTS.LIMITS.MIN_NAME_LENGTH} characters`);
+      }
+      if (name.length > STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH) {
+        errors.push(`Name cannot exceed ${STATISTICS_CONSTANTS.LIMITS.MAX_NAME_LENGTH} characters`);
+      }
+    }
+  }
+
+  // Amount validation
+  if (data.amount !== undefined) {
+    const amountErrors = validateCurrencyAmount(data.amount);
+    errors.push(...amountErrors);
+  }
+
+  return errors;
+}
+
+/**
+ * Validate KPI target data
+ */
+export function validateKpiTargetData(
+  data: Partial<CreateKpiTargetData | UpdateKpiTargetData>
+): string[] {
+  const errors: string[] = [];
+
+  // Name validation
+  if (data.name !== undefined) {
+    if (typeof data.name !== 'string') {
+      errors.push('Name must be a string');
+    } else {
+      const name = data.name.trim();
+      if (!name) {
+        errors.push('Name is required');
+      }
+    }
+  }
+
+  // Year validation
+  if (data.year !== undefined) {
+    const currentYear = new Date().getFullYear();
+    if (data.year < 2000 || data.year > currentYear + 10) {
+      errors.push('Invalid year');
+    }
+  }
+
+  // Month validation
+  if (data.month !== undefined) {
+    if (data.month < 1 || data.month > 12) {
+      errors.push('Month must be between 1 and 12');
+    }
+  }
+
+  // Quarter validation
+  if (data.quarter !== undefined) {
+    if (data.quarter < 1 || data.quarter > 4) {
+      errors.push('Quarter must be between 1 and 4');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate KPI cache data
+ */
+export function validateKpiCacheData(
+  data: Partial<CreateKpiCacheData | UpdateKpiCacheData>
+): string[] {
+  const errors: string[] = [];
+
+  // Name validation
+  if (data.name !== undefined) {
+    if (typeof data.name !== 'string') {
+      errors.push('Name must be a string');
+    } else if (!data.name.trim()) {
+      errors.push('Name is required');
+    }
+  }
+
+  // Year validation
+  if (data.year !== undefined) {
+    const currentYear = new Date().getFullYear();
+    if (data.year < 2000 || data.year > currentYear + 10) {
+      errors.push('Invalid year');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate currency amount
+ */
+export function validateCurrencyAmount(amount: CurrencyAmount): string[] {
+  const errors: string[] = [];
+
+  if (typeof amount.amount !== 'number') {
+    errors.push('Amount must be a number');
+  } else {
+    if (amount.amount < STATISTICS_CONSTANTS.LIMITS.MIN_COST_AMOUNT) {
+      errors.push('Amount cannot be negative');
+    }
+    if (amount.amount > STATISTICS_CONSTANTS.LIMITS.MAX_COST_AMOUNT) {
+      errors.push('Amount exceeds maximum allowed');
+    }
+  }
+
+  if (!['EUR', 'USD'].includes(amount.currency)) {
+    errors.push('Currency must be EUR or USD');
+  }
+
+  return errors;
 }
 
 // ============================================================================
@@ -64,342 +437,54 @@ export function generateKpiCachePublicId(): string {
 // ============================================================================
 
 /**
- * Create a currency amount object
+ * Create a currency amount
  */
 export function createCurrencyAmount(
   amount: number,
-  currency: 'EUR' | 'USD' = DEFAULT_CURRENCY,
-  exchangeRate?: number,
-  exchangeRateDate?: number
+  currency: 'EUR' | 'USD' = STATISTICS_CONSTANTS.DEFAULT_CURRENCY as 'EUR'
 ): CurrencyAmount {
   return {
     amount,
     currency,
-    exchangeRate,
-    exchangeRateDate,
-  }
+  };
 }
 
 /**
- * Add two currency amounts (must be same currency)
- */
-export function addCurrencyAmounts(
-  a: CurrencyAmount,
-  b: CurrencyAmount
-): CurrencyAmount {
-  if (a.currency !== b.currency) {
-    throw new Error('Cannot add amounts with different currencies')
-  }
-  return createCurrencyAmount(a.amount + b.amount, a.currency)
-}
-
-/**
- * Subtract two currency amounts (must be same currency)
- */
-export function subtractCurrencyAmounts(
-  a: CurrencyAmount,
-  b: CurrencyAmount
-): CurrencyAmount {
-  if (a.currency !== b.currency) {
-    throw new Error('Cannot subtract amounts with different currencies')
-  }
-  return createCurrencyAmount(a.amount - b.amount, a.currency)
-}
-
-/**
- * Multiply currency amount by a factor
- */
-export function multiplyCurrencyAmount(
-  amount: CurrencyAmount,
-  factor: number
-): CurrencyAmount {
-  return createCurrencyAmount(amount.amount * factor, amount.currency)
-}
-
-/**
- * Divide currency amount by a divisor
- */
-export function divideCurrencyAmount(
-  amount: CurrencyAmount,
-  divisor: number
-): CurrencyAmount {
-  if (divisor === 0) {
-    throw new Error('Cannot divide by zero')
-  }
-  return createCurrencyAmount(amount.amount / divisor, amount.currency)
-}
-
-/**
- * Convert currency amount to zero amount in same currency
- */
-export function zeroCurrencyAmount(currency: 'EUR' | 'USD' = DEFAULT_CURRENCY): CurrencyAmount {
-  return createCurrencyAmount(0, currency)
-}
-
-// ============================================================================
-// Date & Period Utilities
-// ============================================================================
-
-/**
- * Get the quarter for a given month (1-12)
- */
-export function getQuarterFromMonth(month: number): number {
-  if (month < 1 || month > 12) {
-    throw new Error('Month must be between 1 and 12')
-  }
-  return Math.ceil(month / 3)
-}
-
-/**
- * Get the months in a quarter
- */
-export function getMonthsInQuarter(quarter: number): number[] {
-  if (quarter < 1 || quarter > 4) {
-    throw new Error('Quarter must be between 1 and 4')
-  }
-  return QUARTERS[quarter as keyof typeof QUARTERS]
-}
-
-/**
- * Get the start and end dates for a quarter
- */
-export function getQuarterDateRange(year: number, quarter: number): { start: number; end: number } {
-  const months = getMonthsInQuarter(quarter)
-  const startMonth = months[0]
-  const endMonth = months[2]
-
-  const start = new Date(year, startMonth - 1, 1).getTime()
-  const end = new Date(year, endMonth, 0, 23, 59, 59, 999).getTime()
-
-  return { start, end }
-}
-
-/**
- * Get the start and end dates for a month
- */
-export function getMonthDateRange(year: number, month: number): { start: number; end: number } {
-  if (month < 1 || month > 12) {
-    throw new Error('Month must be between 1 and 12')
-  }
-
-  const start = new Date(year, month - 1, 1).getTime()
-  const end = new Date(year, month, 0, 23, 59, 59, 999).getTime()
-
-  return { start, end }
-}
-
-/**
- * Get the start and end dates for a year
- */
-export function getYearDateRange(year: number): { start: number; end: number } {
-  const start = new Date(year, 0, 1).getTime()
-  const end = new Date(year, 11, 31, 23, 59, 59, 999).getTime()
-
-  return { start, end }
-}
-
-/**
- * Check if a date falls within a period
- */
-export function isDateInPeriod(date: number, start: number, end: number): boolean {
-  return date >= start && date <= end
-}
-
-/**
- * Calculate the number of days between two dates
- */
-export function daysBetween(startDate: number, endDate: number): number {
-  const msPerDay = 24 * 60 * 60 * 1000
-  return Math.round((endDate - startDate) / msPerDay)
-}
-
-/**
- * Calculate the number of months between two dates
- */
-export function monthsBetween(startDate: number, endDate: number): number {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-
-  const yearsDiff = end.getFullYear() - start.getFullYear()
-  const monthsDiff = end.getMonth() - start.getMonth()
-
-  return yearsDiff * 12 + monthsDiff
-}
-
-// ============================================================================
-// Cost Calculation Utilities
-// ============================================================================
-
-/**
- * Calculate total employee cost (salary + benefits + bonuses + other)
+ * Calculate total employee cost
  */
 export function calculateTotalEmployeeCost(
   monthlySalary: CurrencyAmount,
   benefits?: CurrencyAmount,
   bonuses?: CurrencyAmount,
   otherCosts?: CurrencyAmount
-): CurrencyAmount {
-  let total = monthlySalary
+): number {
+  let total = monthlySalary.amount;
 
-  if (benefits) {
-    total = addCurrencyAmounts(total, benefits)
-  }
-  if (bonuses) {
-    total = addCurrencyAmounts(total, bonuses)
-  }
-  if (otherCosts) {
-    total = addCurrencyAmounts(total, otherCosts)
-  }
+  if (benefits) total += benefits.amount;
+  if (bonuses) total += bonuses.amount;
+  if (otherCosts) total += otherCosts.amount;
 
-  return total
+  return total;
 }
 
 /**
- * Calculate annualized cost from a recurring cost
- */
-export function annualizeCost(
-  amount: CurrencyAmount,
-  frequency: 'one_time' | 'monthly' | 'quarterly' | 'yearly'
-): CurrencyAmount {
-  switch (frequency) {
-    case 'one_time':
-      return amount
-    case 'monthly':
-      return multiplyCurrencyAmount(amount, 12)
-    case 'quarterly':
-      return multiplyCurrencyAmount(amount, 4)
-    case 'yearly':
-      return amount
-    default:
-      throw new Error(`Unknown frequency: ${frequency}`)
-  }
-}
-
-/**
- * Calculate prorated cost for a period
- */
-export function prorateCost(
-  amount: CurrencyAmount,
-  totalDays: number,
-  actualDays: number
-): CurrencyAmount {
-  if (totalDays === 0) {
-    throw new Error('Total days cannot be zero')
-  }
-  const proration = actualDays / totalDays
-  return multiplyCurrencyAmount(amount, proration)
-}
-
-// ============================================================================
-// KPI Calculation Utilities
-// ============================================================================
-
-/**
- * Calculate conversion rate (percentage)
+ * Calculate conversion rate
  */
 export function calculateConversionRate(quoteCount: number, orderCount: number): number {
-  if (quoteCount === 0) {
-    return 0
-  }
-  return (orderCount / quoteCount) * 100
+  if (quoteCount === 0) return 0;
+  return (orderCount / quoteCount) * 100;
 }
 
 /**
- * Calculate average amount
+ * Calculate growth rate
  */
-export function calculateAverage(total: CurrencyAmount, count: number): CurrencyAmount {
-  if (count === 0) {
-    return zeroCurrencyAmount(total.currency)
-  }
-  return divideCurrencyAmount(total, count)
+export function calculateGrowthRate(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
 }
 
 /**
- * Calculate growth rate (percentage)
- */
-export function calculateGrowthRate(
-  current: CurrencyAmount,
-  previous: CurrencyAmount
-): number {
-  if (previous.amount === 0) {
-    return current.amount > 0 ? 100 : 0
-  }
-  return ((current.amount - previous.amount) / previous.amount) * 100
-}
-
-/**
- * Calculate margin amount
- */
-export function calculateMargin(
-  revenue: CurrencyAmount,
-  cost: CurrencyAmount
-): CurrencyAmount {
-  return subtractCurrencyAmounts(revenue, cost)
-}
-
-/**
- * Calculate margin percentage
- */
-export function calculateMarginPercentage(
-  revenue: CurrencyAmount,
-  cost: CurrencyAmount
-): number {
-  if (revenue.amount === 0) {
-    return 0
-  }
-  const margin = revenue.amount - cost.amount
-  return (margin / revenue.amount) * 100
-}
-
-// ============================================================================
-// Validation Utilities
-// ============================================================================
-
-/**
- * Validate that end date is after start date
- */
-export function validateDateRange(startDate: number, endDate?: number): boolean {
-  if (!endDate) {
-    return true
-  }
-  return endDate > startDate
-}
-
-/**
- * Validate that a year is valid
- */
-export function validateYear(year: number): boolean {
-  const currentYear = new Date().getFullYear()
-  return year >= 2000 && year <= currentYear + 10
-}
-
-/**
- * Validate that a month is valid (1-12)
- */
-export function validateMonth(month: number): boolean {
-  return month >= 1 && month <= 12
-}
-
-/**
- * Validate that a quarter is valid (1-4)
- */
-export function validateQuarter(quarter: number): boolean {
-  return quarter >= 1 && quarter <= 4
-}
-
-/**
- * Validate currency amount
- */
-export function validateCurrencyAmount(amount: CurrencyAmount): boolean {
-  return amount.amount >= 0 && ['EUR', 'USD'].includes(amount.currency)
-}
-
-// ============================================================================
-// Formatting Utilities
-// ============================================================================
-
-/**
- * Format currency amount for display
+ * Format currency for display
  */
 export function formatCurrency(amount: CurrencyAmount): string {
   const formatter = new Intl.NumberFormat('en-US', {
@@ -407,30 +492,13 @@ export function formatCurrency(amount: CurrencyAmount): string {
     currency: amount.currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })
-  return formatter.format(amount.amount)
+  });
+  return formatter.format(amount.amount);
 }
 
 /**
  * Format percentage for display
  */
 export function formatPercentage(value: number, decimals = 2): string {
-  return `${value.toFixed(decimals)}%`
-}
-
-/**
- * Format period name (e.g., "Q1 2024", "January 2024", "2024")
- */
-export function formatPeriodName(year: number, month?: number, quarter?: number): string {
-  if (quarter) {
-    return `Q${quarter} ${year}`
-  }
-  if (month) {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ]
-    return `${monthNames[month - 1]} ${year}`
-  }
-  return `${year}`
+  return `${value.toFixed(decimals)}%`;
 }

@@ -2,8 +2,7 @@
 // TypeScript type definitions for invoices module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { InvoiceStatus, InvoiceType, PaymentMethod } from '@/schema/yourobc/invoices/types';
-import type { CurrencyAmount } from '@/schema/base';
+import type { InvoiceStatus, InvoiceType, InvoiceCurrencyAmount, PaymentMethod } from '@/schema/yourobc/invoices/types';
 
 // Entity types
 export type Invoice = Doc<'yourobcInvoices'>;
@@ -11,6 +10,7 @@ export type InvoiceId = Id<'yourobcInvoices'>;
 
 // Re-export schema types
 export type { InvoiceStatus, InvoiceType, PaymentMethod };
+export type CurrencyAmount = InvoiceCurrencyAmount;
 
 // Line item interface
 export interface LineItem {
@@ -35,14 +35,6 @@ export interface CollectionAttempt {
   method: 'email' | 'phone' | 'letter' | 'legal_notice' | 'debt_collection';
   result: string;
   createdBy: string;
-}
-
-// Currency amount interface
-export interface CurrencyAmount {
-  amount: number;
-  currency: 'EUR' | 'USD';
-  exchangeRate?: number;
-  exchangeRateDate?: number;
 }
 
 // Data interfaces for mutations

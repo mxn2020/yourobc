@@ -1,473 +1,714 @@
 // convex/lib/yourobc/statistics/mutations.ts
 /**
- * Statistics Mutation Operations
- *
- * Write operations for all 5 statistics tables.
- * Provides create, update, delete for employee costs, office costs,
- * miscellaneous expenses, KPI targets, and KPI cache entries.
- *
- * @module convex/lib/yourobc/statistics/mutations
+ * Statistics Mutations
+ * Write operations for statistics module.
  */
 
-import { MutationCtx } from '../../../_generated/server'
-import { Id } from '@/generated/dataModel'
-import type {
-  CreateEmployeeCostArgs,
-  UpdateEmployeeCostArgs,
-  CreateOfficeCostArgs,
-  UpdateOfficeCostArgs,
-  CreateMiscExpenseArgs,
-  UpdateMiscExpenseArgs,
-  ApproveExpenseArgs,
-  CreateKpiTargetArgs,
-  UpdateKpiTargetArgs,
-  CreateKpiCacheArgs,
-  UpdateKpiCacheArgs,
-} from './types'
+import { mutation } from '@/generated/server';
+import { v } from 'convex/values';
+import { requireCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { statisticsValidators, statisticsFields } from '@/schema/yourobc/statistics/validators';
+import { STATISTICS_CONSTANTS } from './constants';
 import {
-  canEditEmployeeCost,
-  canDeleteEmployeeCost,
-  canEditOfficeCost,
-  canDeleteOfficeCost,
-  canEditMiscExpense,
-  canDeleteMiscExpense,
-  canApproveMiscExpense,
-  canEditKpiTarget,
-  canDeleteKpiTarget,
-  canEditKpiCache,
-  canDeleteKpiCache,
-  getAuthUserId,
-} from './permissions'
+  trimEmployeeCostData,
+  validateEmployeeCostData,
+  trimOfficeCostData,
+  validateOfficeCostData,
+  trimMiscExpenseData,
+  validateMiscExpenseData,
+  trimKpiTargetData,
+  validateKpiTargetData,
+  trimKpiCacheData,
+  validateKpiCacheData,
+} from './utils';
 import {
-  generateEmployeeCostPublicId,
-  generateOfficeCostPublicId,
-  generateMiscExpensePublicId,
-  generateKpiTargetPublicId,
-  generateKpiCachePublicId,
-  validateDateRange,
-} from './utils'
-import { ERROR_MESSAGES } from './constants'
+  requireEditEmployeeCostAccess,
+  requireDeleteEmployeeCostAccess,
+  requireEditOfficeCostAccess,
+  requireDeleteOfficeCostAccess,
+  requireEditMiscExpenseAccess,
+  requireDeleteMiscExpenseAccess,
+  requireApproveMiscExpenseAccess,
+  requireEditKpiTargetAccess,
+  requireDeleteKpiTargetAccess,
+  requireEditKpiCacheAccess,
+  requireDeleteKpiCacheAccess,
+} from './permissions';
 
 // ============================================================================
 // Employee Cost Mutations
 // ============================================================================
 
 /**
- * Create employee cost entry
+ * Create employee cost
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Authenticated users
  */
-export async function createEmployeeCost(
-  ctx: MutationCtx,
-  args: CreateEmployeeCostArgs
-): Promise<Id<'yourobcStatisticsEmployeeCosts'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const createEmployeeCost = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      employeeName: v.optional(v.string()),
+      position: v.string(),
+      department: v.optional(v.string()),
+      monthlySalary: statisticsFields.currencyAmount,
+      benefits: v.optional(statisticsFields.currencyAmount),
+      bonuses: v.optional(statisticsFields.currencyAmount),
+      otherCosts: v.optional(statisticsFields.currencyAmount),
+      startDate: v.number(),
+      endDate: v.optional(v.number()),
+      notes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // Validate date range
-  if (!validateDateRange(args.startDate, args.endDate)) {
-    throw new Error(ERROR_MESSAGES.INVALID_EMPLOYEE_COST_DATES)
-  }
+    // Trim and validate
+    const trimmed = trimEmployeeCostData(data);
+    const errors = validateEmployeeCostData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  const employeeCostId = await ctx.db.insert('yourobcStatisticsEmployeeCosts', {
-    publicId: generateEmployeeCostPublicId(),
-    name: args.name,
-    description: args.description,
-    icon: args.icon,
-    thumbnail: args.thumbnail,
-    employeeId: args.employeeId,
-    employeeName: args.employeeName,
-    position: args.position,
-    department: args.department,
-    monthlySalary: args.monthlySalary,
-    benefits: args.benefits,
-    bonuses: args.bonuses,
-    otherCosts: args.otherCosts,
-    startDate: args.startDate,
-    endDate: args.endDate,
-    notes: args.notes,
-    tags: args.tags || [],
-    category: args.category,
-    customFields: args.customFields,
-    useCase: args.useCase,
-    difficulty: args.difficulty,
-    visibility: args.visibility,
-    ownerId: userId,
-    isOfficial: args.isOfficial,
-    stats: undefined,
-    createdBy: userId,
-    createdAt: now,
-    updatedBy: undefined,
-    updatedAt: undefined,
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
+    const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcStatisticsEmployeeCosts');
 
-  return employeeCostId
-}
+    // Insert record
+    const id = await ctx.db.insert('yourobcStatisticsEmployeeCosts', {
+      ...trimmed,
+      publicId,
+      ownerId: user._id,
+      stats: undefined,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: undefined,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'employee_cost.created',
+      entityType: 'yourobcStatisticsEmployeeCosts',
+      entityId: publicId,
+      entityTitle: trimmed.name,
+      description: `Created employee cost: ${trimmed.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Update employee cost entry
+ * Update employee cost
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function updateEmployeeCost(
-  ctx: MutationCtx,
-  args: UpdateEmployeeCostArgs
-): Promise<Id<'yourobcStatisticsEmployeeCosts'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const updateEmployeeCost = mutation({
+  args: {
+    id: v.id('yourobcStatisticsEmployeeCosts'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      employeeName: v.optional(v.string()),
+      position: v.optional(v.string()),
+      department: v.optional(v.string()),
+      monthlySalary: v.optional(statisticsFields.currencyAmount),
+      benefits: v.optional(statisticsFields.currencyAmount),
+      bonuses: v.optional(statisticsFields.currencyAmount),
+      otherCosts: v.optional(statisticsFields.currencyAmount),
+      startDate: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+      notes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { id, updates }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const employeeCost = await ctx.db.get(args.id)
-  if (!employeeCost) {
-    throw new Error(ERROR_MESSAGES.EMPLOYEE_COST_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Employee cost not found');
+    }
 
-  if (!canEditEmployeeCost(userId, employeeCost)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireEditEmployeeCostAccess(ctx, existing, user);
 
-  // Validate date range if dates are being updated
-  const startDate = args.startDate ?? employeeCost.startDate
-  const endDate = args.endDate ?? employeeCost.endDate
-  if (!validateDateRange(startDate, endDate)) {
-    throw new Error(ERROR_MESSAGES.INVALID_EMPLOYEE_COST_DATES)
-  }
+    // Trim and validate
+    const trimmed = trimEmployeeCostData(updates);
+    const errors = validateEmployeeCostData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  await ctx.db.patch(args.id, {
-    ...(args.name !== undefined && { name: args.name }),
-    ...(args.description !== undefined && { description: args.description }),
-    ...(args.icon !== undefined && { icon: args.icon }),
-    ...(args.thumbnail !== undefined && { thumbnail: args.thumbnail }),
-    ...(args.employeeId !== undefined && { employeeId: args.employeeId }),
-    ...(args.employeeName !== undefined && { employeeName: args.employeeName }),
-    ...(args.position !== undefined && { position: args.position }),
-    ...(args.department !== undefined && { department: args.department }),
-    ...(args.monthlySalary !== undefined && { monthlySalary: args.monthlySalary }),
-    ...(args.benefits !== undefined && { benefits: args.benefits }),
-    ...(args.bonuses !== undefined && { bonuses: args.bonuses }),
-    ...(args.otherCosts !== undefined && { otherCosts: args.otherCosts }),
-    ...(args.startDate !== undefined && { startDate: args.startDate }),
-    ...(args.endDate !== undefined && { endDate: args.endDate }),
-    ...(args.notes !== undefined && { notes: args.notes }),
-    ...(args.tags !== undefined && { tags: args.tags }),
-    ...(args.category !== undefined && { category: args.category }),
-    ...(args.customFields !== undefined && { customFields: args.customFields }),
-    ...(args.useCase !== undefined && { useCase: args.useCase }),
-    ...(args.difficulty !== undefined && { difficulty: args.difficulty }),
-    ...(args.visibility !== undefined && { visibility: args.visibility }),
-    ...(args.isOfficial !== undefined && { isOfficial: args.isOfficial }),
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    const now = Date.now();
 
-  return args.id
-}
+    // Update record
+    await ctx.db.patch(id, {
+      ...trimmed,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'employee_cost.updated',
+      entityType: 'yourobcStatisticsEmployeeCosts',
+      entityId: existing.publicId,
+      entityTitle: trimmed.name ?? existing.name,
+      description: `Updated employee cost: ${trimmed.name ?? existing.name}`,
+      metadata: { data: { changes: trimmed } },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Delete employee cost entry (soft delete)
+ * Delete employee cost (soft delete)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function deleteEmployeeCost(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatisticsEmployeeCosts'>
-): Promise<void> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const deleteEmployeeCost = mutation({
+  args: { id: v.id('yourobcStatisticsEmployeeCosts') },
+  handler: async (ctx, { id }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const employeeCost = await ctx.db.get(id)
-  if (!employeeCost) {
-    throw new Error(ERROR_MESSAGES.EMPLOYEE_COST_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Employee cost not found');
+    }
 
-  if (!canDeleteEmployeeCost(userId, employeeCost)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireDeleteEmployeeCostAccess(existing, user);
 
-  await ctx.db.patch(id, {
-    deletedAt: now,
-    deletedBy: userId,
-  })
-}
+    const now = Date.now();
+
+    // Soft delete
+    await ctx.db.patch(id, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'employee_cost.deleted',
+      entityType: 'yourobcStatisticsEmployeeCosts',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `Deleted employee cost: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 // ============================================================================
 // Office Cost Mutations
 // ============================================================================
 
 /**
- * Create office cost entry
+ * Create office cost
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Authenticated users
  */
-export async function createOfficeCost(
-  ctx: MutationCtx,
-  args: CreateOfficeCostArgs
-): Promise<Id<'yourobcStatisticsOfficeCosts'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const createOfficeCost = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      description: v.string(),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      amount: statisticsFields.currencyAmount,
+      frequency: statisticsValidators.costFrequency,
+      date: v.number(),
+      endDate: v.optional(v.number()),
+      vendor: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      category: statisticsValidators.officeCostCategory,
+      tags: v.optional(v.array(v.string())),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  // Validate date range
-  if (!validateDateRange(args.date, args.endDate)) {
-    throw new Error(ERROR_MESSAGES.INVALID_OFFICE_COST_DATES)
-  }
+    // Trim and validate
+    const trimmed = trimOfficeCostData(data);
+    const errors = validateOfficeCostData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  const officeCostId = await ctx.db.insert('yourobcStatisticsOfficeCosts', {
-    publicId: generateOfficeCostPublicId(),
-    name: args.name,
-    description: args.description,
-    icon: args.icon,
-    thumbnail: args.thumbnail,
-    amount: args.amount,
-    frequency: args.frequency,
-    date: args.date,
-    endDate: args.endDate,
-    vendor: args.vendor,
-    notes: args.notes,
-    tags: args.tags || [],
-    category: args.category,
-    customFields: args.customFields,
-    useCase: args.useCase,
-    difficulty: args.difficulty,
-    visibility: args.visibility,
-    ownerId: userId,
-    isOfficial: args.isOfficial,
-    stats: undefined,
-    createdBy: userId,
-    createdAt: now,
-    updatedBy: undefined,
-    updatedAt: undefined,
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
+    const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcStatisticsOfficeCosts');
 
-  return officeCostId
-}
+    // Insert record
+    const id = await ctx.db.insert('yourobcStatisticsOfficeCosts', {
+      ...trimmed,
+      publicId,
+      ownerId: user._id,
+      stats: undefined,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: undefined,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'office_cost.created',
+      entityType: 'yourobcStatisticsOfficeCosts',
+      entityId: publicId,
+      entityTitle: trimmed.name,
+      description: `Created office cost: ${trimmed.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Update office cost entry
+ * Update office cost
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function updateOfficeCost(
-  ctx: MutationCtx,
-  args: UpdateOfficeCostArgs
-): Promise<Id<'yourobcStatisticsOfficeCosts'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const updateOfficeCost = mutation({
+  args: {
+    id: v.id('yourobcStatisticsOfficeCosts'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      amount: v.optional(statisticsFields.currencyAmount),
+      frequency: v.optional(statisticsValidators.costFrequency),
+      date: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+      vendor: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      category: v.optional(statisticsValidators.officeCostCategory),
+      tags: v.optional(v.array(v.string())),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { id, updates }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const officeCost = await ctx.db.get(args.id)
-  if (!officeCost) {
-    throw new Error(ERROR_MESSAGES.OFFICE_COST_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Office cost not found');
+    }
 
-  if (!canEditOfficeCost(userId, officeCost)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireEditOfficeCostAccess(ctx, existing, user);
 
-  // Validate date range if dates are being updated
-  const date = args.date ?? officeCost.date
-  const endDate = args.endDate ?? officeCost.endDate
-  if (!validateDateRange(date, endDate)) {
-    throw new Error(ERROR_MESSAGES.INVALID_OFFICE_COST_DATES)
-  }
+    // Trim and validate
+    const trimmed = trimOfficeCostData(updates);
+    const errors = validateOfficeCostData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  await ctx.db.patch(args.id, {
-    ...(args.name !== undefined && { name: args.name }),
-    ...(args.description !== undefined && { description: args.description }),
-    ...(args.icon !== undefined && { icon: args.icon }),
-    ...(args.thumbnail !== undefined && { thumbnail: args.thumbnail }),
-    ...(args.amount !== undefined && { amount: args.amount }),
-    ...(args.frequency !== undefined && { frequency: args.frequency }),
-    ...(args.date !== undefined && { date: args.date }),
-    ...(args.endDate !== undefined && { endDate: args.endDate }),
-    ...(args.vendor !== undefined && { vendor: args.vendor }),
-    ...(args.notes !== undefined && { notes: args.notes }),
-    ...(args.tags !== undefined && { tags: args.tags }),
-    ...(args.category !== undefined && { category: args.category }),
-    ...(args.customFields !== undefined && { customFields: args.customFields }),
-    ...(args.useCase !== undefined && { useCase: args.useCase }),
-    ...(args.difficulty !== undefined && { difficulty: args.difficulty }),
-    ...(args.visibility !== undefined && { visibility: args.visibility }),
-    ...(args.isOfficial !== undefined && { isOfficial: args.isOfficial }),
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    const now = Date.now();
 
-  return args.id
-}
+    // Update record
+    await ctx.db.patch(id, {
+      ...trimmed,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'office_cost.updated',
+      entityType: 'yourobcStatisticsOfficeCosts',
+      entityId: existing.publicId,
+      entityTitle: trimmed.name ?? existing.name,
+      description: `Updated office cost: ${trimmed.name ?? existing.name}`,
+      metadata: { data: { changes: trimmed } },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Delete office cost entry (soft delete)
+ * Delete office cost (soft delete)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function deleteOfficeCost(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatisticsOfficeCosts'>
-): Promise<void> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const deleteOfficeCost = mutation({
+  args: { id: v.id('yourobcStatisticsOfficeCosts') },
+  handler: async (ctx, { id }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const officeCost = await ctx.db.get(id)
-  if (!officeCost) {
-    throw new Error(ERROR_MESSAGES.OFFICE_COST_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Office cost not found');
+    }
 
-  if (!canDeleteOfficeCost(userId, officeCost)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireDeleteOfficeCostAccess(existing, user);
 
-  await ctx.db.patch(id, {
-    deletedAt: now,
-    deletedBy: userId,
-  })
-}
+    const now = Date.now();
+
+    // Soft delete
+    await ctx.db.patch(id, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'office_cost.deleted',
+      entityType: 'yourobcStatisticsOfficeCosts',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `Deleted office cost: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 // ============================================================================
-// Miscellaneous Expense Mutations
+// Misc Expense Mutations
 // ============================================================================
 
 /**
- * Create miscellaneous expense
+ * Create misc expense
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Authenticated users
  */
-export async function createMiscExpense(
-  ctx: MutationCtx,
-  args: CreateMiscExpenseArgs
-): Promise<Id<'yourobcStatisticsMiscExpenses'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const createMiscExpense = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      description: v.string(),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      amount: statisticsFields.currencyAmount,
+      date: v.number(),
+      relatedEmployeeId: v.optional(v.id('yourobcEmployees')),
+      relatedProjectId: v.optional(v.id('projects')),
+      vendor: v.optional(v.string()),
+      receiptUrl: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      category: statisticsValidators.miscExpenseCategory,
+      tags: v.optional(v.array(v.string())),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const miscExpenseId = await ctx.db.insert('yourobcStatisticsMiscExpenses', {
-    publicId: generateMiscExpensePublicId(),
-    name: args.name,
-    description: args.description,
-    icon: args.icon,
-    thumbnail: args.thumbnail,
-    amount: args.amount,
-    date: args.date,
-    relatedEmployeeId: args.relatedEmployeeId,
-    relatedProjectId: args.relatedProjectId,
-    vendor: args.vendor,
-    receiptUrl: args.receiptUrl,
-    approved: args.approved ?? false,
-    approvedBy: args.approvedBy,
-    approvedDate: args.approvedDate,
-    notes: args.notes,
-    tags: args.tags || [],
-    category: args.category,
-    customFields: args.customFields,
-    useCase: args.useCase,
-    difficulty: args.difficulty,
-    visibility: args.visibility,
-    ownerId: userId,
-    isOfficial: args.isOfficial,
-    stats: undefined,
-    createdBy: userId,
-    createdAt: now,
-    updatedBy: undefined,
-    updatedAt: undefined,
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
+    // Trim and validate
+    const trimmed = trimMiscExpenseData(data);
+    const errors = validateMiscExpenseData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return miscExpenseId
-}
+    const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcStatisticsMiscExpenses');
+
+    // Insert record
+    const id = await ctx.db.insert('yourobcStatisticsMiscExpenses', {
+      ...trimmed,
+      publicId,
+      ownerId: user._id,
+      approved: false, // Default to not approved
+      approvedBy: undefined,
+      approvedDate: undefined,
+      stats: undefined,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: undefined,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'misc_expense.created',
+      entityType: 'yourobcStatisticsMiscExpenses',
+      entityId: publicId,
+      entityTitle: trimmed.name,
+      description: `Created misc expense: ${trimmed.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Update miscellaneous expense
+ * Update misc expense
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin (only if not approved)
  */
-export async function updateMiscExpense(
-  ctx: MutationCtx,
-  args: UpdateMiscExpenseArgs
-): Promise<Id<'yourobcStatisticsMiscExpenses'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const updateMiscExpense = mutation({
+  args: {
+    id: v.id('yourobcStatisticsMiscExpenses'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      amount: v.optional(statisticsFields.currencyAmount),
+      date: v.optional(v.number()),
+      relatedEmployeeId: v.optional(v.id('yourobcEmployees')),
+      relatedProjectId: v.optional(v.id('projects')),
+      vendor: v.optional(v.string()),
+      receiptUrl: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      category: v.optional(statisticsValidators.miscExpenseCategory),
+      tags: v.optional(v.array(v.string())),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { id, updates }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const miscExpense = await ctx.db.get(args.id)
-  if (!miscExpense) {
-    throw new Error(ERROR_MESSAGES.MISC_EXPENSE_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Misc expense not found');
+    }
 
-  if (!canEditMiscExpense(userId, miscExpense)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireEditMiscExpenseAccess(ctx, existing, user);
 
-  await ctx.db.patch(args.id, {
-    ...(args.name !== undefined && { name: args.name }),
-    ...(args.description !== undefined && { description: args.description }),
-    ...(args.icon !== undefined && { icon: args.icon }),
-    ...(args.thumbnail !== undefined && { thumbnail: args.thumbnail }),
-    ...(args.amount !== undefined && { amount: args.amount }),
-    ...(args.date !== undefined && { date: args.date }),
-    ...(args.relatedEmployeeId !== undefined && { relatedEmployeeId: args.relatedEmployeeId }),
-    ...(args.relatedProjectId !== undefined && { relatedProjectId: args.relatedProjectId }),
-    ...(args.vendor !== undefined && { vendor: args.vendor }),
-    ...(args.receiptUrl !== undefined && { receiptUrl: args.receiptUrl }),
-    ...(args.approved !== undefined && { approved: args.approved }),
-    ...(args.approvedBy !== undefined && { approvedBy: args.approvedBy }),
-    ...(args.approvedDate !== undefined && { approvedDate: args.approvedDate }),
-    ...(args.notes !== undefined && { notes: args.notes }),
-    ...(args.tags !== undefined && { tags: args.tags }),
-    ...(args.category !== undefined && { category: args.category }),
-    ...(args.customFields !== undefined && { customFields: args.customFields }),
-    ...(args.useCase !== undefined && { useCase: args.useCase }),
-    ...(args.difficulty !== undefined && { difficulty: args.difficulty }),
-    ...(args.visibility !== undefined && { visibility: args.visibility }),
-    ...(args.isOfficial !== undefined && { isOfficial: args.isOfficial }),
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    // Trim and validate
+    const trimmed = trimMiscExpenseData(updates);
+    const errors = validateMiscExpenseData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return args.id
-}
+    const now = Date.now();
+
+    // Update record
+    await ctx.db.patch(id, {
+      ...trimmed,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'misc_expense.updated',
+      entityType: 'yourobcStatisticsMiscExpenses',
+      entityId: existing.publicId,
+      entityTitle: trimmed.name ?? existing.name,
+      description: `Updated misc expense: ${trimmed.name ?? existing.name}`,
+      metadata: { data: { changes: trimmed } },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Approve or reject miscellaneous expense
+ * Approve or reject misc expense
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Admin or manager (not expense owner)
  */
-export async function approveMiscExpense(
-  ctx: MutationCtx,
-  args: ApproveExpenseArgs
-): Promise<Id<'yourobcStatisticsMiscExpenses'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const approveMiscExpense = mutation({
+  args: {
+    id: v.id('yourobcStatisticsMiscExpenses'),
+    approved: v.boolean(),
+  },
+  handler: async (ctx, { id, approved }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const miscExpense = await ctx.db.get(args.id)
-  if (!miscExpense) {
-    throw new Error(ERROR_MESSAGES.MISC_EXPENSE_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Misc expense not found');
+    }
 
-  if (!canApproveMiscExpense(userId, miscExpense)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireApproveMiscExpenseAccess(existing, user);
 
-  if (miscExpense.approved) {
-    throw new Error(ERROR_MESSAGES.EXPENSE_ALREADY_APPROVED)
-  }
+    if (existing.approved) {
+      throw new Error('Expense has already been approved');
+    }
 
-  await ctx.db.patch(args.id, {
-    approved: args.approved,
-    approvedBy: args.approvedBy ?? userId,
-    approvedDate: args.approvedDate ?? now,
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    const now = Date.now();
 
-  return args.id
-}
+    // Update approval status
+    await ctx.db.patch(id, {
+      approved,
+      approvedBy: user._id,
+      approvedDate: now,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: approved ? 'misc_expense.approved' : 'misc_expense.rejected',
+      entityType: 'yourobcStatisticsMiscExpenses',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `${approved ? 'Approved' : 'Rejected'} misc expense: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Delete miscellaneous expense (soft delete)
+ * Delete misc expense (soft delete)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin (only if not approved)
  */
-export async function deleteMiscExpense(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatisticsMiscExpenses'>
-): Promise<void> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const deleteMiscExpense = mutation({
+  args: { id: v.id('yourobcStatisticsMiscExpenses') },
+  handler: async (ctx, { id }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const miscExpense = await ctx.db.get(id)
-  if (!miscExpense) {
-    throw new Error(ERROR_MESSAGES.MISC_EXPENSE_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('Misc expense not found');
+    }
 
-  if (!canDeleteMiscExpense(userId, miscExpense)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireDeleteMiscExpenseAccess(existing, user);
 
-  await ctx.db.patch(id, {
-    deletedAt: now,
-    deletedBy: userId,
-  })
-}
+    const now = Date.now();
+
+    // Soft delete
+    await ctx.db.patch(id, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'misc_expense.deleted',
+      entityType: 'yourobcStatisticsMiscExpenses',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `Deleted misc expense: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 // ============================================================================
 // KPI Target Mutations
@@ -475,272 +716,444 @@ export async function deleteMiscExpense(
 
 /**
  * Create KPI target
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Authenticated users
  */
-export async function createKpiTarget(
-  ctx: MutationCtx,
-  args: CreateKpiTargetArgs
-): Promise<Id<'yourobcStatisticsKpiTargets'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const createKpiTarget = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      targetType: statisticsValidators.targetType,
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      teamName: v.optional(v.string()),
+      year: v.number(),
+      month: v.optional(v.number()),
+      quarter: v.optional(v.number()),
+      revenueTarget: v.optional(statisticsFields.currencyAmount),
+      marginTarget: v.optional(statisticsFields.currencyAmount),
+      quoteCountTarget: v.optional(v.number()),
+      orderCountTarget: v.optional(v.number()),
+      conversionRateTarget: v.optional(v.number()),
+      averageMarginTarget: v.optional(statisticsFields.currencyAmount),
+      notes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiTargetId = await ctx.db.insert('yourobcStatisticsKpiTargets', {
-    publicId: generateKpiTargetPublicId(),
-    name: args.name,
-    description: args.description,
-    icon: args.icon,
-    thumbnail: args.thumbnail,
-    targetType: args.targetType,
-    employeeId: args.employeeId,
-    teamName: args.teamName,
-    year: args.year,
-    month: args.month,
-    quarter: args.quarter,
-    revenueTarget: args.revenueTarget,
-    marginTarget: args.marginTarget,
-    quoteCountTarget: args.quoteCountTarget,
-    orderCountTarget: args.orderCountTarget,
-    conversionRateTarget: args.conversionRateTarget,
-    averageMarginTarget: args.averageMarginTarget,
-    notes: args.notes,
-    tags: args.tags || [],
-    category: args.category,
-    customFields: args.customFields,
-    useCase: args.useCase,
-    difficulty: args.difficulty,
-    visibility: args.visibility,
-    ownerId: userId,
-    isOfficial: args.isOfficial,
-    stats: undefined,
-    createdBy: userId,
-    createdAt: now,
-    updatedBy: undefined,
-    updatedAt: undefined,
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
+    // Trim and validate
+    const trimmed = trimKpiTargetData(data);
+    const errors = validateKpiTargetData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return kpiTargetId
-}
+    const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcStatisticsKpiTargets');
+
+    // Insert record
+    const id = await ctx.db.insert('yourobcStatisticsKpiTargets', {
+      ...trimmed,
+      publicId,
+      ownerId: user._id,
+      stats: undefined,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: undefined,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_target.created',
+      entityType: 'yourobcStatisticsKpiTargets',
+      entityId: publicId,
+      entityTitle: trimmed.name,
+      description: `Created KPI target: ${trimmed.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
  * Update KPI target
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function updateKpiTarget(
-  ctx: MutationCtx,
-  args: UpdateKpiTargetArgs
-): Promise<Id<'yourobcStatisticsKpiTargets'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const updateKpiTarget = mutation({
+  args: {
+    id: v.id('yourobcStatisticsKpiTargets'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      targetType: v.optional(statisticsValidators.targetType),
+      employeeId: v.optional(v.id('yourobcEmployees')),
+      teamName: v.optional(v.string()),
+      year: v.optional(v.number()),
+      month: v.optional(v.number()),
+      quarter: v.optional(v.number()),
+      revenueTarget: v.optional(statisticsFields.currencyAmount),
+      marginTarget: v.optional(statisticsFields.currencyAmount),
+      quoteCountTarget: v.optional(v.number()),
+      orderCountTarget: v.optional(v.number()),
+      conversionRateTarget: v.optional(v.number()),
+      averageMarginTarget: v.optional(statisticsFields.currencyAmount),
+      notes: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { id, updates }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiTarget = await ctx.db.get(args.id)
-  if (!kpiTarget) {
-    throw new Error(ERROR_MESSAGES.KPI_TARGET_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('KPI target not found');
+    }
 
-  if (!canEditKpiTarget(userId, kpiTarget)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireEditKpiTargetAccess(ctx, existing, user);
 
-  await ctx.db.patch(args.id, {
-    ...(args.name !== undefined && { name: args.name }),
-    ...(args.description !== undefined && { description: args.description }),
-    ...(args.icon !== undefined && { icon: args.icon }),
-    ...(args.thumbnail !== undefined && { thumbnail: args.thumbnail }),
-    ...(args.targetType !== undefined && { targetType: args.targetType }),
-    ...(args.employeeId !== undefined && { employeeId: args.employeeId }),
-    ...(args.teamName !== undefined && { teamName: args.teamName }),
-    ...(args.year !== undefined && { year: args.year }),
-    ...(args.month !== undefined && { month: args.month }),
-    ...(args.quarter !== undefined && { quarter: args.quarter }),
-    ...(args.revenueTarget !== undefined && { revenueTarget: args.revenueTarget }),
-    ...(args.marginTarget !== undefined && { marginTarget: args.marginTarget }),
-    ...(args.quoteCountTarget !== undefined && { quoteCountTarget: args.quoteCountTarget }),
-    ...(args.orderCountTarget !== undefined && { orderCountTarget: args.orderCountTarget }),
-    ...(args.conversionRateTarget !== undefined && { conversionRateTarget: args.conversionRateTarget }),
-    ...(args.averageMarginTarget !== undefined && { averageMarginTarget: args.averageMarginTarget }),
-    ...(args.notes !== undefined && { notes: args.notes }),
-    ...(args.tags !== undefined && { tags: args.tags }),
-    ...(args.category !== undefined && { category: args.category }),
-    ...(args.customFields !== undefined && { customFields: args.customFields }),
-    ...(args.useCase !== undefined && { useCase: args.useCase }),
-    ...(args.difficulty !== undefined && { difficulty: args.difficulty }),
-    ...(args.visibility !== undefined && { visibility: args.visibility }),
-    ...(args.isOfficial !== undefined && { isOfficial: args.isOfficial }),
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    // Trim and validate
+    const trimmed = trimKpiTargetData(updates);
+    const errors = validateKpiTargetData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return args.id
-}
+    const now = Date.now();
+
+    // Update record
+    await ctx.db.patch(id, {
+      ...trimmed,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_target.updated',
+      entityType: 'yourobcStatisticsKpiTargets',
+      entityId: existing.publicId,
+      entityTitle: trimmed.name ?? existing.name,
+      description: `Updated KPI target: ${trimmed.name ?? existing.name}`,
+      metadata: { data: { changes: trimmed } },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
  * Delete KPI target (soft delete)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function deleteKpiTarget(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatisticsKpiTargets'>
-): Promise<void> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const deleteKpiTarget = mutation({
+  args: { id: v.id('yourobcStatisticsKpiTargets') },
+  handler: async (ctx, { id }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiTarget = await ctx.db.get(id)
-  if (!kpiTarget) {
-    throw new Error(ERROR_MESSAGES.KPI_TARGET_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('KPI target not found');
+    }
 
-  if (!canDeleteKpiTarget(userId, kpiTarget)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireDeleteKpiTargetAccess(existing, user);
 
-  await ctx.db.patch(id, {
-    deletedAt: now,
-    deletedBy: userId,
-  })
-}
+    const now = Date.now();
+
+//Soft delete
+    await ctx.db.patch(id, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_target.deleted',
+      entityType: 'yourobcStatisticsKpiTargets',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `Deleted KPI target: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 // ============================================================================
 // KPI Cache Mutations
 // ============================================================================
 
 /**
- * Create KPI cache entry
+ * Create KPI cache
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Authenticated users
  */
-export async function createKpiCache(
-  ctx: MutationCtx,
-  args: CreateKpiCacheArgs
-): Promise<Id<'yourobcStatisticsKpiCache'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const createKpiCache = mutation({
+  args: {
+    data: v.object({
+      name: v.string(),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      cacheType: statisticsValidators.kpiCacheType,
+      entityId: v.optional(v.string()),
+      entityName: v.optional(v.string()),
+      year: v.number(),
+      month: v.optional(v.number()),
+      quarter: v.optional(v.number()),
+      totalRevenue: statisticsFields.currencyAmount,
+      totalCost: v.optional(statisticsFields.currencyAmount),
+      totalMargin: statisticsFields.currencyAmount,
+      averageMargin: statisticsFields.currencyAmount,
+      quoteCount: v.number(),
+      averageQuoteValue: statisticsFields.currencyAmount,
+      orderCount: v.number(),
+      averageOrderValue: statisticsFields.currencyAmount,
+      averageMarginPerOrder: statisticsFields.currencyAmount,
+      conversionRate: v.number(),
+      totalCommission: v.optional(statisticsFields.currencyAmount),
+      previousPeriodRevenue: v.optional(statisticsFields.currencyAmount),
+      previousPeriodMargin: v.optional(statisticsFields.currencyAmount),
+      growthRate: v.optional(v.number()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { data }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiCacheId = await ctx.db.insert('yourobcStatisticsKpiCache', {
-    publicId: generateKpiCachePublicId(),
-    name: args.name,
-    description: args.description,
-    icon: args.icon,
-    thumbnail: args.thumbnail,
-    cacheType: args.cacheType,
-    entityId: args.entityId,
-    entityName: args.entityName,
-    year: args.year,
-    month: args.month,
-    quarter: args.quarter,
-    totalRevenue: args.totalRevenue,
-    totalCost: args.totalCost,
-    totalMargin: args.totalMargin,
-    averageMargin: args.averageMargin,
-    quoteCount: args.quoteCount,
-    averageQuoteValue: args.averageQuoteValue,
-    orderCount: args.orderCount,
-    averageOrderValue: args.averageOrderValue,
-    averageMarginPerOrder: args.averageMarginPerOrder,
-    conversionRate: args.conversionRate,
-    totalCommission: args.totalCommission,
-    previousPeriodRevenue: args.previousPeriodRevenue,
-    previousPeriodMargin: args.previousPeriodMargin,
-    growthRate: args.growthRate,
-    calculatedAt: args.calculatedAt,
-    calculatedBy: args.calculatedBy,
-    tags: args.tags || [],
-    category: args.category,
-    customFields: args.customFields,
-    useCase: args.useCase,
-    difficulty: args.difficulty,
-    visibility: args.visibility,
-    ownerId: userId,
-    isOfficial: args.isOfficial,
-    stats: undefined,
-    createdBy: userId,
-    createdAt: now,
-    updatedBy: undefined,
-    updatedAt: undefined,
-    deletedAt: undefined,
-    deletedBy: undefined,
-  })
+    // Trim and validate
+    const trimmed = trimKpiCacheData(data);
+    const errors = validateKpiCacheData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return kpiCacheId
-}
+    const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcStatisticsKpiCache');
+
+    // Insert record
+    const id = await ctx.db.insert('yourobcStatisticsKpiCache', {
+      ...trimmed,
+      publicId,
+      ownerId: user._id,
+      calculatedAt: now,
+      calculatedBy: user._id,
+      stats: undefined,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: undefined,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_cache.created',
+      entityType: 'yourobcStatisticsKpiCache',
+      entityId: publicId,
+      entityTitle: trimmed.name,
+      description: `Created KPI cache: ${trimmed.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Update KPI cache entry
+ * Update KPI cache
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function updateKpiCache(
-  ctx: MutationCtx,
-  args: UpdateKpiCacheArgs
-): Promise<Id<'yourobcStatisticsKpiCache'>> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const updateKpiCache = mutation({
+  args: {
+    id: v.id('yourobcStatisticsKpiCache'),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      icon: v.optional(v.string()),
+      thumbnail: v.optional(v.string()),
+      cacheType: v.optional(statisticsValidators.kpiCacheType),
+      entityId: v.optional(v.string()),
+      entityName: v.optional(v.string()),
+      year: v.optional(v.number()),
+      month: v.optional(v.number()),
+      quarter: v.optional(v.number()),
+      totalRevenue: v.optional(statisticsFields.currencyAmount),
+      totalCost: v.optional(statisticsFields.currencyAmount),
+      totalMargin: v.optional(statisticsFields.currencyAmount),
+      averageMargin: v.optional(statisticsFields.currencyAmount),
+      quoteCount: v.optional(v.number()),
+      averageQuoteValue: v.optional(statisticsFields.currencyAmount),
+      orderCount: v.optional(v.number()),
+      averageOrderValue: v.optional(statisticsFields.currencyAmount),
+      averageMarginPerOrder: v.optional(statisticsFields.currencyAmount),
+      conversionRate: v.optional(v.number()),
+      totalCommission: v.optional(statisticsFields.currencyAmount),
+      previousPeriodRevenue: v.optional(statisticsFields.currencyAmount),
+      previousPeriodMargin: v.optional(statisticsFields.currencyAmount),
+      growthRate: v.optional(v.number()),
+      tags: v.optional(v.array(v.string())),
+      category: v.optional(v.string()),
+      customFields: v.optional(v.any()),
+      useCase: v.optional(v.string()),
+      difficulty: v.optional(statisticsValidators.difficulty),
+      visibility: v.optional(statisticsValidators.visibility),
+      isOfficial: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, { id, updates }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiCache = await ctx.db.get(args.id)
-  if (!kpiCache) {
-    throw new Error(ERROR_MESSAGES.KPI_CACHE_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('KPI cache not found');
+    }
 
-  if (!canEditKpiCache(userId, kpiCache)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireEditKpiCacheAccess(ctx, existing, user);
 
-  await ctx.db.patch(args.id, {
-    ...(args.name !== undefined && { name: args.name }),
-    ...(args.description !== undefined && { description: args.description }),
-    ...(args.icon !== undefined && { icon: args.icon }),
-    ...(args.thumbnail !== undefined && { thumbnail: args.thumbnail }),
-    ...(args.cacheType !== undefined && { cacheType: args.cacheType }),
-    ...(args.entityId !== undefined && { entityId: args.entityId }),
-    ...(args.entityName !== undefined && { entityName: args.entityName }),
-    ...(args.year !== undefined && { year: args.year }),
-    ...(args.month !== undefined && { month: args.month }),
-    ...(args.quarter !== undefined && { quarter: args.quarter }),
-    ...(args.totalRevenue !== undefined && { totalRevenue: args.totalRevenue }),
-    ...(args.totalCost !== undefined && { totalCost: args.totalCost }),
-    ...(args.totalMargin !== undefined && { totalMargin: args.totalMargin }),
-    ...(args.averageMargin !== undefined && { averageMargin: args.averageMargin }),
-    ...(args.quoteCount !== undefined && { quoteCount: args.quoteCount }),
-    ...(args.averageQuoteValue !== undefined && { averageQuoteValue: args.averageQuoteValue }),
-    ...(args.orderCount !== undefined && { orderCount: args.orderCount }),
-    ...(args.averageOrderValue !== undefined && { averageOrderValue: args.averageOrderValue }),
-    ...(args.averageMarginPerOrder !== undefined && { averageMarginPerOrder: args.averageMarginPerOrder }),
-    ...(args.conversionRate !== undefined && { conversionRate: args.conversionRate }),
-    ...(args.totalCommission !== undefined && { totalCommission: args.totalCommission }),
-    ...(args.previousPeriodRevenue !== undefined && { previousPeriodRevenue: args.previousPeriodRevenue }),
-    ...(args.previousPeriodMargin !== undefined && { previousPeriodMargin: args.previousPeriodMargin }),
-    ...(args.growthRate !== undefined && { growthRate: args.growthRate }),
-    ...(args.calculatedAt !== undefined && { calculatedAt: args.calculatedAt }),
-    ...(args.calculatedBy !== undefined && { calculatedBy: args.calculatedBy }),
-    ...(args.tags !== undefined && { tags: args.tags }),
-    ...(args.category !== undefined && { category: args.category }),
-    ...(args.customFields !== undefined && { customFields: args.customFields }),
-    ...(args.useCase !== undefined && { useCase: args.useCase }),
-    ...(args.difficulty !== undefined && { difficulty: args.difficulty }),
-    ...(args.visibility !== undefined && { visibility: args.visibility }),
-    ...(args.isOfficial !== undefined && { isOfficial: args.isOfficial }),
-    updatedBy: userId,
-    updatedAt: now,
-  })
+    // Trim and validate
+    const trimmed = trimKpiCacheData(updates);
+    const errors = validateKpiCacheData(trimmed);
+    if (errors.length) {
+      throw new Error(errors.join(', '));
+    }
 
-  return args.id
-}
+    const now = Date.now();
+
+    // Update record
+    await ctx.db.patch(id, {
+      ...trimmed,
+      calculatedAt: now,
+      calculatedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_cache.updated',
+      entityType: 'yourobcStatisticsKpiCache',
+      entityId: existing.publicId,
+      entityTitle: trimmed.name ?? existing.name,
+      description: `Updated KPI cache: ${trimmed.name ?? existing.name}`,
+      metadata: { data: { changes: trimmed } },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});
 
 /**
- * Delete KPI cache entry (soft delete)
+ * Delete KPI cache (soft delete)
+ * 🔒 Authentication: Required
+ * 🔒 Authorization: Owner or admin
  */
-export async function deleteKpiCache(
-  ctx: MutationCtx,
-  id: Id<'yourobcStatisticsKpiCache'>
-): Promise<void> {
-  const userId = await getAuthUserId(ctx)
-  const now = Date.now()
+export const deleteKpiCache = mutation({
+  args: { id: v.id('yourobcStatisticsKpiCache') },
+  handler: async (ctx, { id }) => {
+    const user = await requireCurrentUser(ctx);
 
-  const kpiCache = await ctx.db.get(id)
-  if (!kpiCache) {
-    throw new Error(ERROR_MESSAGES.KPI_CACHE_NOT_FOUND)
-  }
+    // Fetch and check existence
+    const existing = await ctx.db.get(id);
+    if (!existing || existing.deletedAt) {
+      throw new Error('KPI cache not found');
+    }
 
-  if (!canDeleteKpiCache(userId, kpiCache)) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED)
-  }
+    // Check permissions
+    await requireDeleteKpiCacheAccess(existing, user);
 
-  await ctx.db.patch(id, {
-    deletedAt: now,
-    deletedBy: userId,
-  })
-}
+    const now = Date.now();
+
+    // Soft delete
+    await ctx.db.patch(id, {
+      deletedAt: now,
+      deletedBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    // Audit log
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: user.name || user.email || 'Unknown',
+      action: 'kpi_cache.deleted',
+      entityType: 'yourobcStatisticsKpiCache',
+      entityId: existing.publicId,
+      entityTitle: existing.name,
+      description: `Deleted KPI cache: ${existing.name}`,
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+    });
+
+    return id;
+  },
+});

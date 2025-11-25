@@ -127,7 +127,7 @@ export const getQuotes = query({
 
     return {
       items,
-      returnedCount: items.length,
+      total: items.length,
       hasMore: !page.isDone,
       cursor: page.continueCursor,
     };

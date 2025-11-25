@@ -67,8 +67,8 @@ export function validateQuoteData(
     }
   }
 
-  // Validate rejection reason
-  if (data.rejectionReason !== undefined && data.rejectionReason.trim()) {
+  // Validate rejection reason (only in UpdateQuoteData)
+  if ('rejectionReason' in data && data.rejectionReason !== undefined && typeof data.rejectionReason === 'string' && data.rejectionReason.trim()) {
     const trimmed = data.rejectionReason.trim();
     if (trimmed.length > QUOTES_CONSTANTS.LIMITS.MAX_REJECTION_REASON_LENGTH) {
       errors.push(`Rejection reason cannot exceed ${QUOTES_CONSTANTS.LIMITS.MAX_REJECTION_REASON_LENGTH} characters`);
@@ -111,18 +111,6 @@ export function validateQuoteData(
   if ('partnerQuotes' in data && data.partnerQuotes) {
     if (data.partnerQuotes.length > QUOTES_CONSTANTS.LIMITS.MAX_PARTNER_QUOTES) {
       errors.push(`Cannot exceed ${QUOTES_CONSTANTS.LIMITS.MAX_PARTNER_QUOTES} partner quotes`);
-    }
-  }
-
-  // Validate tags
-  if ('tags' in data && data.tags) {
-    if (data.tags.length > QUOTES_CONSTANTS.LIMITS.MAX_TAGS) {
-      errors.push(`Cannot exceed ${QUOTES_CONSTANTS.LIMITS.MAX_TAGS} tags`);
-    }
-
-    const emptyTags = data.tags.filter(tag => !tag.trim());
-    if (emptyTags.length > 0) {
-      errors.push('Tags cannot be empty');
     }
   }
 
@@ -239,7 +227,7 @@ export function trimQuoteData<T extends Partial<CreateQuoteData | UpdateQuoteDat
   const trimmed: T = { ...data };
 
   // Trim string fields
-  if (typeof trimmed.quoteNumber === "string") {
+  if ('quoteNumber' in trimmed && typeof trimmed.quoteNumber === "string") {
     trimmed.quoteNumber = trimmed.quoteNumber.trim() as T["quoteNumber"];
   }
 
@@ -263,22 +251,12 @@ export function trimQuoteData<T extends Partial<CreateQuoteData | UpdateQuoteDat
     trimmed.notes = trimmed.notes.trim() as T["notes"];
   }
 
-  if (typeof trimmed.rejectionReason === "string") {
+  if ('rejectionReason' in trimmed && typeof trimmed.rejectionReason === "string") {
     trimmed.rejectionReason = trimmed.rejectionReason.trim() as T["rejectionReason"];
   }
 
   if (typeof trimmed.incoterms === "string") {
     trimmed.incoterms = trimmed.incoterms.trim().toUpperCase() as T["incoterms"];
-  }
-
-  // Trim array of strings
-  if (Array.isArray(trimmed.tags)) {
-    const nextTags = trimmed.tags
-      .filter((t): t is string => typeof t === "string")
-      .map(t => t.trim())
-      .filter(Boolean);
-
-    trimmed.tags = nextTags as T["tags"];
   }
 
   return trimmed;
@@ -292,13 +270,12 @@ export function buildSearchableText(
 ): string {
   const parts: string[] = [];
 
-  if (data.quoteNumber) parts.push(data.quoteNumber);
+  if ('quoteNumber' in data && data.quoteNumber) parts.push(data.quoteNumber);
   if (data.customerReference) parts.push(data.customerReference);
   if (data.description) parts.push(data.description);
   if (data.specialInstructions) parts.push(data.specialInstructions);
   if (data.quoteText) parts.push(data.quoteText);
   if (data.notes) parts.push(data.notes);
-  if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
 
   return parts.join(' ').toLowerCase().trim();
 }

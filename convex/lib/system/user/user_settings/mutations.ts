@@ -108,15 +108,15 @@ export const updateUserSettings = mutation({
         ...(existing && {
           oldValues: {
             theme: existing.theme,
-            language: existing.language,
-            timezone: existing.timezone,
-            dateFormat: existing.dateFormat,
+            language: existing.language ?? null,
+            timezone: existing.timezone ?? null,
+            dateFormat: existing.dateFormat ?? null,
           },
           newValues: {
             theme: updateData.theme ?? existing.theme,
-            language: updateData.language ?? existing.language,
-            timezone: updateData.timezone ?? existing.timezone,
-            dateFormat: updateData.dateFormat ?? existing.dateFormat,
+            language: (updateData.language ?? existing.language) ?? null,
+            timezone: (updateData.timezone ?? existing.timezone) ?? null,
+            dateFormat: (updateData.dateFormat ?? existing.dateFormat) ?? null,
           },
         }),
         data: {
@@ -178,15 +178,15 @@ export const resetUserSettings = mutation({
           operation: 'reset',
           oldValues: {
             theme: existing.theme,
-            language: existing.language,
-            timezone: existing.timezone,
-            dateFormat: existing.dateFormat,
+            language: existing.language ?? null,
+            timezone: existing.timezone ?? null,
+            dateFormat: existing.dateFormat ?? null,
           },
           newValues: {
             theme: defaults.theme,
-            language: defaults.language,
-            timezone: defaults.timezone,
-            dateFormat: defaults.dateFormat,
+            language: defaults.language ?? null,
+            timezone: defaults.timezone ?? null,
+            dateFormat: defaults.dateFormat ?? null,
           },
         },
         createdAt: now,
@@ -292,8 +292,8 @@ export const updateUserSetting = mutation({
         description: `Updated user setting: ${key}`,
         metadata: {
           operation: 'update',
-          oldValues: existing[key],
-          newValues: value,
+          oldValues: existing[key] ?? null,
+          newValues: value ?? null,
           data: {
             settingKey: key,
           }

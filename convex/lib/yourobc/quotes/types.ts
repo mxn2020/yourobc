@@ -98,9 +98,6 @@ export interface CreateQuoteData {
   status?: QuoteStatus;
   quoteText?: string;
   notes?: string;
-  tags?: string[];
-  category?: string;
-  customFields?: Record<string, unknown>;
 }
 
 export interface UpdateQuoteData {
@@ -132,9 +129,6 @@ export interface UpdateQuoteData {
   rejectionReason?: string;
   quoteText?: string;
   notes?: string;
-  tags?: string[];
-  category?: string;
-  customFields?: Record<string, unknown>;
 }
 
 // Response types

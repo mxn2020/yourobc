@@ -5,39 +5,38 @@ import { SYSTEM_COMMENTS_CONSTANTS } from './constants';
 import type {
   CreateSystemCommentData,
   UpdateSystemCommentData,
-  SystemCommentMention,
   SystemCommentAttachment,
 } from './types';
 
 export function trimSystemCommentData<
   T extends Partial<CreateSystemCommentData | UpdateSystemCommentData>
 >(data: T): T {
-  const trimmed: T = { ...data };
+  const trimmed = { ...data } as any;
 
   if (typeof trimmed.name === 'string') {
-    trimmed.name = trimmed.name.trim() as T['name'];
+    trimmed.name = trimmed.name.trim();
   }
 
   if (typeof trimmed.content === 'string') {
-    trimmed.content = trimmed.content.trim() as T['content'];
+    trimmed.content = trimmed.content.trim();
   }
 
-  if (typeof trimmed.entityType === 'string') {
-    trimmed.entityType = trimmed.entityType.trim() as T['entityType'];
+  if ('entityType' in trimmed && typeof trimmed.entityType === 'string') {
+    trimmed.entityType = trimmed.entityType.trim();
   }
 
-  if (typeof trimmed.entityId === 'string') {
-    trimmed.entityId = trimmed.entityId.trim() as T['entityId'];
+  if ('entityId' in trimmed && typeof trimmed.entityId === 'string') {
+    trimmed.entityId = trimmed.entityId.trim();
   }
 
   if (Array.isArray(trimmed.mentions)) {
-    trimmed.mentions = trimmed.mentions.map((m) => ({
+    trimmed.mentions = trimmed.mentions.map((m: any) => ({
       ...m,
       userName: m.userName.trim(),
-    })) as T['mentions'];
+    }));
   }
 
-  return trimmed;
+  return trimmed as T;
 }
 
 export function validateSystemCommentData(

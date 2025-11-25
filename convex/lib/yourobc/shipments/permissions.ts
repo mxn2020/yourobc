@@ -3,7 +3,7 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Shipment } from './types';
-import { UserProfile } from '@/schema/system';
+import type { UserProfile } from '@/schema/system/user/user_profiles/types';
 
 
 // ============================================================================

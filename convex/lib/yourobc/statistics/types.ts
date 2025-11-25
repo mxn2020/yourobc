@@ -1,27 +1,11 @@
 // convex/lib/yourobc/statistics/types.ts
 /**
- * Statistics Library Types
- *
- * Type definitions for statistics operations, DTOs, and function arguments.
- * Provides type-safe interfaces for CRUD operations across all 5 statistics tables.
- *
- * @module convex/lib/yourobc/statistics/types
+ * Statistics Types
+ * TypeScript type definitions for statistics operations.
  */
 
-import { Id } from '@/generated/dataModel'
-
-// ============================================================================
-// Re-export Schema Types
-// ============================================================================
-
-export type {
-  EmployeeCost,
-  OfficeCost,
-  MiscExpense,
-  KpiTarget,
-  KpiCache,
-  StatisticsEntity,
-  StatisticsTableName,
+import type { Doc, Id } from '@/generated/dataModel';
+import type {
   OfficeCostCategory,
   CostFrequency,
   MiscExpenseCategory,
@@ -29,417 +13,395 @@ export type {
   KpiCacheType,
   Difficulty,
   Visibility,
-  Currency,
-} from '../../../schema/yourobc/statistics/types'
+  CurrencyAmount,
+} from '@/schema/yourobc/statistics/types';
 
 // ============================================================================
-// Currency Amount Type
+// Base Entity Types
 // ============================================================================
 
-/**
- * Currency amount with exchange rate support
- */
-export interface CurrencyAmount {
-  amount: number
-  currency: 'EUR' | 'USD'
-  exchangeRate?: number
-  exchangeRateDate?: number
+export type EmployeeCost = Doc<'yourobcStatisticsEmployeeCosts'>;
+export type EmployeeCostId = Id<'yourobcStatisticsEmployeeCosts'>;
+
+export type OfficeCost = Doc<'yourobcStatisticsOfficeCosts'>;
+export type OfficeCostId = Id<'yourobcStatisticsOfficeCosts'>;
+
+export type MiscExpense = Doc<'yourobcStatisticsMiscExpenses'>;
+export type MiscExpenseId = Id<'yourobcStatisticsMiscExpenses'>;
+
+export type KpiTarget = Doc<'yourobcStatisticsKpiTargets'>;
+export type KpiTargetId = Id<'yourobcStatisticsKpiTargets'>;
+
+export type KpiCache = Doc<'yourobcStatisticsKpiCache'>;
+export type KpiCacheId = Id<'yourobcStatisticsKpiCache'>;
+
+export type StatisticsEntity = EmployeeCost | OfficeCost | MiscExpense | KpiTarget | KpiCache;
+
+// ============================================================================
+// Re-export Schema Types
+// ============================================================================
+
+export type {
+  OfficeCostCategory,
+  CostFrequency,
+  MiscExpenseCategory,
+  TargetType,
+  KpiCacheType,
+  Difficulty,
+  Visibility,
+  CurrencyAmount,
+};
+
+// ============================================================================
+// Employee Cost Operations
+// ============================================================================
+
+export interface CreateEmployeeCostData {
+  name: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  employeeId?: Id<'yourobcEmployees'>;
+  employeeName?: string;
+  position: string;
+  department?: string;
+  monthlySalary: CurrencyAmount;
+  benefits?: CurrencyAmount;
+  bonuses?: CurrencyAmount;
+  otherCosts?: CurrencyAmount;
+  startDate: number;
+  endDate?: number;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-// ============================================================================
-// Employee Cost Types
-// ============================================================================
-
-/**
- * Employee cost creation arguments
- */
-export interface CreateEmployeeCostArgs {
-  name: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  employeeId?: Id<'yourobcEmployees'>
-  employeeName?: string
-  position: string
-  department?: string
-  monthlySalary: CurrencyAmount
-  benefits?: CurrencyAmount
-  bonuses?: CurrencyAmount
-  otherCosts?: CurrencyAmount
-  startDate: number
-  endDate?: number
-  notes?: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface UpdateEmployeeCostData {
+  name?: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  employeeId?: Id<'yourobcEmployees'>;
+  employeeName?: string;
+  position?: string;
+  department?: string;
+  monthlySalary?: CurrencyAmount;
+  benefits?: CurrencyAmount;
+  bonuses?: CurrencyAmount;
+  otherCosts?: CurrencyAmount;
+  startDate?: number;
+  endDate?: number;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * Employee cost update arguments
- */
-export interface UpdateEmployeeCostArgs {
-  id: Id<'yourobcStatisticsEmployeeCosts'>
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  employeeId?: Id<'yourobcEmployees'>
-  employeeName?: string
-  position?: string
-  department?: string
-  monthlySalary?: CurrencyAmount
-  benefits?: CurrencyAmount
-  bonuses?: CurrencyAmount
-  otherCosts?: CurrencyAmount
-  startDate?: number
-  endDate?: number
-  notes?: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface EmployeeCostListResponse {
+  items: EmployeeCost[];
+  returnedCount: number;
+  hasMore: boolean;
+  cursor?: string;
 }
 
-// ============================================================================
-// Office Cost Types
-// ============================================================================
-
-/**
- * Office cost creation arguments
- */
-export interface CreateOfficeCostArgs {
-  name: string
-  description: string
-  icon?: string
-  thumbnail?: string
-  amount: CurrencyAmount
-  frequency: 'one_time' | 'monthly' | 'quarterly' | 'yearly'
-  date: number
-  endDate?: number
-  vendor?: string
-  notes?: string
-  category: 'rent' | 'utilities' | 'insurance' | 'maintenance' | 'supplies' | 'technology' | 'other'
-  tags?: string[]
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
-}
-
-/**
- * Office cost update arguments
- */
-export interface UpdateOfficeCostArgs {
-  id: Id<'yourobcStatisticsOfficeCosts'>
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  amount?: CurrencyAmount
-  frequency?: 'one_time' | 'monthly' | 'quarterly' | 'yearly'
-  date?: number
-  endDate?: number
-  vendor?: string
-  notes?: string
-  category?: 'rent' | 'utilities' | 'insurance' | 'maintenance' | 'supplies' | 'technology' | 'other'
-  tags?: string[]
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface EmployeeCostFilters {
+  employeeId?: Id<'yourobcEmployees'>;
+  department?: string;
+  startDate?: number;
+  endDate?: number;
+  isOfficial?: boolean;
+  category?: string;
 }
 
 // ============================================================================
-// Miscellaneous Expense Types
+// Office Cost Operations
 // ============================================================================
 
-/**
- * Miscellaneous expense creation arguments
- */
-export interface CreateMiscExpenseArgs {
-  name: string
-  description: string
-  icon?: string
-  thumbnail?: string
-  amount: CurrencyAmount
-  date: number
-  relatedEmployeeId?: Id<'yourobcEmployees'>
-  relatedProjectId?: Id<'projects'>
-  vendor?: string
-  receiptUrl?: string
-  approved?: boolean
-  approvedBy?: string
-  approvedDate?: number
-  notes?: string
-  category: 'trade_show' | 'marketing' | 'tools' | 'software' | 'travel' | 'entertainment' | 'other'
-  tags?: string[]
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface CreateOfficeCostData {
+  name: string;
+  description: string;
+  icon?: string;
+  thumbnail?: string;
+  amount: CurrencyAmount;
+  frequency: CostFrequency;
+  date: number;
+  endDate?: number;
+  vendor?: string;
+  notes?: string;
+  category: OfficeCostCategory;
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * Miscellaneous expense update arguments
- */
-export interface UpdateMiscExpenseArgs {
-  id: Id<'yourobcStatisticsMiscExpenses'>
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  amount?: CurrencyAmount
-  date?: number
-  relatedEmployeeId?: Id<'yourobcEmployees'>
-  relatedProjectId?: Id<'projects'>
-  vendor?: string
-  receiptUrl?: string
-  approved?: boolean
-  approvedBy?: string
-  approvedDate?: number
-  notes?: string
-  category?: 'trade_show' | 'marketing' | 'tools' | 'software' | 'travel' | 'entertainment' | 'other'
-  tags?: string[]
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface UpdateOfficeCostData {
+  name?: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  amount?: CurrencyAmount;
+  frequency?: CostFrequency;
+  date?: number;
+  endDate?: number;
+  vendor?: string;
+  notes?: string;
+  category?: OfficeCostCategory;
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * Expense approval arguments
- */
-export interface ApproveExpenseArgs {
-  id: Id<'yourobcStatisticsMiscExpenses'>
-  approved: boolean
-  approvedBy?: string
-  approvedDate?: number
+export interface OfficeCostListResponse {
+  items: OfficeCost[];
+  returnedCount: number;
+  hasMore: boolean;
+  cursor?: string;
+}
+
+export interface OfficeCostFilters {
+  category?: OfficeCostCategory;
+  frequency?: CostFrequency;
+  startDate?: number;
+  endDate?: number;
+  isOfficial?: boolean;
 }
 
 // ============================================================================
-// KPI Target Types
+// Misc Expense Operations
 // ============================================================================
 
-/**
- * KPI target creation arguments
- */
-export interface CreateKpiTargetArgs {
-  name: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  targetType: 'employee' | 'team' | 'company'
-  employeeId?: Id<'yourobcEmployees'>
-  teamName?: string
-  year: number
-  month?: number
-  quarter?: number
-  revenueTarget?: CurrencyAmount
-  marginTarget?: CurrencyAmount
-  quoteCountTarget?: number
-  orderCountTarget?: number
-  conversionRateTarget?: number
-  averageMarginTarget?: CurrencyAmount
-  notes?: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface CreateMiscExpenseData {
+  name: string;
+  description: string;
+  icon?: string;
+  thumbnail?: string;
+  amount: CurrencyAmount;
+  date: number;
+  relatedEmployeeId?: Id<'yourobcEmployees'>;
+  relatedProjectId?: Id<'projects'>;
+  vendor?: string;
+  receiptUrl?: string;
+  notes?: string;
+  category: MiscExpenseCategory;
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * KPI target update arguments
- */
-export interface UpdateKpiTargetArgs {
-  id: Id<'yourobcStatisticsKpiTargets'>
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  targetType?: 'employee' | 'team' | 'company'
-  employeeId?: Id<'yourobcEmployees'>
-  teamName?: string
-  year?: number
-  month?: number
-  quarter?: number
-  revenueTarget?: CurrencyAmount
-  marginTarget?: CurrencyAmount
-  quoteCountTarget?: number
-  orderCountTarget?: number
-  conversionRateTarget?: number
-  averageMarginTarget?: CurrencyAmount
-  notes?: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface UpdateMiscExpenseData {
+  name?: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  amount?: CurrencyAmount;
+  date?: number;
+  relatedEmployeeId?: Id<'yourobcEmployees'>;
+  relatedProjectId?: Id<'projects'>;
+  vendor?: string;
+  receiptUrl?: string;
+  notes?: string;
+  category?: MiscExpenseCategory;
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
+}
+
+export interface MiscExpenseListResponse {
+  items: MiscExpense[];
+  returnedCount: number;
+  hasMore: boolean;
+  cursor?: string;
+}
+
+export interface MiscExpenseFilters {
+  category?: MiscExpenseCategory;
+  approved?: boolean;
+  relatedEmployeeId?: Id<'yourobcEmployees'>;
+  startDate?: number;
+  endDate?: number;
+  isOfficial?: boolean;
 }
 
 // ============================================================================
-// KPI Cache Types
+// KPI Target Operations
 // ============================================================================
 
-/**
- * KPI cache creation arguments
- */
-export interface CreateKpiCacheArgs {
-  name: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  cacheType: 'employee' | 'customer' | 'company' | 'department'
-  entityId?: string
-  entityName?: string
-  year: number
-  month?: number
-  quarter?: number
-  totalRevenue: CurrencyAmount
-  totalCost?: CurrencyAmount
-  totalMargin: CurrencyAmount
-  averageMargin: CurrencyAmount
-  quoteCount: number
-  averageQuoteValue: CurrencyAmount
-  orderCount: number
-  averageOrderValue: CurrencyAmount
-  averageMarginPerOrder: CurrencyAmount
-  conversionRate: number
-  totalCommission?: CurrencyAmount
-  previousPeriodRevenue?: CurrencyAmount
-  previousPeriodMargin?: CurrencyAmount
-  growthRate?: number
-  calculatedAt: number
-  calculatedBy: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface CreateKpiTargetData {
+  name: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  targetType: TargetType;
+  employeeId?: Id<'yourobcEmployees'>;
+  teamName?: string;
+  year: number;
+  month?: number;
+  quarter?: number;
+  revenueTarget?: CurrencyAmount;
+  marginTarget?: CurrencyAmount;
+  quoteCountTarget?: number;
+  orderCountTarget?: number;
+  conversionRateTarget?: number;
+  averageMarginTarget?: CurrencyAmount;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * KPI cache update arguments
- */
-export interface UpdateKpiCacheArgs {
-  id: Id<'yourobcStatisticsKpiCache'>
-  name?: string
-  description?: string
-  icon?: string
-  thumbnail?: string
-  cacheType?: 'employee' | 'customer' | 'company' | 'department'
-  entityId?: string
-  entityName?: string
-  year?: number
-  month?: number
-  quarter?: number
-  totalRevenue?: CurrencyAmount
-  totalCost?: CurrencyAmount
-  totalMargin?: CurrencyAmount
-  averageMargin?: CurrencyAmount
-  quoteCount?: number
-  averageQuoteValue?: CurrencyAmount
-  orderCount?: number
-  averageOrderValue?: CurrencyAmount
-  averageMarginPerOrder?: CurrencyAmount
-  conversionRate?: number
-  totalCommission?: CurrencyAmount
-  previousPeriodRevenue?: CurrencyAmount
-  previousPeriodMargin?: CurrencyAmount
-  growthRate?: number
-  calculatedAt?: number
-  calculatedBy?: string
-  tags?: string[]
-  category?: string
-  customFields?: Record<string, unknown>
-  useCase?: string
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
-  visibility?: 'public' | 'private' | 'shared' | 'organization'
-  isOfficial?: boolean
+export interface UpdateKpiTargetData {
+  name?: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  targetType?: TargetType;
+  employeeId?: Id<'yourobcEmployees'>;
+  teamName?: string;
+  year?: number;
+  month?: number;
+  quarter?: number;
+  revenueTarget?: CurrencyAmount;
+  marginTarget?: CurrencyAmount;
+  quoteCountTarget?: number;
+  orderCountTarget?: number;
+  conversionRateTarget?: number;
+  averageMarginTarget?: CurrencyAmount;
+  notes?: string;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
+}
+
+export interface KpiTargetListResponse {
+  items: KpiTarget[];
+  returnedCount: number;
+  hasMore: boolean;
+  cursor?: string;
+}
+
+export interface KpiTargetFilters {
+  targetType?: TargetType;
+  employeeId?: Id<'yourobcEmployees'>;
+  teamName?: string;
+  year?: number;
+  month?: number;
+  quarter?: number;
+  isOfficial?: boolean;
 }
 
 // ============================================================================
-// Query Filter Types
+// KPI Cache Operations
 // ============================================================================
 
-/**
- * Employee cost filter arguments
- */
-export interface EmployeeCostFilterArgs {
-  employeeId?: Id<'yourobcEmployees'>
-  department?: string
-  startDate?: number
-  endDate?: number
-  isOfficial?: boolean
-  category?: string
-  includeDeleted?: boolean
+export interface CreateKpiCacheData {
+  name: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  cacheType: KpiCacheType;
+  entityId?: string;
+  entityName?: string;
+  year: number;
+  month?: number;
+  quarter?: number;
+  totalRevenue: CurrencyAmount;
+  totalCost?: CurrencyAmount;
+  totalMargin: CurrencyAmount;
+  averageMargin: CurrencyAmount;
+  quoteCount: number;
+  averageQuoteValue: CurrencyAmount;
+  orderCount: number;
+  averageOrderValue: CurrencyAmount;
+  averageMarginPerOrder: CurrencyAmount;
+  conversionRate: number;
+  totalCommission?: CurrencyAmount;
+  previousPeriodRevenue?: CurrencyAmount;
+  previousPeriodMargin?: CurrencyAmount;
+  growthRate?: number;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * Office cost filter arguments
- */
-export interface OfficeCostFilterArgs {
-  category?: 'rent' | 'utilities' | 'insurance' | 'maintenance' | 'supplies' | 'technology' | 'other'
-  frequency?: 'one_time' | 'monthly' | 'quarterly' | 'yearly'
-  startDate?: number
-  endDate?: number
-  isOfficial?: boolean
-  includeDeleted?: boolean
+export interface UpdateKpiCacheData {
+  name?: string;
+  description?: string;
+  icon?: string;
+  thumbnail?: string;
+  cacheType?: KpiCacheType;
+  entityId?: string;
+  entityName?: string;
+  year?: number;
+  month?: number;
+  quarter?: number;
+  totalRevenue?: CurrencyAmount;
+  totalCost?: CurrencyAmount;
+  totalMargin?: CurrencyAmount;
+  averageMargin?: CurrencyAmount;
+  quoteCount?: number;
+  averageQuoteValue?: CurrencyAmount;
+  orderCount?: number;
+  averageOrderValue?: CurrencyAmount;
+  averageMarginPerOrder?: CurrencyAmount;
+  conversionRate?: number;
+  totalCommission?: CurrencyAmount;
+  previousPeriodRevenue?: CurrencyAmount;
+  previousPeriodMargin?: CurrencyAmount;
+  growthRate?: number;
+  tags?: string[];
+  category?: string;
+  customFields?: Record<string, unknown>;
+  useCase?: string;
+  difficulty?: Difficulty;
+  visibility?: Visibility;
+  isOfficial?: boolean;
 }
 
-/**
- * Miscellaneous expense filter arguments
- */
-export interface MiscExpenseFilterArgs {
-  category?: 'trade_show' | 'marketing' | 'tools' | 'software' | 'travel' | 'entertainment' | 'other'
-  approved?: boolean
-  relatedEmployeeId?: Id<'yourobcEmployees'>
-  startDate?: number
-  endDate?: number
-  isOfficial?: boolean
-  includeDeleted?: boolean
+export interface KpiCacheListResponse {
+  items: KpiCache[];
+  returnedCount: number;
+  hasMore: boolean;
+  cursor?: string;
 }
 
-/**
- * KPI target filter arguments
- */
-export interface KpiTargetFilterArgs {
-  targetType?: 'employee' | 'team' | 'company'
-  employeeId?: Id<'yourobcEmployees'>
-  teamName?: string
-  year?: number
-  month?: number
-  quarter?: number
-  isOfficial?: boolean
-  includeDeleted?: boolean
-}
-
-/**
- * KPI cache filter arguments
- */
-export interface KpiCacheFilterArgs {
-  cacheType?: 'employee' | 'customer' | 'company' | 'department'
-  entityId?: string
-  year?: number
-  month?: number
-  quarter?: number
-  isOfficial?: boolean
-  includeDeleted?: boolean
+export interface KpiCacheFilters {
+  cacheType?: KpiCacheType;
+  entityId?: string;
+  year?: number;
+  month?: number;
+  quarter?: number;
+  isOfficial?: boolean;
 }

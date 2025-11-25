@@ -147,7 +147,7 @@ export const getCommentsByCreator = query({
     const page = await ctx.db
       .query('yourobcComments')
       .withIndex('by_created_at', iq => iq.gte('createdAt', 0))
-      .filter(doc => doc.createdBy === createdBy && !doc.deletedAt)
+      .filter(q => q.and(q.eq(q.field('createdBy'), createdBy), q.eq(q.field('deletedAt'), undefined)))
       .order('desc')
       .paginate({
         numItems: limit,
@@ -177,12 +177,12 @@ export const countCommentReplies = query({
   handler: async (ctx, { parentCommentId }) => {
     const user = await requireCurrentUser(ctx);
 
-    const count = await ctx.db
+    const replies = await ctx.db
       .query('yourobcComments')
       .withIndex('by_parent', iq => iq.eq('parentCommentId', parentCommentId))
       .filter(notDeleted)
-      .count();
+      .collect();
 
-    return count;
+    return replies.length;
   },
 });

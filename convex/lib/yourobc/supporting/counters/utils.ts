@@ -12,13 +12,13 @@ export function trimCounterData<
   T extends Partial<CreateCounterData | UpdateCounterData>
 >(data: T): T {
   // Clone to avoid mutating caller data
-  const trimmed: T = { ...data };
+  const trimmed = { ...data } as any;
 
   if (typeof trimmed.prefix === 'string') {
-    trimmed.prefix = trimmed.prefix.trim() as T['prefix'];
+    trimmed.prefix = trimmed.prefix.trim();
   }
 
-  return trimmed;
+  return trimmed as T;
 }
 
 /**

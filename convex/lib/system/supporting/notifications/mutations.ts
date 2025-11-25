@@ -16,7 +16,7 @@ import { requireDeleteSystemNotificationAccess } from './permissions';
 export const createSystemNotification = mutation({
   args: {
     data: v.object({
-      title: v.string(),
+      name: v.string(),
       message: v.string(),
       type: notificationsValidators.notificationType,
       priority: notificationsValidators.priority,
@@ -37,9 +37,14 @@ export const createSystemNotification = mutation({
     const publicId = await generateUniquePublicId(ctx, 'systemSupportingNotifications');
 
     const id = await ctx.db.insert('systemSupportingNotifications', {
-      ...trimmed,
+      name: trimmed.name,
+      message: trimmed.message,
+      type: trimmed.type,
+      priority: trimmed.priority,
+      entityType: trimmed.entityType || '',
+      entityId: trimmed.entityId || '',
       publicId,
-      ownerId: user._id,
+      ownerId: trimmed.recipientId,
       isRead: SYSTEM_NOTIFICATIONS_CONSTANTS.DEFAULTS.IS_READ,
       createdAt: now,
       createdBy: user._id,
@@ -54,7 +59,7 @@ export const createSystemNotification = mutation({
       action: 'system.notifications.created',
       entityType: 'systemSupportingNotifications',
       entityId: publicId,
-      entityTitle: trimmed.title,
+      entityTitle: trimmed.name,
       description: 'Created notification',
       createdAt: now,
       createdBy: user._id,

@@ -7,22 +7,22 @@ import type { CreateSystemCounterData, UpdateSystemCounterData } from './types';
 export function trimSystemCounterData<
   T extends Partial<CreateSystemCounterData | UpdateSystemCounterData>
 >(data: T): T {
-  const trimmed: T = { ...data };
+  const trimmed = { ...data } as any;
 
   if (typeof trimmed.name === 'string') {
-    trimmed.name = trimmed.name.trim() as T['name'];
+    trimmed.name = trimmed.name.trim();
   }
   if (typeof trimmed.prefix === 'string') {
-    trimmed.prefix = trimmed.prefix.trim() as T['prefix'];
+    trimmed.prefix = trimmed.prefix.trim();
   }
   if (typeof trimmed.suffix === 'string') {
-    trimmed.suffix = trimmed.suffix.trim() as T['suffix'];
+    trimmed.suffix = trimmed.suffix.trim();
   }
   if (typeof trimmed.format === 'string') {
-    trimmed.format = trimmed.format.trim() as T['format'];
+    trimmed.format = trimmed.format.trim();
   }
 
-  return trimmed;
+  return trimmed as T;
 }
 
 export function validateSystemCounterData(

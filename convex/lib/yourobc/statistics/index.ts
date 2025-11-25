@@ -3,12 +3,7 @@
  * Statistics Library - Barrel Export
  *
  * Central export point for all statistics operations.
- * Provides CRUD operations for all 5 statistics tables:
- * - Employee Costs
- * - Office Costs
- * - Miscellaneous Expenses
- * - KPI Targets
- * - KPI Cache
+ * Provides CRUD operations for all 5 statistics tables.
  *
  * @module convex/lib/yourobc/statistics
  */
@@ -17,187 +12,165 @@
 // Constants & Configuration
 // ============================================================================
 
-export {
-  OFFICE_COST_CATEGORIES,
-  MISC_EXPENSE_CATEGORIES,
-  COST_FREQUENCIES,
-  TARGET_TYPES,
-  KPI_CACHE_TYPES,
-  MAX_COST_NAME_LENGTH,
-  MAX_DESCRIPTION_LENGTH,
-  MAX_NOTES_LENGTH,
-  MIN_COST_AMOUNT,
-  MAX_COST_AMOUNT,
-  KPI_CACHE_TTL,
-  KPI_CACHE_STALE_THRESHOLD,
-  MAX_CACHED_KPIS_PER_ENTITY,
-  DEFAULT_CURRENCY,
-  QUARTERS,
-  QUARTER_NAMES,
-  MONTH_NAMES,
-  DEFAULT_KPI_TARGETS,
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES,
-} from './constants'
+export { STATISTICS_CONSTANTS, STATISTICS_VALUES } from './constants';
 
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
 
-export type {
-  EmployeeCost,
-  OfficeCost,
-  MiscExpense,
-  KpiTarget,
-  KpiCache,
-  StatisticsEntity,
-  StatisticsTableName,
-  OfficeCostCategory,
-  CostFrequency,
-  MiscExpenseCategory,
-  TargetType,
-  KpiCacheType,
-  Difficulty,
-  Visibility,
-  CurrencyAmount,
-  CreateEmployeeCostArgs,
-  UpdateEmployeeCostArgs,
-  CreateOfficeCostArgs,
-  UpdateOfficeCostArgs,
-  CreateMiscExpenseArgs,
-  UpdateMiscExpenseArgs,
-  ApproveExpenseArgs,
-  CreateKpiTargetArgs,
-  UpdateKpiTargetArgs,
-  CreateKpiCacheArgs,
-  UpdateKpiCacheArgs,
-  EmployeeCostFilterArgs,
-  OfficeCostFilterArgs,
-  MiscExpenseFilterArgs,
-  KpiTargetFilterArgs,
-  KpiCacheFilterArgs,
-} from './types'
+export type * from './types';
 
 // ============================================================================
-// Utilities & Helpers (business logic)
+// Utilities & Helpers
 // ============================================================================
 
 export {
-  generatePublicId,
-  generateEmployeeCostPublicId,
-  generateOfficeCostPublicId,
-  generateMiscExpensePublicId,
-  generateKpiTargetPublicId,
-  generateKpiCachePublicId,
-  createCurrencyAmount,
-  addCurrencyAmounts,
-  subtractCurrencyAmounts,
-  multiplyCurrencyAmount,
-  divideCurrencyAmount,
-  zeroCurrencyAmount,
-  getQuarterFromMonth,
-  getMonthsInQuarter,
-  getQuarterDateRange,
-  getMonthDateRange,
-  getYearDateRange,
-  isDateInPeriod,
-  daysBetween,
-  monthsBetween,
-  calculateTotalEmployeeCost,
-  annualizeCost,
-  prorateCost,
-  calculateConversionRate,
-  calculateAverage,
-  calculateGrowthRate,
-  calculateMargin,
-  calculateMarginPercentage,
-  validateDateRange,
-  validateYear,
-  validateMonth,
-  validateQuarter,
+  // Trim functions
+  trimEmployeeCostData,
+  trimOfficeCostData,
+  trimMiscExpenseData,
+  trimKpiTargetData,
+  trimKpiCacheData,
+  
+  // Validation functions
+  validateEmployeeCostData,
+  validateOfficeCostData,
+  validateMiscExpenseData,
+  validateKpiTargetData,
+  validateKpiCacheData,
   validateCurrencyAmount,
+  
+  // Currency utilities
+  createCurrencyAmount,
+  calculateTotalEmployeeCost,
+  calculateConversionRate,
+  calculateGrowthRate,
   formatCurrency,
   formatPercentage,
-  formatPeriodName,
-} from './utils'
+} from './utils';
 
 // ============================================================================
 // Permissions & Access Control
 // ============================================================================
 
 export {
+  // Auth helpers
   isAuthenticated,
   getAuthUserId,
-  isOwner,
-  canView,
-  canEdit,
-  canDelete,
+  
+  // Employee Cost permissions
   canViewEmployeeCost,
+  requireViewEmployeeCostAccess,
   canEditEmployeeCost,
+  requireEditEmployeeCostAccess,
   canDeleteEmployeeCost,
+  requireDeleteEmployeeCostAccess,
+  
+  // Office Cost permissions
   canViewOfficeCost,
+  requireViewOfficeCostAccess,
   canEditOfficeCost,
+  requireEditOfficeCostAccess,
   canDeleteOfficeCost,
+  requireDeleteOfficeCostAccess,
+  
+  // Misc Expense permissions
   canViewMiscExpense,
+  requireViewMiscExpenseAccess,
   canEditMiscExpense,
+  requireEditMiscExpenseAccess,
   canDeleteMiscExpense,
+  requireDeleteMiscExpenseAccess,
   canApproveMiscExpense,
+  requireApproveMiscExpenseAccess,
+  
+  // KPI Target permissions
   canViewKpiTarget,
+  requireViewKpiTargetAccess,
   canEditKpiTarget,
+  requireEditKpiTargetAccess,
   canDeleteKpiTarget,
+  requireDeleteKpiTargetAccess,
+  
+  // KPI Cache permissions
   canViewKpiCache,
+  requireViewKpiCacheAccess,
   canEditKpiCache,
+  requireEditKpiCacheAccess,
   canDeleteKpiCache,
-  canRecalculateKpiCache,
-  isSoftDeleted,
-  canRestore,
-} from './permissions'
+  requireDeleteKpiCacheAccess,
+  
+  // Filter functions
+  filterEmployeeCostsByAccess,
+  filterOfficeCostsByAccess,
+  filterMiscExpensesByAccess,
+  filterKpiTargetsByAccess,
+  filterKpiCacheByAccess,
+} from './permissions';
 
 // ============================================================================
 // Queries (Read Operations)
 // ============================================================================
 
 export {
-  getEmployeeCostById,
+  // Employee Cost queries
+  getEmployeeCosts,
+  getEmployeeCost,
   getEmployeeCostByPublicId,
-  listEmployeeCosts,
   getEmployeeCostsByEmployee,
-  getOfficeCostById,
+  
+  // Office Cost queries
+  getOfficeCosts,
+  getOfficeCost,
   getOfficeCostByPublicId,
-  listOfficeCosts,
-  getMiscExpenseById,
+  
+  // Misc Expense queries
+  getMiscExpenses,
+  getMiscExpense,
   getMiscExpenseByPublicId,
-  listMiscExpenses,
   getPendingMiscExpenses,
-  getKpiTargetById,
+  
+  // KPI Target queries
+  getKpiTargets,
+  getKpiTarget,
   getKpiTargetByPublicId,
-  listKpiTargets,
-  getKpiTargetsByEmployee,
+  
+  // KPI Cache queries
+  getKpiCache,
   getKpiCacheById,
   getKpiCacheByPublicId,
-  listKpiCache,
   getKpiCacheForEntity,
-} from './queries'
+} from './queries';
 
 // ============================================================================
 // Mutations (Write Operations)
 // ============================================================================
 
 export {
+  // Employee Cost mutations
   createEmployeeCost,
   updateEmployeeCost,
   deleteEmployeeCost,
+  
+  // Office Cost mutations
   createOfficeCost,
   updateOfficeCost,
   deleteOfficeCost,
+  
+  // Misc Expense mutations
   createMiscExpense,
   updateMiscExpense,
   approveMiscExpense,
   deleteMiscExpense,
+  
+  // KPI Target mutations
   createKpiTarget,
   updateKpiTarget,
   deleteKpiTarget,
+  
+  // KPI Cache mutations
   createKpiCache,
   updateKpiCache,
   deleteKpiCache,
-} from './mutations'
+} from './mutations';
+

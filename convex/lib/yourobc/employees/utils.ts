@@ -273,18 +273,34 @@ export function formatSalary(amount: number, currency: string = 'USD', frequency
 /**
  * Sanitize and trim string fields
  */
-export function sanitizeEmployeeData<T extends Record<string, any>>(data: T): T {
-  const sanitized = { ...data };
+export function sanitizeEmployeeData<T extends Record<string, unknown>>(data: T): T {
+  const sanitized: Record<string, unknown> = { ...data };
 
   // Trim string fields
-  if (sanitized.name) sanitized.name = sanitized.name.trim();
-  if (sanitized.employeeNumber) sanitized.employeeNumber = sanitized.employeeNumber.trim();
-  if (sanitized.email) sanitized.email = sanitized.email.trim().toLowerCase();
-  if (sanitized.workEmail) sanitized.workEmail = sanitized.workEmail.trim().toLowerCase();
-  if (sanitized.phone) sanitized.phone = sanitized.phone.trim();
-  if (sanitized.workPhone) sanitized.workPhone = sanitized.workPhone.trim();
-  if (sanitized.department) sanitized.department = sanitized.department.trim();
-  if (sanitized.position) sanitized.position = sanitized.position.trim();
+  if ('name' in sanitized && typeof sanitized.name === 'string') {
+    sanitized.name = sanitized.name.trim();
+  }
+  if ('employeeNumber' in sanitized && typeof sanitized.employeeNumber === 'string') {
+    sanitized.employeeNumber = sanitized.employeeNumber.trim();
+  }
+  if ('email' in sanitized && typeof sanitized.email === 'string') {
+    sanitized.email = sanitized.email.trim().toLowerCase();
+  }
+  if ('workEmail' in sanitized && typeof sanitized.workEmail === 'string') {
+    sanitized.workEmail = sanitized.workEmail.trim().toLowerCase();
+  }
+  if ('phone' in sanitized && typeof sanitized.phone === 'string') {
+    sanitized.phone = sanitized.phone.trim();
+  }
+  if ('workPhone' in sanitized && typeof sanitized.workPhone === 'string') {
+    sanitized.workPhone = sanitized.workPhone.trim();
+  }
+  if ('department' in sanitized && typeof sanitized.department === 'string') {
+    sanitized.department = sanitized.department.trim();
+  }
+  if ('position' in sanitized && typeof sanitized.position === 'string') {
+    sanitized.position = sanitized.position.trim();
+  }
 
-  return sanitized;
+  return sanitized as T;
 }

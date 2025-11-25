@@ -105,6 +105,12 @@ export const PUBLIC_ID_PREFIXES = {
   yourobcCustomers: 'cust',
   yourobcCustomerMargins: 'cmarg',
 
+  yourobcStatisticsKpiTargets: 'ktgt',
+  yourobcStatisticsKpiCache: 'kpcache',
+  yourobcStatisticsEmployeeCosts: 'ecost',
+  yourobcStatisticsOfficeCosts: 'ocost',
+  yourobcStatisticsMiscExpenses: 'mexp',
+
 } as const;
 
 export type PublicIdTable = keyof typeof PUBLIC_ID_PREFIXES;

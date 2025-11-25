@@ -24,7 +24,7 @@ export interface CreateEmployeeCommissionData {
   totalAmount: number;
   currency: 'EUR' | 'USD';
   type: 'margin_percentage' | 'revenue_percentage' | 'fixed_amount' | 'tiered';
-  ruleId?: Id<'yourobcEmployeeCommissionRules'>;
+  ruleId?: Id<'yourobcEmployeeCommissionsRules'>;
   ruleName?: string;
   calculationBreakdown?: {
     baseAmount: number;

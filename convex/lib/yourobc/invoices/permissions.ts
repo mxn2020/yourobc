@@ -4,7 +4,7 @@
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Invoice } from './types';
 import { INVOICES_CONSTANTS } from './constants';
-import { UserProfile } from '@/schema/system';
+import type { UserProfile } from '@/schema/system/user/user_profiles/types';
 
 // ============================================================================
 // View Access

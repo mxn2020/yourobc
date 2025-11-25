@@ -78,9 +78,13 @@ export const listWikiEntries = query({
   handler: async (ctx, { status, limit = 50, cursor }) => {
     const user = await requireCurrentUser(ctx);
 
-    let q = ctx.db.query('systemSupportingWikiEntries').filter(notDeleted);
+    let q;
     if (status) {
-      q = q.withIndex('by_status', (idx) => idx.eq('status', status));
+      q = ctx.db.query('systemSupportingWikiEntries')
+        .withIndex('by_status', (idx) => idx.eq('status', status))
+        .filter(notDeleted);
+    } else {
+      q = ctx.db.query('systemSupportingWikiEntries').filter(notDeleted);
     }
 
     const page = await q
