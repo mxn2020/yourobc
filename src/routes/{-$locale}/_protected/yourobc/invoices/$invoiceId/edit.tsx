@@ -16,8 +16,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/invoices/$i
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.invoices.queries.getInvoice, {
             invoiceId: params.invoiceId as InvoiceId,
-            authUserId: session.data.user.id
-          })
+                      })
         )
       }
       

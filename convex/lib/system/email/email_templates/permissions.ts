@@ -3,9 +3,8 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { EmailTemplate } from './types';
-import type { Doc } from '@/generated/dataModel';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access
@@ -43,14 +42,14 @@ export async function canEditEmailTemplate(
   template: EmailTemplate,
   user: UserProfile
 ): Promise<boolean> {
-  // Only admins can edit email templates
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-
   // Check if template is locked/archived
   if (template.status === 'archived') {
     // Only superadmins can edit archived templates
     return user.role === 'superadmin';
   }
+
+  // Only admins can edit email templates
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   return false;
 }

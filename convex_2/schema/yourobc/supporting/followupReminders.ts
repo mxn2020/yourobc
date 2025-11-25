@@ -11,7 +11,7 @@
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import { entityTypes } from '../../../lib/system/audit_logs/entityTypes'
-import { supportingValidators, supportingFields } from './validators'
+import { supportingValidators, supportingFields } from '../validators'
 import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**

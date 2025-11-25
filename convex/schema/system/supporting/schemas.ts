@@ -1,22 +1,22 @@
 // convex/schema/system/supporting/schemas.ts
-// Schema exports for supporting module
+// Aggregated schema exports for all supporting modules
 
-import { exchangeRatesTable } from './exchangeRates';
-import { inquirySourcesTable } from './inquirySources';
-import { wikiEntriesTable } from './wikiEntries';
-import { commentsTable } from './comments';
-import { followupRemindersTable } from './followupReminders';
-import { documentsTable } from './documents';
-import { notificationsTable } from './notifications';
-import { countersTable } from './counters';
+import { systemSupportingCommentsSchemas } from './comments/schemas';
+import { systemSupportingCountersSchemas } from './counters/schemas';
+import { systemSupportingDocumentsSchemas } from './documents/schemas';
+import { systemSupportingExchangeRatesSchemas } from './exchange_rates/schemas';
+import { systemSupportingFollowupRemindersSchemas } from './followup_reminders/schemas';
+import { systemSupportingInquirySourcesSchemas } from './inquiry_sources/schemas';
+import { systemSupportingNotificationsSchemas } from './notifications/schemas';
+import { systemSupportingWikiEntriesSchemas } from './wikiEntries/schemas';
 
 export const systemSupportingSchemas = {
-  exchangeRates: exchangeRatesTable,
-  inquirySources: inquirySourcesTable,
-  wikiEntries: wikiEntriesTable,
-  comments: commentsTable,
-  followupReminders: followupRemindersTable,
-  documents: documentsTable,
-  notifications: notificationsTable,
-  counters: countersTable,
+  ...systemSupportingCommentsSchemas,
+  ...systemSupportingCountersSchemas,
+  ...systemSupportingDocumentsSchemas,
+  ...systemSupportingExchangeRatesSchemas,
+  ...systemSupportingFollowupRemindersSchemas,
+  ...systemSupportingInquirySourcesSchemas,
+  ...systemSupportingNotificationsSchemas,
+  ...systemSupportingWikiEntriesSchemas,
 };

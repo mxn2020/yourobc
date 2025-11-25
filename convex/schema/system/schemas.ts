@@ -1,39 +1,43 @@
 // convex/schema/system/schemas.ts
 
 // Core system table imports
-import { systemUserProfilesUserProfilesSchemas } from './user_profiles/user_profiles/schemas'
-import { systemAuditLogsSchemas } from './audit_logs/audit_logs/schemas'
-import { systemNotificationsNotificationsSchemas } from './notifications/notifications/schemas'
-import { systemAppSettingsAppSettingsSchemas } from './app_settings/app_settings/schemas'
-import { systemSystemMetricsSystemMetricsSchemas } from './system_metrics/system_metrics/schemas'
-import { systemAppThemeSettingsAppThemeSettingsSchemas } from './app_theme_settings/app_theme_settings/schemas'
-import { systemAppConfigsAppConfigsSchemas } from './app_configs/app_configs/schemas'
-import { systemPermissionRequestsPermissionRequestsSchemas } from './permission_requests/permission_requests/schemas'
-import { systemUserSettingsUserSettingsSchemas } from './user_settings/user_settings/schemas'
-import { systemUserModelPreferencesSchemas } from './user_settings/user_model_preferences/schemas'
-import { systemDashboardsSchemas } from './dashboards/schemas'
-import { systemAnalyticsSchemas } from './analytics/schemas'
-import { systemEmailSchemas } from './email/schemas'
+import { systemAppSettingsSchemas } from './app/app_settings/schemas'
+import { systemAppThemeSettingsSchemas } from './app/app_theme_settings/schemas'
+import { systemAppConfigsSchemas } from './app/app_configs/schemas'
+
+import { systemAnalyticsSchemas } from './core/analytics/schemas'
+import { systemAuditLogsSchemas } from './core/audit_logs/schemas'
+import { systemNotificationsSchemas } from './core/notifications/schemas'
+import { systemMetricsSchemas } from './core/system_metrics/schemas'
+import { systemPermissionRequestsSchemas } from './core/permission_requests/schemas'
+
+import { systemUserProfilesSchemas } from './user/user_profiles/schemas'
+import { systemUserSettingsSchemas } from './user/user_settings/schemas'
+import { systemUserModelPreferencesSchemas } from './user/user_model_preferences/schemas'
+
 import { systemSupportingSchemas } from './supporting/schemas'
+
+import { systemDashboardsSchemas } from './dashboards/schemas'
+import { systemEmailSchemas } from './email/schemas'
 
 export const systemSchemas = {
   // User & Profile
-  ...systemUserProfilesUserProfilesSchemas,
-  ...systemUserSettingsUserSettingsSchemas,
+  ...systemUserProfilesSchemas,
+  ...systemUserSettingsSchemas,
   ...systemUserModelPreferencesSchemas,
-  
+
   // System
+  ...systemAppSettingsSchemas,
+  ...systemAppThemeSettingsSchemas,
+  ...systemAppConfigsSchemas,
+  ...systemPermissionRequestsSchemas,
   ...systemAuditLogsSchemas,
-  ...systemNotificationsNotificationsSchemas,
-  ...systemAppSettingsAppSettingsSchemas,
-  ...systemSystemMetricsSystemMetricsSchemas,
-  ...systemAppThemeSettingsAppThemeSettingsSchemas,
-  ...systemAppConfigsAppConfigsSchemas,
-  ...systemPermissionRequestsPermissionRequestsSchemas,
+  ...systemNotificationsSchemas,
+  ...systemMetricsSchemas,
 
   // Supporting
   ...systemSupportingSchemas,
-  
+
   // Dashboards
   ...systemDashboardsSchemas,
 

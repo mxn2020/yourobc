@@ -6,7 +6,6 @@ import type { Doc } from '@/generated/dataModel';
 import type { AppConfig } from './types';
 import { APP_CONFIGS_CONSTANTS } from './constants';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access

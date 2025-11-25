@@ -1,63 +1,313 @@
 // convex/schema/system/types.ts
 // Type exports for system schema module
+//
+// NOTE: Most types are now defined in their respective module's types.ts file.
+// This file re-exports them for convenience and backward compatibility.
 
-import { type Infer } from 'convex/values';
 import type { Doc, Id } from '@/generated/dataModel';
-import * as validators from './validators';
 
 // ============================================================================
-// User & Profile Types
+// Re-export Module Types
 // ============================================================================
 
-// Full document types (includes _id and _creationTime)
-export type UserProfile = Doc<'userProfiles'>;
-export type UserProfileId = Id<'userProfiles'>;
+// App Settings
+export type {
+  AppSetting,
+  AppSettingId,
+  AppSettingSchema,
+  AppSettingValue,
+  AppSettingMetadata,
+  AppSettingValueType,
+  AppSettingVisibility,
+  AppSettingCategory,
+} from './app/app_settings/types';
 
-export type UserSettings = Doc<'userSettings'>;
-export type UserSettingsId = Id<'userSettings'>;
+// App Theme Settings
+export type {
+  AppThemeSetting,
+  AppThemeSettingId,
+  AppThemeSettingSchema,
+  AppThemeSettingValue,
+  AppThemeSettingMetadata,
+} from './app/app_theme_settings/types';
 
-export type UserModelPreference = Doc<'userModelPreferences'>;
-export type UserModelPreferenceId = Id<'userModelPreferences'>;
+// App Configs
+export type {
+  AppConfig,
+  AppConfigId,
+  AppConfigSchema,
+  AppConfigValueType,
+  AppConfigScope,
+  AppConfigOverrideSource,
+  AppConfigValue,
+  AppConfigValidationRules,
+  AppConfigChangeHistoryEntry,
+  AppConfigMetadata,
+} from './app/app_configs/types';
 
-// Validator types (field definitions only)
-export type UserProfileSchema = Infer<typeof validators.userProfile>;
-export type UserSettingsSchema = Infer<typeof validators.userSettings>;
-export type UserModelPreferenceSchema = Infer<typeof validators.userModelPreference>;
+// Dashboards
+export type {
+  Dashboard,
+  DashboardId,
+  DashboardSchema,
+  DashboardLayout,
+  WidgetType,
+  ChartType,
+  AggregationType,
+  FormatType,
+  DashboardFilterCondition,
+  DashboardFilterGroup,
+  DashboardWidgetPosition,
+  DashboardWidgetConfig,
+  DashboardWidget,
+} from './dashboards/types';
+
+// Email
+export type {
+  EmailConfig,
+  EmailConfigId,
+  EmailConfigSchema,
+  EmailTemplate,
+  EmailTemplateId,
+  EmailTemplateSchema,
+  EmailLog,
+  EmailLogId,
+  EmailLogSchema,
+  EmailProvider,
+  EmailTestStatus,
+  EmailStatus,
+  EmailDeliveryStatus,
+  EmailVariableType,
+  EmailContentPreview,
+  EmailTemplateVariable,
+  EmailProviderConfig,
+  EmailTemplateSettings,
+  EmailConfigSettings,
+  EmailConfigMetadata,
+  EmailTemplateMetadata,
+  EmailLogMetadata,
+} from './email/types';
 
 // ============================================================================
-// System Types
+// Core Module Types (Analytics, Audit Logs, Notifications, etc.)
 // ============================================================================
 
-// Full document types
+// Analytics
+export type {
+  AnalyticsEvent,
+  AnalyticsEventId,
+  AnalyticsEventSchema,
+  AnalyticsMetric,
+  AnalyticsMetricId,
+  AnalyticsMetricSchema,
+  AnalyticsDashboard,
+  AnalyticsDashboardId,
+  AnalyticsDashboardSchema,
+  AnalyticsReport,
+  AnalyticsReportId,
+  AnalyticsReportSchema,
+  AnalyticsProviderSync,
+  AnalyticsProviderSyncId,
+  AnalyticsProviderSyncSchema,
+  AnalyticsEventType,
+  DeviceType,
+  SyncStatus,
+  MetricPeriod,
+  DashboardType,
+  WidgetType,
+  ReportType,
+  ReportFrequency,
+  ExportFormat,
+  AnalyticsProviderType,
+  SyncDirection,
+  PaymentStatus,
+  ErrorSeverity,
+  FilterOperator,
+  TransformType,
+  ChartFormat,
+  ColorScheme,
+  LastSyncStatus,
+  AnalyticsEventProperties,
+  AnalyticsFilterGroup,
+  AnalyticsDashboardWidget,
+  AnalyticsReportQuery,
+  AnalyticsReportSchedule,
+  AnalyticsReportResult,
+  AnalyticsProviderConfig,
+  AnalyticsEventMappings,
+} from './core/analytics/types';
+
+// Audit Logs
+export type {
+  AuditLog,
+  AuditLogId,
+  AuditLogSchema,
+  AuditLogSource,
+  AuditLogMetadata,
+} from './core/audit_logs/types';
+
+// Notifications
+export type {
+  Notification,
+  NotificationId,
+  NotificationSchema,
+  NotificationType,
+  NotificationEntityType,
+  NotificationEntityId,
+  NotificationContent,
+  NotificationMetadata,
+} from './core/notifications/types';
+
+// Permission Requests
+export type {
+  PermissionRequest,
+  PermissionRequestId,
+  PermissionRequestSchema,
+  PermissionRequestStatus,
+  PermissionRequestRequester,
+  PermissionRequestRequest,
+  PermissionRequestReview,
+} from './core/permission_requests/types';
+
+// System Metrics
+export type {
+  SystemMetric,
+  SystemMetricId,
+  SystemMetricSchema,
+  SystemMetricType,
+  SystemMetricUnit,
+  SystemMetricMeasurement,
+  SystemMetricTimestamps,
+} from './core/system_metrics/types';
+
+// ============================================================================
+// Supporting Modules (Independent Sibling Modules)
+// ============================================================================
+
+// Comments
+export type {
+  Comment,
+  CommentId,
+  CommentSchema,
+  CommentType,
+  CommentMention,
+  CommentReaction,
+  CommentAttachment,
+  CommentEditHistoryEntry,
+} from './supporting/comments/types';
+
+// Counters
+export type {
+  Counter,
+  CounterId,
+  CounterSchema,
+  CounterType,
+} from './supporting/counters/types';
+
+// Documents
+export type {
+  Document,
+  DocumentId,
+  DocumentSchema,
+  DocumentType,
+  DocumentStatus,
+} from './supporting/documents/types';
+
+// Exchange Rates
+export type {
+  ExchangeRate,
+  ExchangeRateId,
+  ExchangeRateSchema,
+  Currency,
+} from './supporting/exchange_rates/types';
+
+// Followup Reminders
+export type {
+  FollowupReminder,
+  FollowupReminderId,
+  FollowupReminderSchema,
+  ReminderType,
+  ReminderStatus,
+  ReminderPriority,
+  RecurrenceFrequency,
+  RecurrencePattern,
+} from './supporting/followup_reminders/types';
+
+// Inquiry Sources
+export type {
+  InquirySource,
+  InquirySourceId,
+  InquirySourceSchema,
+  InquirySourceType,
+} from './supporting/inquiry_sources/types';
+
+// Supporting Notifications (different from core notifications)
+export type {
+  SupportingNotification,
+  SupportingNotificationId,
+  SupportingNotificationSchema,
+  SupportingNotificationType,
+  SupportingNotificationPriority,
+} from './supporting/notifications/types';
+
+// Wiki Entries
+export type {
+  WikiEntry,
+  WikiEntryId,
+  WikiEntrySchema,
+  WikiEntryType,
+  WikiEntryStatus,
+} from './supporting/wikiEntries/types';
+
+// ============================================================================
+// User Modules
+// ============================================================================
+
+// User Profiles
+export type {
+  UserProfile,
+  UserProfileId,
+  UserProfileSchema,
+  UserProfileRole,
+  UserProfileStats,
+  UserProfileExtendedMetadata,
+} from './user/user_profiles/types';
+
+// User Settings
+export type {
+  UserSettings,
+  UserSettingsId,
+  UserSettingsSchema,
+  UserSettingsTheme,
+  UserSettingsLayout,
+  UserSettingsDashboardView,
+  UserSettingsLayoutPreferences,
+  UserSettingsNotificationPreferences,
+  UserSettingsDashboardPreferences,
+} from './user/user_settings/types';
+
+// User Model Preferences
+export type {
+  UserModelPreference,
+  UserModelPreferenceId,
+  UserModelPreferenceSchema,
+  PreferredView,
+  SortDirection,
+  SortPreference,
+  TestingDefaults,
+} from './user/user_model_preferences/types';
+
+// ============================================================================
+// Legacy/Commented Out Types
+// ============================================================================
+
+// System Types (commented out - not active)
 export type AuditLog = Doc<'auditLogs'>;
 export type AuditLogId = Id<'auditLogs'>;
-
 export type Notification = Doc<'notifications'>;
 export type NotificationId = Id<'notifications'>;
-
-export type AppSetting = Doc<'appSettings'>;
-export type AppSettingId = Id<'appSettings'>;
-
 export type SystemMetric = Doc<'systemMetrics'>;
 export type SystemMetricId = Id<'systemMetrics'>;
-
-export type AppThemeSetting = Doc<'appThemeSettings'>;
-export type AppThemeSettingId = Id<'appThemeSettings'>;
-
-export type AppConfig = Doc<'appConfigs'>;
-export type AppConfigId = Id<'appConfigs'>;
-
-export type Dashboard = Doc<'dashboards'>;
-export type DashboardId = Id<'dashboards'>;
-
-// Validator types
-export type AuditLogSchema = Infer<typeof validators.auditLog>;
-export type NotificationSchema = Infer<typeof validators.notification>;
-export type AppSettingSchema = Infer<typeof validators.appSetting>;
-export type SystemMetricSchema = Infer<typeof validators.systemMetric>;
-export type AppThemeSettingSchema = Infer<typeof validators.appThemeSetting>;
-export type AppConfigSchema = Infer<typeof validators.appConfig>;
-export type DashboardSchema = Infer<typeof validators.dashboard>;
 
 // ============================================================================
 // Analytics Types
@@ -80,28 +330,9 @@ export type AnalyticsProviderSync = Doc<'analyticsProviderSync'>;
 export type AnalyticsProviderSyncId = Id<'analyticsProviderSync'>;
 
 // Validator types
-export type AnalyticsEventSchema = Infer<typeof validators.analyticsEvent>;
-export type AnalyticsMetricSchema = Infer<typeof validators.analyticsMetric>;
-export type AnalyticsDashboardSchema = Infer<typeof validators.analyticsDashboard>;
-export type AnalyticsReportSchema = Infer<typeof validators.analyticsReport>;
-export type AnalyticsProviderSyncSchema = Infer<typeof validators.analyticsProviderSync>;
-
-// ============================================================================
-// Email Types
-// ============================================================================
-
-// Full document types
-export type EmailConfig = Doc<'emailConfigs'>;
-export type EmailConfigId = Id<'emailConfigs'>;
-
-export type EmailTemplate = Doc<'emailTemplates'>;
-export type EmailTemplateId = Id<'emailTemplates'>;
-
-export type EmailLog = Doc<'emailLogs'>;
-export type EmailLogId = Id<'emailLogs'>;
-
-// Validator types
-export type EmailConfigSchema = Infer<typeof validators.emailConfig>;
-export type EmailTemplateSchema = Infer<typeof validators.emailTemplate>;
-export type EmailLogSchema = Infer<typeof validators.emailLog>;
+// export type AnalyticsEventSchema = Infer<typeof validators.analyticsEvent>;
+// export type AnalyticsMetricSchema = Infer<typeof validators.analyticsMetric>;
+// export type AnalyticsDashboardSchema = Infer<typeof validators.analyticsDashboard>;
+// export type AnalyticsReportSchema = Infer<typeof validators.analyticsReport>;
+// export type AnalyticsProviderSyncSchema = Infer<typeof validators.analyticsProviderSync>;
 

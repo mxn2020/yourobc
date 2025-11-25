@@ -3,9 +3,8 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Customer } from './types';
-import type { Doc } from '@/generated/dataModel';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access
@@ -20,10 +19,10 @@ export async function canViewCustomer(
   if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can view
-  if (customer.ownerId === user.authUserId) return true;
+  if (customer.ownerId === user._id) return true;
 
   // Creator can view
-  if (customer.createdBy === user.authUserId) return true;
+  if (customer.createdBy === user._id) return true;
 
   return false;
 }
@@ -51,7 +50,7 @@ export async function canEditCustomer(
   if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can edit
-  if (customer.ownerId === user.authUserId) return true;
+  if (customer.ownerId === user._id) return true;
 
   // Cannot edit blacklisted customers (unless admin)
   if (customer.status === 'blacklisted') {
@@ -81,7 +80,7 @@ export async function canDeleteCustomer(
 ): Promise<boolean> {
   // Only admins and owners can delete
   if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (customer.ownerId === user.authUserId) return true;
+  if (customer.ownerId === user._id) return true;
   return false;
 }
 

@@ -15,18 +15,14 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
         await Promise.all([
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.shipments.queries.getShipments, {
-              authUserId: session.data.user.id,
-              options: { limit: 25 }
+              limit: 25
             })
           ),
           context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.shipments.queries.getShipmentStats, {
-              authUserId: session.data.user.id
-            })
+            convexQuery(api.lib.yourobc.shipments.queries.getShipmentStats, {})
           ),
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.shipments.queries.getOverdueShipments, {
-              authUserId: session.data.user.id,
               limit: 10
             })
           )

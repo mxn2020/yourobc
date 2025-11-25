@@ -2,10 +2,9 @@
 // Access control for comments module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
-import type { Doc } from '@/generated/dataModel';
 import type { Comment } from './types';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 /**
  * Check if user can view comment
@@ -40,7 +39,7 @@ export async function requireViewCommentAccess(
   ctx: QueryCtx | MutationCtx,
   resource: Comment,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canViewComment(ctx, resource, user))) {
     throw new Error('No permission to view this comment');
   }
@@ -74,7 +73,7 @@ export async function requireEditCommentAccess(
   ctx: QueryCtx | MutationCtx,
   resource: Comment,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canEditComment(ctx, resource, user))) {
     throw new Error('No permission to edit this comment');
   }
@@ -106,7 +105,7 @@ export async function canDeleteComment(
 export async function requireDeleteCommentAccess(
   resource: Comment,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canDeleteComment(resource, user))) {
     throw new Error('No permission to delete this comment');
   }

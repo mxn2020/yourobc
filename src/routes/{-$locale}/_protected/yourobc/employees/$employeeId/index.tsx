@@ -13,27 +13,12 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/employees/$
       const session = await authService.getSession()
       
       if (session?.data?.user?.id) {
-        await Promise.all([
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.employees.queries.getEmployee, {
-              employeeId: params.employeeId as EmployeeId,
-              authUserId: session.data.user.id
-            })
-          ),
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.employees.queries.getEmployeeVacations, {
-              authUserId: session.data.user.id,
-              employeeId: params.employeeId as EmployeeId,
-              year: new Date().getFullYear()
-            })
-          ),
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.employees.queries.getEmployeeTimeEntries, {
-              authUserId: session.data.user.id,
-              employeeId: params.employeeId as EmployeeId
-            })
-          )
-        ])
+        await context.queryClient.prefetchQuery(
+          convexQuery(api.lib.yourobc.employees.queries.getEmployee, {
+            employeeId: params.employeeId as EmployeeId
+          })
+        )
+        // TODO: Add getEmployeeVacations and getEmployeeTimeEntries queries when implemented
       }
       
       return {}

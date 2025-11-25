@@ -14,8 +14,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/employees/v
       if (session?.data?.user?.id) {
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.employees.queries.getVacationRequests, {
-            authUserId: session.data.user.id,
-            year: new Date().getFullYear(),
+                        year: new Date().getFullYear(),
             limit: 50
           })
         )

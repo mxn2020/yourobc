@@ -13,26 +13,12 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/$c
       const session = await authService.getSession()
       
       if (session?.data?.user?.id) {
-        await Promise.all([
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.couriers.queries.getCourier, {
-              courierId: params.courierId as CourierId,
-              authUserId: session.data.user.id
-            })
-          ),
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.couriers.queries.getCourierCommissions, {
-              authUserId: session.data.user.id,
-              courierId: params.courierId as CourierId
-            })
-          ),
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.couriers.queries.getCourierTimeEntries, {
-              authUserId: session.data.user.id,
-              courierId: params.courierId as CourierId
-            })
-          )
-        ])
+        await context.queryClient.prefetchQuery(
+          convexQuery(api.lib.yourobc.couriers.queries.getCourier, {
+            courierId: params.courierId as CourierId
+          })
+        )
+        // TODO: Add getCourierCommissions and getCourierTimeEntries queries when they are implemented
       }
       
       return {}

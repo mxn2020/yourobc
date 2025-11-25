@@ -10,7 +10,7 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { supportingValidators, supportingFields } from './validators'
+import { supportingValidators, supportingFields } from '../validators'
 import { auditFields, classificationFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**

@@ -2,10 +2,9 @@
 // Access control and authorization logic for quotes module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
-import type { Doc } from '@/generated/dataModel';
 import type { Quote } from './types';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access

@@ -3,9 +3,7 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { EmailConfig } from './types';
-import type { Doc } from '@/generated/dataModel';
-
-type UserProfile = Doc<'userProfiles'>;
+import { UserProfile } from '@/schema/system';
 
 // ============================================================================
 // View Access
@@ -42,14 +40,14 @@ export async function canEditEmailConfig(
   config: EmailConfig,
   user: UserProfile
 ): Promise<boolean> {
-  // Only admins can edit email configs
-  if (user.role === 'admin' || user.role === 'superadmin') return true;
-
   // Check if config is locked/archived
   if (config.status === 'archived') {
     // Only superadmins can edit archived configs
     return user.role === 'superadmin';
   }
+
+  // Only admins can edit email configs
+  if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   return false;
 }

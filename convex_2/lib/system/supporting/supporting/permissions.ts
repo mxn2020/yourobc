@@ -13,7 +13,6 @@ import type {
   AvailabilityPreference,
 } from './types';
 
-type UserProfile = Doc<'userProfiles'>;
 type SupportingEntity =
   | WikiEntry
   | Comment

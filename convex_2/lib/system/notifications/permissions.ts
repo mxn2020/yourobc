@@ -3,7 +3,6 @@
 
 import type { Doc } from '@/generated/dataModel';
 
-type UserProfile = Doc<'userProfiles'>;
 type Notification = Doc<'notifications'>;
 
 /**

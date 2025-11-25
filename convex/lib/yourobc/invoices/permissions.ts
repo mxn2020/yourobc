@@ -4,14 +4,7 @@
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Invoice } from './types';
 import { INVOICES_CONSTANTS } from './constants';
-
-// User interface (simplified - matches yourobc pattern with authUserId as string)
-interface User {
-  authUserId: string;
-  role?: string;
-  email?: string;
-  name?: string;
-}
+import { UserProfile } from '@/schema/system';
 
 // ============================================================================
 // View Access
@@ -20,7 +13,7 @@ interface User {
 export async function canViewInvoice(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<boolean> {
   // Admins and superadmins can view all
   if (user.role === 'admin' || user.role === 'superadmin') return true;
@@ -29,15 +22,15 @@ export async function canViewInvoice(
   if (INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role || '')) return true;
 
   // Owner can view their own invoices
-  if (invoice.ownerId === user.authUserId) return true;
+  if (invoice.ownerId === user._id) return true;
 
   // Creator can view
-  if (invoice.createdBy === user.authUserId) return true;
+  if (invoice.createdBy === user._id) return true;
 
   // Check related customer access (if user owns the customer)
   if (invoice.customerId) {
     const customer = await ctx.db.get(invoice.customerId);
-    if (customer && 'ownerId' in customer && customer.ownerId === user.authUserId) {
+    if (customer && 'ownerId' in customer && customer.ownerId === user._id) {
       return true;
     }
   }
@@ -45,7 +38,7 @@ export async function canViewInvoice(
   // Check related partner access (if user owns the partner)
   if (invoice.partnerId) {
     const partner = await ctx.db.get(invoice.partnerId);
-    if (partner && 'ownerId' in partner && partner.ownerId === user.authUserId) {
+    if (partner && 'ownerId' in partner && partner.ownerId === user._id) {
       return true;
     }
   }
@@ -53,7 +46,7 @@ export async function canViewInvoice(
   // Check related shipment access (if user owns the shipment)
   if (invoice.shipmentId) {
     const shipment = await ctx.db.get(invoice.shipmentId);
-    if (shipment && 'createdBy' in shipment && shipment.createdBy === user.authUserId) {
+    if (shipment && 'createdBy' in shipment && shipment.createdBy === user._id) {
       return true;
     }
   }
@@ -64,7 +57,7 @@ export async function canViewInvoice(
 export async function requireViewInvoiceAccess(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<void> {
   if (!(await canViewInvoice(ctx, invoice, user))) {
     throw new Error('You do not have permission to view this invoice');
@@ -78,7 +71,7 @@ export async function requireViewInvoiceAccess(
 export async function canEditInvoice(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<boolean> {
   // Admins can edit all
   if (user.role === 'admin' || user.role === 'superadmin') return true;
@@ -87,7 +80,7 @@ export async function canEditInvoice(
   if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '')) return true;
 
   // Owner can edit their own invoices (if not paid or cancelled)
-  if (invoice.ownerId === user.authUserId) {
+  if (invoice.ownerId === user._id) {
     // Cannot edit paid or cancelled invoices unless admin/manager
     if (
       invoice.status === INVOICES_CONSTANTS.STATUS.PAID ||
@@ -104,7 +97,7 @@ export async function canEditInvoice(
 export async function requireEditInvoiceAccess(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<void> {
   if (!(await canEditInvoice(ctx, invoice, user))) {
     throw new Error('You do not have permission to edit this invoice');
@@ -115,7 +108,7 @@ export async function requireEditInvoiceAccess(
 // Delete Access
 // ============================================================================
 
-export async function canDeleteInvoice(invoice: Invoice, user: User): Promise<boolean> {
+export async function canDeleteInvoice(invoice: Invoice, user: UserProfile): Promise<boolean> {
   // Only admins and finance managers can delete invoices
   if (user.role === 'admin' || user.role === 'superadmin') return true;
   if (user.role === 'finance_manager') return true;
@@ -124,14 +117,14 @@ export async function canDeleteInvoice(invoice: Invoice, user: User): Promise<bo
   if (invoice.status === INVOICES_CONSTANTS.STATUS.PAID) return false;
 
   // Owner can delete draft invoices only
-  if (invoice.ownerId === user.authUserId && invoice.status === INVOICES_CONSTANTS.STATUS.DRAFT) {
+  if (invoice.ownerId === user._id && invoice.status === INVOICES_CONSTANTS.STATUS.DRAFT) {
     return true;
   }
 
   return false;
 }
 
-export async function requireDeleteInvoiceAccess(invoice: Invoice, user: User): Promise<void> {
+export async function requireDeleteInvoiceAccess(invoice: Invoice, user: UserProfile): Promise<void> {
   if (!(await canDeleteInvoice(invoice, user))) {
     throw new Error('You do not have permission to delete this invoice');
   }
@@ -141,7 +134,7 @@ export async function requireDeleteInvoiceAccess(invoice: Invoice, user: User): 
 // Process Payment Access
 // ============================================================================
 
-export async function canProcessPayment(invoice: Invoice, user: User): Promise<boolean> {
+export async function canProcessPayment(invoice: Invoice, user: UserProfile): Promise<boolean> {
   // Only admins, finance, and accounting can process payments
   if (user.role === 'admin' || user.role === 'superadmin') return true;
   if (INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '')) return true;
@@ -149,7 +142,7 @@ export async function canProcessPayment(invoice: Invoice, user: User): Promise<b
   return false;
 }
 
-export async function requireProcessPaymentAccess(invoice: Invoice, user: User): Promise<void> {
+export async function requireProcessPaymentAccess(invoice: Invoice, user: UserProfile): Promise<void> {
   if (!(await canProcessPayment(invoice, user))) {
     throw new Error('You do not have permission to process payments for this invoice');
   }
@@ -159,7 +152,7 @@ export async function requireProcessPaymentAccess(invoice: Invoice, user: User):
 // Manage Dunning Access
 // ============================================================================
 
-export async function canManageDunning(invoice: Invoice, user: User): Promise<boolean> {
+export async function canManageDunning(invoice: Invoice, user: UserProfile): Promise<boolean> {
   // Only admins, finance managers, and accountants can manage dunning
   if (user.role === 'admin' || user.role === 'superadmin') return true;
   if (user.role === 'finance_manager' || user.role === 'accountant') return true;
@@ -167,7 +160,7 @@ export async function canManageDunning(invoice: Invoice, user: User): Promise<bo
   return false;
 }
 
-export async function requireManageDunningAccess(invoice: Invoice, user: User): Promise<void> {
+export async function requireManageDunningAccess(invoice: Invoice, user: UserProfile): Promise<void> {
   if (!(await canManageDunning(invoice, user))) {
     throw new Error('You do not have permission to manage dunning for this invoice');
   }
@@ -180,7 +173,7 @@ export async function requireManageDunningAccess(invoice: Invoice, user: User): 
 export async function canSendInvoice(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<boolean> {
   // Must be able to edit to send
   if (!(await canEditInvoice(ctx, invoice, user))) return false;
@@ -194,7 +187,7 @@ export async function canSendInvoice(
 export async function requireSendInvoiceAccess(
   ctx: QueryCtx | MutationCtx,
   invoice: Invoice,
-  user: User
+  user: UserProfile
 ): Promise<void> {
   if (!(await canSendInvoice(ctx, invoice, user))) {
     throw new Error('You do not have permission to send this invoice');
@@ -205,7 +198,7 @@ export async function requireSendInvoiceAccess(
 // Approve Invoice Access (for incoming invoices)
 // ============================================================================
 
-export async function canApproveInvoice(invoice: Invoice, user: User): Promise<boolean> {
+export async function canApproveInvoice(invoice: Invoice, user: UserProfile): Promise<boolean> {
   // Only admins and finance managers can approve incoming invoices
   if (user.role === 'admin' || user.role === 'superadmin') return true;
   if (user.role === 'finance_manager') return true;
@@ -216,7 +209,7 @@ export async function canApproveInvoice(invoice: Invoice, user: User): Promise<b
   return false;
 }
 
-export async function requireApproveInvoiceAccess(invoice: Invoice, user: User): Promise<void> {
+export async function requireApproveInvoiceAccess(invoice: Invoice, user: UserProfile): Promise<void> {
   if (!(await canApproveInvoice(invoice, user))) {
     throw new Error('You do not have permission to approve this invoice');
   }
@@ -229,7 +222,7 @@ export async function requireApproveInvoiceAccess(invoice: Invoice, user: User):
 export async function filterInvoicesByAccess(
   ctx: QueryCtx | MutationCtx,
   invoices: Invoice[],
-  user: User
+  user: UserProfile
 ): Promise<Invoice[]> {
   // Admins and viewer roles see everything
   if (user.role === 'admin' || user.role === 'superadmin') {
@@ -256,14 +249,14 @@ export async function filterInvoicesByAccess(
 // Role Check Helpers
 // ============================================================================
 
-export function isFinanceRole(user: User): boolean {
+export function isFinanceRole(user: UserProfile): boolean {
   return INVOICES_CONSTANTS.MANAGER_ROLES.includes(user.role || '');
 }
 
-export function isViewerRole(user: User): boolean {
+export function isViewerRole(user: UserProfile): boolean {
   return INVOICES_CONSTANTS.VIEWER_ROLES.includes(user.role || '');
 }
 
-export function isAdmin(user: User): boolean {
+export function isAdmin(user: UserProfile): boolean {
   return user.role === 'admin' || user.role === 'superadmin';
 }

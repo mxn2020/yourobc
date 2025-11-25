@@ -29,8 +29,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/
         // Prefetch reminders data using TanStack Query
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.supporting.followup_reminders.queries.getReminders, {
-            authUserId: session.data.user.id,
-            filters: {}
+                        filters: {}
           })
         )
       }

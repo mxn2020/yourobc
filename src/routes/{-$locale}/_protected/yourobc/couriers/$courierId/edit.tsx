@@ -17,8 +17,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/$c
         // Prefetch full courier data for editing
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.couriers.queries.getCourier, {
-            courierId: params.courierId as CourierId,
-            authUserId: session.data.user.id
+            courierId: params.courierId as CourierId
           })
         )
       }

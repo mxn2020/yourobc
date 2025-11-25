@@ -14,7 +14,7 @@ import {
   requireDeleteEmailConfigAccess,
 } from './permissions';
 import type { EmailConfigId } from './types';
-import { createAuditLog } from '../../auditLogs/helpers';
+import { createAuditLog } from '../../core/audit_logs/helpers';
 
 /**
  * Create or update email provider configuration

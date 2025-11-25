@@ -2,18 +2,19 @@
 // Central Convex schema definition
 // Includes both system tables and YouROBC business entity tables
 
-import { defineSchema } from 'convex/server'
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
 
-import { systemSchemas } from './schema/system'
-import { yourobcSchemas } from './schema/yourobc'
+// import { systemSchemas } from './schema/system'
+//import { yourobcSchemas } from './schema/yourobc'
 
 const schema = defineSchema({
   // System Tables
-  ...systemSchemas,
+  // ...systemSchemas,
 
   // YouROBC Tables
-  ...yourobcSchemas,
-  
+  //...yourobcSchemas,
+
 })
 
 export default schema

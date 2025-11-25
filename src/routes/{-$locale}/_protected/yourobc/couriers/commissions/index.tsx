@@ -12,9 +12,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/couriers/co
       const session = await authService.getSession()
       
       if (session?.data?.user?.id) {
+        // TODO: Add getCommissions query when implemented
+        // For now, fetch all couriers
         await context.queryClient.prefetchQuery(
-          convexQuery(api.lib.yourobc.couriers.queries.getCommissions, {
-            authUserId: session.data.user.id,
+          convexQuery(api.lib.yourobc.couriers.queries.getCouriers, {
             limit: 50
           })
         )

@@ -16,15 +16,13 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/invoices/ov
           // Prefetch overdue invoices
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.invoices.queries.getOverdueInvoices, {
-              authUserId: session.data.user.id,
-              limit: 100
+                            limit: 100
             })
           ),
           // Prefetch invoice stats for summary
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.invoices.queries.getInvoiceStats, {
-              authUserId: session.data.user.id
-            })
+                          })
           )
         ])
       }

@@ -1,0 +1,8 @@
+// convex/schema/system/user_profiles/user_profiles/schemas.ts
+// Schema exports for user profiles module
+
+import { userProfilesTable } from './tables';
+
+export const systemUserProfilesSchemas = {
+  userProfiles: userProfilesTable,
+};

@@ -2,10 +2,9 @@
 // Access control for email logs module
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
-import type { Doc } from '@/generated/dataModel';
 import type { EmailLog } from './types';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // Email Log Permissions
@@ -36,7 +35,7 @@ export async function requireViewEmailLogAccess(
   ctx: QueryCtx | MutationCtx,
   resource: EmailLog,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canViewEmailLog(ctx, resource, user))) {
     throw new Error('Permission denied: Cannot view this email log');
   }
@@ -60,7 +59,7 @@ export async function canManageEmailLogs(
 export async function requireManageEmailLogsAccess(
   ctx: QueryCtx | MutationCtx,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canManageEmailLogs(ctx, user))) {
     throw new Error('Permission denied: Admin access required to manage email logs');
   }
@@ -108,7 +107,7 @@ export async function canDeleteEmailLog(
 export async function requireDeleteEmailLogAccess(
   resource: EmailLog,
   user: UserProfile
-) {
+): Promise<void> {
   if (!(await canDeleteEmailLog(resource, user))) {
     throw new Error('Permission denied: Superadmin access required to delete email logs');
   }

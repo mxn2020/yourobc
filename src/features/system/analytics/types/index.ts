@@ -12,6 +12,9 @@ import type {
   ExportFormat,
   AnalyticsProviderType,
   SyncDirection,
+} from "@/convex/schema/system/core/analytics/types";
+
+import type {
   EventProperties,
   WidgetConfig,
   Filters,

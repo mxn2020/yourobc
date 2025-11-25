@@ -17,8 +17,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/customers/$
         // Prefetch full customer data for detail view
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.customers.queries.getCustomer, {
-            customerId: params.customerId as CustomerId,
-            authUserId: session.data.user.id
+            customerId: params.customerId as CustomerId
           })
         )
       }

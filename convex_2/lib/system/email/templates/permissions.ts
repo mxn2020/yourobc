@@ -5,7 +5,6 @@ import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { EmailTemplate } from './types';
 import type { Doc } from '@/generated/dataModel';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access

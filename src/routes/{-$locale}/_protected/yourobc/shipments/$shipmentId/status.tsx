@@ -21,8 +21,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.shipments.queries.getShipment, {
             shipmentId: params.shipmentId as ShipmentId,
-            authUserId: session.data.user.id
-          })
+                      })
         )
       }
       

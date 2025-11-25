@@ -3,9 +3,8 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Courier } from './types';
-import type { Doc } from '@/generated/dataModel';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access
@@ -20,10 +19,10 @@ export async function canViewCourier(
   if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can view
-  if (courier.ownerId === user.authUserId) return true;
+  if (courier.ownerId === user._id) return true;
 
   // Creator can view
-  if (courier.createdBy === user.authUserId) return true;
+  if (courier.createdBy === user._id) return true;
 
   // Active couriers can be viewed by all authenticated users
   if (courier.status === 'active' && courier.isActive) return true;
@@ -54,7 +53,7 @@ export async function canEditCourier(
   if (user.role === 'admin' || user.role === 'superadmin') return true;
 
   // Owner can edit
-  if (courier.ownerId === user.authUserId) return true;
+  if (courier.ownerId === user._id) return true;
 
   // Check if courier is archived
   if (courier.status === 'archived') {
@@ -82,7 +81,7 @@ export async function requireEditCourierAccess(
 export async function canDeleteCourier(courier: Courier, user: UserProfile): Promise<boolean> {
   // Only admins and owners can delete
   if (user.role === 'admin' || user.role === 'superadmin') return true;
-  if (courier.ownerId === user.authUserId) return true;
+  if (courier.ownerId === user._id) return true;
   return false;
 }
 

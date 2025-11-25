@@ -16,8 +16,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/
         // Prefetch exchange rates data using TanStack Query
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.supporting.exchange_rates.queries.getExchangeRates, {
-            authUserId: session.data.user.id
-          })
+                      })
         )
       }
       

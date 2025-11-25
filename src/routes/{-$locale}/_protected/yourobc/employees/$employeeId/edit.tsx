@@ -17,8 +17,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/employees/$
         // Prefetch full employee data for editing
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.employees.queries.getEmployee, {
-            employeeId: params.employeeId as EmployeeId,
-            authUserId: session.data.user.id
+            employeeId: params.employeeId as EmployeeId
           })
         )
       }

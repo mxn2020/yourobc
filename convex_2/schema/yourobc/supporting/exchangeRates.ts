@@ -10,7 +10,7 @@
 
 import { defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { supportingValidators, supportingFields } from './validators'
+import { supportingValidators, supportingFields } from '../validators'
 import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/base';
 
 /**
@@ -19,8 +19,8 @@ import { auditFields, softDeleteFields, userProfileIdSchema } from '@/schema/bas
  */
 export const exchangeRatesTable = defineTable({
   // Core fields
-  fromCurrency: supportingValidators.currency,
-  toCurrency: supportingValidators.currency,
+  fromCurrency: exchangeRatesValidators.currency,
+  toCurrency: exchangeRatesValidators.currency,
   rate: v.number(),
   date: v.number(),
   source: v.optional(v.string()),

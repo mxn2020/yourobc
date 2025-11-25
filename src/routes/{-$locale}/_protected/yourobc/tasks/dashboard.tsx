@@ -17,38 +17,32 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/tasks/dashb
           // Tasks
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.tasks.queries.getAllTasks, {
-              authUserId: session.data.user.id,
-              filters: {}
+                            filters: {}
             })
           ),
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.tasks.queries.getTaskStats, {
-              authUserId: session.data.user.id
-            })
+                          })
           ),
           // Quotes
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.quotes.queries.getQuotes, {
-              authUserId: session.data.user.id,
-              options: { limit: 100 }
+                            limit: 100
             })
           ),
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.quotes.queries.getQuoteStats, {
-              authUserId: session.data.user.id
-            })
+                          })
           ),
           // Shipments
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.shipments.queries.getShipments, {
-              authUserId: session.data.user.id,
-              options: { limit: 100 }
+                            limit: 100
             })
           ),
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.shipments.queries.getShipmentStats, {
-              authUserId: session.data.user.id
-            })
+                          })
           ),
         ])
       }

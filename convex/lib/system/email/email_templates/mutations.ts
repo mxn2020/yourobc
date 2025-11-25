@@ -14,7 +14,7 @@ import {
   requireDeleteEmailTemplateAccess,
 } from './permissions';
 import type { EmailTemplateId } from './types';
-import { createAuditLog } from '../../auditLogs/helpers';
+import { createAuditLog } from '../../core/audit_logs/helpers';
 
 /**
  * Create or update email template

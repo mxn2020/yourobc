@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/schemas.ts
+// convex/schema/system/core/analytics/analytics/schemas.ts
 // Schema exports for analytics module
 
 import {

@@ -17,14 +17,11 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/tasks/')({
         await Promise.all([
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.tasks.queries.getAllTasks, {
-              authUserId: session.data.user.id,
-              options: { limit: 25 }
+              limit: 25
             })
           ),
           context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.tasks.queries.getTaskStats, {
-              authUserId: session.data.user.id
-            })
+            convexQuery(api.lib.yourobc.tasks.queries.getTaskStats, {})
           )
         ])
       }

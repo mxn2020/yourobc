@@ -1,6 +1,12 @@
 // convex/schema/system/supporting/index.ts
-// Public API exports for supporting schema module
+// Public schema exports for all supporting modules
 
-export { systemSupportingSchemas } from './schemas';
-export * from './types';
-export { supportingValidators, supportingFields } from './validators';
+export * from './comments';
+export * from './counters';
+export * from './documents';
+export * from './exchange_rates';
+export * from './followup_reminders';
+export * from './inquiry_sources';
+export * from './notifications';
+export * from './wikiEntries';
+export * from './schemas';

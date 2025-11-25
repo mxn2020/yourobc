@@ -3,9 +3,8 @@
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Shipment } from './types';
-import type { Doc } from '@/generated/dataModel';
+import { UserProfile } from '@/schema/system';
 
-type UserProfile = Doc<'userProfiles'>;
 
 // ============================================================================
 // View Access

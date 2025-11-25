@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/types.ts
+// convex/schema/system/core/analytics/analytics/types.ts
 // Type extractions from validators for analytics module
 
 import { Infer } from 'convex/values';

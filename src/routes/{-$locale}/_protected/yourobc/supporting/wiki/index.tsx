@@ -16,9 +16,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/
         // Prefetch wiki entries data using TanStack Query
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.supporting.wiki.queries.getWikiEntries, {
-            authUserId: session.data.user.id,
-            filters: {},
-            options: { limit: 50 }
+                        filters: {},
+            limit: 50
           })
         )
       }

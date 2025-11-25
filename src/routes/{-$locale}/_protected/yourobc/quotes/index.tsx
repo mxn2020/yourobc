@@ -15,14 +15,12 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/quotes/')({
         await Promise.all([
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.quotes.queries.getQuotes, {
-              authUserId: session.data.user.id,
-              options: { limit: 25 }
+                            limit: 25
             })
           ),
           context.queryClient.prefetchQuery(
             convexQuery(api.lib.yourobc.quotes.queries.getQuoteStats, {
-              authUserId: session.data.user.id
-            })
+                          })
           )
         ])
       }

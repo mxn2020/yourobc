@@ -34,5 +34,7 @@
   "include": ["./**/*"],
   "exclude": [
     "./_generated",
+    "./_templates",
+    "./_old"
   ]
 }

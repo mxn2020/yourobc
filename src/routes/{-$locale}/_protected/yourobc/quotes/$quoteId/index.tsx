@@ -16,8 +16,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/quotes/$quo
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.quotes.queries.getQuote, {
             quoteId: params.quoteId as QuoteId,
-            authUserId: session.data.user.id
-          })
+                      })
         )
       }
       

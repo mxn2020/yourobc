@@ -1,12 +1,13 @@
 // convex/schema/system/email/schemas.ts
 // Consolidated schema exports for all email module components
+// Now sourced from module-specific folders to match template structure
 
-import { emailConfigsTable } from './configs';
-import { emailTemplatesTable } from './templates';
-import { emailLogsTable } from './logs';
+import { systemEmailConfigsSchemas } from './configs/schemas';
+import { systemEmailTemplatesSchemas } from './email_templates/schemas';
+import { systemEmailLogsSchemas } from './email_logs/schemas';
 
 export const systemEmailSchemas = {
-  emailConfigs: emailConfigsTable,
-  emailTemplates: emailTemplatesTable,
-  emailLogs: emailLogsTable,
+  ...systemEmailConfigsSchemas,
+  ...systemEmailTemplatesSchemas,
+  ...systemEmailLogsSchemas,
 };

@@ -16,8 +16,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/
         // Prefetch inquiry sources data using TanStack Query
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.supporting.inquiry_sources.queries.getInquirySources, {
-            authUserId: session.data.user.id
-          })
+                      })
         )
       }
       

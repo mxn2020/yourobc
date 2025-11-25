@@ -20,8 +20,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/supporting/
         
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.supporting.comments.queries.getRecentComments, {
-            authUserId: session.data.user.id,
-            limit: 50,
+                        limit: 50,
             entityTypes: ['yourobc_customer', 'yourobc_quote', 'yourobc_shipment', 'yourobc_partner', 'yourobc_invoice']
           })
         )

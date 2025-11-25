@@ -17,8 +17,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/o
       if (session?.data?.user?.id) {
         await context.queryClient.prefetchQuery(
           convexQuery(api.lib.yourobc.shipments.queries.getOverdueShipments, {
-            authUserId: session.data.user.id,
-            limit: 100
+                        limit: 100
           })
         )
       }

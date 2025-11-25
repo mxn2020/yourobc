@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/validators.ts
+// convex/schema/system/core/analytics/analytics/validators.ts
 // Grouped validators for analytics module
 
 import { v } from 'convex/values';

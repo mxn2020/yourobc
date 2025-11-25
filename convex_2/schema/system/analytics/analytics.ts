@@ -1,4 +1,4 @@
-// convex/schema/system/analytics/analytics/analytics.ts
+// convex/schema/system/core/analytics/analytics/analytics.ts
 // Table definitions for analytics module
 
 import { defineTable } from 'convex/server';

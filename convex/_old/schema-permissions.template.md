@@ -163,8 +163,6 @@ import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { [Entity] } from './types';
 import type { Doc } from '@/generated/dataModel';
 
-type UserProfile = Doc<'userProfiles'>;
-
 // ============================================================================
 // [Entity] Access Control
 // ============================================================================
