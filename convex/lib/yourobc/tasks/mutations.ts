@@ -87,6 +87,7 @@ export const createTask = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.created',
@@ -95,9 +96,11 @@ export const createTask = mutation({
       entityTitle: trimmedData.title,
       description: `Created task: ${trimmedData.title}`,
       metadata: {
-        status: trimmedData.status || 'draft',
-        priority: trimmedData.priority,
-        assignedTo: trimmedData.assignedTo,
+        data: {
+          status: trimmedData.status || 'draft',
+          priority: trimmedData.priority || 'medium',
+          assignedTo: trimmedData.assignedTo || null,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -229,6 +232,7 @@ export const updateTask = mutation({
 
     // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.updated',
@@ -236,7 +240,7 @@ export const updateTask = mutation({
       entityId: task.publicId,
       entityTitle: updateData.title || task.title,
       description: `Updated task: ${updateData.title || task.title}`,
-      metadata: { changes: updates },
+      metadata: { data: { changes: updates } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -278,6 +282,7 @@ export const deleteTask = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.deleted',
@@ -335,6 +340,7 @@ export const restoreTask = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.restored',
@@ -426,6 +432,7 @@ export const bulkUpdateTasks = mutation({
 
     // 5. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.bulk_updated',
@@ -434,9 +441,11 @@ export const bulkUpdateTasks = mutation({
       entityTitle: `${results.length} tasks`,
       description: `Bulk updated ${results.length} tasks`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
-        updates,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+          updates,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -504,6 +513,7 @@ export const bulkDeleteTasks = mutation({
 
     // 4. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'tasks.bulk_deleted',
@@ -512,8 +522,10 @@ export const bulkDeleteTasks = mutation({
       entityTitle: `${results.length} tasks`,
       description: `Bulk deleted ${results.length} tasks`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+        },
       },
       createdAt: now,
       createdBy: user._id,

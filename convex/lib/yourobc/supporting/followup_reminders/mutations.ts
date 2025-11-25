@@ -8,6 +8,7 @@ import { followupRemindersValidators } from '@/schema/yourobc/supporting/followu
 import { FOLLOWUP_REMINDERS_CONSTANTS } from './constants';
 import { trimFollowupReminderData, validateFollowupReminderData, calculateSnoozeUntil } from './utils';
 import { requireEditFollowupReminderAccess, requireDeleteFollowupReminderAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create a new reminder
@@ -22,7 +23,7 @@ export const createFollowupReminder = mutation({
       entityId: v.string(),
       dueDate: v.number(),
       reminderDate: v.optional(v.number()),
-      priority: followupRemindersValidators.servicePriority,
+      priority: followupRemindersValidators.priority,
       assignedTo: v.string(),
       status: v.optional(followupRemindersValidators.reminderStatus),
       emailReminder: v.optional(v.boolean()),
@@ -51,6 +52,7 @@ export const createFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'followup_reminders.created',
@@ -78,7 +80,7 @@ export const updateFollowupReminder = mutation({
       description: v.optional(v.string()),
       dueDate: v.optional(v.number()),
       reminderDate: v.optional(v.number()),
-      priority: v.optional(followupRemindersValidators.servicePriority),
+      priority: v.optional(followupRemindersValidators.priority),
       status: v.optional(followupRemindersValidators.reminderStatus),
     }),
   },
@@ -103,6 +105,7 @@ export const updateFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'followup_reminders.updated',
@@ -145,6 +148,7 @@ export const completeFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'followup_reminders.completed',
@@ -215,6 +219,7 @@ export const deleteFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'followup_reminders.deleted',

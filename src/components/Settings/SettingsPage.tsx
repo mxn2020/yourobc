@@ -21,11 +21,11 @@ export function SettingsPage() {
   const { auth, isAuthenticated, isAuthLoading } = useAuth()
 
   const settings = useQuery(
-    api.lib.system.user_settings.queries.getUserSettings,
+    api.lib.system.user.user_settings.queries.getUserSettings,
     isAuthenticated ? {} : "skip"
   )
-  const updateSettings = useMutation(api.lib.system.user_settings.mutations.updateUserSettings)
-  const resetSettings = useMutation(api.lib.system.user_settings.mutations.resetUserSettings)
+  const updateSettings = useMutation(api.lib.system.user.user_settings.mutations.updateUserSettings)
+  const resetSettings = useMutation(api.lib.system.user.user_settings.mutations.resetUserSettings)
 
   const [loading, setLoading] = React.useState(false)
   const [localSettings, setLocalSettings] = React.useState(settings)

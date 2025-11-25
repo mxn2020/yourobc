@@ -35,9 +35,9 @@ export const createSystemInquirySource = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'inquirySources');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingInquirySources');
 
-    const id = await ctx.db.insert('inquirySources', {
+    const id = await ctx.db.insert('systemSupportingInquirySources', {
       ...trimmed,
       publicId,
       ownerId: user._id,
@@ -49,10 +49,11 @@ export const createSystemInquirySource = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.inquiry_sources.created',
-      entityType: 'inquirySources',
+      entityType: 'systemSupportingInquirySources',
       entityId: publicId,
       entityTitle: trimmed.name,
       description: 'Created inquiry source',
@@ -67,7 +68,7 @@ export const createSystemInquirySource = mutation({
 
 export const updateSystemInquirySource = mutation({
   args: {
-    id: v.id('inquirySources'),
+    id: v.id('systemSupportingInquirySources'),
     updates: v.object({
       name: v.optional(v.string()),
       code: v.optional(v.string()),
@@ -99,14 +100,19 @@ export const updateSystemInquirySource = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.inquiry_sources.updated',
-      entityType: 'inquirySources',
+      entityType: 'systemSupportingInquirySources',
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: 'Updated inquiry source',
-      metadata: { updates: trimmed },
+      metadata: {
+        data: {
+          updates: trimmed
+        }
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -117,7 +123,7 @@ export const updateSystemInquirySource = mutation({
 });
 
 export const deleteSystemInquirySource = mutation({
-  args: { id: v.id('inquirySources') },
+  args: { id: v.id('systemSupportingInquirySources') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -136,10 +142,11 @@ export const deleteSystemInquirySource = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.inquiry_sources.deleted',
-      entityType: 'inquirySources',
+      entityType: 'systemSupportingInquirySources',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: 'Deleted inquiry source',

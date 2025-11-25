@@ -319,6 +319,7 @@ Fill this out first:
 | `{tableName}` | _________ | `freelancerProjects` |
 | `{TableName}` | _________ | `FreelancerProjects` |
 | `{table_name}` | _________ | `freelancer_projects` |
+| `{displayField}` | `name` | 
 
 ## Case Convention Rules
 

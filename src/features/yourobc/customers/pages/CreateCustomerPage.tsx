@@ -1,13 +1,13 @@
 // src/features/yourobc/customers/pages/CreateCustomerPage.tsx
 
-import { FC } from 'react'
+import { FC, useRef, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { CustomerForm } from '../components/CustomerForm'
 import { useCustomers, useCustomer } from '../hooks/useCustomers'
 import { useAuth } from '@/features/system/auth'
 import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
-import { Card, Alert, AlertDescription, Loading } from '@/components/ui'
+import { Card, Alert, AlertDescription } from '@/components/ui'
 import type { CustomerFormData, CustomerId } from '../types'
 
 interface CreateCustomerPageProps {
@@ -19,11 +19,30 @@ export const CreateCustomerPage: FC<CreateCustomerPageProps> = ({
   customerId,
   mode = 'create',
 }) => {
+  // Performance tracking (dev mode only)
+  const mountTimeRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      mountTimeRef.current = performance.now()
+
+      const logInteractive = () => {
+        if (mountTimeRef.current) {
+          const duration = performance.now() - mountTimeRef.current
+          console.log(`CreateCustomerPage: Became interactive in ${duration.toFixed(2)}ms`)
+        }
+      }
+
+      const timeoutId = setTimeout(logInteractive, 0)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [])
+
   const navigate = useNavigate()
   const toast = useToast()
   const { user } = useAuth()
 
-  const { customer, isLoading: isLoadingCustomer } = useCustomer(customerId)
+  const { customer } = customerId ? useCustomer(customerId) : { customer: undefined }
   const { createCustomer, updateCustomer, isCreating, isUpdating } = useCustomers()
 
   const handleSubmit = async (formData: CustomerFormData) => {
@@ -31,11 +50,11 @@ export const CreateCustomerPage: FC<CreateCustomerPageProps> = ({
       if (mode === 'edit' && customerId) {
         await updateCustomer(customerId, formData)
         toast.success(`${formData.companyName} updated successfully!`)
-        navigate({ to: '/yourobc/customers/$customerId', params: { customerId } })
+        navigate({ to: '/{-$locale}/yourobc/customers/$customerId', params: { customerId } })
       } else {
         const newCustomerId = await createCustomer(formData)
         toast.success(`${formData.companyName} created successfully!`)
-        navigate({ to: '/yourobc/customers/$customerId', params: { customerId: newCustomerId } })
+        navigate({ to: '/{-$locale}/yourobc/customers/$customerId', params: { customerId: newCustomerId } })
       }
     } catch (error: any) {
       console.error('Customer operation error:', error)
@@ -55,36 +74,30 @@ export const CreateCustomerPage: FC<CreateCustomerPageProps> = ({
 
   const handleCancel = () => {
     if (mode === 'edit' && customerId) {
-      navigate({ to: '/yourobc/customers/$customerId', params: { customerId } })
+      navigate({ to: '/{-$locale}/yourobc/customers/$customerId', params: { customerId } })
     } else {
-      navigate({ to: '/yourobc/customers' })
+      navigate({ to: '/{-$locale}/yourobc/customers' })
     }
   }
 
-  if (mode === 'edit' && (isLoadingCustomer || !customer)) {
+  if (mode === 'edit' && !customer) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {isLoadingCustomer ? (
-            <div className="flex justify-center py-12">
-              <Loading size="lg" />
+          <Card>
+            <div className="text-center py-12 p-6">
+              <div className="text-red-500 text-lg mb-4">Customer Not Found</div>
+              <p className="text-gray-500 mb-4">
+                The customer you are trying to edit does not exist or has been deleted.
+              </p>
+              <Link
+                to="/yourobc/customers"
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                ← Back to Customers
+              </Link>
             </div>
-          ) : (
-            <Card>
-              <div className="text-center py-12 p-6">
-                <div className="text-red-500 text-lg mb-4">Customer Not Found</div>
-                <p className="text-gray-500 mb-4">
-                  The customer you are trying to edit does not exist or has been deleted.
-                </p>
-                <Link
-                  to="/yourobc/customers"
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  ← Back to Customers
-                </Link>
-              </div>
-            </Card>
-          )}
+          </Card>
         </div>
       </div>
     )

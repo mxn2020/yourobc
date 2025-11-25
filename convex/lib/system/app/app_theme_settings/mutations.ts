@@ -5,7 +5,6 @@ import { v } from 'convex/values';
 import { mutation } from '@/generated/server';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { createAuditLog } from '@/lib/system/core/audit_logs/mutations';
 import {
   requireCreateThemeSettingAccess,
   requireEditThemeSettingAccess,
@@ -88,12 +87,11 @@ export const createAppThemeSetting = mutation({
       createdBy: user._id,
       updatedAt: now,
       updatedBy: user._id,
-      deletedAt: undefined,
-      deletedBy: undefined,
     });
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'theme_setting.created',
@@ -136,7 +134,7 @@ export const updateAppThemeSetting = mutation({
     }
 
     // 3. AUTHZ: Check edit permission
-    await requireEditThemeSettingAccess(ctx, setting, user);
+    await requireEditThemeSettingAccess(setting, user);
 
     // 4. VALIDATE: Check update data validity
     const errors = validateAppThemeSettingData(updates);
@@ -174,6 +172,7 @@ export const updateAppThemeSetting = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'theme_setting.updated',
@@ -207,7 +206,7 @@ export const deleteThemeSetting = mutation({
     }
 
     // 3. AUTHZ: Check delete permission
-    await requireDeleteThemeSettingAccess(ctx, setting, user);
+    await requireDeleteThemeSettingAccess(setting, user);
 
     // 4. PROCESS: Prepare delete data
     const now = Date.now();
@@ -220,6 +219,7 @@ export const deleteThemeSetting = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'theme_setting.deleted',
@@ -271,6 +271,7 @@ export const restoreThemeSetting = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'theme_setting.restored',

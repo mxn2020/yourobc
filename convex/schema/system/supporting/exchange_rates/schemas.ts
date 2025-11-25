@@ -4,5 +4,5 @@
 import { exchangeRatesTable } from './tables';
 
 export const systemSupportingExchangeRatesSchemas = {
-  exchangeRates: exchangeRatesTable,
+  systemSupportingExchangeRates: exchangeRatesTable,
 };

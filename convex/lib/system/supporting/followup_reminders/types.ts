@@ -9,8 +9,8 @@ import type {
   RecurrencePattern,
 } from '@/schema/system/supporting/followup_reminders/types';
 
-export type SystemFollowupReminder = Doc<'followupReminders'>;
-export type SystemFollowupReminderId = Id<'followupReminders'>;
+export type SystemFollowupReminder = Doc<'systemSupportingFollowupReminders'>;
+export type SystemFollowupReminderId = Id<'systemSupportingFollowupReminders'>;
 
 export interface CreateSystemFollowupReminderData {
   name: string;

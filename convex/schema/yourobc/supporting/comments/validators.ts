@@ -9,7 +9,13 @@ import { supportingFields } from '../validators';
  * Simple union validators for comments
  */
 export const commentsValidators = {
-  commentType: baseValidators.commentType,
+  commentType: v.union(
+    v.literal('general'),
+    v.literal('note'),
+    v.literal('question'),
+    v.literal('answer'),
+    v.literal('review')
+  ),
 } as const;
 
 /**

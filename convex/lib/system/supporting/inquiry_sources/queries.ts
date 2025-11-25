@@ -25,7 +25,7 @@ export const getSystemInquirySources = query({
     const { limit = 50, cursor, filters = {} as SystemInquirySourceFilters } = args;
 
     const page = await ctx.db
-      .query('inquirySources')
+      .query('systemSupportingInquirySources')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -51,7 +51,7 @@ export const getSystemInquirySources = query({
 });
 
 export const getSystemInquirySource = query({
-  args: { id: v.id('inquirySources') },
+  args: { id: v.id('systemSupportingInquirySources') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);

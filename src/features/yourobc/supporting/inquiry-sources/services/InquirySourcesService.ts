@@ -66,7 +66,7 @@ export class InquirySourcesService {
   async updateInquirySource(
     mutation: ReturnType<typeof this.useUpdateInquirySource>,
     authUserId: string,
-    sourceId: Id<'inquirySources'>,
+    sourceId: Id<'yourobcInquirySources'>,
     data: UpdateInquirySourceData
   ) {
     try {

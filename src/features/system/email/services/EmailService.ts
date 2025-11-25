@@ -60,7 +60,7 @@ export class EmailService {
   // ==========================================
 
   public getAllConfigsQueryOptions() {
-    return convexQuery(api.lib.system.email.queries.getAllConfigs, {});
+    return convexQuery(api.lib.system.email.configs.queries.getAllConfigs, {});
   }
 
   public getEmailStatsQueryOptions(days: number = 30) {
@@ -68,11 +68,11 @@ export class EmailService {
   }
 
   public getAllTemplatesQueryOptions() {
-    return convexQuery(api.lib.system.email.queries.getAllTemplates, {});
+    return convexQuery(api.lib.system.email.email_templates.queries.getAllTemplates, {});
   }
 
   public getEmailLogsQueryOptions(limit: number = 50) {
-    return convexQuery(api.lib.system.email.queries.getEmailLogs, { limit });
+    return convexQuery(api.lib.system.email.email_logs.queries.getEmailLogs, { limit });
   }
 
   // ==========================================

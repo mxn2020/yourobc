@@ -19,7 +19,7 @@ export const getInquirySources = query({
     limit: v.optional(v.number()),
     cursor: v.optional(v.string()),
     filters: v.optional(v.object({
-      type: v.optional(v.array(inquirySourcesValidators.inquirySourceType)),
+      type: v.optional(v.array(inquirySourcesValidators.sourceType)),
       isActive: v.optional(v.boolean()),
     })),
   },

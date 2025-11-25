@@ -27,7 +27,7 @@ export const getSystemDocuments = query({
     const { limit = 50, cursor, filters = {} as SystemDocumentFilters } = args;
 
     const page = await ctx.db
-      .query('documents')
+      .query('systemSupportingDocuments')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -58,7 +58,7 @@ export const getSystemDocuments = query({
 });
 
 export const getSystemDocument = query({
-  args: { id: v.id('documents') },
+  args: { id: v.id('systemSupportingDocuments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);

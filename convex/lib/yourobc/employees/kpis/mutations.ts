@@ -94,6 +94,7 @@ export const createEmployeeKPI = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeKPIs.created',
@@ -102,9 +103,11 @@ export const createEmployeeKPI = mutation({
       entityTitle: data.kpiName.trim(),
       description: `Created employee KPI: ${data.kpiName.trim()}`,
       metadata: {
+      data: {
         status,
         period: data.period,
         achievementPercentage,
+      },
       },
       createdAt: now,
       createdBy: user._id,
@@ -220,6 +223,7 @@ export const updateEmployeeKPI = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeKPIs.updated',
@@ -227,7 +231,7 @@ export const updateEmployeeKPI = mutation({
       entityId: kpi.publicId,
       entityTitle: updateData.kpiName || kpi.kpiName,
       description: `Updated employee KPI: ${updateData.kpiName || kpi.kpiName}`,
-      metadata: { changes: updates },
+      metadata: { data: { changes: updates } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -269,6 +273,7 @@ export const deleteEmployeeKPI = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeKPIs.deleted',
@@ -326,6 +331,7 @@ export const restoreEmployeeKPI = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeKPIs.restored',

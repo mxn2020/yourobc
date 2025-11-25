@@ -29,7 +29,7 @@ export const getSystemWikiEntries = query({
     const { limit = 50, cursor, filters = {} as SystemWikiEntryFilters } = args;
 
     const page = await ctx.db
-      .query('wikiEntries')
+      .query('systemSupportingWikiEntries')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -57,13 +57,59 @@ export const getSystemWikiEntries = query({
 });
 
 export const getSystemWikiEntry = query({
-  args: { id: v.id('wikiEntries') },
+  args: { id: v.id('systemSupportingWikiEntries') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);
     if (!doc || doc.deletedAt) {
       throw new Error('Wiki entry not found');
     }
+    await requireViewSystemWikiEntryAccess(ctx, doc, user);
+    return doc;
+  },
+});
+
+export const listWikiEntries = query({
+  args: {
+    status: v.optional(wikiEntriesValidators.entryStatus),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, { status, limit = 50, cursor }) => {
+    const user = await requireCurrentUser(ctx);
+
+    let q = ctx.db.query('systemSupportingWikiEntries').filter(notDeleted);
+    if (status) {
+      q = q.withIndex('by_status', (idx) => idx.eq('status', status));
+    }
+
+    const page = await q
+      .order('desc')
+      .paginate({ numItems: Math.min(limit, 100), cursor: cursor ?? null });
+
+    const items = await filterSystemWikiEntriesByAccess(ctx, page.page, user);
+
+    return {
+      items,
+      cursor: page.continueCursor ?? undefined,
+      hasMore: !page.isDone,
+    };
+  },
+});
+
+export const getWikiEntryBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const user = await requireCurrentUser(ctx);
+
+    const doc = await ctx.db
+      .query('systemSupportingWikiEntries')
+      .withIndex('by_slug', (idx) => idx.eq('slug', slug))
+      .filter(notDeleted)
+      .first();
+
+    if (!doc) return null;
+
     await requireViewSystemWikiEntryAccess(ctx, doc, user);
     return doc;
   },

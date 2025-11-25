@@ -9,7 +9,7 @@ export function trimSystemNotificationData<
 >(data: T): T {
   const trimmed: T = { ...data };
 
-  if (typeof trimmed.title === 'string') {
+  if (typeof trimmed.name === 'string') {
     trimmed.title = trimmed.title.trim() as T['title'];
   }
   if (typeof trimmed.message === 'string') {

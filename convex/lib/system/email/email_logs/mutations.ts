@@ -88,7 +88,7 @@ export const logEmail = mutation({
     const logId = await ctx.db.insert('emailLogs', {
       // Required fields
       publicId,
-      ownerId: user._id,
+      userId: user._id,
       subject: trimmedSubject,
 
       // Email details
@@ -120,6 +120,7 @@ export const logEmail = mutation({
 
     // 6. AUDIT: Log the email log creation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'email_log.created',
@@ -128,9 +129,11 @@ export const logEmail = mutation({
       entityTitle: trimmedSubject,
       description: `Logged email to ${trimmedTo.join(', ')}: ${trimmedSubject}`,
       metadata: {
-        provider: args.provider,
-        status: statusValue,
-        context: trimmedContext,
+        data: {
+          provider: args.provider,
+          status: statusValue,
+          context: trimmedContext || 'none',
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -216,6 +219,7 @@ export const updateEmailStatus = mutation({
 
     // 7. AUDIT: Log the status update
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'email_log.updated',
@@ -224,9 +228,11 @@ export const updateEmailStatus = mutation({
       entityTitle: log.subject,
       description: `Updated email status to ${statusValue}: ${log.subject}`,
       metadata: {
-        oldStatus: log.deliveryStatus,
-        newStatus: statusValue,
-        error: trimmedError,
+        data: {
+          oldStatus: log.deliveryStatus,
+          newStatus: statusValue,
+          error: trimmedError || 'none',
+        }
       },
       createdAt: now,
       createdBy: user._id,
@@ -276,6 +282,7 @@ export const deleteEmailLog = mutation({
 
     // 5. AUDIT: Log the deletion
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'email_log.deleted',
@@ -284,9 +291,12 @@ export const deleteEmailLog = mutation({
       entityTitle: log.subject,
       description: `Deleted email log: ${log.subject}`,
       metadata: {
-        provider: log.provider,
-        to: log.to,
-        status: log.deliveryStatus,
+        data: {
+          provider: log.provider,
+          to: log.to,
+          status: log.deliveryStatus,
+          context: log.context || 'none',
+        },
       },
       createdAt: now,
       createdBy: user._id,

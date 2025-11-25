@@ -201,7 +201,7 @@ async function syncUserToConvex(user: AuthUser, action: 'create' | 'update' | 's
 
   try {
     // syncProfileFromAuth mutation handles both creating and updating profiles
-    await convex.mutation(api.lib.system.user_profiles.mutations.syncProfileFromAuth, {
+    await convex.mutation(api.lib.system.user.user_profiles.mutations.syncProfileFromAuth, {
       authUserId: userId,
       email: user.email,
       name: user.name || undefined,
@@ -231,7 +231,7 @@ async function syncUserToConvex(user: AuthUser, action: 'create' | 'update' | 's
 async function trackUserLogin(session: AuthSession) {
   try {
     const authUserId: AuthUserId = session.userId; // session.userId is a string (Better Auth ID)
-    await convex.mutation(api.lib.system.user_profiles.mutations.updateActivity, {
+    await convex.mutation(api.lib.system.user.user_profiles.mutations.updateActivity, {
       activityType: 'login',
       metadata: {
         ipAddress: session.ipAddress || undefined,
@@ -269,7 +269,7 @@ export async function recoverAllUsers() {
     console.log(`Found ${users.length} users in Neon database`);
 
     const authUserIds = users.map(u => u.id);
-    const missingCheck = await convex.query(api.lib.system.user_profiles.recovery.findMissingProfiles, {
+    const missingCheck = await convex.query(api.lib.system.user.user_profiles.recovery.findMissingProfiles, {
       authUserIds
     });
 
@@ -282,7 +282,7 @@ export async function recoverAllUsers() {
         throw new Error('No users found to recover despite missing profiles detected');
       }
 
-      const results = await convex.mutation(api.lib.system.user_profiles.recovery.batchRecoverProfiles, {
+      const results = await convex.mutation(api.lib.system.user.user_profiles.recovery.batchRecoverProfiles, {
         users: usersToRecover.map(u => ({
           authUserId: u.id,
           email: u.email,

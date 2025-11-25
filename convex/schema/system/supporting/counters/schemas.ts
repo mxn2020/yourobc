@@ -4,5 +4,5 @@
 import { countersTable } from './tables';
 
 export const systemSupportingCountersSchemas = {
-  counters: countersTable,
+  systemSupportingCounters: countersTable,
 };

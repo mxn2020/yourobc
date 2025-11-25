@@ -23,15 +23,15 @@ export const CustomerAnalyticsDashboard: FC<CustomerAnalyticsDashboardProps> = (
   customerId,
 }) => {
   // Fetch analytics
-  const analytics = useQuery(api.lib.yourobc.customers.analytics.index.getCustomerAnalytics, {
+  const analytics = useQuery(api.lib.yourobc.customers.analytics.queries.getCustomerAnalytics, {
     customerId,
   })
 
-  const lifetimeValue = useQuery(api.lib.yourobc.customers.analytics.index.getCustomerLifetimeValue, {
+  const lifetimeValue = useQuery(api.lib.yourobc.customers.analytics.queries.getCustomerLifetimeValue, {
     customerId,
   })
 
-  const standardRoutes = useQuery(api.lib.yourobc.customers.analytics.index.getStandardRoutes, {
+  const standardRoutes = useQuery(api.lib.yourobc.customers.analytics.queries.getStandardRoutes, {
     customerId,
     minOccurrences: 3,
   })

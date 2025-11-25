@@ -10,8 +10,8 @@ import { exchangeRatesTable } from './tables';
 // Document Types
 // ============================================
 
-export type ExchangeRate = Doc<'exchangeRates'>;
-export type ExchangeRateId = Id<'exchangeRates'>;
+export type ExchangeRate = Doc<'systemSupportingExchangeRates'>;
+export type ExchangeRateId = Id<'systemSupportingExchangeRates'>;
 
 // ============================================
 // Schema Type (from table validator)

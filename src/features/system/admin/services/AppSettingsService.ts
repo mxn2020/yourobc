@@ -23,55 +23,55 @@ class AppSettingsService {
   // ==========================================
 
   getAppSettingsQueryOptions(category?: SettingCategory) {
-    return convexQuery(api.lib.system.app_settings.queries.getAppSettings, {
+    return convexQuery(api.lib.system.app.app_settings.queries.getAppSettings, {
       category,
     });
   }
 
   getAppSettingQueryOptions(key: string) {
-    return convexQuery(api.lib.system.app_settings.queries.getAppSetting, {
+    return convexQuery(api.lib.system.app.app_settings.queries.getAppSetting, {
       key,
     });
   }
 
   getAISettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getAISettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getAISettings, {});
   }
 
   getGeneralSettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getGeneralSettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getGeneralSettings, {});
   }
 
   getSecuritySettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getSecuritySettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getSecuritySettings, {});
   }
 
   getNotificationSettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getNotificationSettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getNotificationSettings, {});
   }
 
   getBillingSettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getBillingSettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getBillingSettings, {});
   }
 
   getIntegrationSettingsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getIntegrationSettings, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getIntegrationSettings, {});
   }
 
   getPublicSettingsQueryOptions(category?: SettingCategory) {
-    return convexQuery(api.lib.system.app_settings.queries.getPublicSettings, {
+    return convexQuery(api.lib.system.app.app_settings.queries.getPublicSettings, {
       category,
     });
   }
 
   getSettingsStatsQueryOptions() {
-    return convexQuery(api.lib.system.app_settings.queries.getSettingsStats, {});
+    return convexQuery(api.lib.system.app.app_settings.queries.getSettingsStats, {});
   }
 
   // === Settings Queries ===
   useAllSettings(category?: SettingCategory) {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getAppSettings, {
+      ...convexQuery(api.lib.system.app.app_settings.queries.getAppSettings, {
         category,
       }),
       staleTime: 5 * 60 * 1000, // 5 minutes
@@ -80,7 +80,7 @@ class AppSettingsService {
 
   useAppSetting(key: string) {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getAppSetting, {
+      ...convexQuery(api.lib.system.app.app_settings.queries.getAppSetting, {
         key,
       }),
       staleTime: 5 * 60 * 1000,
@@ -89,49 +89,49 @@ class AppSettingsService {
 
   useAISettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getAISettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getAISettings, {}),
       staleTime: 10 * 60 * 1000, // 10 minutes
     })
   }
 
   useGeneralSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getGeneralSettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getGeneralSettings, {}),
       staleTime: 15 * 60 * 1000, // 15 minutes
     })
   }
 
   useSecuritySettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getSecuritySettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getSecuritySettings, {}),
       staleTime: 15 * 60 * 1000,
     })
   }
 
   useNotificationSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getNotificationSettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getNotificationSettings, {}),
       staleTime: 10 * 60 * 1000,
     })
   }
 
   useBillingSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getBillingSettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getBillingSettings, {}),
       staleTime: 15 * 60 * 1000,
     })
   }
 
   useIntegrationSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getIntegrationSettings, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getIntegrationSettings, {}),
       staleTime: 10 * 60 * 1000,
     })
   }
 
   usePublicSettings(category?: SettingCategory) {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getPublicSettings, {
+      ...convexQuery(api.lib.system.app.app_settings.queries.getPublicSettings, {
         category,
       }),
       staleTime: 30 * 60 * 1000, // 30 minutes
@@ -140,7 +140,7 @@ class AppSettingsService {
 
   useSearchSettings(searchTerm: string, categories?: SettingCategory[]) {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.searchSettings, {
+      ...convexQuery(api.lib.system.app.app_settings.queries.searchSettings, {
         searchTerm,
         categories,
       }),
@@ -151,7 +151,7 @@ class AppSettingsService {
 
   useSettingsStats() {
     return useQuery({
-      ...convexQuery(api.lib.system.app_settings.queries.getSettingsStats, {}),
+      ...convexQuery(api.lib.system.app.app_settings.queries.getSettingsStats, {}),
       staleTime: 10 * 60 * 1000,
     })
   }
@@ -159,67 +159,67 @@ class AppSettingsService {
   // === Settings Mutations ===
   useCreateOrUpdateSetting() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.createOrUpdateAppSetting),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.createOrUpdateAppSetting),
     })
   }
 
   useDeleteSetting() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.deleteAppSetting),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.deleteAppSetting),
     })
   }
 
   useUpdateAISettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateAISettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateAISettings),
     })
   }
 
   useUpdateGeneralSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateGeneralSettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateGeneralSettings),
     })
   }
 
   useUpdateSecuritySettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateSecuritySettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateSecuritySettings),
     })
   }
 
   useUpdateNotificationSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateNotificationSettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateNotificationSettings),
     })
   }
 
   useUpdateBillingSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateBillingSettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateBillingSettings),
     })
   }
 
   useUpdateIntegrationSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.updateIntegrationSettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateIntegrationSettings),
     })
   }
 
   useBatchUpdateSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.batchUpdateSettings),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.batchUpdateSettings),
     })
   }
 
   useResetCategoryToDefaults() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.resetCategoryToDefaults),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.resetCategoryToDefaults),
     })
   }
 
   useTestAIConnection() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app_settings.mutations.testAIConnection),
+      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.testAIConnection),
     })
   }
 

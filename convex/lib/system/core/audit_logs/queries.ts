@@ -4,7 +4,7 @@ import { query } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from '@/shared/auth.helper';
 import { notDeleted } from '@/shared/db.helper';
-import { entityTypes } from './entityTypes';
+import { entityTypes } from './entity_types';
 import { AUDIT_LOG_CONSTANTS } from './constants';
 
 /**

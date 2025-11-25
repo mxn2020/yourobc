@@ -24,7 +24,7 @@ export type {Module}Id = Id<'{tableName}'>;
  * @param tags - Array of tags (optional)
  */
 export interface Create{Module}Data {
-  name: string;
+  {displayField}: string;
   description?: string;
   status?: {Module}Status;
   priority?: {Module}Priority;
@@ -40,7 +40,7 @@ export interface Create{Module}Data {
  * All fields optional for partial updates
  */
 export interface Update{Module}Data {
-  name?: string;
+  {displayField}?: string;
   description?: string;
   status?: {Module}Status;
   priority?: {Module}Priority;

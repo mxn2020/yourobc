@@ -47,6 +47,7 @@ export const createAppConfig = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appconfigs.created',
@@ -81,6 +82,7 @@ export const updateAppConfig = mutation({
     await ctx.db.patch(id, { ...trimmed, updatedAt: now, updatedBy: user._id });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appconfigs.updated',
@@ -108,6 +110,7 @@ export const deleteAppConfig = mutation({
     await ctx.db.patch(id, { deletedAt: now, deletedBy: user._id, updatedAt: now, updatedBy: user._id });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appconfigs.deleted',

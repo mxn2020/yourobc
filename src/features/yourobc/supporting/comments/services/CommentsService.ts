@@ -34,7 +34,7 @@ export class CommentsService {
     })
   }
 
-  useComment(authUserId: string, commentId?: Id<'comments'>) {
+  useComment(authUserId: string, commentId?: Id<'yourobcComments'>) {
     return useQuery({
       ...convexQuery(api.lib.yourobc.supporting.comments.queries.getComment, {
         authUserId,
@@ -115,7 +115,7 @@ export class CommentsService {
   async updateComment(
     mutation: ReturnType<typeof this.useUpdateComment>,
     authUserId: string,
-    commentId: Id<'comments'>,
+    commentId: Id<'yourobcComments'>,
     data: {
       content?: string
       isInternal?: boolean
@@ -132,7 +132,7 @@ export class CommentsService {
   async deleteComment(
     mutation: ReturnType<typeof this.useDeleteComment>,
     authUserId: string,
-    commentId: Id<'comments'>
+    commentId: Id<'yourobcComments'>
   ) {
     try {
       return await mutation.mutateAsync({ authUserId, commentId })
@@ -144,7 +144,7 @@ export class CommentsService {
   async addReaction(
     mutation: ReturnType<typeof this.useAddReaction>,
     authUserId: string,
-    commentId: Id<'comments'>,
+    commentId: Id<'yourobcComments'>,
     reaction: string
   ) {
     try {

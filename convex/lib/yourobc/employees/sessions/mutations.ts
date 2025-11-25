@@ -83,6 +83,7 @@ export const createEmployeeSession = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeSessions.created',
@@ -91,8 +92,10 @@ export const createEmployeeSession = mutation({
       entityTitle: sessionId,
       description: `Created employee session: ${sessionId}`,
       metadata: {
+      data: {
         status: data.status || 'active',
         sessionType: data.sessionType,
+      },
       },
       createdAt: now,
       createdBy: user._id,
@@ -194,6 +197,7 @@ export const updateEmployeeSession = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeSessions.updated',
@@ -201,7 +205,7 @@ export const updateEmployeeSession = mutation({
       entityId: session.publicId,
       entityTitle: session.sessionId,
       description: `Updated employee session: ${session.sessionId}`,
-      metadata: { changes: updates },
+      metadata: { data: { changes: updates } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -243,6 +247,7 @@ export const deleteEmployeeSession = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeSessions.deleted',
@@ -300,6 +305,7 @@ export const restoreEmployeeSession = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeSessions.restored',

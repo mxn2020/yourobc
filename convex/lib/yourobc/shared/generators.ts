@@ -1,7 +1,8 @@
 // convex/lib/yourobc/shared/generators.ts
 // convex/yourobc/shared/generators.ts
 
-import { EntityType } from '../../../types';
+import { EntityType } from "@/config/index";
+
 
 /**
  * Common generator utilities shared across YourOBC modules

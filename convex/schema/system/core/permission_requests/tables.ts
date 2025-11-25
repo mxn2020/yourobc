@@ -3,15 +3,8 @@
 
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { softDeleteFields } from '@/schema/base';
+import { auditFields, softDeleteFields } from '@/schema/base';
 import { permissionRequestsFields, permissionRequestsValidators } from './validators';
-
-const permissionRequestsAuditFields = {
-  createdAt: v.number(),
-  createdBy: v.id('userProfiles'),
-  updatedAt: v.number(),
-  updatedBy: v.optional(v.id('userProfiles')),
-};
 
 export const permissionRequestsTable = defineTable({
   displayName: v.string(),
@@ -23,7 +16,7 @@ export const permissionRequestsTable = defineTable({
   status: permissionRequestsValidators.status,
   review: permissionRequestsFields.review,
 
-  ...permissionRequestsAuditFields,
+  ...auditFields,
   ...softDeleteFields,
 })
   .index('by_public_id', ['publicId'])

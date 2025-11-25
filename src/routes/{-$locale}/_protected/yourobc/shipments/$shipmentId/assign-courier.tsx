@@ -1,56 +1,111 @@
 // src/routes/_protected/yourobc/shipments/$shipmentId/assign-courier.tsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { CourierSearch } from '@/features/yourobc/couriers/components/CourierSearch'
 import { useShipment, useShipments } from '@/features/yourobc/shipments/hooks/useShipments'
 import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
-import { authService } from '@/features/system/auth'
-import { convexQuery } from '@convex-dev/react-query'
+import { shipmentService } from '@/features/yourobc/shipments'
+import { courierService } from '@/features/yourobc/couriers'
 import { api } from '@/generated/api'
 import { Suspense, useState } from 'react'
 import { Card, Loading, Button, Textarea, Alert, AlertDescription } from '@/components/ui'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { defaultLocale } from '@/features/system/i18n'
+import { createI18nSeo } from '@/utils/seo'
+import type { Locale } from '@/features/system/i18n'
 import type { ShipmentId } from '@/features/yourobc/shipments/types'
 import type { CourierListItem, CourierId } from '@/features/yourobc/couriers/types'
 
 export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$shipmentId/assign-courier')({
   loader: async ({ params, context }) => {
-    try {
-      const session = await authService.getSession()
-      
-      if (session?.data?.user?.id) {
-        await Promise.all([
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.shipments.queries.getShipment, {
-              shipmentId: params.shipmentId as ShipmentId,
-                          })
-          ),
-          context.queryClient.prefetchQuery(
-            convexQuery(api.lib.yourobc.couriers.queries.getAvailableCouriers, {
-                            limit: 20
-            })
-          )
-        ])
+    const isServer = typeof window === 'undefined'
+    console.log(`🔄 Route Loader STARTED (${isServer ? 'SERVER' : 'CLIENT'})`)
+    console.time('Route Loader: Assign Courier')
+
+    const { user } = context
+    const locale = (context.locale || defaultLocale) as Locale
+
+    // Role guard - operations action
+    if (!user || !['admin', 'manager', 'operations'].includes(user.role)) {
+      throw redirect({
+        to: '/{-$locale}/yourobc/shipments/$shipmentId',
+        params: {
+          shipmentId: params.shipmentId,
+          locale: locale === defaultLocale ? undefined : locale
+        }
+      })
+    }
+
+    // ✅ Use service-provided query options
+    const shipmentQueryOptions = shipmentService.getShipmentQueryOptions(params.shipmentId as ShipmentId)
+    const couriersQueryOptions = courierService.getAvailableCouriersQueryOptions({ limit: 20 })
+
+    if (typeof window === 'undefined') {
+      try {
+        console.time('Route Loader: SSR Data Fetch')
+        const { getAuthenticatedConvexClient } = await import('@/lib/convex-server')
+        const convexClient = await getAuthenticatedConvexClient()
+
+        if (convexClient) {
+          const [shipment, couriers] = await Promise.all([
+            convexClient.query(
+              api.lib.yourobc.shipments.queries.getShipment,
+              { shipmentId: params.shipmentId as ShipmentId }
+            ),
+            convexClient.query(
+              api.lib.yourobc.couriers.queries.getAvailableCouriers,
+              { limit: 20 }
+            )
+          ])
+
+          context.queryClient.setQueryData(shipmentQueryOptions.queryKey, shipment)
+          context.queryClient.setQueryData(couriersQueryOptions.queryKey, couriers)
+          console.timeEnd('Route Loader: SSR Data Fetch')
+        }
+        console.timeEnd('Route Loader: Assign Courier')
+      } catch (error) {
+        console.warn('SSR prefetch failed:', error)
+        console.timeEnd('Route Loader: Assign Courier')
       }
-      
-      return {}
-    } catch (error) {
-      console.warn('Failed to prefetch data:', error)
-      return {}
+    } else {
+      console.time('Route Loader: Client ensureQueryData')
+      await Promise.all([
+        context.queryClient.ensureQueryData(shipmentQueryOptions),
+        context.queryClient.ensureQueryData(couriersQueryOptions)
+      ])
+      console.timeEnd('Route Loader: Client ensureQueryData')
+      console.timeEnd('Route Loader: Assign Courier')
     }
   },
   component: AssignCourierPage,
-  head: () => ({
-    meta: [
-      {
+  pendingComponent: () => (
+    <Loading size="lg" message="page.loading" namespace="shipments" showMessage />
+  ),
+  head: async ({ matches }) => {
+    const locale = matches[0]?.context?.locale || defaultLocale
+
+    return {
+      meta: await createI18nSeo(locale, 'shipments.assignCourier', {
         title: 'Assign Courier - YourOBC',
-      },
-      {
-        name: 'description',
-        content: 'Assign a courier to handle shipment delivery',
-      },
-    ],
-  }),
+        description: 'Assign a courier to handle shipment delivery',
+        keywords: 'courier, assign, shipment, delivery',
+      }),
+    }
+  },
+  errorComponent: ({ error, reset }) => (
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold text-red-600 mb-4">Error Loading Page</h2>
+        <p className="text-gray-600 mb-4">{error.message}</p>
+        <button
+          onClick={reset}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  ),
 })
 
 function AssignCourierPage() {

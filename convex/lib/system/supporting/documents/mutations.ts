@@ -42,9 +42,9 @@ export const createSystemDocument = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'documents');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingDocuments');
 
-    const id = await ctx.db.insert('documents', {
+    const id = await ctx.db.insert('systemSupportingDocuments', {
       ...trimmed,
       publicId,
       ownerId: user._id,
@@ -56,10 +56,11 @@ export const createSystemDocument = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.documents.created',
-      entityType: 'documents',
+      entityType: 'systemSupportingDocuments',
       entityId: publicId,
       entityTitle: trimmed.name,
       description: `Uploaded document for ${trimmed.entityType}`,
@@ -74,7 +75,7 @@ export const createSystemDocument = mutation({
 
 export const updateSystemDocument = mutation({
   args: {
-    id: v.id('documents'),
+    id: v.id('systemSupportingDocuments'),
     updates: v.object({
       name: v.optional(v.string()),
       status: v.optional(documentsValidators.documentStatus),
@@ -106,14 +107,19 @@ export const updateSystemDocument = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.documents.updated',
-      entityType: 'documents',
+      entityType: 'systemSupportingDocuments',
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: 'Updated document metadata',
-      metadata: { updates: trimmed },
+      metadata: { 
+        data: { 
+          updates: trimmed 
+        },
+        },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -124,7 +130,7 @@ export const updateSystemDocument = mutation({
 });
 
 export const deleteSystemDocument = mutation({
-  args: { id: v.id('documents') },
+  args: { id: v.id('systemSupportingDocuments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -143,10 +149,11 @@ export const deleteSystemDocument = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.documents.deleted',
-      entityType: 'documents',
+      entityType: 'systemSupportingDocuments',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: 'Deleted document',

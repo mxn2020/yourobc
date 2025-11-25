@@ -122,6 +122,7 @@ export const createAccountingEntry = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'accounting_entry.created',
@@ -255,6 +256,7 @@ export const updateAccountingEntry = mutation({
     await ctx.db.patch(entryId, updateData);
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'accounting_entry.updated',
@@ -298,6 +300,7 @@ export const deleteAccountingEntry = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'accounting_entry.deleted',
@@ -349,6 +352,7 @@ export const restoreAccountingEntry = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'accounting_entry.restored',
@@ -395,6 +399,7 @@ export const approveAccountingEntry = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'accounting_entry.approved',

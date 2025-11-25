@@ -51,26 +51,26 @@ class AuditLogsAdminService {
       } : undefined
     };
 
-    return convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogs, {
+    return convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogs, {
       options: convexOptions,
     });
   }
 
   getAdminAuditLogStatsQueryOptions(timeWindow?: 'day' | 'week' | 'month' | 'all') {
-    return convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogStats, {
+    return convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogStats, {
       timeWindow,
     });
   }
 
   getAdminUserAuditLogsQueryOptions(targetUserId: Id<"userProfiles">, limit?: number) {
-    return convexQuery(api.lib.system.audit_logs.admin_queries.adminGetUserAuditLogs, {
+    return convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetUserAuditLogs, {
       targetUserId,
       limit,
     });
   }
 
   getAdminRecentActivityQueryOptions(limit?: number) {
-    return convexQuery(api.lib.system.audit_logs.admin_queries.adminGetRecentActivity, {
+    return convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetRecentActivity, {
       limit,
     });
   }
@@ -103,7 +103,7 @@ class AuditLogsAdminService {
     }
 
     return useQuery({
-      ...convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogs, {
+      ...convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogs, {
         options: convexOptions,
       }),
       staleTime: 30000, // 30 seconds
@@ -116,7 +116,7 @@ class AuditLogsAdminService {
    */
   useAdminAuditLogStats(timeWindow?: 'day' | 'week' | 'month' | 'all'): ReturnType<typeof useQuery<AdminAuditLogStats>> {
     return useQuery({
-      ...convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogStats, {
+      ...convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogStats, {
         timeWindow,
       }),
       staleTime: 60000, // 1 minute
@@ -128,7 +128,7 @@ class AuditLogsAdminService {
    */
   useAdminUserAuditLogs(targetUserId: Id<"userProfiles">, limit?: number) {
     return useQuery({
-      ...convexQuery(api.lib.system.audit_logs.admin_queries.adminGetUserAuditLogs, {
+      ...convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetUserAuditLogs, {
         targetUserId,
         limit,
       }),
@@ -142,7 +142,7 @@ class AuditLogsAdminService {
    */
   useAdminRecentActivity(limit?: number) {
     return useQuery({
-      ...convexQuery(api.lib.system.audit_logs.admin_queries.adminGetRecentActivity, {
+      ...convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetRecentActivity, {
         limit,
       }),
       staleTime: 30000,
@@ -156,7 +156,7 @@ class AuditLogsAdminService {
    */
   useCleanupOldAuditLogs() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.audit_logs.mutations.cleanupOldAuditLogs),
+      mutationFn: useConvexMutation(api.lib.system.core.audit_logs.mutations.cleanupOldAuditLogs),
     })
   }
 
@@ -165,7 +165,7 @@ class AuditLogsAdminService {
    */
   useBulkCreateAuditLogs() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.audit_logs.mutations.bulkCreateAuditLogs),
+      mutationFn: useConvexMutation(api.lib.system.core.audit_logs.mutations.bulkCreateAuditLogs),
     })
   }
 

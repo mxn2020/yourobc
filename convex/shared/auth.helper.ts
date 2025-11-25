@@ -9,7 +9,7 @@ import {
   throwAccessError,
   throwError
 } from './errors'
-import { UserProfileId } from '@/lib/system/core/user_profiles'
+import { UserProfileId } from '@/lib/system/user/user_profiles'
 
 export type AuthUserId = string
 

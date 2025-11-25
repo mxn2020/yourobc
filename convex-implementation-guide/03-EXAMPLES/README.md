@@ -244,7 +244,7 @@ schema/_shared/validators.ts
 // Sub-modules pattern
 projectId: v.id('projects'),  // Required
   → Child can't exist without parent
-  → Use .index('by_project', ['projectId'])
+  → Use .index('by_project_id', ['projectId'])
 ```
 
 ### Optional Foreign Keys
@@ -253,7 +253,7 @@ projectId: v.id('projects'),  // Required
 projectId: v.optional(v.id('projects')),  // Optional
   → Module works standalone
   → Check existence before querying
-  → Use .index('by_project', ['projectId'])
+  → Use .index('by_project_id', ['projectId'])
 ```
 
 ### Combined Exports

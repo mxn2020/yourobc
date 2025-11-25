@@ -39,7 +39,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/email/templ
         const convexClient = await getAuthenticatedConvexClient()
 
         if (convexClient) {
-          const templates = await convexClient.query(api.lib.system.email.queries.getAllTemplates, {})
+          const templates = await convexClient.query(api.lib.system.email.email_templates.queries.getAllTemplates, {})
 
           // Cache data using service query options (ensures same keys as hooks)
           context.queryClient.setQueryData(templatesQueryOptions.queryKey, templates)

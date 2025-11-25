@@ -28,7 +28,7 @@ export const getSystemExchangeRates = query({
     const { limit = 50, cursor, filters = {} as SystemExchangeRateFilters } = args;
 
     const page = await ctx.db
-      .query('exchangeRates')
+      .query('systemSupportingExchangeRates')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -62,7 +62,7 @@ export const getSystemExchangeRates = query({
 });
 
 export const getSystemExchangeRate = query({
-  args: { id: v.id('exchangeRates') },
+  args: { id: v.id('systemSupportingExchangeRates') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);
@@ -87,7 +87,7 @@ export const getSystemExchangeRateForPair = query({
     const { fromCurrency, toCurrency, activeAt } = args;
 
     const results = await ctx.db
-      .query('exchangeRates')
+      .query('systemSupportingExchangeRates')
       .withIndex('by_currency_pair', (q) => q.eq('fromCurrency', fromCurrency).eq('toCurrency', toCurrency))
       .filter(notDeleted)
       .order('desc')

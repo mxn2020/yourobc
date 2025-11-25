@@ -15,14 +15,14 @@ import { emailLogsTable } from './email_logs/tables';
 // Document Types
 // ============================================================================
 
-export type EmailConfig = Doc<'configs'>;
-export type EmailConfigId = Id<'configs'>;
+export type EmailConfig = Doc<'emailConfigs'>;
+export type EmailConfigId = Id<'emailConfigs'>;
 
-export type EmailTemplate = Doc<'templates'>;
-export type EmailTemplateId = Id<'templates'>;
+export type EmailTemplate = Doc<'emailTemplates'>;
+export type EmailTemplateId = Id<'emailTemplates'>;
 
-export type EmailLog = Doc<'logs'>;
-export type EmailLogId = Id<'logs'>;
+export type EmailLog = Doc<'emailLogs'>;
+export type EmailLogId = Id<'emailLogs'>;
 
 // ============================================================================
 // Schema Types (from table validators)

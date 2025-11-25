@@ -4,7 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators, emailFields } from './validators';
+import { emailTemplatesFields, emailTemplatesValidators } from './validators';
 
 export const emailTemplatesTable = defineTable({
   // Required: Main display field
@@ -17,7 +17,7 @@ export const emailTemplatesTable = defineTable({
   // Module-specific fields
   slug: v.string(), // Unique identifier like 'welcome-email', 'password-reset'
   description: v.optional(v.string()),
-  status: emailValidators.status,
+  status: emailTemplatesValidators.status,
 
   // Template content
   subject: v.string(), // Can include variables like {{userName}}
@@ -28,7 +28,7 @@ export const emailTemplatesTable = defineTable({
   reactComponentPath: v.optional(v.string()),
 
   // Template variables
-  variables: v.array(emailFields.templateVariable),
+  variables: v.array(emailTemplatesFields.templateVariable),
 
   // Preview data for testing
   previewData: v.optional(v.any()),
@@ -38,14 +38,14 @@ export const emailTemplatesTable = defineTable({
   category: v.optional(v.string()), // e.g., 'auth', 'crm', 'notifications'
 
   // Settings (flexible configuration)
-  settings: v.optional(emailFields.templateSettings),
+  settings: v.optional(emailTemplatesFields.templateSettings),
 
   // Usage stats
   timesUsed: v.optional(v.number()),
   lastUsedAt: v.optional(v.number()),
 
   // Metadata (typed versioning/testing tracking)
-  metadata: v.optional(emailFields.templateMetadata),
+  metadata: v.optional(emailTemplatesFields.templateMetadata),
 
   // Audit fields
   ...auditFields,
@@ -63,5 +63,4 @@ export const emailTemplatesTable = defineTable({
   .index('by_active', ['isActive'])
   .index('by_status', ['status'])
   .index('by_created_at', ['createdAt'])
-  .index('by_last_activity', ['lastActivityAt'])
   .index('by_owner_and_status', ['ownerId', 'status']);

@@ -1,6 +1,6 @@
 // src/features/yourobc/customers/pages/CustomerDetailsPage.tsx
 
-import { FC, useState } from 'react'
+import { FC, useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useCustomer, useCustomers, useCustomerTags } from '../hooks/useCustomers'
 import { useToast } from '@/features/system/notifications'
@@ -40,15 +40,34 @@ interface CustomerDetailsPageProps {
 }
 
 export const CustomerDetailsPage: FC<CustomerDetailsPageProps> = ({ customerId }) => {
+  // Performance tracking (dev mode only)
+  const mountTimeRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      mountTimeRef.current = performance.now()
+
+      const logInteractive = () => {
+        if (mountTimeRef.current) {
+          const duration = performance.now() - mountTimeRef.current
+          console.log(`CustomerDetailsPage: Became interactive in ${duration.toFixed(2)}ms`)
+        }
+      }
+
+      const timeoutId = setTimeout(logInteractive, 0)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [])
+
   const [activeTab, setActiveTab] = useState('overview')
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [newTag, setNewTag] = useState('')
   const navigate = useNavigate()
   const toast = useToast()
 
-  const { customer, customerMetrics, customerInsights, activity, isLoading, error } = useCustomer(customerId)
+  const { customer, customerMetrics, customerInsights, activity } = useCustomer(customerId)
   const { canEditCustomers, canDeleteCustomers, deleteCustomer, isDeleting } = useCustomers()
-  const { allTags, addTag, removeTag, isAddingTag, isRemovingTag } = useCustomerTags(customerId)
+  const { allTags, addTag, removeTag, isAddingTag, isRemovingTag } = useCustomerTags(customerId, customer?.companyName)
 
   const handleDeleteClick = () => {
     setDeleteModalOpen(true)
@@ -61,7 +80,7 @@ export const CustomerDetailsPage: FC<CustomerDetailsPageProps> = ({ customerId }
       await deleteCustomer(customerId)
       toast.success(`${customer.companyName} has been deleted successfully`)
       setDeleteModalOpen(false)
-      navigate({ to: '/yourobc/customers' })
+      navigate({ to: '/{-$locale}/yourobc/customers' })
     } catch (error: any) {
       console.error('Delete customer error:', error)
       const { message } = parseConvexError(error)
@@ -470,7 +489,7 @@ export const CustomerDetailsPage: FC<CustomerDetailsPageProps> = ({ customerId }
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
                         <div className="space-y-2">
-                          <Link to="/yourobc/quotes/new" search={{ customerId }} className="block w-full">
+                          <Link to="/{-$locale}/yourobc/quotes/new" search={{ customerId }} className="block w-full">
                             <Button variant="primary" className="w-full">
                               📄 Create Quote
                             </Button>

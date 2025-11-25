@@ -90,7 +90,7 @@ export const requireAdminServer = createServerFn({ method: "GET" }).handler(
     const authenticatedConvex = await getAuthenticatedConvexClient()
 
     const profile = await authenticatedConvex.query(
-      api.lib.system.user_profiles.queries.getProfileByAuthId,
+      api.lib.system.user.user_profiles.queries.getProfileByAuthId,
       {}
     )
 
@@ -120,7 +120,7 @@ export const getCurrentUserServer = createServerFn({ method: "GET" }).handler(
       const authenticatedConvex = await getAuthenticatedConvexClient()
 
       const profile = await authenticatedConvex.query(
-        api.lib.system.user_profiles.queries.getProfileByAuthId,
+        api.lib.system.user.user_profiles.queries.getProfileByAuthId,
         {}
       )
 
@@ -156,7 +156,7 @@ export const hasPermissionServer = createServerFn({ method: "POST" })
       const authenticatedConvex = await getAuthenticatedConvexClient()
 
       const profile = await authenticatedConvex.query(
-        api.lib.system.user_profiles.queries.getProfileByAuthId,
+        api.lib.system.user.user_profiles.queries.getProfileByAuthId,
         {}
       )
 
@@ -183,7 +183,7 @@ export const getAuthStatusServer = createServerFn({ method: "GET" }).handler(
       const authenticatedConvex = await getAuthenticatedConvexClient()
 
       const profile = await authenticatedConvex.query(
-        api.lib.system.user_profiles.queries.getProfileByAuthId,
+        api.lib.system.user.user_profiles.queries.getProfileByAuthId,
         {}
       )
 

@@ -39,7 +39,7 @@ export const getThemeSettings = query({
       .collect();
 
     // Apply access filtering
-    settings = await filterThemeSettingsByAccess(ctx, settings, user);
+    settings = await filterThemeSettingsByAccess(settings, user);
 
     // Apply category filter
     if (filters.category?.length) {
@@ -104,7 +104,7 @@ export const getThemeSettingById = query({
       return null;
     }
 
-    await requireViewThemeSettingAccess(ctx, setting, user);
+    await requireViewThemeSettingAccess(setting, user);
 
     return setting;
   },
@@ -128,7 +128,7 @@ export const getThemeSettingByKey = query({
       return null;
     }
 
-    await requireViewThemeSettingAccess(ctx, setting, user);
+    await requireViewThemeSettingAccess(setting, user);
 
     return setting;
   },
@@ -149,7 +149,7 @@ export const getThemeSettingsByCategory = query({
       .collect();
 
     // Apply access filtering
-    settings = await filterThemeSettingsByAccess(ctx, settings, user);
+    settings = await filterThemeSettingsByAccess(settings, user);
 
     // Sort by key
     settings.sort((a, b) => a.key.localeCompare(b.key));
@@ -171,7 +171,7 @@ export const getThemeSettingStats = query({
       .collect();
 
     // Apply access filtering
-    settings = await filterThemeSettingsByAccess(ctx, settings, user);
+    settings = await filterThemeSettingsByAccess(settings, user);
 
     // Calculate stats
     const settingsByCategory: Record<string, number> = {};

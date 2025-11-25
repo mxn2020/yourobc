@@ -1,2 +1,7 @@
-// Module-scoped validators wrapper for email/logs
-export * from '@/schema/system/email/validators';
+// convex/schema/system/email/email_logs/validators.ts
+// Validators for email logs module (wraps shared email validators/fields)
+
+import { emailValidators, emailFields } from '../validators';
+
+export const emailLogsValidators = emailValidators;
+export const emailLogsFields = emailFields;

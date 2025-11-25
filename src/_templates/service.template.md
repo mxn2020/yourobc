@@ -2,9 +2,9 @@
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
-import { api } from "@/convex/_generated/api";
+import { api } from '@/generated/api'
 import type { Create[Entity]Data, Update[Entity]Data, [Entity]Id, [Entities]ListOptions } from "../types";
-import type { Id } from "@/convex/_generated/dataModel";
+import { {Entity}Id } from '@/convex/lib/{category}/{entity}/types'
 import * as {entity}Helpers from "../utils/{entity}Helpers";
 
 /**

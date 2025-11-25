@@ -39,7 +39,7 @@ export const createQuote = mutation({
       serviceType: baseValidators.serviceType,
       priority: quotesValidators.priority,
       customerId: v.id('yourobcCustomers'),
-      inquirySourceId: v.optional(v.id('inquirySources')),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
       origin: baseFields.address,
       destination: baseFields.address,
       dimensions: quotesFields.dimensions,
@@ -125,6 +125,7 @@ export const createQuote = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.created',
@@ -159,7 +160,7 @@ export const updateQuote = mutation({
       customerReference: v.optional(v.string()),
       serviceType: v.optional(baseValidators.serviceType),
       priority: v.optional(quotesValidators.priority),
-      inquirySourceId: v.optional(v.id('inquirySources')),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
       origin: v.optional(baseFields.address),
       destination: v.optional(baseFields.address),
       dimensions: v.optional(quotesFields.dimensions),
@@ -261,6 +262,7 @@ export const updateQuote = mutation({
 
     // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.updated',
@@ -310,6 +312,7 @@ export const deleteQuote = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.deleted',
@@ -367,6 +370,7 @@ export const restoreQuote = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.restored',
@@ -420,6 +424,7 @@ export const sendQuote = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.sent',
@@ -472,6 +477,7 @@ export const acceptQuote = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.accepted',
@@ -526,6 +532,7 @@ export const rejectQuote = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.rejected',
@@ -593,6 +600,7 @@ export const convertQuoteToShipment = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'quotes.converted',

@@ -35,7 +35,7 @@ export const commentsTable = defineTable({
   editHistory: v.optional(v.array(commentsFields.editHistoryEntry)),
 
   // Threading
-  parentCommentId: v.optional(v.id('comments')),
+  parentCommentId: v.optional(v.id('systemSupportingComments')),
   replyCount: v.optional(v.number()),
 
   // Audit fields

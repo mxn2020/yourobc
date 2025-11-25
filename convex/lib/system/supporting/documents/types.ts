@@ -8,8 +8,8 @@ import type {
   DocumentSchema,
 } from '@/schema/system/supporting/documents/types';
 
-export type SystemDocument = Doc<'documents'>;
-export type SystemDocumentId = Id<'documents'>;
+export type SystemDocument = Doc<'systemSupportingDocuments'>;
+export type SystemDocumentId = Id<'systemSupportingDocuments'>;
 
 export interface CreateSystemDocumentData {
   name: string;

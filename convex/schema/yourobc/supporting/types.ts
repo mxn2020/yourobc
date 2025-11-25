@@ -14,29 +14,29 @@ import type { Doc, Id } from '@/generated/dataModel'
 // Exchange Rates Types
 // ============================================================================
 
-export type ExchangeRate = Doc<'exchangeRates'>
-export type ExchangeRateId = Id<'exchangeRates'>
+export type ExchangeRate = Doc<'yourobcExchangeRates'>
+export type ExchangeRateId = Id<'yourobcExchangeRates'>
 
 // ============================================================================
 // Inquiry Sources Types
 // ============================================================================
 
-export type InquirySource = Doc<'inquirySources'>
-export type InquirySourceId = Id<'inquirySources'>
+export type InquirySource = Doc<'yourobcInquirySources'>
+export type InquirySourceId = Id<'yourobcInquirySources'>
 
 // ============================================================================
 // Wiki Entries Types
 // ============================================================================
 
-export type WikiEntry = Doc<'wikiEntries'>
-export type WikiEntryId = Id<'wikiEntries'>
+export type WikiEntry = Doc<'yourobcWikiEntries'>
+export type WikiEntryId = Id<'yourobcWikiEntries'>
 
 // ============================================================================
 // Comments Types
 // ============================================================================
 
-export type Comment = Doc<'comments'>
-export type CommentId = Id<'comments'>
+export type Comment = Doc<'yourobcComments'>
+export type CommentId = Id<'yourobcComments'>
 
 export interface CommentMention {
   userId: string

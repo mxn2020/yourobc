@@ -1,7 +1,7 @@
 // convex/schema/{category}/{entity}/{module}/schemas.ts
 // Schema exports for {module} module
 
-import { {module}Table } from './{module}';
+import { {module}Table } from './tables';
 
 /**
  * Schema export object for registration in main schema.ts
@@ -21,7 +21,7 @@ export const {category}{Entity}{Module}Schemas = {
  * IMPLEMENTATION CHECKLIST
  *
  * When creating schemas.ts:
- * [ ] Import table from ./{module}
+ * [ ] Import table from ./tables
  * [ ] Export as {category}{Entity}{Module}Schemas
  * [ ] Use correct {tableName} key (camelCase)
  * [ ] Add all tables for multi-table modules

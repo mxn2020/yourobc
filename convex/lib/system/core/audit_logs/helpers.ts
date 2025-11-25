@@ -2,6 +2,7 @@
 
 import { MutationCtx } from '@/generated/server';
 import { getCurrentUser } from '@/shared/auth.helper';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Audit Log Data Interface
@@ -103,9 +104,11 @@ export async function createAuditLog(
     throw new Error('User not authenticated');
   }
 
-  const id = crypto.randomUUID();
+  const now = Date.now();
+  const publicId = await generateUniquePublicId(ctx, 'auditLogs');
 
-  await ctx.db.insert('auditLogs', {
+  const auditLogId = await ctx.db.insert('auditLogs', {
+    publicId: await generateUniquePublicId(ctx, 'auditLogs'),
     userId: user._id,
     userName: user.name || user.email || 'Unknown User',
     action: data.action,
@@ -115,11 +118,11 @@ export async function createAuditLog(
     description: data.description,
     metadata: data.metadata,
     createdBy: user._id,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    createdAt: now,
+    updatedAt: now,
   });
 
-  return id;
+  return auditLogId;
 }
 
 export async function batchCreateAuditLogs(
@@ -134,10 +137,12 @@ export async function batchCreateAuditLogs(
 
   const userName = user.name || user.email || 'Unknown User';
   const now = Date.now();
+  const publicId = await generateUniquePublicId(ctx, 'auditLogs');
 
   // Use Promise.all for concurrent inserts instead of sequential
   const insertPromises = dataArray.map(data => 
     ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName,
       action: data.action,

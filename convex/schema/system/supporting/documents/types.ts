@@ -10,8 +10,8 @@ import { documentsTable } from './tables';
 // Document Types
 // ============================================
 
-export type Document = Doc<'documents'>;
-export type DocumentId = Id<'documents'>;
+export type Document = Doc<'systemSupportingDocuments'>;
+export type DocumentId = Id<'systemSupportingDocuments'>;
 
 // ============================================
 // Schema Type (from table validator)

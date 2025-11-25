@@ -1,11 +1,8 @@
 // convex/schema/system/index.ts
 
-/**
- * System Schema Module
- *
- * Central entry point for all system/system schemas, validators, and types
- */
+// convex/schema/system/index.ts
+// Public exports for system schema module
 
-export { systemSchemas } from './schemas'
-export * as systemValidators from './validators'
-export * from './types'
+export * from './validators';
+export * from './types';
+export * from './schemas';

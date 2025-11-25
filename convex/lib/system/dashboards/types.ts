@@ -4,7 +4,7 @@
 import type { Doc, Id } from '@/generated/dataModel';
 import type {
   DashboardLayout,
-  Widget,
+  DashboardWidget,
   WidgetType,
   ChartType,
   AggregationType,
@@ -19,7 +19,7 @@ export type Dashboard = Doc<'dashboards'>;
 export type DashboardId = Id<'dashboards'>;
 
 // Re-export schema types
-export type { DashboardLayout, Widget, WidgetType, ChartType, AggregationType, FormatType };
+export type { DashboardLayout, DashboardWidget, WidgetType, ChartType, AggregationType, FormatType };
 
 // ============================================
 // Data Interfaces
@@ -29,7 +29,7 @@ export interface CreateDashboardData {
   name: string;
   description?: string;
   layout?: DashboardLayout;
-  widgets?: Widget[];
+  widgets?: DashboardWidget[];
   isDefault?: boolean;
   isPublic?: boolean;
   tags?: string[];
@@ -39,7 +39,7 @@ export interface UpdateDashboardData {
   name?: string;
   description?: string;
   layout?: DashboardLayout;
-  widgets?: Widget[];
+  widgets?: DashboardWidget[];
   isDefault?: boolean;
   isPublic?: boolean;
   tags?: string[];

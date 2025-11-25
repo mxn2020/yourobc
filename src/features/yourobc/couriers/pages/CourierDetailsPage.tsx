@@ -76,7 +76,7 @@ export const CourierDetailsPage: FC<CourierDetailsPageProps> = ({ courierId }) =
       await deleteCourier(courierId)
       toast.success(`${courier.firstName} ${courier.lastName} has been deleted successfully`)
       setDeleteModalOpen(false)
-      navigate({ to: '/yourobc/couriers' })
+      navigate({ to: '/{-$locale}/yourobc/couriers' })
     } catch (error: any) {
       console.error('Delete courier error:', error)
       const { message } = parseConvexError(error)
@@ -137,7 +137,7 @@ export const CourierDetailsPage: FC<CourierDetailsPageProps> = ({ courierId }) =
               <p className="text-gray-500 mb-4">
                 {error?.message || 'The courier you are looking for does not exist or has been deleted.'}
               </p>
-              <Link to="/yourobc/couriers" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/couriers" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Couriers
               </Link>
             </div>
@@ -152,12 +152,12 @@ export const CourierDetailsPage: FC<CourierDetailsPageProps> = ({ courierId }) =
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Link to="/yourobc/couriers" className="text-blue-600 hover:text-blue-800 font-medium">
+          <Link to="/{-$locale}/yourobc/couriers" className="text-blue-600 hover:text-blue-800 font-medium">
             ← Back to Couriers
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/shipments/new" search={{ courierId }}>
+            <Link to="/{-$locale}/yourobc/shipments/new" search={{ courierId }}>
               <Button variant="primary">📦 Assign Shipment</Button>
             </Link>
 
@@ -424,7 +424,7 @@ export const CourierDetailsPage: FC<CourierDetailsPageProps> = ({ courierId }) =
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
                         <div className="space-y-2">
-                          <Link to="/yourobc/shipments/new" search={{ courierId }} className="block w-full">
+                          <Link to="/{-$locale}/yourobc/shipments/new" search={{ courierId }} className="block w-full">
                             <Button variant="primary" className="w-full">
                               📦 Assign Shipment
                             </Button>
@@ -523,7 +523,7 @@ export const CourierDetailsPage: FC<CourierDetailsPageProps> = ({ courierId }) =
                       <p className="text-gray-600 mb-4">
                         This courier hasn't been assigned any shipments yet.
                       </p>
-                      <Link to="/yourobc/shipments/new" search={{ courierId }}>
+                      <Link to="/{-$locale}/yourobc/shipments/new" search={{ courierId }}>
                         <Button variant="primary">Assign First Shipment</Button>
                       </Link>
                     </div>

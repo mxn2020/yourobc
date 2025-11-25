@@ -45,7 +45,7 @@ export const tasksTable = defineTable({
   projectId: v.id('freelancerProjects'),  // REQUIRED parent reference
   // ... other fields
 })
-  .index('by_project', ['projectId'])  // Index for parent queries
+  .index('by_project_id', ['projectId'])  // Index for parent queries
   .index('by_project_and_status', ['projectId', 'status']);
 ```
 
@@ -57,7 +57,7 @@ export const tasksTable = defineTable({
 // Get all tasks for a project
 const tasks = await ctx.db
   .query('freelancerTasks')
-  .withIndex('by_project', q => q.eq('projectId', projectId))
+  .withIndex('by_project_id', q => q.eq('projectId', projectId))
   .collect();
 
 // Get project with all tasks and milestones
@@ -82,7 +82,7 @@ export const deleteProject = mutation({
       // Delete all child tasks
       const tasks = await ctx.db
         .query('freelancerTasks')
-        .withIndex('by_project', q => q.eq('projectId', id))
+        .withIndex('by_project_id', q => q.eq('projectId', id))
         .collect();
 
       for (const task of tasks) {

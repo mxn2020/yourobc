@@ -39,10 +39,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/audit-
           };
 
           const [auditLogs, stats] = await Promise.all([
-            convexClient.query(api.lib.system.audit_logs.admin_queries.adminGetAuditLogs, {
+            convexClient.query(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogs, {
               options: convexOptions,
             }),
-            convexClient.query(api.lib.system.audit_logs.admin_queries.adminGetAuditLogStats, {
+            convexClient.query(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogStats, {
               timeWindow: 'week',
             }),
           ]);

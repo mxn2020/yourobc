@@ -114,7 +114,6 @@ export type {
   SyncStatus,
   MetricPeriod,
   DashboardType,
-  WidgetType,
   ReportType,
   ReportFrequency,
   ExportFormat,
@@ -243,11 +242,11 @@ export type {
 
 // Supporting Notifications (different from core notifications)
 export type {
-  SupportingNotification,
-  SupportingNotificationId,
-  SupportingNotificationSchema,
-  SupportingNotificationType,
-  SupportingNotificationPriority,
+  SystemSupportingNotification,
+  SystemSupportingNotificationId,
+  SystemSupportingNotificationSchema,
+  SystemSupportingNotificationType,
+  SystemSupportingNotificationPriority,
 } from './supporting/notifications/types';
 
 // Wiki Entries
@@ -296,43 +295,4 @@ export type {
   SortPreference,
   TestingDefaults,
 } from './user/user_model_preferences/types';
-
-// ============================================================================
-// Legacy/Commented Out Types
-// ============================================================================
-
-// System Types (commented out - not active)
-export type AuditLog = Doc<'auditLogs'>;
-export type AuditLogId = Id<'auditLogs'>;
-export type Notification = Doc<'notifications'>;
-export type NotificationId = Id<'notifications'>;
-export type SystemMetric = Doc<'systemMetrics'>;
-export type SystemMetricId = Id<'systemMetrics'>;
-
-// ============================================================================
-// Analytics Types
-// ============================================================================
-
-// Full document types
-export type AnalyticsEvent = Doc<'analyticsEvents'>;
-export type AnalyticsEventId = Id<'analyticsEvents'>;
-
-export type AnalyticsMetric = Doc<'analyticsMetrics'>;
-export type AnalyticsMetricId = Id<'analyticsMetrics'>;
-
-export type AnalyticsDashboard = Doc<'analyticsDashboards'>;
-export type AnalyticsDashboardId = Id<'analyticsDashboards'>;
-
-export type AnalyticsReport = Doc<'analyticsReports'>;
-export type AnalyticsReportId = Id<'analyticsReports'>;
-
-export type AnalyticsProviderSync = Doc<'analyticsProviderSync'>;
-export type AnalyticsProviderSyncId = Id<'analyticsProviderSync'>;
-
-// Validator types
-// export type AnalyticsEventSchema = Infer<typeof validators.analyticsEvent>;
-// export type AnalyticsMetricSchema = Infer<typeof validators.analyticsMetric>;
-// export type AnalyticsDashboardSchema = Infer<typeof validators.analyticsDashboard>;
-// export type AnalyticsReportSchema = Infer<typeof validators.analyticsReport>;
-// export type AnalyticsProviderSyncSchema = Infer<typeof validators.analyticsProviderSync>;
 

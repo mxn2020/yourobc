@@ -94,6 +94,7 @@ export const createPartner = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.created',
@@ -102,8 +103,10 @@ export const createPartner = mutation({
       entityTitle: trimmed.companyName || '',
       description: `Created partner: ${trimmed.companyName}`,
       metadata: {
-        status: trimmed.status || 'active',
-        serviceType: trimmed.serviceType,
+        data: {
+          status: trimmed.status || 'active',
+          serviceType: trimmed.serviceType,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -199,6 +202,7 @@ export const updatePartner = mutation({
 
     // 8. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.updated',
@@ -206,7 +210,7 @@ export const updatePartner = mutation({
       entityId: partner.publicId,
       entityTitle: updateData.companyName || partner.companyName,
       description: `Updated partner: ${updateData.companyName || partner.companyName}`,
-      metadata: { changes: trimmed },
+      metadata: { data: { changes: trimmed } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -248,6 +252,7 @@ export const deletePartner = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.deleted',
@@ -305,6 +310,7 @@ export const restorePartner = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.restored',
@@ -352,6 +358,7 @@ export const archivePartner = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.archived',
@@ -424,6 +431,7 @@ export const bulkUpdatePartners = mutation({
     }
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.bulk_updated',
@@ -432,10 +440,12 @@ export const bulkUpdatePartners = mutation({
       entityTitle: 'partners bulk update',
       description: `Bulk updated ${updatedCount} partners`,
       metadata: {
-        updates: trimmed,
-        denied,
-        requestedCount: ids.length,
-        updatedCount,
+        data: {
+          updates: trimmed,
+          denied,
+          requestedCount: ids.length,
+          updatedCount,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -494,6 +504,7 @@ export const bulkDeletePartners = mutation({
     }
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'partners.bulk_deleted',
@@ -502,9 +513,11 @@ export const bulkDeletePartners = mutation({
       entityTitle: 'partners bulk delete',
       description: `Bulk deleted ${deletedCount} partners`,
       metadata: {
-        denied,
-        requestedCount: ids.length,
-        deletedCount,
+        data: {
+          denied,
+          requestedCount: ids.length,
+          deletedCount,
+        },
       },
       createdAt: now,
       createdBy: user._id,

@@ -55,7 +55,7 @@ export interface CreateCustomerData {
   paymentMethod: PaymentMethod;
   margin: number;
   status?: CustomerStatus;
-  inquirySourceId?: Id<'inquirySources'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
   serviceSuspended?: boolean;
   serviceSuspendedDate?: number;
   serviceSuspendedReason?: string;
@@ -80,7 +80,7 @@ export interface UpdateCustomerData {
   paymentMethod?: PaymentMethod;
   margin?: number;
   status?: CustomerStatus;
-  inquirySourceId?: Id<'inquirySources'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
   serviceSuspended?: boolean;
   serviceSuspendedDate?: number;
   serviceSuspendedReason?: string;
@@ -94,7 +94,7 @@ export interface UpdateCustomerData {
 
 // Response types
 export interface CustomerWithRelations extends Customer {
-  inquirySource?: Doc<'inquirySources'> | null;
+  inquirySource?: Doc<'yourobcInquirySources'> | null;
 }
 
 export interface CustomerListResponse {
@@ -108,7 +108,7 @@ export interface CustomerFilters {
   status?: CustomerStatus[];
   currency?: Currency[];
   search?: string;
-  inquirySourceId?: Id<'inquirySources'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
   country?: string;
   serviceSuspended?: boolean;
 }

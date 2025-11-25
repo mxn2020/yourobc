@@ -5,8 +5,8 @@ import type { Doc, Id } from '@/generated/dataModel';
 import type { CommentType } from '@/schema/yourobc/supporting/comments/types';
 
 // Entity types
-export type Comment = Doc<'comments'>;
-export type CommentId = Id<'comments'>;
+export type Comment = Doc<'yourobcComments'>;
+export type CommentId = Id<'yourobcComments'>;
 
 // Nested types
 export interface Mention {

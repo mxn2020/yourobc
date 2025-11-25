@@ -2,5 +2,5 @@
 import { emailConfigsTable } from './tables';
 
 export const systemEmailConfigsSchemas = {
-  configs: emailConfigsTable,
+  emailConfigs: emailConfigsTable,
 } as const;

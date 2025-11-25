@@ -20,13 +20,13 @@ export const getSystemCounters = query({
     const { limit = 50, cursor, type } = args;
 
     let queryBuilder = ctx.db
-      .query('counters')
+      .query('systemSupportingCounters')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted);
 
     if (type) {
       queryBuilder = ctx.db
-        .query('counters')
+        .query('systemSupportingCounters')
         .withIndex('by_type', (q) => q.eq('type', type))
         .filter(notDeleted);
     }
@@ -46,7 +46,7 @@ export const getSystemCounters = query({
 });
 
 export const getSystemCounter = query({
-  args: { id: v.id('counters') },
+  args: { id: v.id('systemSupportingCounters') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);

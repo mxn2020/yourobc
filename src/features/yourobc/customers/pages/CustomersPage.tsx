@@ -1,6 +1,6 @@
 // src/features/yourobc/customers/pages/CustomersPage.tsx
 
-import { FC, useState } from 'react'
+import { FC, useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { CustomerCard } from '../components/CustomerCard'
 import { CustomerStats } from '../components/CustomerStats'
@@ -10,11 +10,30 @@ import { CustomersTable } from '../components/CustomersTable'
 import { CustomersQuickFilterBadges } from '../components/CustomersQuickFilterBadges'
 import { CustomersHelpSection } from '../components/CustomersHelpSection'
 import { useCustomers } from '../hooks/useCustomers'
-import { Card, Loading, PermissionDenied, ErrorState } from '@/components/ui'
+import { Card } from '@/components/ui'
 import type { CustomerListItem } from '../types'
 import { WikiSidebar } from '@/features/yourobc/supporting/wiki/components/WikiSidebar'
 
 export const CustomersPage: FC = () => {
+  // Performance tracking (dev mode only)
+  const mountTimeRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      mountTimeRef.current = performance.now()
+
+      const logInteractive = () => {
+        if (mountTimeRef.current) {
+          const duration = performance.now() - mountTimeRef.current
+          console.log(`CustomersPage: Became interactive in ${duration.toFixed(2)}ms`)
+        }
+      }
+
+      const timeoutId = setTimeout(logInteractive, 0)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [])
+
   const navigate = useNavigate()
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [searchTerm, setSearchTerm] = useState('')
@@ -23,11 +42,6 @@ export const CustomersPage: FC = () => {
   const {
     customers,
     stats,
-    isLoading,
-    isStatsLoading,
-    error,
-    isPermissionError,
-    refetch,
     canCreateCustomers,
   } = useCustomers({
     limit: 50,
@@ -35,7 +49,7 @@ export const CustomersPage: FC = () => {
 
   const handleCustomerClick = (customer: CustomerListItem) => {
     navigate({
-      to: '/yourobc/customers/$customerId',
+      to: '/{-$locale}/yourobc/customers/$customerId',
       params: { customerId: customer._id },
     })
   }
@@ -62,31 +76,6 @@ export const CustomersPage: FC = () => {
     return true
   })
 
-  if (isLoading && customers.length === 0) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loading size="lg" />
-      </div>
-    )
-  }
-
-  // Handle permission errors
-  if (isPermissionError && error) {
-    return (
-      <PermissionDenied
-        permission={error.permission}
-        module="Customers"
-        message={error.message}
-        showDetails={true}
-      />
-    )
-  }
-
-  // Handle other errors
-  if (error) {
-    return <ErrorState error={error} onRetry={refetch} showDetails={true} />
-  }
-
   const handleClearFilters = () => {
     setSearchTerm('')
     setStatusFilter('')
@@ -105,13 +94,7 @@ export const CustomersPage: FC = () => {
         />
 
         {/* Stats Overview */}
-        {!isStatsLoading ? (
-          <CustomerStats />
-        ) : (
-          <div className="flex justify-center py-8 mb-8">
-            <Loading size="lg" />
-          </div>
-        )}
+        {stats && <CustomerStats />}
 
         {/* Filters */}
         <CustomersFilters
@@ -183,7 +166,7 @@ export const CustomersPage: FC = () => {
         {/* Quick Actions (Fixed Position) */}
         <div className="fixed bottom-6 right-6 flex flex-col gap-3">
           {canCreateCustomers && (
-            <Link to="/yourobc/customers/new">
+            <Link to="/{-$locale}/yourobc/customers/new">
               <button
                 className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-xl hover:scale-110 transition-all"
                 title="Add New Customer"

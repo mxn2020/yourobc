@@ -33,7 +33,7 @@ export const createCustomer = mutation({
       paymentMethod: baseValidators.paymentMethod,
       margin: v.number(),
       status: v.optional(customersValidators.status),
-      inquirySourceId: v.optional(v.id('inquirySources')),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
       serviceSuspended: v.optional(v.boolean()),
       serviceSuspendedDate: v.optional(v.number()),
       serviceSuspendedReason: v.optional(v.string()),
@@ -64,8 +64,8 @@ export const createCustomer = mutation({
     }
 
     // 5. PROCESS: Generate IDs and prepare data
-    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
 
     // Build searchable text
     const searchableText = buildSearchableText(trimmedData);
@@ -112,6 +112,7 @@ export const createCustomer = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.created',
@@ -120,9 +121,11 @@ export const createCustomer = mutation({
       entityTitle: trimmedData.companyName,
       description: `Created customer: ${trimmedData.companyName}`,
       metadata: {
-        status: trimmedData.status || 'active',
-        currency: trimmedData.defaultCurrency || data.defaultCurrency,
-        margin: trimmedData.margin ?? data.margin,
+        data: {
+          status: trimmedData.status || 'active',
+          currency: trimmedData.defaultCurrency || data.defaultCurrency,
+          margin: trimmedData.margin ?? data.margin,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -153,7 +156,7 @@ export const updateCustomer = mutation({
       paymentMethod: v.optional(baseValidators.paymentMethod),
       margin: v.optional(v.number()),
       status: v.optional(customersValidators.status),
-      inquirySourceId: v.optional(v.id('inquirySources')),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
       serviceSuspended: v.optional(v.boolean()),
       serviceSuspendedDate: v.optional(v.number()),
       serviceSuspendedReason: v.optional(v.string()),
@@ -186,6 +189,8 @@ export const updateCustomer = mutation({
 
     // 5. PROCESS: Prepare update data
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+
     const updateData: any = {
       updatedAt: now,
       updatedBy: user._id,
@@ -291,6 +296,7 @@ export const updateCustomer = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.updated',
@@ -298,7 +304,11 @@ export const updateCustomer = mutation({
       entityId: customer.publicId,
       entityTitle: updateData.companyName || customer.companyName,
       description: `Updated customer: ${updateData.companyName || customer.companyName}`,
-      metadata: { changes: updates },
+      metadata: {
+        data: {
+          changes: updates
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -331,6 +341,8 @@ export const deleteCustomer = mutation({
 
     // 4. SOFT DELETE: Mark as deleted
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+
     await ctx.db.patch(customerId, {
       deletedAt: now,
       deletedBy: user._id,
@@ -340,6 +352,7 @@ export const deleteCustomer = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.deleted',
@@ -388,6 +401,8 @@ export const restoreCustomer = mutation({
 
     // 4. RESTORE: Clear soft delete fields
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+
     await ctx.db.patch(customerId, {
       deletedAt: undefined,
       deletedBy: undefined,
@@ -397,6 +412,7 @@ export const restoreCustomer = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.restored',
@@ -436,6 +452,8 @@ export const archiveCustomer = mutation({
 
     // 4. ARCHIVE: Update status to inactive
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+
     await ctx.db.patch(customerId, {
       status: 'inactive',
       updatedAt: now,
@@ -444,6 +462,7 @@ export const archiveCustomer = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.archived',
@@ -491,6 +510,8 @@ export const bulkUpdateCustomers = mutation({
     }
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+
     const results: { id: Id<'yourobcCustomers'>; success: true }[] = [];
     const failed: { id: Id<'yourobcCustomers'>; reason: string }[] = [];
 
@@ -521,7 +542,7 @@ export const bulkUpdateCustomers = mutation({
             ...(updates.tags !== undefined && { tags: updates.tags.map(tag => tag.trim()) }),
             ...(updates.category !== undefined && { category: updates.category.trim() }),
           };
-          
+
           await ctx.db.patch(customerId, updateData);
           results.push({ id: customerId, success: true });
         } catch (error: any) {
@@ -533,6 +554,7 @@ export const bulkUpdateCustomers = mutation({
 
     // 5. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.bulk_updated',
@@ -541,9 +563,11 @@ export const bulkUpdateCustomers = mutation({
       entityTitle: `${results.length} customers`,
       description: `Bulk updated ${results.length} customers`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
-        updates,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+          updates,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -576,6 +600,8 @@ export const bulkDeleteCustomers = mutation({
     });
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'yourobcCustomers');
+    
     const results: { id: Id<'yourobcCustomers'>; success: true }[] = [];
     const failed: { id: Id<'yourobcCustomers'>; reason: string }[] = [];
 
@@ -614,6 +640,7 @@ export const bulkDeleteCustomers = mutation({
 
     // 4. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId,
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'customers.bulk_deleted',
@@ -622,8 +649,10 @@ export const bulkDeleteCustomers = mutation({
       entityTitle: `${results.length} customers`,
       description: `Bulk deleted ${results.length} customers`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+        },
       },
       createdAt: now,
       createdBy: user._id,

@@ -16,6 +16,7 @@ import {
   requirePublishWikiEntryAccess,
   requireDeleteWikiEntryAccess,
 } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create new wiki entry
@@ -66,6 +67,7 @@ export const createWikiEntry = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'wiki_entries.created',
@@ -128,6 +130,7 @@ export const updateWikiEntry = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'wiki_entries.updated',
@@ -135,7 +138,11 @@ export const updateWikiEntry = mutation({
       entityId: existing.slug,
       entityTitle: existing.title,
       description: `Updated wiki entry: ${existing.title}`,
-      metadata: { changes: trimmed },
+      metadata: { 
+        data: { 
+          changes: trimmed 
+        },
+        },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -178,6 +185,7 @@ export const publishWikiEntry = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'wiki_entries.published',
@@ -185,7 +193,11 @@ export const publishWikiEntry = mutation({
       entityId: existing.slug,
       entityTitle: existing.title,
       description: `Published wiki entry: ${existing.title} (status: ${status})`,
-      metadata: { status, isPublic },
+      metadata: {
+        data: {
+          status,
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -247,6 +259,7 @@ export const deleteWikiEntry = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'wiki_entries.deleted',

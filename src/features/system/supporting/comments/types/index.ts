@@ -2,14 +2,14 @@
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 
-export type Comment = Doc<'comments'>
-export type CommentId = Id<'comments'>
+export type Comment = Doc<'systemSupportingComments'>
+export type CommentId = Id<'systemSupportingComments'>
 
 export interface CreateCommentData {
   entityType: string
   entityId: string
   content: string
-  parentCommentId?: Id<'comments'>
+  parentCommentId?: Id<'systemSupportingComments'>
   type?: Comment['type']
   isInternal?: boolean
   mentions?: Array<{

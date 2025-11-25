@@ -2,8 +2,7 @@
 // Schema exports for couriers module
 
 import { v } from 'convex/values';
-import { couriersTable } from './couriers';
-import { commissionsTable } from './commissions';
+import { couriersTable, commissionsTable } from './tables';
 
 // ID schemas
 export const courierIdSchema = v.id('yourobcCouriers');

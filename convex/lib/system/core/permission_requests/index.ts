@@ -2,7 +2,7 @@
 // Barrel exports for permissionRequests module
 
 // Export constants and types
-export { PERMISSION_REQUEST_CONSTANTS } from './constants';
+export { PERMISSION_REQUESTS_CONSTANTS } from './constants';
 export * from './types';
 
 // Export utilities

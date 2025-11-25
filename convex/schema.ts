@@ -5,15 +5,19 @@
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
-// import { systemSchemas } from './schema/system'
-//import { yourobcSchemas } from './schema/yourobc'
+import { systemSchemas } from './schema/system'
+import { yourobcSchemas } from './schema/yourobc'
+import { projectsSchemas } from './schema/projects'
 
 const schema = defineSchema({
   // System Tables
-  // ...systemSchemas,
+  ...systemSchemas,
 
   // YouROBC Tables
-  //...yourobcSchemas,
+  ...yourobcSchemas,
+
+  // Projects Module Tables
+  ...projectsSchemas,
 
 })
 

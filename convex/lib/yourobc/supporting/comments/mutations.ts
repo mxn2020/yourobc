@@ -8,6 +8,7 @@ import { commentsValidators } from '@/schema/yourobc/supporting/comments/validat
 import { COMMENTS_CONSTANTS } from './constants';
 import { trimCommentData, validateCommentData, isValidReaction } from './utils';
 import { requireEditCommentAccess, requireDeleteCommentAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create a new comment
@@ -32,7 +33,7 @@ export const createComment = mutation({
         fileSize: v.number(),
         mimeType: v.string(),
       }))),
-      parentCommentId: v.optional(v.id('comments')),
+      parentCommentId: v.optional(v.id('yourobcComments')),
     }),
   },
   handler: async (ctx, { data }) => {
@@ -52,7 +53,7 @@ export const createComment = mutation({
     const now = Date.now();
 
     // Insert record
-    const id = await ctx.db.insert('comments', {
+    const id = await ctx.db.insert('yourobcComments', {
       ...trimmed,
       isInternal: trimmed.isInternal ?? COMMENTS_CONSTANTS.DEFAULTS.IS_INTERNAL,
       replyCount: COMMENTS_CONSTANTS.DEFAULTS.REPLY_COUNT,
@@ -67,6 +68,7 @@ export const createComment = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'comments.created',
@@ -74,7 +76,7 @@ export const createComment = mutation({
       entityId: trimmed.entityId,
       entityTitle: `Comment on ${trimmed.entityType}`,
       description: `Created comment on ${trimmed.entityType}: ${trimmed.entityId}`,
-      metadata: { isInternal: trimmed.isInternal },
+      metadata: { data: { isInternal: trimmed.isInternal } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -91,7 +93,7 @@ export const createComment = mutation({
  */
 export const updateComment = mutation({
   args: {
-    id: v.id('comments'),
+    id: v.id('yourobcComments'),
     updates: v.object({
       content: v.optional(v.string()),
       isInternal: v.optional(v.boolean()),
@@ -157,7 +159,7 @@ export const updateComment = mutation({
       entityId: existing.entityId,
       entityTitle: `Comment on ${existing.entityType}`,
       description: `Updated comment on ${existing.entityType}`,
-      metadata: { changes: trimmed, editReason: reason },
+      metadata: { data: { changes: trimmed, editReason: reason } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -174,7 +176,7 @@ export const updateComment = mutation({
  */
 export const addCommentReaction = mutation({
   args: {
-    commentId: v.id('comments'),
+    commentId: v.id('yourobcComments'),
     reaction: v.string(),
   },
   handler: async (ctx, { commentId, reaction }) => {
@@ -230,7 +232,7 @@ export const addCommentReaction = mutation({
  */
 export const removeCommentReaction = mutation({
   args: {
-    commentId: v.id('comments'),
+    commentId: v.id('yourobcComments'),
     reaction: v.string(),
   },
   handler: async (ctx, { commentId, reaction }) => {
@@ -264,7 +266,7 @@ export const removeCommentReaction = mutation({
  * 🔒 Authorization: Creator or admin
  */
 export const deleteComment = mutation({
-  args: { id: v.id('comments') },
+  args: { id: v.id('yourobcComments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
 
@@ -289,6 +291,7 @@ export const deleteComment = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'comments.deleted',

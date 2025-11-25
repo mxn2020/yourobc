@@ -16,7 +16,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/settings')(
     console.time('Route Loader: Settings Page')
 
     // Get query options for user settings
-    const userSettingsQueryOptions = convexQuery(api.lib.system.user_settings.queries.getUserSettings, {})
+    const userSettingsQueryOptions = convexQuery(api.lib.system.user.user_settings.queries.getUserSettings, {})
 
     // SERVER: SSR prefetching with authenticated Convex client
     if (isServer) {
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/settings')(
 
         if (convexClient) {
           // Fetch user settings
-          const settings = await convexClient.query(api.lib.system.user_settings.queries.getUserSettings, {})
+          const settings = await convexClient.query(api.lib.system.user.user_settings.queries.getUserSettings, {})
 
           // Cache data
           context.queryClient.setQueryData(userSettingsQueryOptions.queryKey, settings)

@@ -4,7 +4,7 @@
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Doc } from '@/generated/dataModel';
 import type { Counter } from './types';
-
+import { UserProfile } from '@/schema/system';
 
 /**
  * Check if user can view counters

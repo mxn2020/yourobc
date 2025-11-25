@@ -4,9 +4,9 @@
  * Database schemas for user AI model preferences and defaults
  */
 
-import { defineTable } from "convex/server";
-import { v } from "convex/values";
-import { auditFields, softDeleteFields } from "../../../base";
+import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+import { auditFields, softDeleteFields } from '@/schema/base';
 import { userModelPreferencesValidators } from './validators';
 
 /**
@@ -19,6 +19,7 @@ export const userModelPreferencesTable = defineTable({
 
   // User identification (userId serves as ownerId)
   userId: v.id('userProfiles'),
+  ownerId: v.id('userProfiles'),
 
   // Main display field - user identifier
   displayName: v.string(), // e.g., "Model Preferences for [User Name]"
@@ -48,18 +49,11 @@ export const userModelPreferencesTable = defineTable({
   ...softDeleteFields,
 })
   // Required indexes
-  .index("by_public_id", ["publicId"])
-  .index("by_display_name", ["displayName"])
-  .index("by_deleted_at", ["deletedAt"])
+  .index('by_public_id', ['publicId'])
+  .index('by_displayName', ['displayName'])
+  .index('by_deleted_at', ['deletedAt'])
 
   // Module-specific indexes
   .index('by_user_id', ['userId'])
   .index('by_preferred_view', ['preferredView'])
-  .index('by_created_at', ['createdAt']);
-
-/**
- * Export the table schema
- */
-export const userModelPreferencesSchemas = {
-  userModelPreferencesTable,
-};
+.index('by_created_at', ['createdAt']);

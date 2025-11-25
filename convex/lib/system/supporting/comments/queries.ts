@@ -18,7 +18,7 @@ export const getSystemComments = query({
         entityType: v.optional(v.string()),
         entityId: v.optional(v.string()),
         isInternal: v.optional(v.boolean()),
-        parentCommentId: v.optional(v.id('comments')),
+        parentCommentId: v.optional(v.id('systemSupportingComments')),
       })
     ),
   },
@@ -27,7 +27,7 @@ export const getSystemComments = query({
     const { limit = 50, cursor, filters = {} as SystemCommentFilters } = args;
 
     const page = await ctx.db
-      .query('comments')
+      .query('systemSupportingComments')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')
@@ -58,7 +58,7 @@ export const getSystemComments = query({
 });
 
 export const getSystemComment = query({
-  args: { id: v.id('comments') },
+  args: { id: v.id('systemSupportingComments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);
@@ -82,7 +82,7 @@ export const listSystemCommentsForEntity = query({
     const { entityType, entityId, limit = 50, cursor } = args;
 
     const page = await ctx.db
-      .query('comments')
+      .query('systemSupportingComments')
       .withIndex('by_entity', (q) => q.eq('entityType', entityType).eq('entityId', entityId))
       .filter(notDeleted)
       .order('desc')

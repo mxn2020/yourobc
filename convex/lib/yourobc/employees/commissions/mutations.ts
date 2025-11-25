@@ -114,6 +114,7 @@ export const createEmployeeCommission = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.created',
@@ -122,9 +123,11 @@ export const createEmployeeCommission = mutation({
       entityTitle: commissionId,
       description: `Created employee commission: ${commissionId}`,
       metadata: {
+        data: {
         status: data.status || 'pending',
         totalAmount: data.totalAmount,
         currency: data.currency,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -204,6 +207,7 @@ export const updateEmployeeCommission = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.updated',
@@ -211,7 +215,7 @@ export const updateEmployeeCommission = mutation({
       entityId: commission.publicId,
       entityTitle: commission.commissionId,
       description: `Updated employee commission: ${commission.commissionId}`,
-      metadata: { changes: updates },
+      metadata: { data: { changes: updates } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -255,6 +259,7 @@ export const approveEmployeeCommission = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.approved',
@@ -306,6 +311,7 @@ export const payEmployeeCommission = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.paid',
@@ -313,7 +319,7 @@ export const payEmployeeCommission = mutation({
       entityId: commission.publicId,
       entityTitle: commissionId,
       description: `Paid employee commission: ${commissionId}`,
-      metadata: { paymentReference, paymentMethod },
+      metadata: { data: { paymentReference, paymentMethod } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -349,6 +355,7 @@ export const deleteEmployeeCommission = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.deleted',
@@ -400,6 +407,7 @@ export const restoreEmployeeCommission = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employeeCommissions.restored',

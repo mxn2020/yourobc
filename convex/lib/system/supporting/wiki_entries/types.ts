@@ -7,16 +7,17 @@ import type {
   WikiEntryStatus,
 } from '@/schema/system/supporting/wikiEntries/types';
 
-export type SystemWikiEntry = Doc<'wikiEntries'>;
-export type SystemWikiEntryId = Id<'wikiEntries'>;
+export type SystemWikiEntry = Doc<'systemSupportingWikiEntries'>;
+export type SystemWikiEntryId = Id<'systemSupportingWikiEntries'>;
 
 export interface CreateSystemWikiEntryData {
   title: string;
-  slug: string;
+  slug?: string;
   content: string;
   type: WikiEntryType;
   status?: WikiEntryStatus;
   tags?: string[];
+  isPublic?: boolean;
 }
 
 export interface UpdateSystemWikiEntryData {

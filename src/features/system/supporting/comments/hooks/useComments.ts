@@ -23,7 +23,7 @@ export function useEntityComments(
 /**
  * Hook to fetch a single comment
  */
-export function useComment(commentId?: Id<'comments'>) {
+export function useComment(commentId?: Id<'systemSupportingComments'>) {
   return useQuery(
     api.lib.system.supporting.comments.queries.getComment,
     commentId
@@ -35,7 +35,7 @@ export function useComment(commentId?: Id<'comments'>) {
 /**
  * Hook to fetch comment thread (comment + replies)
  */
-export function useCommentThread(threadId?: Id<'comments'>) {
+export function useCommentThread(threadId?: Id<'systemSupportingComments'>) {
   return useQuery(
     api.lib.system.supporting.comments.queries.getCommentThread,
     threadId

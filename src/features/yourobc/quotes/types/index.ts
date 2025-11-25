@@ -34,7 +34,7 @@ export interface QuoteWithDetails extends Quote {
     status?: 'available' | 'busy' | 'offline'
   } | null
   inquirySource?: {
-    _id: Id<'inquirySources'>
+    _id: Id<'yourobcInquirySources'>
     name: string
     type: string
   } | null

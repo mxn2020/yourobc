@@ -3,6 +3,7 @@
 import { mutation } from '@/generated/server'
 import { v } from 'convex/values'
 import { requireAdmin } from '@/shared/auth.helper'
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Record a system metric
@@ -138,6 +139,7 @@ export const cleanupOldMetrics = mutation({
     // 6. Create audit log
     const adminName = (admin.name || admin.email || 'Admin').trim();
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: admin._id,
       userName: adminName,
       action: 'system_metrics.cleanup',
@@ -146,9 +148,11 @@ export const cleanupOldMetrics = mutation({
       entityTitle: 'System Metrics Cleanup',
       description: `Cleaned up ${deletedCount} old system metrics`,
       metadata: {
-        deletedCount,
-        olderThan: args.olderThan,
-        metricType: trimmedMetricType ?? null,
+        data: {
+          deletedCount,
+          olderThan: args.olderThan,
+          metricType: trimmedMetricType ?? null,
+        }
       },
       createdAt: now,
       createdBy: admin._id,
@@ -197,6 +201,7 @@ export const deleteMetricsByType = mutation({
     // 5. Create audit log
     const adminName = (admin.name || admin.email || 'Admin').trim();
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: admin._id,
       userName: adminName,
       action: 'system_metrics.delete_by_type',
@@ -205,8 +210,10 @@ export const deleteMetricsByType = mutation({
       entityTitle: `Delete ${trimmedMetricType} Metrics`,
       description: `Deleted ${deletedCount} metrics of type ${trimmedMetricType}`,
       metadata: {
-        metricType: trimmedMetricType,
-        deletedCount,
+        data: {
+          metricType: trimmedMetricType,
+          deletedCount,
+        },
       },
       createdAt: now,
       createdBy: admin._id,

@@ -9,44 +9,87 @@
 
 import type { Id } from '@/generated/dataModel'
 
-// Re-export schema types
+// Re-export schema types from their specific modules
 export type {
   ExchangeRate,
   ExchangeRateId,
+} from '../../../schema/yourobc/supporting/exchange_rates/types'
+
+export type {
   InquirySource,
   InquirySourceId,
+} from '../../../schema/yourobc/supporting/inquiry_sources/types'
+
+export type {
   WikiEntry,
   WikiEntryId,
+} from '../../../schema/yourobc/supporting/wiki_entries/types'
+
+export type {
   Comment,
   CommentId,
   CommentMention,
   CommentReaction,
   CommentAttachment,
   CommentEditHistory,
+} from '../../../schema/yourobc/supporting/comments/types'
+
+export type {
   FollowupReminder,
   FollowupReminderId,
   RecurrencePattern,
+} from '../../../schema/yourobc/supporting/followup_reminders/types'
+
+export type {
   Document,
   DocumentId,
+} from '../../../schema/yourobc/supporting/documents/types'
+
+export type {
   Notification,
   NotificationId,
+} from '../../../schema/yourobc/supporting/notifications/types'
+
+export type {
   Counter,
   CounterId,
+  CounterType,
+} from '../../../schema/yourobc/supporting/counters/types'
+
+// Re-export validator types from their respective modules
+export type {
   Currency,
+} from '../../../schema/yourobc/supporting/exchange_rates/types'
+
+export type {
   ReminderStatus,
   ServicePriority,
-  NotificationPriority,
-  InquirySourceType,
-  WikiEntryType,
-  WikiStatus,
-  CommentType,
   ReminderType,
   RecurrenceFrequency,
+} from '../../../schema/yourobc/supporting/followup_reminders/types'
+
+export type {
+  NotificationPriority,
+  NotificationType,
+} from '../../../schema/yourobc/supporting/notifications/types'
+
+export type {
+  InquirySourceType,
+} from '../../../schema/yourobc/supporting/inquiry_sources/types'
+
+export type {
+  WikiEntryType,
+  WikiStatus,
+} from '../../../schema/yourobc/supporting/wiki_entries/types'
+
+export type {
+  CommentType,
+} from '../../../schema/yourobc/supporting/comments/types'
+
+export type {
   DocumentType,
   DocumentStatus,
-  NotificationType,
-  CounterType,
-} from '../../../schema/yourobc/supporting'
+} from '../../../schema/yourobc/supporting/documents/types'
 
 // ============================================================================
 // Exchange Rates Types
@@ -62,7 +105,7 @@ export interface CreateExchangeRateArgs {
 }
 
 export interface UpdateExchangeRateArgs {
-  id: Id<'exchangeRates'>
+  id: Id<'yourobcExchangeRates'>
   rate?: number
   isActive?: boolean
   source?: string
@@ -87,7 +130,7 @@ export interface CreateInquirySourceArgs {
 }
 
 export interface UpdateInquirySourceArgs {
-  id: Id<'inquirySources'>
+  id: Id<'yourobcInquirySources'>
   name?: string
   code?: string
   type?: string
@@ -112,7 +155,7 @@ export interface CreateWikiEntryArgs {
 }
 
 export interface UpdateWikiEntryArgs {
-  id: Id<'wikiEntries'>
+  id: Id<'yourobcWikiEntries'>
   title?: string
   slug?: string
   content?: string
@@ -150,23 +193,23 @@ export interface CreateCommentArgs {
     fileSize: number
     mimeType: string
   }>
-  parentCommentId?: Id<'comments'>
+  parentCommentId?: Id<'yourobcComments'>
 }
 
 export interface UpdateCommentArgs {
-  id: Id<'comments'>
+  id: Id<'yourobcComments'>
   content?: string
   reason?: string
 }
 
 export interface AddCommentReactionArgs {
-  id: Id<'comments'>
+  id: Id<'yourobcComments'>
   userId: string
   reaction: string
 }
 
 export interface RemoveCommentReactionArgs {
-  id: Id<'comments'>
+  id: Id<'yourobcComments'>
   userId: string
   reaction: string
 }

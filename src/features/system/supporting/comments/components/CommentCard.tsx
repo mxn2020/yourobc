@@ -11,9 +11,9 @@ interface CommentCardProps {
   comment: Comment;
   currentUserId?: Id<"userProfiles">;
   isReply?: boolean;
-  onDelete?: (commentId: Id<'comments'>) => void;
-  onReply?: (commentId: Id<'comments'>) => void;
-  onReaction?: (commentId: Id<'comments'>, reaction: string) => void;
+  onDelete?: (commentId: Id<'systemSupportingComments'>) => void;
+  onReply?: (commentId: Id<'systemSupportingComments'>) => void;
+  onReaction?: (commentId: Id<'systemSupportingComments'>, reaction: string) => void;
 }
 
 export function CommentCard({

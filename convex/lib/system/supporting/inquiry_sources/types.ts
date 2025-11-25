@@ -4,8 +4,8 @@
 import type { Doc, Id } from '@/generated/dataModel';
 import type { InquirySourceType } from '@/schema/system/supporting/inquiry_sources/types';
 
-export type SystemInquirySource = Doc<'inquirySources'>;
-export type SystemInquirySourceId = Id<'inquirySources'>;
+export type SystemInquirySource = Doc<'systemSupportingInquirySources'>;
+export type SystemInquirySourceId = Id<'systemSupportingInquirySources'>;
 
 export interface CreateSystemInquirySourceData {
   name: string;

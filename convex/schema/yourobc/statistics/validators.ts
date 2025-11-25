@@ -20,8 +20,6 @@ import {
   visibilityValidator,
   currencyValidator,
   currencyAmountSchema,
-  auditFields,
-  softDeleteFields,
   statsSchema,
 } from '../../base'
 
@@ -55,21 +53,5 @@ export const statisticsFields = {
 
   // Tracking
   stats: statsSchema,
-  audit: auditFields,
-  softDelete: softDeleteFields,
 } as const
 
-// ============================================================================
-// Type Exports
-// ============================================================================
-
-export type {
-  OfficeCostCategory,
-  CostFrequency,
-  MiscExpenseCategory,
-  TargetType,
-  KpiCacheType,
-  Difficulty,
-  Visibility,
-  Currency,
-} from '../../base'

@@ -25,7 +25,7 @@ export const projectMembersTable = defineTable({
   ...softDeleteFields,
 })
   .index('by_deleted_at', ['deletedAt'])
-  .index('by_project', ['projectId'])
+  .index('by_project_id', ['projectId'])
   .index('by_user', ['userId'])
   .index('by_project_and_user', ['projectId', 'userId'])
   .index('by_project_and_status', ['projectId', 'status']);

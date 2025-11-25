@@ -10,8 +10,8 @@ import { followupRemindersTable } from './tables';
 // Document Types
 // ============================================
 
-export type FollowupReminder = Doc<'followupReminders'>;
-export type FollowupReminderId = Id<'followupReminders'>;
+export type FollowupReminder = Doc<'systemSupportingFollowupReminders'>;
+export type FollowupReminderId = Id<'systemSupportingFollowupReminders'>;
 
 // ============================================
 // Schema Type (from table validator)

@@ -85,7 +85,7 @@ export function CommentsPage({ entityType, entityId }: CommentsPageProps) {
     });
   };
 
-  const handleReply = async (parentCommentId: Id<'comments'>, content: string) => {
+  const handleReply = async (parentCommentId: Id<'systemSupportingComments'>, content: string) => {
     if (!user) return;
 
     await createComment({
@@ -99,7 +99,7 @@ export function CommentsPage({ entityType, entityId }: CommentsPageProps) {
     });
   };
 
-  const handleDelete = async (commentId: Id<'comments'>) => {
+  const handleDelete = async (commentId: Id<'systemSupportingComments'>) => {
     if (!user) return;
 
     await deleteComment({
@@ -107,7 +107,7 @@ export function CommentsPage({ entityType, entityId }: CommentsPageProps) {
     });
   };
 
-  const handleReaction = async (commentId: Id<'comments'>, reaction: string) => {
+  const handleReaction = async (commentId: Id<'systemSupportingComments'>, reaction: string) => {
     if (!user) return;
 
     await addReaction({

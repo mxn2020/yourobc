@@ -3,5 +3,12 @@ import { v } from 'convex/values';
 import { baseValidators } from '@/schema/base.validators';
 
 export const countersValidators = {
-  counterType: baseValidators.counterType,
+  counterType: v.union(
+    v.literal('invoice'),
+    v.literal('quote'),
+    v.literal('order'),
+    v.literal('customer'),
+    v.literal('product'),
+    v.literal('general')
+  ),
 } as const;

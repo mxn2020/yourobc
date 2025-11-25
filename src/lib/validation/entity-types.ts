@@ -2,7 +2,7 @@
 // Zod validators derived from convex/types.ts (single source of truth)
 
 import { z } from 'zod'
-import { ALL_ENTITY_TYPES } from '../../../convex/types'
+import { ALL_ENTITY_TYPES } from '@/convex/config'
 
 /**
  * Zod schema for entity type validation

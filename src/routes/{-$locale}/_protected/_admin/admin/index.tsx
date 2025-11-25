@@ -34,8 +34,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/')({
 
         if (convexClient) {
           const [stats, users] = await Promise.all([
-            convexClient.query(api.lib.system.user_profiles.queries.getProfileStats, {}),
-            convexClient.query(api.lib.system.user_profiles.queries.getAllProfiles, {
+            convexClient.query(api.lib.system.user.user_profiles.queries.getProfileStats, {}),
+            convexClient.query(api.lib.system.user.user_profiles.queries.getAllProfiles, {
               options: { limit: 10 }
             })
           ])

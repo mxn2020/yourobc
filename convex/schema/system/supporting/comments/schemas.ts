@@ -4,5 +4,5 @@
 import { commentsTable } from './tables';
 
 export const systemSupportingCommentsSchemas = {
-  comments: commentsTable,
+  systemSupportingComments: commentsTable,
 };

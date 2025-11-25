@@ -1,10 +1,14 @@
 // src/features/yourobc/customers/hooks/useCustomers.ts
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useRef, useEffect } from 'react'
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { useConvexMutation } from '@convex-dev/react-query'
 import { useAuthenticatedUser } from '@/features/system/auth'
 import { customersService } from '../services/CustomersService'
+import { useCustomerAudit } from './useCustomerAudit'
+import { useCustomerPermissions } from './useCustomerPermissions'
 import { CUSTOMER_CONSTANTS } from '../types'
-import { parseConvexError, type ParsedError } from '@/utils/errorHandling'
+import { api } from '@/convex/_generated/api'
 import type {
   CreateCustomerData,
   UpdateCustomerData,
@@ -28,30 +32,58 @@ export function useCustomers(options?: {
   filters?: CustomerSearchFilters
   autoRefresh?: boolean
 }) {
+  // Performance tracking (dev mode only)
+  const instanceId = useRef(Math.random().toString(36).substr(2, 9))
+  const startTimeRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      startTimeRef.current = performance.now()
+    }
+  }, [])
+
   const authUser = useAuthenticatedUser()
+  const queryClient = useQueryClient()
+  const audit = useCustomerAudit()
+  const permissions = useCustomerPermissions()
 
-  const {
-    data: customersQuery,
-    isPending,
-    error,
-    refetch,
-  } = customersService.useCustomers(authUser?.id!, options)
+  // Switch to useSuspenseQuery for better SSR
+  const { data: customersQuery, refetch } = useSuspenseQuery(
+    customersService.getCustomersQueryOptions(options)
+  )
 
-  const {
-    data: stats,
-    isPending: isStatsLoading,
-  } = customersService.useCustomerStats(authUser?.id!)
+  const { data: stats } = useSuspenseQuery(
+    customersService.getCustomerStatsQueryOptions()
+  )
 
-  const createMutation = customersService.useCreateCustomer()
-  const updateMutation = customersService.useUpdateCustomer()
-  const deleteMutation = customersService.useDeleteCustomer()
+  // Log performance after data loads (dev mode only)
+  useEffect(() => {
+    if (import.meta.env.DEV && !startTimeRef.current) return
 
-  // Parse error for better user experience
-  const parsedError = useMemo(() => {
-    return error ? parseConvexError(error) : null
-  }, [error])
+    if (customersQuery && startTimeRef.current) {
+      const duration = performance.now() - startTimeRef.current
+      const source = duration < 10 ? 'from SSR cache' : 'from WebSocket'
+      console.log(
+        `useCustomers[${instanceId.current}]: ${duration.toFixed(2)}ms - Loaded ${
+          customersQuery.customers?.length || 0
+        } customers ${source}`
+      )
+      startTimeRef.current = undefined // Clear to prevent duplicate logs
+    }
+  }, [customersQuery])
 
-  const isPermissionError = parsedError?.code === 'PERMISSION_DENIED'
+  // Mutations with audit logging integration
+  const createMutation = useConvexMutation(
+    api.lib.yourobc.customers.mutations.createCustomer
+  )
+
+  const updateMutation = useConvexMutation(
+    api.lib.yourobc.customers.mutations.updateCustomer
+  )
+
+  const deleteMutation = useConvexMutation(
+    api.lib.yourobc.customers.mutations.deleteCustomer
+  )
 
   const createCustomer = useCallback(async (customerData: CustomerFormData) => {
     if (!authUser) throw new Error('Authentication required')
@@ -89,8 +121,18 @@ export function useCustomers(options?: {
       website: customerData.website?.trim(),
     }
 
-    return await customersService.createCustomer(createMutation, authUser.id, createData)
-  }, [authUser, createMutation])
+    const result = await createMutation.mutateAsync({ data: createData })
+
+    // Invalidate queries
+    queryClient.invalidateQueries({
+      queryKey: [api.lib.yourobc.customers.queries.getCustomers],
+    })
+
+    // Log audit
+    audit.logCustomerCreated(result._id, createData.companyName, createData)
+
+    return result
+  }, [authUser, createMutation, queryClient, audit])
 
   const updateCustomer = useCallback(async (
     customerId: CustomerId,
@@ -102,6 +144,9 @@ export function useCustomers(options?: {
     if (errors.length > 0) {
       throw new Error(`Validation failed: ${errors.join(', ')}`)
     }
+
+    const current = customersQuery?.customers?.find(c => c._id === customerId)
+    if (!current) throw new Error('Customer not found')
 
     const updateData: UpdateCustomerData = {}
     if (updates.companyName !== undefined) updateData.companyName = updates.companyName.trim()
@@ -134,28 +179,37 @@ export function useCustomers(options?: {
     if (updates.internalNotes !== undefined) updateData.internalNotes = updates.internalNotes?.trim()
     if (updates.website !== undefined) updateData.website = updates.website?.trim()
 
-    return await customersService.updateCustomer(updateMutation, authUser.id, customerId, updateData)
-  }, [authUser, updateMutation])
+    const result = await updateMutation.mutateAsync({ customerId, data: updateData })
+
+    // Invalidate queries
+    queryClient.invalidateQueries({
+      queryKey: [api.lib.yourobc.customers.queries.getCustomers],
+    })
+
+    // Log audit
+    audit.logCustomerUpdated(customerId, current.companyName, current, updateData)
+
+    return result
+  }, [authUser, updateMutation, queryClient, audit, customersQuery])
 
   const deleteCustomer = useCallback(async (customerId: CustomerId) => {
     if (!authUser) throw new Error('Authentication required')
-    return await customersService.deleteCustomer(deleteMutation, authUser.id, customerId)
-  }, [authUser, deleteMutation])
 
-  const canCreateCustomers = useMemo(() => {
-    if (!authUser) return false
-    return authUser.role === 'admin' || authUser.role === 'superadmin'
-  }, [authUser])
+    const customer = customersQuery?.customers?.find(c => c._id === customerId)
+    if (!customer) throw new Error('Customer not found')
 
-  const canEditCustomers = useMemo(() => {
-    if (!authUser) return false
-    return authUser.role === 'admin' || authUser.role === 'superadmin'
-  }, [authUser])
+    const result = await deleteMutation.mutateAsync({ customerId })
 
-  const canDeleteCustomers = useMemo(() => {
-    if (!authUser) return false
-    return authUser.role === 'admin' || authUser.role === 'superadmin'
-  }, [authUser])
+    // Invalidate queries
+    queryClient.invalidateQueries({
+      queryKey: [api.lib.yourobc.customers.queries.getCustomers],
+    })
+
+    // Log audit
+    audit.logCustomerDeleted(customerId, customer.companyName, customer, false)
+
+    return result
+  }, [authUser, deleteMutation, queryClient, audit, customersQuery])
 
   const enrichedCustomers = useMemo(() => {
     const customers = customersQuery?.customers || []
@@ -163,7 +217,7 @@ export function useCustomers(options?: {
       ...customer,
       displayName: customersService.formatCustomerName(customer),
       formattedBillingAddress: customersService.formatAddress(customer.billingAddress),
-      formattedShippingAddress: customer.shippingAddress 
+      formattedShippingAddress: customer.shippingAddress
         ? customersService.formatAddress(customer.shippingAddress)
         : undefined,
       hasRecentActivity: customersService.isCustomerActive(customer),
@@ -177,18 +231,11 @@ export function useCustomers(options?: {
     total: customersQuery?.total || 0,
     hasMore: customersQuery?.hasMore || false,
     stats,
-    isLoading: isPending,
-    isStatsLoading,
-    error: parsedError,
-    rawError: error,
-    isPermissionError,
     createCustomer,
     updateCustomer,
     deleteCustomer,
     refetch,
-    canCreateCustomers,
-    canEditCustomers,
-    canDeleteCustomers,
+    ...permissions,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
@@ -199,21 +246,26 @@ export function useCustomers(options?: {
  * Hook for managing a single customer
  */
 export function useCustomer(customerId?: CustomerId) {
-  // Always call ALL hooks at the top level (Rules of Hooks)
   const authUser = useAuthenticatedUser()
+  const audit = useCustomerAudit()
 
-  // Call service hooks unconditionally - the enabled flag will prevent actual API calls
-  const {
-    data: customer,
-    isPending,
-    error,
-    refetch,
-  } = customersService.useCustomer(authUser?.id!, customerId)
+  // Use suspenseQuery - will suspend if no customerId
+  const { data: customer, refetch } = useSuspenseQuery({
+    ...customersService.getCustomerQueryOptions(customerId!),
+    enabled: !!customerId,
+  })
 
-  const {
-    data: activity,
-    isPending: isActivityLoading,
-  } = customersService.useCustomerActivity(authUser?.id!, customerId)
+  const { data: activity } = useSuspenseQuery({
+    ...customersService.getCustomerActivityQueryOptions(customerId!),
+    enabled: !!customerId,
+  })
+
+  // Log view on mount (for analytics/compliance)
+  useEffect(() => {
+    if (customer && customerId) {
+      audit.logCustomerViewed(customerId, customer.companyName)
+    }
+  }, [customer, customerId, audit])
 
   const customerInsights = useMemo((): CustomerInsights | null => {
     if (!customer) return null
@@ -237,11 +289,10 @@ export function useCustomer(customerId?: CustomerId) {
       needsAttention: daysSinceLastOrder !== null && daysSinceLastOrder > 90,
       isNewCustomer: daysSinceCreated <= 30,
       isTopCustomer: score >= 80,
-      potentialValue: customer.stats.totalRevenue * 1.2, // Mock calculation
+      potentialValue: customer.stats.totalRevenue * 1.2,
     }
   }, [customer])
 
-  // Mock customer metrics (would come from actual data queries)
   const customerMetrics = useMemo((): CustomerPerformanceMetrics | null => {
     if (!customer) return null
 
@@ -254,7 +305,7 @@ export function useCustomer(customerId?: CustomerId) {
       acceptedQuotes: customer.stats.acceptedQuotes,
       rejectedQuotes: customer.stats.totalQuotes - customer.stats.acceptedQuotes,
       totalRevenue: customer.stats.totalRevenue,
-      totalShipments: 0, // Would come from shipments query
+      totalShipments: 0,
       averageOrderValue: customer.stats.acceptedQuotes > 0
         ? customer.stats.totalRevenue / customer.stats.acceptedQuotes
         : 0,
@@ -263,28 +314,11 @@ export function useCustomer(customerId?: CustomerId) {
     }
   }, [customer])
 
-  // Early return AFTER all hooks are called
-  if (!customerId || !authUser) {
-    return {
-      customer: null,
-      activity: null,
-      customerInsights: null,
-      customerMetrics: null,
-      isLoading: false,
-      isActivityLoading: false,
-      error: null,
-      refetch: () => {},
-    }
-  }
-
   return {
     customer,
     activity,
     customerInsights,
     customerMetrics,
-    isLoading: isPending,
-    isActivityLoading,
-    error,
     refetch,
   }
 }
@@ -293,18 +327,12 @@ export function useCustomer(customerId?: CustomerId) {
  * Hook for customer search
  */
 export function useCustomerSearch(searchTerm: string) {
-  const authUser = useAuthenticatedUser()
-
-  const {
-    data: searchResults,
-    isPending,
-    error,
-  } = customersService.useSearchCustomers(authUser?.id!, searchTerm)
+  const { data: searchResults } = useSuspenseQuery(
+    customersService.getSearchCustomersQueryOptions(searchTerm)
+  )
 
   return {
     results: searchResults || [],
-    isLoading: isPending,
-    error,
     hasResults: (searchResults?.length || 0) > 0,
   }
 }
@@ -316,48 +344,73 @@ export function useTopCustomers(
   limit = 10,
   sortBy: 'revenue' | 'yourobcQuotes' | 'score' = 'revenue'
 ) {
-  const authUser = useAuthenticatedUser()
-
-  const {
-    data: topCustomers,
-    isPending,
-    error,
-  } = customersService.useTopCustomers(authUser?.id!, limit, sortBy)
+  const { data: topCustomers } = useSuspenseQuery(
+    customersService.getTopCustomersQueryOptions(limit, sortBy)
+  )
 
   return {
     topCustomers: topCustomers || [],
-    isLoading: isPending,
-    error,
   }
 }
 
 /**
  * Hook for customer tags management
  */
-export function useCustomerTags(customerId?: CustomerId) {
+export function useCustomerTags(customerId?: CustomerId, customerName?: string) {
   const authUser = useAuthenticatedUser()
+  const audit = useCustomerAudit()
+  const queryClient = useQueryClient()
 
-  const {
-    data: allTags,
-    isPending: isLoadingTags,
-  } = customersService.useCustomerTags(authUser?.id!)
+  const { data: allTags } = useSuspenseQuery(
+    customersService.getCustomerTagsQueryOptions()
+  )
 
-  const addTagMutation = customersService.useAddCustomerTag()
-  const removeTagMutation = customersService.useRemoveCustomerTag()
+  const addTagMutation = useConvexMutation(
+    api.lib.yourobc.customers.mutations.addCustomerTag
+  )
+
+  const removeTagMutation = useConvexMutation(
+    api.lib.yourobc.customers.mutations.removeCustomerTag
+  )
 
   const addTag = useCallback(async (tag: string) => {
     if (!authUser || !customerId) throw new Error('Authentication and customer ID required')
-    return await customersService.addTag(addTagMutation, authUser.id, customerId, tag)
-  }, [authUser, customerId, addTagMutation])
+
+    const result = await addTagMutation.mutateAsync({ customerId, tag })
+
+    // Invalidate queries
+    queryClient.invalidateQueries({
+      queryKey: [api.lib.yourobc.customers.queries.getCustomers],
+    })
+
+    // Log audit
+    if (customerName) {
+      audit.logCustomerTagAdded(customerId, customerName, tag)
+    }
+
+    return result
+  }, [authUser, customerId, customerName, addTagMutation, queryClient, audit])
 
   const removeTag = useCallback(async (tag: string) => {
     if (!authUser || !customerId) throw new Error('Authentication and customer ID required')
-    return await customersService.removeTag(removeTagMutation, authUser.id, customerId, tag)
-  }, [authUser, customerId, removeTagMutation])
+
+    const result = await removeTagMutation.mutateAsync({ customerId, tag })
+
+    // Invalidate queries
+    queryClient.invalidateQueries({
+      queryKey: [api.lib.yourobc.customers.queries.getCustomers],
+    })
+
+    // Log audit
+    if (customerName) {
+      audit.logCustomerTagRemoved(customerId, customerName, tag)
+    }
+
+    return result
+  }, [authUser, customerId, customerName, removeTagMutation, queryClient, audit])
 
   return {
     allTags: allTags || [],
-    isLoadingTags,
     addTag,
     removeTag,
     isAddingTag: addTagMutation.isPending,

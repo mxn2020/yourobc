@@ -493,7 +493,7 @@ export const getUserEvents = query({
 
     const events = await ctx.db
       .query('analyticsEvents')
-      .withIndex('by_user', (q) => q.eq('userId', targetUserId))
+      .withIndex('by_user_id', (q) => q.eq('userId', targetUserId))
       .filter((q) => q.eq(q.field('deletedAt'), undefined))
       .order('desc')
       .take(limit);

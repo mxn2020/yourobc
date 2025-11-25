@@ -112,6 +112,7 @@ Fill this out for your module:
 | `{tableName}` | _________ | `freelancerProjects` |
 | `{TableName}` | _________ | `FreelancerProjects` |
 | `{table_name}` | _________ | `freelancer_projects` |
+| `{displayField}` | `name` | 
 
 ### Display Field Options
 

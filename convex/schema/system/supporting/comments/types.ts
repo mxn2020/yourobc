@@ -10,8 +10,8 @@ import { commentsTable } from './tables';
 // Document Types
 // ============================================
 
-export type Comment = Doc<'comments'>;
-export type CommentId = Id<'comments'>;
+export type Comment = Doc<'systemSupportingComments'>;
+export type CommentId = Id<'systemSupportingComments'>;
 
 // ============================================
 // Schema Type (from table validator)

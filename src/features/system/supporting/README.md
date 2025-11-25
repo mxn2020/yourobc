@@ -68,7 +68,7 @@ import {
 } from '@/features/system/supporting';
 
 // Check if a feature is enabled
-const commentsEnabled = isFeatureEnabled('comments');
+const commentsEnabled = isFeatureEnabled('systemSupportingComments');
 
 // Get all enabled features
 const enabledFeatures = getEnabledFeatures();
@@ -550,7 +550,7 @@ function CustomComments() {
 import { isFeatureEnabled } from '@/features/system/supporting';
 
 function MyComponent() {
-  const showComments = isFeatureEnabled('comments');
+  const showComments = isFeatureEnabled('systemSupportingComments');
   const showDocuments = isFeatureEnabled('documents');
 
   return (

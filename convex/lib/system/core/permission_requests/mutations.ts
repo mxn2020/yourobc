@@ -3,7 +3,8 @@
 import { v } from 'convex/values'
 import { mutation } from '@/generated/server'
 import { requireCurrentUser, requireAdmin } from '@/shared/auth.helper'
-import { ACTIONS, ENTITY_TYPES } from './constants'
+import { PERMISSION_REQUESTS_CONSTANTS } from './constants'
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Request permission access
@@ -44,7 +45,7 @@ export const requestPermission = mutation({
 
     // 4. Create permission request
     const requestId = await ctx.db.insert('permissionRequests', {
-      publicId: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'permissionRequests'),
       displayName: `${trimmedPermission} - ${trimmedUserName}`,
       ownerId: currentUser._id,
       requester: {
@@ -75,20 +76,26 @@ export const requestPermission = mutation({
 
     for (const admin of admins) {
       await ctx.db.insert('notifications', {
+        publicId: await generateUniquePublicId(ctx, 'notifications'),
         ownerId: admin._id,
         type: 'info',
-        title: 'New Permission Request',
-        message: `${trimmedUserName} has requested ${trimmedPermission} permission`,
-        emoji: '🔑',
+        displayName: 'New Permission Request',
+        content: {
+          title: 'New Permission Request',
+          message: `${trimmedUserName} has requested ${trimmedPermission} permission`,
+          emoji: '🔑',
+          actionUrl: `/admin/permission-requests`,
+        },
         isRead: false,
-        actionUrl: `/admin/permission-requests`,
-        entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+        entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
         entityId: requestId,
         metadata: {
-          requestId,
-          permission: trimmedPermission,
-          module: trimmedModule,
-          requesterName: trimmedUserName,
+          data: {
+            requestId,
+            permission: trimmedPermission,
+            module: trimmedModule,
+            requesterName: trimmedUserName,
+          }
         },
         createdAt: now,
         updatedAt: now,
@@ -101,17 +108,20 @@ export const requestPermission = mutation({
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: currentUser._id,
       userName: trimmedUserName,
-      action: ACTIONS.PERMISSION_REQUEST_CREATED,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      action: PERMISSION_REQUESTS_CONSTANTS.ACTIONS.REQUEST_CREATED,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       entityTitle: `${trimmedPermission} permission`,
       description: `Requested ${trimmedPermission} permission for ${trimmedModule}`,
       metadata: {
-        permission: trimmedPermission,
-        module: trimmedModule,
-        message: trimmedMessage ?? null,
+        data: {
+          permission: trimmedPermission,
+          module: trimmedModule,
+          message: trimmedMessage ?? null,
+        },
       },
       createdAt: now,
       createdBy: currentUser._id,
@@ -174,19 +184,25 @@ export const approvePermissionRequest = mutation({
 
     // 5. Notify the requester
     await ctx.db.insert('notifications', {
+      publicId: await generateUniquePublicId(ctx, 'notifications'),
       ownerId: request.ownerId,
       type: 'success',
-      title: 'Permission Request Approved',
-      message: `Your request for ${request.request.permission} permission has been approved`,
-      emoji: '✅',
+      displayName: 'Permission Request Approved',
+      content: {
+        title: 'Permission Request Approved',
+        message: `Your request for ${request.request.permission} permission has been approved`,
+        emoji: '✅',
+      },
       isRead: false,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       metadata: {
-        requestId,
-        permission: request.request.permission,
-        module: request.request.module,
-        reviewedBy: trimmedAdminName,
+        data: {
+          requestId,
+          permission: request.request.permission,
+          module: request.request.module,
+          reviewedBy: trimmedAdminName,
+        },
       },
       createdAt: now,
       updatedAt: now,
@@ -198,18 +214,21 @@ export const approvePermissionRequest = mutation({
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: admin._id,
       userName: trimmedAdminName,
-      action: ACTIONS.PERMISSION_REQUEST_APPROVED,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      action: PERMISSION_REQUESTS_CONSTANTS.ACTIONS.REQUEST_APPROVED,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       entityTitle: `${request.request.permission} permission`,
       description: `Approved permission request for ${request.requester.userName}`,
       metadata: {
-        requestId,
-        permission: request.request.permission,
-        module: request.request.module,
-        reviewNotes: trimmedReviewNotes ?? null,
+        data: {
+          requestId,
+          permission: request.request.permission,
+          module: request.request.module,
+          reviewNotes: trimmedReviewNotes ?? null,
+        },
       },
       createdAt: now,
       createdBy: admin._id,
@@ -268,20 +287,26 @@ export const denyPermissionRequest = mutation({
 
     // 5. Notify the requester
     await ctx.db.insert('notifications', {
+      publicId: await generateUniquePublicId(ctx, 'notifications'),
       ownerId: request.ownerId,
       type: 'error',
-      title: 'Permission Request Denied',
-      message: `Your request for ${request.request.permission} permission has been denied`,
-      emoji: '❌',
+      displayName: 'Permission Request Denied',
+      content: {
+        title: 'Permission Request Denied',
+        message: `Your request for ${request.request.permission} permission has been denied`,
+        emoji: '❌',
+      },
       isRead: false,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       metadata: {
-        requestId,
-        permission: request.request.permission,
-        module: request.request.module,
-        reviewedBy: trimmedAdminName,
-        reviewNotes: trimmedReviewNotes ?? null,
+        data: {
+          requestId,
+          permission: request.request.permission,
+          module: request.request.module,
+          reviewedBy: trimmedAdminName,
+          reviewNotes: trimmedReviewNotes ?? null,
+        },
       },
       createdAt: now,
       updatedAt: now,
@@ -293,18 +318,21 @@ export const denyPermissionRequest = mutation({
 
     // 6. Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: admin._id,
       userName: trimmedAdminName,
-      action: ACTIONS.PERMISSION_REQUEST_DENIED,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      action: PERMISSION_REQUESTS_CONSTANTS.ACTIONS.REQUEST_DENIED,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
       entityTitle: `${request.request.permission} permission`,
       description: `Denied permission request for ${request.requester.userName}`,
       metadata: {
-        requestId,
-        permission: request.request.permission,
-        module: request.request.module,
-        reviewNotes: trimmedReviewNotes ?? null,
+        data: {
+          requestId,
+          permission: request.request.permission,
+          module: request.request.module,
+          reviewNotes: trimmedReviewNotes ?? null,
+        },
       },
       createdAt: now,
       createdBy: admin._id,
@@ -363,16 +391,19 @@ export const cancelPermissionRequest = mutation({
 
     // 5. Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: currentUser._id,
       userName: trimmedUserName,
-      action: ACTIONS.PERMISSION_REQUEST_CANCELLED,
-      entityType: ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
+      action: PERMISSION_REQUESTS_CONSTANTS.ACTIONS.REQUEST_CANCELLED,
+      entityType: PERMISSION_REQUESTS_CONSTANTS.ENTITY_TYPES.SYSTEM_PERMISSION_REQUEST,
       entityId: requestId,
-      entityTitle: `${request.permission} permission`,
-      description: `Cancelled permission request for ${request.permission}`,
+      entityTitle: `${request.request.permission} permission`,
+      description: `Cancelled permission request for ${request.request.permission}`,
       metadata: {
-        permission: request.request.permission,
-        module: request.request.module,
+        data: {
+          permission: request.request.permission,
+          module: request.request.module,
+        },
       },
       createdAt: now,
       createdBy: currentUser._id,

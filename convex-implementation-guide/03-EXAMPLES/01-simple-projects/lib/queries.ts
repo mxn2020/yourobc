@@ -126,7 +126,7 @@ export const getProjectMembers = query({
     // Get members
     const members = await ctx.db
       .query('freelancerProjectMembers')
-      .withIndex('by_project', q => q.eq('projectId', projectId))
+      .withIndex('by_project_id', q => q.eq('projectId', projectId))
       .filter(notDeleted)
       .collect();
 
@@ -190,7 +190,7 @@ export const getProjectStats = query({
         .slice(0, 5)
         .map(i => ({
           id: i._id,
-          name: i.name,
+          name: i.{displayField},
           deadline: i.deadline,
         })),
     };

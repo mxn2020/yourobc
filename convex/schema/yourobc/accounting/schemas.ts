@@ -1,12 +1,14 @@
 // convex/schema/yourobc/accounting/schemas.ts
 // Schema exports for accounting module
 
-import { accountingTable } from './accounting';
-import { accountingDashboardCacheTable } from './accountingDashboardCache';
-import { incomingInvoiceTrackingTable } from './incomingInvoiceTracking';
-import { invoiceAutoGenLogTable } from './invoiceAutoGenLog';
-import { invoiceNumberingTable } from './invoiceNumbering';
-import { statementOfAccountsTable } from './statementOfAccounts';
+import {
+  accountingTable,
+  accountingDashboardCacheTable,
+  incomingInvoiceTrackingTable,
+  invoiceAutoGenLogTable,
+  invoiceNumberingTable,
+  statementOfAccountsTable
+} from './tables';
 
 export const yourobcAccountingSchemas = {
   yourobcAccounting: accountingTable,

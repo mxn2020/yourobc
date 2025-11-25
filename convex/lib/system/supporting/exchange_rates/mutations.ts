@@ -40,13 +40,13 @@ export const createSystemExchangeRate = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'exchangeRates');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingExchangeRates');
 
     const rate = trimmed.rate;
     const inverseRate = deriveInverseRate(rate, trimmed.inverseRate);
     const name = trimmed.name?.trim() || `${trimmed.fromCurrency}/${trimmed.toCurrency}`;
 
-    const id = await ctx.db.insert('exchangeRates', {
+    const id = await ctx.db.insert('systemSupportingExchangeRates', {
       name,
       publicId,
       ownerId: user._id,
@@ -65,10 +65,11 @@ export const createSystemExchangeRate = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.exchange_rates.created',
-      entityType: 'exchangeRates',
+      entityType: 'systemSupportingExchangeRates',
       entityId: publicId,
       entityTitle: name,
       description: `Created exchange rate ${trimmed.fromCurrency}/${trimmed.toCurrency}`,
@@ -83,7 +84,7 @@ export const createSystemExchangeRate = mutation({
 
 export const updateSystemExchangeRate = mutation({
   args: {
-    id: v.id('exchangeRates'),
+    id: v.id('systemSupportingExchangeRates'),
     updates: v.object({
       name: v.optional(v.string()),
       rate: v.optional(v.number()),
@@ -123,14 +124,19 @@ export const updateSystemExchangeRate = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.exchange_rates.updated',
-      entityType: 'exchangeRates',
+      entityType: 'systemSupportingExchangeRates',
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: `Updated exchange rate ${existing.fromCurrency}/${existing.toCurrency}`,
-      metadata: { updates: trimmed },
+      metadata: {
+        data: {
+          updates: trimmed
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -141,7 +147,7 @@ export const updateSystemExchangeRate = mutation({
 });
 
 export const deleteSystemExchangeRate = mutation({
-  args: { id: v.id('exchangeRates') },
+  args: { id: v.id('systemSupportingExchangeRates') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -160,10 +166,11 @@ export const deleteSystemExchangeRate = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.exchange_rates.deleted',
-      entityType: 'exchangeRates',
+      entityType: 'systemSupportingExchangeRates',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: `Deleted exchange rate ${existing.fromCurrency}/${existing.toCurrency}`,

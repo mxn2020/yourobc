@@ -12,21 +12,21 @@ import { validateProviderConfig } from '../utils';
  * Hook to get the active email configuration
  */
 export function useActiveEmailConfig() {
-  return useConvexQuery(api.lib.system.email.queries.getActiveConfig, {});
+  return useConvexQuery(api.lib.system.email.configs.queries.getActiveConfig, {});
 }
 
 /**
  * Hook to get all email configurations
  */
 export function useAllEmailConfigs() {
-  return useConvexQuery(api.lib.system.email.queries.getAllConfigs, {});
+  return useConvexQuery(api.lib.system.email.configs.queries.getAllConfigs, {});
 }
 
 /**
  * Hook to get configuration by provider
  */
 export function useEmailConfigByProvider(provider: EmailProvider) {
-  return useConvexQuery(api.lib.system.email.queries.getConfigByProvider, { provider });
+return useConvexQuery(api.lib.system.email.configs.queries.getConfigByProvider, { provider });
 }
 
 /**
@@ -34,7 +34,7 @@ export function useEmailConfigByProvider(provider: EmailProvider) {
  */
 export function useSaveEmailConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.system.email.mutations.saveEmailConfig);
+  const mutation = useConvexMutation(api.lib.system.email.configs.mutations.saveEmailConfig);
 
   return useMutation({
     mutationFn: async ({
@@ -74,7 +74,7 @@ export function useSaveEmailConfig() {
  */
 export function useSetActiveConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.system.email.mutations.setActiveConfig);
+  const mutation = useConvexMutation(api.lib.system.email.configs.mutations.setActiveConfig);
 
   return useMutation({
     mutationFn: async ({ configId }: { configId: Id<"emailConfigs"> }) => {
@@ -92,7 +92,7 @@ export function useSetActiveConfig() {
  */
 export function useDeleteEmailConfig() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.system.email.mutations.deleteEmailConfig);
+  const mutation = useConvexMutation(api.lib.system.email.configs.mutations.deleteEmailConfig);
 
   return useMutation({
     mutationFn: async ({ configId }: { configId: Id<"emailConfigs"> }) => {
@@ -110,7 +110,7 @@ export function useDeleteEmailConfig() {
  */
 export function useUpdateTestStatus() {
   const { auth } = useAuth();
-  const mutation = useConvexMutation(api.lib.system.email.mutations.updateTestStatus);
+  const mutation = useConvexMutation(api.lib.system.email.configs.mutations.updateTestStatus);
 
   return useMutation({
     mutationFn: async ({

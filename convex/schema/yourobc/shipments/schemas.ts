@@ -2,8 +2,7 @@
 // Schema exports for shipments module
 
 import { v } from 'convex/values';
-import { shipmentsTable } from './shipments';
-import { shipmentStatusHistoryTable } from './shipmentStatusHistory';
+import { shipmentStatusHistoryTable, shipmentsTable } from './tables';
 
 export const shipmentIdSchema = v.id('yourobcShipments')
 export const shipmentStatusHistoryIdSchema = v.id('yourobcShipmentStatusHistory')

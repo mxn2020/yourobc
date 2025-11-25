@@ -12,8 +12,8 @@ export function trimProjectData<
 >(data: T): T {
   const trimmed: T = { ...data };
 
-  if (typeof trimmed.name === "string") {
-    trimmed.name = trimmed.name.trim() as T["name"];
+  if (typeof trimmed.{displayField} === "string") {
+    trimmed.{displayField} = trimmed.{displayField}.trim() as T["name"];
   }
 
   if (typeof trimmed.description === "string") {
@@ -41,11 +41,11 @@ export function validateProjectData(
   const errors: string[] = [];
 
   // Validate name
-  if (data.name !== undefined) {
-    if (typeof data.name !== "string") {
+  if (data.{displayField} !== undefined) {
+    if (typeof data.{displayField} !== "string") {
       errors.push("Name must be a string");
     } else {
-      const name = data.name.trim();
+      const name = data.{displayField}.trim();
 
       if (!name) {
         errors.push("Name is required");

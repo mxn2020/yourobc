@@ -7,7 +7,7 @@
 - [Overview](#overview)
 - [Implementation Steps](#implementation-steps)
 - [File 1: validators.ts](#file-1-validatorsts)
-- [File 2: {module}.ts](#file-2-modulets)
+- [File 2: tables.ts](#file-2-modulets)
 - [File 3: types.ts](#file-3-typests)
 - [File 4: schemas.ts](#file-4-schemasts)
 - [File 5: index.ts](#file-5-indexts)
@@ -41,7 +41,7 @@ Schema implementation is **Phase 1** of module creation. This phase defines:
 
 ```
 1. validators.ts   → Define reusable validators
-2. {module}.ts     → Define table with fields
+2. tables.ts     → Define table with fields
 3. types.ts        → Extract TypeScript types
 4. schemas.ts      → Export for registration
 5. index.ts        → Barrel exports
@@ -70,7 +70,7 @@ touch validators.ts ${MODULE}.ts types.ts schemas.ts index.ts
 Follow the sections below in sequence:
 
 1. [validators.ts](#file-1-validatorsts)
-2. [{module}.ts](#file-2-modulets)
+2. [tables.ts](#file-2-modulets)
 3. [types.ts](#file-3-typests)
 4. [schemas.ts](#file-4-schemasts)
 5. [index.ts](#file-5-indexts)
@@ -199,7 +199,7 @@ metadata: v.object({
 
 ---
 
-## File 2: {module}.ts
+## File 2: tables.ts
 
 ### Purpose
 
@@ -216,7 +216,7 @@ Define database tables with `defineTable()`.
 ### Template
 
 ```typescript
-// convex/schema/{category}/{entity}/{module}/{module}.ts
+// convex/schema/{category}/{entity}/{module}/tables.ts
 // Table definitions for {module} module
 
 import { defineTable } from 'convex/server';
@@ -225,10 +225,8 @@ import { auditFields, softDeleteFields } from '@/schema/base';
 import { {module}Validators, {module}Fields } from './validators';
 
 export const {module}Table = defineTable({
-  // Main display field (choose one)
-  name: v.string(),
-  // OR: title: v.string(),
-  // OR: displayName: v.string(),
+  // Main display field (choose one of: 'name' | 'title' | 'displayName')
+  {displayField}: v.string(),
 
   // Core fields
   publicId: v.string(),
@@ -491,7 +489,7 @@ Every table **MUST** include these fields unless explicitly exempt. If exempt, d
 | `publicId` | `v.string()` | External reference | ✅ Yes |
 | `ownerId` | `v.id('userProfiles')` | Resource owner | ✅ Yes (domain tables) |
 
-### Display Field (Choose One)
+### Display Field {displayField} (Choose One)
 
 Pick the most appropriate for your domain:
 
@@ -705,7 +703,7 @@ export const projectsTable = defineTable({
 - [ ] Export with `as const`
 - [ ] No schema imports
 
-**{module}.ts**:
+**tables.ts**:
 - [ ] Import `defineTable`, `v`, audit fields
 - [ ] Import validators from `./validators`
 - [ ] Define main display field (name/title/displayName)
@@ -784,7 +782,7 @@ export default defineSchema({
 
 **Solution**: Check all indexes have unique names
 ```bash
-grep "\.index(" convex/schema/{category}/{entity}/{module}/{module}.ts
+grep "\.index(" convex/schema/{category}/{entity}/{module}/tables.ts
 ```
 
 ### Warning: Missing Required Field

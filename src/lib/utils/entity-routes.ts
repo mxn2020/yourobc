@@ -1,7 +1,7 @@
 // src/lib/utils/entity-routes.ts
 // Utility functions for constructing entity routes
 
-import type { EntityType } from '@/convex/types'
+import type { EntityType } from '@/convex/config'
 
 /**
  * Entity type to plural route mapping

@@ -270,7 +270,7 @@ export type {Module}Id = Id<'{tableName}'>;
 
 // Create operation
 export interface Create{Module}Data {
-  name: string;
+  {displayField}: string;
   description?: string;
   status?: {Module}Status;
   priority?: {Module}Priority;
@@ -282,7 +282,7 @@ export interface Create{Module}Data {
 
 // Update operation
 export interface Update{Module}Data {
-  name?: string;
+  {displayField}?: string;
   description?: string;
   status?: {Module}Status;
   priority?: {Module}Priority;
@@ -400,8 +400,8 @@ export function trim{Module}Data<
   const trimmed: T = { ...data };
 
   // Trim string fields
-  if (typeof trimmed.name === "string") {
-    trimmed.name = trimmed.name.trim() as T["name"];
+  if (typeof trimmed.{displayField} === "string") {
+    trimmed.{displayField} = trimmed.{displayField}.trim() as T["name"];
   }
 
   if (typeof trimmed.description === "string") {
@@ -431,11 +431,11 @@ export function validate{Module}Data(
   const errors: string[] = [];
 
   // Validate name
-  if (data.name !== undefined) {
-    if (typeof data.name !== "string") {
+  if (data.{displayField} !== undefined) {
+    if (typeof data.{displayField} !== "string") {
       errors.push("Name must be a string");
     } else {
-      const name = data.name.trim();
+      const name = data.{displayField}.trim();
 
       if (!name) {
         errors.push("Name is required");
@@ -498,7 +498,7 @@ export function buildSearchableText(
 ): string {
   const parts: string[] = [];
 
-  if (data.name) parts.push(data.name);
+  if (data.{displayField}) parts.push(data.{displayField});
   if (data.description) parts.push(data.description);
   if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
 
@@ -879,7 +879,7 @@ export const get{Module}s = query({
     if (filters.search) {
       const term = filters.search.toLowerCase();
       items = items.filter(i =>
-        i.name.toLowerCase().includes(term) ||
+        i.{displayField}.toLowerCase().includes(term) ||
         (i.description && i.description.toLowerCase().includes(term))
       );
     }
@@ -1194,7 +1194,7 @@ import {
 export const create{Module} = mutation({
   args: {
     data: v.object({
-      name: v.string(),
+      {displayField}: v.string(),
       description: v.optional(v.string()),
       status: v.optional({module}Validators.status),
       priority: v.optional({module}Validators.priority),
@@ -1237,12 +1237,12 @@ export const create{Module} = mutation({
     // Audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
-      userName: user.name || user.email || 'Unknown',
+      userName: user.{displayField} || user.email || 'Unknown',
       action: '{module}.created',
       entityType: '{tableName}',
       entityId: publicId,
-      entityTitle: trimmed.name,
-      description: `Created {module}: ${trimmed.name}`,
+      entityTitle: trimmed.{displayField},
+      description: `Created {module}: ${trimmed.{displayField}}`,
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -1261,7 +1261,7 @@ export const update{Module} = mutation({
   args: {
     id: v.id('{tableName}'),
     updates: v.object({
-      name: v.optional(v.string()),
+      {displayField}: v.optional(v.string()),
       description: v.optional(v.string()),
       status: v.optional({module}Validators.status),
       priority: v.optional({module}Validators.priority),
@@ -1291,7 +1291,7 @@ export const update{Module} = mutation({
 
     // Rebuild searchableText with merged data
     const searchableText = buildSearchableText({
-      name: trimmed.name ?? existing.name,
+      {displayField}: trimmed.{displayField} ?? existing.{displayField},
       description: trimmed.description ?? existing.description,
       tags: trimmed.tags ?? existing.tags,
     });
@@ -1307,12 +1307,12 @@ export const update{Module} = mutation({
     // Audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
-      userName: user.name || user.email || 'Unknown',
+      userName: user.{displayField} || user.email || 'Unknown',
       action: '{module}.updated',
       entityType: '{tableName}',
       entityId: existing.publicId,
-      entityTitle: trimmed.name ?? existing.name,
-      description: `Updated {module}: ${trimmed.name ?? existing.name}`,
+      entityTitle: trimmed.{displayField} ?? existing.{displayField},
+      description: `Updated {module}: ${trimmed.{displayField} ?? existing.{displayField}}`,
       metadata: { changes: trimmed },
       createdAt: now,
       createdBy: user._id,
@@ -1355,12 +1355,12 @@ export const delete{Module} = mutation({
     // Audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
-      userName: user.name || user.email || 'Unknown',
+      userName: user.{displayField} || user.email || 'Unknown',
       action: '{module}.deleted',
       entityType: '{tableName}',
       entityId: existing.publicId,
-      entityTitle: existing.name,
-      description: `Deleted {module}: ${existing.name}`,
+      entityTitle: existing.{displayField},
+      description: `Deleted {module}: ${existing.{displayField}}`,
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -1432,7 +1432,7 @@ export const bulkUpdate{Module}s = mutation({
     // Single audit log for bulk operation
     await ctx.db.insert("auditLogs", {
       userId: user._id,
-      userName: user.name || user.email || "Unknown",
+      userName: user.{displayField} || user.email || "Unknown",
       action: "{module}.bulk_updated",
       entityType: "{tableName}",
       entityId: "bulk",
@@ -1508,7 +1508,7 @@ export const bulkDelete{Module}s = mutation({
     // Single audit log for bulk operation
     await ctx.db.insert("auditLogs", {
       userId: user._id,
-      userName: user.name || user.email || "Unknown",
+      userName: user.{displayField} || user.email || "Unknown",
       action: "{module}.bulk_deleted",
       entityType: "{tableName}",
       entityId: "bulk",
@@ -1745,7 +1745,7 @@ const results = await ctx.db
 ```typescript
 await ctx.db.insert("auditLogs", {
   userId: user._id,
-  userName: user.name || user.email || "Unknown",
+  userName: user.{displayField} || user.email || "Unknown",
   action: "{module}.bulk_updated",  // or bulk_deleted
   entityType: "{tableName}",
   entityId: "bulk",  // Special ID for bulk operations
@@ -1909,7 +1909,7 @@ cursor: cursor ?? null
 ```typescript
 // ✅ Must rebuild with current values
 const searchableText = buildSearchableText({
-  name: trimmed.name ?? existing.name,
+  {displayField}: trimmed.{displayField} ?? existing.{displayField},
   description: trimmed.description ?? existing.description,
   tags: trimmed.tags ?? existing.tags,
 });

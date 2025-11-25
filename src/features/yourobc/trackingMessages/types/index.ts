@@ -1,7 +1,7 @@
 // src/features/yourobc/trackingMessages/types/index.ts
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
-import type { ShipmentStatus } from '@/convex/schema/base'
+import { ShipmentStatus } from '@/convex/schema/yourobc/shipments'
 
 // Re-export types from Convex
 export type TrackingMessage = Doc<'yourobcTrackingMessages'>

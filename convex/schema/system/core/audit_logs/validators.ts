@@ -18,7 +18,8 @@ export const auditLogsValidators = {
     v.literal('web'),
     v.literal('api'),
     v.literal('system'),
-    v.literal('webhook')
+    v.literal('webhook'),
+    v.literal('project'),
   ),
 } as const;
 
@@ -49,5 +50,8 @@ export const auditLogsFields = {
       message: v.optional(v.string()),
       stack: v.optional(v.string()),
     })),
+
+    // Arbitrary extra fields:
+    data: v.optional(v.record(v.string(), metadataValue)),
   }),
 } as const;

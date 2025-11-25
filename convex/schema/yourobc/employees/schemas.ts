@@ -1,7 +1,7 @@
 // convex/schema/yourobc/employees/schemas.ts
 // Schema exports for employees module
 
-import { employeesTable, vacationDaysTable } from './employees';
+import { employeesTable, vacationDaysTable } from './tables';
 import { yourobcEmployeeCommissionsSchemas } from './commissions/schemas';
 import { yourobcEmployeeKpisSchemas } from './kpis/schemas';
 import { yourobcEmployeeSessionsSchemas } from './sessions/schemas';

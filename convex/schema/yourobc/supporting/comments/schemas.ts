@@ -1,8 +1,8 @@
 // convex/schema/yourobc/supporting/comments/schemas.ts
 // Schema exports for comments module
 
-import { commentsTable } from './comments';
+import { commentsTable } from './tables';
 
 export const supportingCommentsSchemas = {
-  comments: commentsTable,
+  yourobcComments: commentsTable,
 };

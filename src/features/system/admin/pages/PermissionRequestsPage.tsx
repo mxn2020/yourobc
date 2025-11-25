@@ -40,14 +40,14 @@ export function PermissionRequestsPage() {
   const [reviewAction, setReviewAction] = useState<'approve' | 'deny' | null>(null)
 
   // Queries
-  const stats = useQuery(api.lib.system.permission_requests.queries.getPermissionRequestsStats)
-  const allRequests = useQuery(api.lib.system.permission_requests.queries.getAllPermissionRequests, {
+  const stats = useQuery(api.lib.system.core.permission_requests.queries.getPermissionRequestsStats)
+  const allRequests = useQuery(api.lib.system.core.permission_requests.queries.getAllPermissionRequests, {
     status: activeTab === 'all' ? undefined : activeTab,
   })
 
   // Mutations
-  const approveRequest = useMutation(api.lib.system.permission_requests.mutations.approvePermissionRequest)
-  const denyRequest = useMutation(api.lib.system.permission_requests.mutations.denyPermissionRequest)
+  const approveRequest = useMutation(api.lib.system.core.permission_requests.mutations.approvePermissionRequest)
+  const denyRequest = useMutation(api.lib.system.core.permission_requests.mutations.denyPermissionRequest)
 
   const handleReview = async () => {
     if (!selectedRequest || !reviewAction) return

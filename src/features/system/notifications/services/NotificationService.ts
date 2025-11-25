@@ -33,16 +33,16 @@ export class NotificationService {
   // ==========================================
 
   public getNotificationsQueryOptions() {
-    return convexQuery(api.lib.system.notifications.queries.getNotifications, {});
+    return convexQuery(api.lib.system.core.notifications.queries.getNotifications, {});
   }
 
   public getUnreadCountQueryOptions() {
-    return convexQuery(api.lib.system.notifications.queries.getUnreadCount, {});
+    return convexQuery(api.lib.system.core.notifications.queries.getUnreadCount, {});
   }
 
   public getNotificationSettingsQueryOptions() {
     // Notification settings are stored in userSettings.notificationPreferences
-    return convexQuery(api.lib.system.user_settings.queries.getUserSettings, {});
+    return convexQuery(api.lib.system.user.user_settings.queries.getUserSettings, {});
   }
 
   // ==========================================
@@ -75,20 +75,20 @@ export class NotificationService {
   // ==========================================
 
   public useMarkAsRead() {
-    return useConvexMutation(api.lib.system.notifications.mutations.markAsRead);
+    return useConvexMutation(api.lib.system.core.notifications.mutations.markAsRead);
   }
 
   public useMarkAllAsRead() {
-    return useConvexMutation(api.lib.system.notifications.mutations.markAllAsRead);
+    return useConvexMutation(api.lib.system.core.notifications.mutations.markAllAsRead);
   }
 
   public useDeleteNotification() {
-    return useConvexMutation(api.lib.system.notifications.mutations.deleteNotification);
+    return useConvexMutation(api.lib.system.core.notifications.mutations.deleteNotification);
   }
 
   public useUpdateSettings() {
     // Notification settings are part of userSettings.notificationPreferences
-    return useConvexMutation(api.lib.system.user_settings.mutations.updateUserSettings);
+    return useConvexMutation(api.lib.system.user.user_settings.mutations.updateUserSettings);
   }
 }
 

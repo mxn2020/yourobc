@@ -9,9 +9,9 @@ import type { Id } from '@/convex/_generated/dataModel';
 interface CommentListProps {
   comments: CommentWithReplies[];
   currentUserId?: Id<"userProfiles">;
-  onDelete?: (commentId: Id<'comments'>) => void;
-  onReply?: (parentCommentId: Id<'comments'>, content: string) => void | Promise<void>;
-  onReaction?: (commentId: Id<'comments'>, reaction: string) => void;
+  onDelete?: (commentId: Id<'systemSupportingComments'>) => void;
+  onReply?: (parentCommentId: Id<'systemSupportingComments'>, content: string) => void | Promise<void>;
+  onReaction?: (commentId: Id<'systemSupportingComments'>, reaction: string) => void;
   emptyMessage?: string;
 }
 
@@ -27,11 +27,11 @@ export function CommentList({
 
   // Comments already come with nested replies from the query
 
-  const handleReplyClick = (commentId: Id<'comments'>) => {
+  const handleReplyClick = (commentId: Id<'systemSupportingComments'>) => {
     setReplyingTo(commentId);
   };
 
-  const handleReplySubmit = async (parentCommentId: Id<'comments'>, content: string) => {
+  const handleReplySubmit = async (parentCommentId: Id<'systemSupportingComments'>, content: string) => {
     if (onReply) {
       await onReply(parentCommentId, content);
       setReplyingTo(null);

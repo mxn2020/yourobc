@@ -363,7 +363,7 @@ function GlobalErrorHandlers() {
   const { permissionError, closePermissionModal } = useErrorContext()
   const [requestAccessOpen, setRequestAccessOpen] = React.useState(false)
   const [savedPermissionData, setSavedPermissionData] = React.useState<{ permission: string; module: string } | null>(null)
-  const requestPermission = useMutation(api.lib.system.permission_requests.mutations.requestPermission)
+  const requestPermission = useMutation(api.lib.system.core.permission_requests.mutations.requestPermission)
   const toast = useToast()
 
   const handleRequestAccess = () => {

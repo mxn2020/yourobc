@@ -4,5 +4,5 @@
 import { followupRemindersTable } from './tables';
 
 export const systemSupportingFollowupRemindersSchemas = {
-  followupReminders: followupRemindersTable,
+  systemSupportingFollowupReminders: followupRemindersTable,
 };

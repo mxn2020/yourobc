@@ -17,8 +17,8 @@ export function trim{Module}Data<
   const trimmed: T = { ...data };
 
   // Trim string fields
-  if (typeof trimmed.name === "string") {
-    trimmed.name = trimmed.name.trim() as T["name"];
+  if (typeof trimmed.{displayField} === "string") {
+    trimmed.{displayField} = trimmed.{displayField}.trim() as T["name"];
   }
 
   if (typeof trimmed.description === "string") {
@@ -53,11 +53,11 @@ export function validate{Module}Data(
   const errors: string[] = [];
 
   // Validate name
-  if (data.name !== undefined) {
-    if (typeof data.name !== "string") {
+  if (data.{displayField} !== undefined) {
+    if (typeof data.{displayField} !== "string") {
       errors.push("Name must be a string");
     } else {
-      const name = data.name.trim();
+      const name = data.{displayField}.trim();
 
       if (!name) {
         errors.push("Name is required");
@@ -125,7 +125,7 @@ export function buildSearchableText(
 ): string {
   const parts: string[] = [];
 
-  if (data.name) parts.push(data.name);
+  if (data.{displayField}) parts.push(data.{displayField});
   if (data.description) parts.push(data.description);
   if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
 

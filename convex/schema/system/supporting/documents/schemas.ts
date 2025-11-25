@@ -4,5 +4,5 @@
 import { documentsTable } from './tables';
 
 export const systemSupportingDocumentsSchemas = {
-  documents: documentsTable,
+  systemSupportingDocuments: documentsTable,
 };

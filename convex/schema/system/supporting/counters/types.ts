@@ -10,8 +10,8 @@ import { countersTable } from './tables';
 // Document Types
 // ============================================
 
-export type Counter = Doc<'counters'>;
-export type CounterId = Id<'counters'>;
+export type Counter = Doc<'systemSupportingCounters'>;
+export type CounterId = Id<'systemSupportingCounters'>;
 
 // ============================================
 // Schema Type (from table validator)

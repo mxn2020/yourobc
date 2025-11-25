@@ -41,8 +41,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/email/')({
 
         if (convexClient) {
           const [configs, stats] = await Promise.all([
-            convexClient.query(api.lib.system.email.queries.getAllConfigs, {}),
-            convexClient.query(api.lib.system.email.queries.getEmailStats, { days: 30 })
+            convexClient.query(api.lib.system.email.configs.queries.getAllConfigs, {}),
+            convexClient.query(api.lib.system.email.configs.queries.getEmailStats, { days: 30 })
           ])
 
           // Cache data using service query options (ensures same keys as hooks)

@@ -2,5 +2,5 @@
 import { emailLogsTable } from './tables';
 
 export const systemEmailLogsSchemas = {
-  logs: emailLogsTable,
+  emailLogs: emailLogsTable,
 } as const;

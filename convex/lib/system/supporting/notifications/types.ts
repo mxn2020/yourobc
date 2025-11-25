@@ -3,18 +3,18 @@
 
 import type { Doc, Id } from '@/generated/dataModel';
 import type {
-  NotificationType,
-  NotificationPriority,
+  SystemSupportingNotificationType,
+  SystemSupportingNotificationPriority,
 } from '@/schema/system/supporting/notifications/types';
 
 export type SystemNotification = Doc<'notifications'>;
 export type SystemNotificationId = Id<'notifications'>;
 
 export interface CreateSystemNotificationData {
-  title: string;
+  name: string;
   message: string;
-  type: NotificationType;
-  priority: NotificationPriority;
+  type: SystemSupportingNotificationType;
+  priority: SystemSupportingNotificationPriority;
   recipientId: Id<'userProfiles'>;
   entityType?: string;
   entityId?: string;
@@ -25,8 +25,8 @@ export interface UpdateSystemNotificationData {
 }
 
 export interface SystemNotificationFilters {
-  type?: NotificationType;
-  priority?: NotificationPriority;
+  type?: SystemSupportingNotificationType;
+  priority?: SystemSupportingNotificationPriority;
   isRead?: boolean;
 }
 

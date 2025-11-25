@@ -4,7 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators, emailFields } from './validators';
+import { emailLogsFields, emailLogsValidators } from './validators';
 
 // Email logs (track all sent emails for debugging and auditing)
 export const emailLogsTable = defineTable({
@@ -16,7 +16,7 @@ export const emailLogsTable = defineTable({
   userId: v.id('userProfiles'), // The user associated with this email log (for filtering)
 
   // Provider info
-  provider: emailValidators.provider,
+  provider: emailLogsValidators.provider,
 
   // Email details
   to: v.array(v.string()), // Recipient emails
@@ -32,7 +32,7 @@ export const emailLogsTable = defineTable({
   templateData: v.optional(v.any()),
 
   // Status tracking
-  deliveryStatus: emailValidators.deliveryStatus,
+  deliveryStatus: emailLogsValidators.deliveryStatus,
   messageId: v.optional(v.string()), // Provider's message ID
   error: v.optional(v.string()),
 
@@ -40,7 +40,7 @@ export const emailLogsTable = defineTable({
   providerResponse: v.optional(v.any()),
 
   // Metadata (typed operational tracking)
-  metadata: v.optional(emailFields.logMetadata),
+  metadata: v.optional(emailLogsFields.logMetadata),
   sentAt: v.optional(v.number()),
   deliveredAt: v.optional(v.number()),
   failedAt: v.optional(v.number()),
@@ -64,6 +64,5 @@ export const emailLogsTable = defineTable({
   .index('by_delivery_status', ['deliveryStatus'])
   .index('by_context', ['context'])
   .index('by_created_at', ['createdAt'])
-  .index('by_last_activity_at', ['lastActivityAt'])
   .index('by_message_id', ['messageId'])
   .index('by_triggered_by', ['triggeredBy']);

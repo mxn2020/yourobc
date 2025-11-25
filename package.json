@@ -35,6 +35,7 @@
     "db:generate": "prisma generate",
     "stop": "lsof -ti:3000 | xargs kill -9 2>/dev/null; lsof -ti:3001 | xargs kill -9 2>/dev/null; lsof -ti:3210 | xargs kill -9 2>/dev/null; lsof -ti:3211 | xargs kill -9 2>/dev/null; lsof -ti:3212 | xargs kill -9 2>/dev/null; echo 'Processes stopped (ports 3000, 3001, 3210, 3211, 3212)'",
     "error": "pnpm tsc --noEmit",
+    "error:frontend": "tsc -p tsconfig.src.json --noEmit",
     "error:convex": "npx tsc -p convex/tsconfig.json --noEmit",
     "validate:translations": "tsx scripts/validate-translations.ts",
     "error:codes": "pnpm tsc --noEmit 2>&1 | grep -oE 'TS[0-9]+' | sort | uniq -c | sort -rn",

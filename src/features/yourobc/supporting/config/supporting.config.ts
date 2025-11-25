@@ -307,12 +307,12 @@ export const hasAnySupportingModuleEnabled = (): boolean => {
 export const getEnabledModules = (): string[] => {
   const modules: string[] = []
 
-  if (SUPPORTING_CONFIG.comments.enabled) modules.push('comments')
-  if (SUPPORTING_CONFIG.documents.enabled) modules.push('documents')
-  if (SUPPORTING_CONFIG.exchangeRates.enabled) modules.push('exchangeRates')
-  if (SUPPORTING_CONFIG.followupReminders.enabled) modules.push('followupReminders')
-  if (SUPPORTING_CONFIG.inquirySources.enabled) modules.push('inquirySources')
-  if (SUPPORTING_CONFIG.wiki.enabled) modules.push('wiki')
+  if (SUPPORTING_CONFIG.comments.enabled) modules.push('yourobcComments')
+  if (SUPPORTING_CONFIG.documents.enabled) modules.push('yourobcDocuments')
+  if (SUPPORTING_CONFIG.exchangeRates.enabled) modules.push('yourobcExchangeRates')
+  if (SUPPORTING_CONFIG.followupReminders.enabled) modules.push('yourobcFollowupReminders')
+  if (SUPPORTING_CONFIG.inquirySources.enabled) modules.push('yourobcInquirySources')
+  if (SUPPORTING_CONFIG.wiki.enabled) modules.push('yourobcWikiEntries')
 
   return modules
 }

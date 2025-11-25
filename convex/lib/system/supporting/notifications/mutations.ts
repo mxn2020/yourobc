@@ -34,9 +34,9 @@ export const createSystemNotification = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'notifications');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingNotifications');
 
-    const id = await ctx.db.insert('notifications', {
+    const id = await ctx.db.insert('systemSupportingNotifications', {
       ...trimmed,
       publicId,
       ownerId: user._id,
@@ -48,10 +48,11 @@ export const createSystemNotification = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.notifications.created',
-      entityType: 'notifications',
+      entityType: 'systemSupportingNotifications',
       entityId: publicId,
       entityTitle: trimmed.title,
       description: 'Created notification',
@@ -65,7 +66,7 @@ export const createSystemNotification = mutation({
 });
 
 export const markSystemNotificationRead = mutation({
-  args: { id: v.id('notifications'), isRead: v.optional(v.boolean()) },
+  args: { id: v.id('systemSupportingNotifications'), isRead: v.optional(v.boolean()) },
   handler: async (ctx, { id, isRead }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -87,10 +88,11 @@ export const markSystemNotificationRead = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.notifications.marked_read',
-      entityType: 'notifications',
+      entityType: 'systemSupportingNotifications',
       entityId: existing.publicId,
       entityTitle: existing.title,
       description: 'Marked notification read',
@@ -104,7 +106,7 @@ export const markSystemNotificationRead = mutation({
 });
 
 export const deleteSystemNotification = mutation({
-  args: { id: v.id('notifications') },
+  args: { id: v.id('systemSupportingNotifications') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -123,10 +125,11 @@ export const deleteSystemNotification = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.notifications.deleted',
-      entityType: 'notifications',
+      entityType: 'systemSupportingNotifications',
       entityId: existing.publicId,
       entityTitle: existing.title,
       description: 'Deleted notification',

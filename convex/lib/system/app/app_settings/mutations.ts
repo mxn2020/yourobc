@@ -4,17 +4,19 @@ import { v } from 'convex/values';
 import { requireAdmin } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
 import { trimAppSettingData, validateAppSettingData } from './utils';
+import { appSettingsFields, appSettingsValidators } from '@/schema/system/app/app_settings';
 
 export const createAppSetting = mutation({
   args: {
     name: v.string(),
     key: v.string(),
-    value: v.union(v.string(), v.number(), v.boolean(), v.null()),
-    category: v.string(),
+    value: appSettingsFields.settingValue,
+    valueType: appSettingsValidators.valueType,
+    category: appSettingsValidators.category,
     description: v.optional(v.string()),
     isPublic: v.optional(v.boolean()),
   },
-  handler: async (ctx, { name, key, value, category, description, isPublic = false }) => {
+  handler: async (ctx, { name, key, value, valueType, category, description, isPublic = false }) => {
     const user = await requireAdmin(ctx);
     const trimmed = trimAppSettingData({ name, key });
     const errors = validateAppSettingData(trimmed);
@@ -27,6 +29,7 @@ export const createAppSetting = mutation({
       publicId,
       key: trimmed.key || key,
       value,
+      valueType,
       category,
       description,
       isPublic,
@@ -37,6 +40,7 @@ export const createAppSetting = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appsettings.created',
@@ -71,6 +75,7 @@ export const updateAppSetting = mutation({
     await ctx.db.patch(id, { ...trimmed, updatedAt: now, updatedBy: user._id });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appsettings.updated',
@@ -98,6 +103,7 @@ export const deleteAppSetting = mutation({
     await ctx.db.patch(id, { deletedAt: now, deletedBy: user._id, updatedAt: now, updatedBy: user._id });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || 'Admin',
       action: 'appsettings.deleted',

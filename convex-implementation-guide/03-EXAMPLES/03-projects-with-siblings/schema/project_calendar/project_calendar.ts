@@ -51,7 +51,7 @@ export const projectCalendarTable = defineTable({
   .index('by_deleted_at', ['deletedAt'])
 
   // Optional project relationship
-  .index('by_project', ['projectId'])
+  .index('by_project_id', ['projectId'])
 
   // Time-based queries
   .index('by_start_time', ['startTime'])

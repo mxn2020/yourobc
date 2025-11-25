@@ -36,8 +36,8 @@ export const Route = createFileRoute(
         if (convexClient) {
           // Fetch stats and pending requests in parallel
           const [stats, requests] = await Promise.all([
-            convexClient.query(api.lib.system.permission_requests.queries.getPermissionRequestsStats, {}),
-            convexClient.query(api.lib.system.permission_requests.queries.getAllPermissionRequests, {
+            convexClient.query(api.lib.system.core.permission_requests.queries.getPermissionRequestsStats, {}),
+            convexClient.query(api.lib.system.core.permission_requests.queries.getAllPermissionRequests, {
               status: 'pending',
             }),
           ]);

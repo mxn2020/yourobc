@@ -24,7 +24,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_system/notificatio
         const convexClient = await getAuthenticatedConvexClient()
 
         if (convexClient) {
-          const notifications = await convexClient.query(api.lib.system.notifications.queries.getNotifications, {})
+          const notifications = await convexClient.query(api.lib.system.core.notifications.queries.getNotifications, {})
 
           // Cache data using service query options (ensures same keys as hooks)
           context.queryClient.setQueryData(notificationsQueryOptions.queryKey, notifications)

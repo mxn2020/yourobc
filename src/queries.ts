@@ -9,7 +9,7 @@ import { Id } from '@/convex/_generated/dataModel'
 // Audit Log Queries (User-scoped)
 export const auditLogQueries = {
   list: (filters?: Partial<AuditLogFilters> & { limit?: number; offset?: number }) =>
-    convexQuery(api.lib.system.audit_logs.queries.getAuditLogs, {
+    convexQuery(api.lib.system.core.audit_logs.queries.getAuditLogs, {
       options: {
         limit: filters?.limit,
         offset: filters?.offset,
@@ -24,7 +24,7 @@ export const auditLogQueries = {
       },
     }),
   stats: (timeWindow?: 'day' | 'week' | 'month' | 'all') =>
-    convexQuery(api.lib.system.audit_logs.queries.getMyAuditLogStats, {
+    convexQuery(api.lib.system.core.audit_logs.queries.getMyAuditLogStats, {
       timeWindow,
     }),
 }
@@ -32,7 +32,7 @@ export const auditLogQueries = {
 // Admin Audit Log Queries (Admin-only)
 export const adminAuditLogQueries = {
   list: (filters?: Partial<AuditLogFilters> & { limit?: number; offset?: number }) =>
-    convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogs, {
+    convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogs, {
       options: {
         limit: filters?.limit,
         offset: filters?.offset,
@@ -47,7 +47,7 @@ export const adminAuditLogQueries = {
       },
     }),
   stats: (timeWindow?: 'day' | 'week' | 'month' | 'all') =>
-    convexQuery(api.lib.system.audit_logs.admin_queries.adminGetAuditLogStats, {
+    convexQuery(api.lib.system.core.audit_logs.admin_queries.adminGetAuditLogStats, {
       timeWindow,
     }),
 }

@@ -4,6 +4,7 @@
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Doc } from '@/generated/dataModel';
 import type { Notification } from './types';
+import { UserProfile } from '@/schema/system';
 
 
 /**

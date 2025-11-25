@@ -148,7 +148,7 @@ if (errors.length) {
 ```typescript
 // ✅ Must rebuild with current values
 const searchableText = buildSearchableText({
-  name: trimmed.name ?? existing.name,
+  {displayField}: trimmed.{displayField} ?? existing.{displayField},
   description: trimmed.description ?? existing.description,
   tags: trimmed.tags ?? existing.tags,
 });
@@ -232,12 +232,12 @@ await ctx.db.patch(id, {
 // ✅ Always audit mutations
 await ctx.db.insert('auditLogs', {
   userId: user._id,
-  userName: user.name || user.email || 'Unknown',
+  userName: user.{displayField} || user.email || 'Unknown',
   action: '{module}.created',
   entityType: '{tableName}',
   entityId: publicId,
-  entityTitle: trimmed.name,
-  description: `Created {module}: ${trimmed.name}`,
+  entityTitle: trimmed.{displayField},
+  description: `Created {module}: ${trimmed.{displayField}}`,
   createdAt: now,
   createdBy: user._id,
   updatedAt: now,

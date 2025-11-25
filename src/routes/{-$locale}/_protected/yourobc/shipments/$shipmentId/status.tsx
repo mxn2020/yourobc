@@ -1,48 +1,97 @@
 // src/routes/_protected/yourobc/shipments/$shipmentId/status.tsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { StatusUpdateForm } from '@/features/yourobc/shipments/components/StatusUpdateForm'
 import { useShipment, useShipments } from '@/features/yourobc/shipments/hooks/useShipments'
 import { useToast } from '@/features/system/notifications'
 import { parseConvexError } from '@/utils/errorHandling'
-import { authService } from '@/features/system/auth'
-import { convexQuery } from '@convex-dev/react-query'
+import { shipmentService } from '@/features/yourobc/shipments'
 import { api } from '@/generated/api'
 import { Suspense } from 'react'
 import { Card, Loading } from '@/components/ui'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { defaultLocale } from '@/features/system/i18n'
+import { createI18nSeo } from '@/utils/seo'
+import type { Locale } from '@/features/system/i18n'
 import type { ShipmentId, StatusUpdateFormData } from '@/features/yourobc/shipments/types'
 
 export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/$shipmentId/status')({
   loader: async ({ params, context }) => {
-    try {
-      const session = await authService.getSession()
-      
-      if (session?.data?.user?.id) {
-        await context.queryClient.prefetchQuery(
-          convexQuery(api.lib.yourobc.shipments.queries.getShipment, {
-            shipmentId: params.shipmentId as ShipmentId,
-                      })
-        )
+    const isServer = typeof window === 'undefined'
+    console.log(`🔄 Route Loader STARTED (${isServer ? 'SERVER' : 'CLIENT'})`)
+    console.time('Route Loader: Update Shipment Status')
+
+    const { user } = context
+    const locale = (context.locale || defaultLocale) as Locale
+
+    // ⚠️ Stricter role guard for status updates
+    if (!user || !['admin', 'manager', 'operations'].includes(user.role)) {
+      throw redirect({
+        to: '/{-$locale}/yourobc/shipments/$shipmentId',
+        params: {
+          shipmentId: params.shipmentId,
+          locale: locale === defaultLocale ? undefined : locale
+        }
+      })
+    }
+
+    const shipmentQueryOptions = shipmentService.getShipmentQueryOptions(params.shipmentId as ShipmentId)
+
+    if (typeof window === 'undefined') {
+      try {
+        console.time('Route Loader: SSR Data Fetch')
+        const { getAuthenticatedConvexClient } = await import('@/lib/convex-server')
+        const convexClient = await getAuthenticatedConvexClient()
+
+        if (convexClient) {
+          const shipment = await convexClient.query(
+            api.lib.yourobc.shipments.queries.getShipment,
+            { shipmentId: params.shipmentId as ShipmentId }
+          )
+
+          context.queryClient.setQueryData(shipmentQueryOptions.queryKey, shipment)
+          console.timeEnd('Route Loader: SSR Data Fetch')
+        }
+        console.timeEnd('Route Loader: Update Shipment Status')
+      } catch (error) {
+        console.warn('SSR prefetch failed:', error)
+        console.timeEnd('Route Loader: Update Shipment Status')
       }
-      
-      return {}
-    } catch (error) {
-      console.warn('Failed to prefetch shipment data:', error)
-      return {}
+    } else {
+      console.time('Route Loader: Client ensureQueryData')
+      await context.queryClient.ensureQueryData(shipmentQueryOptions)
+      console.timeEnd('Route Loader: Client ensureQueryData')
+      console.timeEnd('Route Loader: Update Shipment Status')
     }
   },
   component: ShipmentStatusUpdatePage,
-  head: () => ({
-    meta: [
-      {
+  pendingComponent: () => (
+    <Loading size="lg" message="page.loading" namespace="shipments" showMessage />
+  ),
+  head: async ({ matches }) => {
+    const locale = matches[0]?.context?.locale || defaultLocale
+
+    return {
+      meta: await createI18nSeo(locale, 'shipments.status', {
         title: 'Update Shipment Status - YourOBC',
-      },
-      {
-        name: 'description',
-        content: 'Update shipment status and tracking information',
-      },
-    ],
-  }),
+        description: 'Update shipment status and tracking information',
+        keywords: 'shipment, status, update, tracking',
+      }),
+    }
+  },
+  errorComponent: ({ error, reset }) => (
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold text-red-600 mb-4">Error Loading Shipment</h2>
+        <p className="text-gray-600 mb-4">{error.message}</p>
+        <button
+          onClick={reset}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  ),
 })
 
 function ShipmentStatusUpdatePage() {

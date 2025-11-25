@@ -5,7 +5,7 @@ import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { requireCurrentUser, requirePermission } from '@/shared/auth.helper';
 import { generateUniquePublicId } from '@/shared/utils/publicId';
-import { dashboardsValidators } from '@/schema/system/dashboards/validators';
+import { dashboardsFields, dashboardsValidators } from '@/schema/system/dashboards/validators';
 import { DASHBOARDS_CONSTANTS } from './constants';
 import { validateDashboardData } from './utils';
 import { requireEditDashboardAccess, requireDeleteDashboardAccess } from './permissions';
@@ -20,7 +20,7 @@ export const createDashboard = mutation({
       name: v.string(),
       description: v.optional(v.string()),
       layout: v.optional(dashboardsValidators.layout),
-      widgets: v.optional(v.array(dashboardsValidators.widget)),
+      widgets: v.optional(v.array(dashboardsFields.widget)),
       isDefault: v.optional(v.boolean()),
       isPublic: v.optional(v.boolean()),
       tags: v.optional(v.array(v.string())),
@@ -63,6 +63,7 @@ export const createDashboard = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'dashboard.created',
@@ -71,8 +72,10 @@ export const createDashboard = mutation({
       entityTitle: data.name.trim(),
       description: `Created dashboard: ${data.name.trim()}`,
       metadata: {
-        layout: data.layout || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.LAYOUT,
-        isPublic: data.isPublic || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.IS_PUBLIC,
+        data: {
+          layout: data.layout || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.LAYOUT,
+          isPublic: data.isPublic || DASHBOARDS_CONSTANTS.DEFAULT_VALUES.IS_PUBLIC,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -94,7 +97,7 @@ export const updateDashboard = mutation({
       name: v.optional(v.string()),
       description: v.optional(v.string()),
       layout: v.optional(dashboardsValidators.layout),
-      widgets: v.optional(v.array(dashboardsValidators.widget)),
+      widgets: v.optional(v.array(dashboardsFields.widget)),
       isDefault: v.optional(v.boolean()),
       isPublic: v.optional(v.boolean()),
       tags: v.optional(v.array(v.string())),
@@ -153,6 +156,7 @@ export const updateDashboard = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'dashboard.updated',
@@ -160,7 +164,11 @@ export const updateDashboard = mutation({
       entityId: dashboard.publicId,
       entityTitle: updateData.name || dashboard.name,
       description: `Updated dashboard: ${updateData.name || dashboard.name}`,
-      metadata: { changes: updates },
+      metadata: {
+        data: {
+          changes: updates
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -202,6 +210,7 @@ export const deleteDashboard = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'dashboard.deleted',
@@ -259,6 +268,7 @@ export const restoreDashboard = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'dashboard.restored',

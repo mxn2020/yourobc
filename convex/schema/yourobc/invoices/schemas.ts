@@ -2,7 +2,7 @@
 // Schema exports for invoices module
 
 import { v } from 'convex/values';
-import { invoicesTable } from './invoices';
+import { invoicesTable } from './tables';
 
 export const invoiceIdSchema = v.id('yourobcInvoices')
 

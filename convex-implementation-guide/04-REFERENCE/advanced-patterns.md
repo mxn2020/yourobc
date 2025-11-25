@@ -102,7 +102,7 @@ export const getProjects = query({
     if (filters?.search) {
       const term = filters.search.toLowerCase();
       items = items.filter(i =>
-        i.name.toLowerCase().includes(term) ||
+        i.{displayField}.toLowerCase().includes(term) ||
         (i.description && i.description.toLowerCase().includes(term))
       );
     }
@@ -162,7 +162,7 @@ export function buildSearchableText(
 ): string {
   const parts: string[] = [];
 
-  if (data.name) parts.push(data.name);
+  if (data.{displayField}) parts.push(data.{displayField});
   if (data.description) parts.push(data.description);
   if (data.tags && Array.isArray(data.tags)) parts.push(...data.tags);
   
@@ -207,7 +207,7 @@ export const updateProject = mutation({
     
     // Rebuild with merged data
     const searchableText = buildSearchableText({
-      name: trimmed.name ?? existing.name,
+      name: trimmed.{displayField} ?? existing.{displayField},
       description: trimmed.description ?? existing.description,
       tags: trimmed.tags ?? existing.tags,
     });
@@ -492,7 +492,7 @@ export const projectsTable = defineTable({
 export const createProject = mutation({
   handler: async (ctx, { data }) => {
     const id = await ctx.db.insert('freelancerProjects', {
-      name: data.name,
+      name: data.{displayField},
       metadata: {  // ✅ Type-safe
         budgetAllocated: data.budget,
         estimatedHours: data.hours,
@@ -553,7 +553,7 @@ export const auditLogsFields = {
     
     // If you truly need arbitrary extra fields:
     // add a dedicated map instead of an index signature.
-    extras: v.optional(v.record(v.string(), metadataValue)),
+    meta: v.optional(v.record(v.string(), metadataValue)),
   }),
 };
 ```
@@ -681,7 +681,7 @@ export const bulkUpdateProjects = mutation({
     // Single audit log for bulk operation
     await ctx.db.insert("auditLogs", {
       userId: user._id,
-      userName: user.name || user.email || "Unknown",
+      userName: user.{displayField} || user.email || "Unknown",
       action: "projects.bulk_updated",
       entityType: "freelancerProjects",
       entityId: "bulk",  // Special ID for bulk
@@ -805,7 +805,7 @@ export const createProject = mutation({
 
     const id = await ctx.db.insert('freelancerProjects', {
       publicId,
-      name: data.name,
+      name: data.{displayField},
       // ... other fields
     });
 
@@ -1074,7 +1074,7 @@ export const deleteProject = mutation({
     // Cascade to related entities
     const tasks = await ctx.db
       .query('projectTasks')
-      .withIndex('by_project', q => q.eq('projectId', id))
+      .withIndex('by_project_id', q => q.eq('projectId', id))
       .collect();
 
     for (const task of tasks) {
@@ -1134,7 +1134,7 @@ export const duplicateProject = mutation({
       _id: undefined,  // Clear internal ID
       _creationTime: undefined,
       publicId,  // New publicId
-      name: `${original.name} (Copy)`,
+      name: `${original.{displayField}} (Copy)`,
       status: 'draft',  // Reset status
       createdAt: now,
       createdBy: user._id,
@@ -1252,7 +1252,7 @@ export const duplicateProject = mutation({
 **Solution**: Rebuild searchableText in update
 ```typescript
 const searchableText = buildSearchableText({
-  name: trimmed.name ?? existing.name,
+  {displayField}: trimmed.{displayField} ?? existing.{displayField},
   description: trimmed.description ?? existing.description,
 });
 ```

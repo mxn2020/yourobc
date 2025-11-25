@@ -48,7 +48,7 @@ export const projectCalendarTable = defineTable({
 
   // ... other fields
 })
-  .index('by_project', ['projectId']);  // Index for optional queries
+  .index('by_project_id', ['projectId']);  // Index for optional queries
 ```
 
 ### 3. Cross-Module Queries
@@ -62,7 +62,7 @@ export const getProjectCalendarEvents = query({
     // Query sibling module
     return await ctx.db
       .query('freelancerProjectCalendar')
-      .withIndex('by_project', q => q.eq('projectId', projectId))
+      .withIndex('by_project_id', q => q.eq('projectId', projectId))
       .collect();
   },
 });
@@ -192,7 +192,7 @@ export const projectCalendarValidators = {
 // Query with optional FK
 const events = await ctx.db
   .query('freelancerProjectCalendar')
-  .withIndex('by_project', q => q.eq('projectId', projectId))
+  .withIndex('by_project_id', q => q.eq('projectId', projectId))
   .collect();
 
 // Handle missing FK

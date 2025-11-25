@@ -76,7 +76,7 @@ export interface CreateQuoteData {
   serviceType: QuoteServiceType;
   priority: QuotePriority;
   customerId: Id<'yourobcCustomers'>;
-  inquirySourceId?: Id<'inquirySources'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
   origin: AddressData;
   destination: AddressData;
   dimensions: DimensionsData;
@@ -107,7 +107,7 @@ export interface UpdateQuoteData {
   customerReference?: string;
   serviceType?: QuoteServiceType;
   priority?: QuotePriority;
-  inquirySourceId?: Id<'inquirySources'>;
+  inquirySourceId?: Id<'yourobcInquirySources'>;
   origin?: AddressData;
   destination?: AddressData;
   dimensions?: DimensionsData;
@@ -140,7 +140,7 @@ export interface UpdateQuoteData {
 // Response types
 export interface QuoteWithRelations extends Quote {
   customer?: Doc<'yourobcCustomers'> | null;
-  inquirySource?: Doc<'inquirySources'> | null;
+  inquirySource?: Doc<'yourobcInquirySources'> | null;
   assignedCourier?: Doc<'yourobcCouriers'> | null;
   employee?: Doc<'yourobcEmployees'> | null;
   convertedShipment?: Doc<'yourobcShipments'> | null;

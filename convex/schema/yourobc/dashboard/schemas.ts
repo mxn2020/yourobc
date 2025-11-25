@@ -5,7 +5,7 @@
  * Consolidated export of all dashboard-related database table schemas.
  */
 
-import { dashboardAlertAcknowledgmentsTable } from './dashboardAlertAcknowledgments';
+import { dashboardAlertAcknowledgmentsTable } from './tables';
 
 /**
  * Dashboard Schemas

@@ -22,7 +22,7 @@ export const getCustomers = query({
       status: v.optional(v.array(customersValidators.status)),
       currency: v.optional(v.array(baseValidators.currency)),
       search: v.optional(v.string()),
-      inquirySourceId: v.optional(v.id('inquirySources')),
+      inquirySourceId: v.optional(v.id('yourobcInquirySources')),
       country: v.optional(v.string()),
       serviceSuspended: v.optional(v.boolean()),
     })),

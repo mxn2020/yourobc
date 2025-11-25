@@ -4,8 +4,8 @@
 import type { Doc, Id } from '@/generated/dataModel';
 import type { CounterType } from '@/schema/system/supporting/counters/types';
 
-export type SystemCounter = Doc<'counters'>;
-export type SystemCounterId = Id<'counters'>;
+export type SystemCounter = Doc<'systemSupportingCounters'>;
+export type SystemCounterId = Id<'systemSupportingCounters'>;
 
 export interface CreateSystemCounterData {
   name: string;

@@ -3,11 +3,11 @@
 
 // Constants
 export { CUSTOMERS_CONSTANTS, CUSTOMERS_VALUES } from './constants';
-export { CUSTOMER_MARGINS_CONSTANTS } from './margins.constants';
+export { CUSTOMER_MARGINS_CONSTANTS } from './margins/constants';
 
 // Types
 export type * from './types';
-export type * from './margins.types';
+export type * from './margins/types';
 
 // Utilities
 export {
@@ -30,7 +30,7 @@ export {
   calculateMarginAmount,
   calculatePriceWithMargin,
   getApplicableVolumeTier,
-} from './margins.utils';
+} from './margins/utils';
 
 // Permissions
 export {
@@ -52,7 +52,7 @@ export {
   requireDeleteCustomerMarginAccess,
   requireApproveCustomerMarginAccess,
   filterCustomerMarginsByAccess,
-} from './margins.permissions';
+} from './margins/permissions';
 
 // Queries
 export {
@@ -67,7 +67,7 @@ export {
   getCustomerMarginByPublicId,
   getCustomerMarginByMarginId,
   getCustomerMarginStats,
-} from './margins.queries';
+} from './margins/queries';
 
 // Mutations
 export {
@@ -85,4 +85,4 @@ export {
   deleteCustomerMargin,
   restoreCustomerMargin,
   approveCustomerMargin,
-} from './margins.mutations';
+} from './margins/mutations';

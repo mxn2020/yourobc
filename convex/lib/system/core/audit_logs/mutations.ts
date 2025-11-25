@@ -3,8 +3,10 @@
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
 import { getCurrentUser, requireAdmin } from '@/shared/auth.helper';
-import { entityTypes } from './entityTypes';
+import { entityTypes } from './entity_types';
 import { AUDIT_LOG_CONSTANTS } from './constants';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
+import { auditLogsFields } from '@/schema/system/core/audit_logs';
 
 /**
  * Create an audit log entry
@@ -17,19 +19,7 @@ export const createAuditLog = mutation({
     entityId: v.optional(v.string()),
     entityTitle: v.optional(v.string()),
     description: v.string(),
-    metadata: v.optional(
-      v.union(
-        v.object({
-          source: v.optional(v.string()),
-          operation: v.optional(v.string()),
-          oldValues: v.optional(v.any()),
-          newValues: v.optional(v.any()),
-          ipAddress: v.optional(v.string()),
-          userAgent: v.optional(v.string()),
-        }),
-        v.record(v.string(), v.any())
-      )
-    ),
+    metadata: v.optional(auditLogsFields.auditMetadata),
   },
   handler: async (ctx, args) => {
     // 1. Authentication
@@ -56,11 +46,13 @@ export const createAuditLog = mutation({
     }
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'appConfigs');
 
     // 4. Create audit log data
     const auditLogData = {
       userId: user._id,
       userName: (user.name || 'User').trim(),
+      publicId,
       action,
       entityType,
       entityId,
@@ -74,7 +66,9 @@ export const createAuditLog = mutation({
     };
 
     // 5. Insert audit log
-    return await ctx.db.insert('auditLogs', auditLogData);
+    const auditLogId = await ctx.db.insert('auditLogs', auditLogData);
+
+    return auditLogId;
   },
 });
 
@@ -101,6 +95,8 @@ export const cleanupOldAuditLogs = mutation({
       .collect();
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'appConfigs');
+
     const batchSize = 100;
     let deletedCount = 0;
 
@@ -120,6 +116,7 @@ export const cleanupOldAuditLogs = mutation({
 
     // 5. Create audit log for cleanup operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: admin._id,
       userName: admin.name || 'Admin',
       action: AUDIT_LOG_CONSTANTS.ACTIONS.SYSTEM_MAINTENANCE,
@@ -166,11 +163,13 @@ export const bulkCreateAuditLogs = mutation({
     const admin = await requireAdmin(ctx);
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'appConfigs');
 
     // 2. Trim string fields and create audit logs
     const auditLogs = logs.map((log) => ({
       userId: admin._id,
       userName: (admin.name || 'Admin').trim(),
+      publicId,
       action: log.action.trim(),
       entityType: log.entityType.trim(),
       entityId: log.entityId?.trim(),

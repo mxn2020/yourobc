@@ -17,17 +17,17 @@ class PermissionRequestsService {
   // ==========================================
 
   getPermissionRequestsStatsQueryOptions() {
-    return convexQuery(api.lib.system.permission_requests.queries.getPermissionRequestsStats, {});
+    return convexQuery(api.lib.system.core.permission_requests.queries.getPermissionRequestsStats, {});
   }
 
   getAllPermissionRequestsQueryOptions(status?: 'pending' | 'approved' | 'denied') {
-    return convexQuery(api.lib.system.permission_requests.queries.getAllPermissionRequests, {
+    return convexQuery(api.lib.system.core.permission_requests.queries.getAllPermissionRequests, {
       status,
     });
   }
 
   getUserPermissionRequestsQueryOptions(userId: Id<'userProfiles'>) {
-    return convexQuery(api.lib.system.permission_requests.queries.getUserPermissionRequests, {
+    return convexQuery(api.lib.system.core.permission_requests.queries.getUserPermissionRequests, {
       userId,
     });
   }
@@ -64,25 +64,25 @@ class PermissionRequestsService {
 
   useApprovePermissionRequest() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.permission_requests.mutations.approvePermissionRequest),
+      mutationFn: useConvexMutation(api.lib.system.core.permission_requests.mutations.approvePermissionRequest),
     });
   }
 
   useDenyPermissionRequest() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.permission_requests.mutations.denyPermissionRequest),
+      mutationFn: useConvexMutation(api.lib.system.core.permission_requests.mutations.denyPermissionRequest),
     });
   }
 
   useCreatePermissionRequest() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.permission_requests.mutations.createPermissionRequest),
+      mutationFn: useConvexMutation(api.lib.system.core.permission_requests.mutations.createPermissionRequest),
     });
   }
 
   useCancelPermissionRequest() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.permission_requests.mutations.cancelPermissionRequest),
+      mutationFn: useConvexMutation(api.lib.system.core.permission_requests.mutations.cancelPermissionRequest),
     });
   }
 

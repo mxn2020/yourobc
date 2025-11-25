@@ -102,8 +102,8 @@ export const getExchangeRate = query({
  */
 export const getExchangeRateForPair = query({
   args: {
-    fromCurrency: v.string(),
-    toCurrency: v.string(),
+      fromCurrency: exchangeRatesValidators.currency,
+      toCurrency: exchangeRatesValidators.currency,
   },
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);

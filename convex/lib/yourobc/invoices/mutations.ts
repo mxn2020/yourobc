@@ -123,6 +123,7 @@ export const createInvoice = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.created',
@@ -230,6 +231,7 @@ export const updateInvoice = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.updated',
@@ -279,6 +281,7 @@ export const deleteInvoice = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.deleted',
@@ -337,6 +340,7 @@ export const restoreInvoice = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.restored',
@@ -385,6 +389,7 @@ export const sendInvoice = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.sent',
@@ -450,6 +455,7 @@ export const processPayment = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.payment_processed',
@@ -526,6 +532,7 @@ export const addCollectionAttempt = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.collection_attempt_added',
@@ -592,6 +599,7 @@ export const escalateDunning = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.dunning_escalated',
@@ -653,6 +661,7 @@ export const markAsOverdue = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user.authUserId,
       userName: user.name || user.email || 'Unknown User',
       action: 'invoice.marked_overdue',

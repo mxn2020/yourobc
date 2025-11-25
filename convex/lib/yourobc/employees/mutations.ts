@@ -97,21 +97,17 @@ export const createEmployee = mutation({
       authUserId: sanitized.authUserId,
       employeeNumber: sanitized.employeeNumber,
       type: sanitized.type || 'office',
-      department: sanitized.department,
-      position: sanitized.position,
+      department: sanitized.department || '',
+      position: sanitized.position || '',
       managerId: sanitized.managerId,
       employmentType: sanitized.employmentType,
       office: sanitized.office,
       hireDate: sanitized.hireDate,
       startDate: sanitized.startDate,
       endDate: sanitized.endDate,
-      salary: sanitized.salary,
-      currency: sanitized.currency || 'USD',
-      paymentFrequency: sanitized.paymentFrequency,
-      email: sanitized.email,
-      phone: sanitized.phone,
-      workPhone: sanitized.workPhone,
-      workEmail: sanitized.workEmail,
+      phone: sanitized.phone || '',
+      workPhone: sanitized.workPhone || '',
+      workEmail: sanitized.workEmail || '',
       emergencyContact: sanitized.emergencyContact,
       status: sanitized.status || EMPLOYEES_CONSTANTS.STATUS.ACTIVE,
       workStatus: sanitized.workStatus,
@@ -126,6 +122,7 @@ export const createEmployee = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employee.created',
@@ -134,14 +131,17 @@ export const createEmployee = mutation({
       entityTitle: sanitized.name,
       description: `Created employee: ${sanitized.name}`,
       metadata: {
-        status: sanitized.status || EMPLOYEES_CONSTANTS.STATUS.ACTIVE,
-        department: sanitized.department,
-        position: sanitized.position,
+        data: {
+          status: sanitized.status || EMPLOYEES_CONSTANTS.STATUS.ACTIVE,
+          department: sanitized.department || '',
+          position: sanitized.position || '',
+        },
       },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
-    });
+    }
+    );
 
     // 7. RETURN: Return entity ID
     return employeeId;
@@ -235,6 +235,7 @@ export const updateEmployee = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employee.updated',
@@ -242,7 +243,11 @@ export const updateEmployee = mutation({
       entityId: employee.publicId,
       entityTitle: updateData.name || employee.name,
       description: `Updated employee: ${updateData.name || employee.name}`,
-      metadata: { changes: updates },
+      metadata: {
+        data: {
+          changes: updates
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -288,14 +293,15 @@ export const updateEmployeeSalary = mutation({
     const now = Date.now();
     await ctx.db.patch(employeeId, {
       salary,
-      currency: currency || employee.currency || 'USD',
-      paymentFrequency: paymentFrequency || employee.paymentFrequency,
+      currency: currency || 'USD',
+      paymentFrequency: paymentFrequency,
       updatedAt: now,
       updatedBy: user._id,
     });
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employee.salary_updated',
@@ -303,7 +309,11 @@ export const updateEmployeeSalary = mutation({
       entityId: employee.publicId,
       entityTitle: employee.name,
       description: `Updated salary for employee: ${employee.name}`,
-      metadata: { salary, currency, paymentFrequency },
+      metadata: {
+        data: {
+          salary,
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -344,6 +354,7 @@ export const deleteEmployee = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employee.deleted',
@@ -397,6 +408,7 @@ export const restoreEmployee = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'employee.restored',
@@ -478,6 +490,7 @@ export const createVacationDays = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'vacation_days.created',
@@ -486,8 +499,10 @@ export const createVacationDays = mutation({
       entityTitle: `${employee.name} - ${data.year}`,
       description: `Created vacation days record for ${employee.name}`,
       metadata: {
-        year: data.year,
-        annualEntitlement: data.annualEntitlement,
+        data: {
+          year: data.year,
+          annualEntitlement: data.annualEntitlement,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -619,6 +634,7 @@ export const requestVacation = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'vacation.requested',
@@ -627,10 +643,12 @@ export const requestVacation = mutation({
       entityTitle: `${employee.name} - Vacation Request`,
       description: `Requested ${data.days} days of ${data.type} vacation`,
       metadata: {
-        startDate: data.startDate,
-        endDate: data.endDate,
-        days: data.days,
-        type: data.type,
+        data: {
+          startDate: data.startDate,
+          endDate: data.endDate,
+          days: data.days,
+          type: data.type,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -706,6 +724,7 @@ export const approveVacation = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'vacation.approved',
@@ -714,10 +733,12 @@ export const approveVacation = mutation({
       entityTitle: `${employee.name} - Vacation Approved`,
       description: `Approved ${entry.days} days of ${entry.type} vacation`,
       metadata: {
-        startDate: entry.startDate,
-        endDate: entry.endDate,
-        days: entry.days,
-        type: entry.type,
+        data: {
+          startDate: entry.startDate,
+          endDate: entry.endDate,
+          days: entry.days,
+          type: entry.type,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -791,6 +812,7 @@ export const rejectVacation = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'vacation.rejected',
@@ -799,11 +821,13 @@ export const rejectVacation = mutation({
       entityTitle: `${employee.name} - Vacation Rejected`,
       description: `Rejected ${entry.days} days of ${entry.type} vacation`,
       metadata: {
-        startDate: entry.startDate,
-        endDate: entry.endDate,
-        days: entry.days,
-        type: entry.type,
-        reason,
+        data: {
+          startDate: entry.startDate,
+          endDate: entry.endDate,
+          days: entry.days,
+          type: entry.type,
+          reason,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -864,7 +888,7 @@ export const cancelVacation = mutation({
     const entry = vacationDays.entries[entryIndex];
 
     if (entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.CANCELLED ||
-        entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.COMPLETED) {
+      entry.status === EMPLOYEES_CONSTANTS.VACATION_STATUS.COMPLETED) {
       throw new Error('This vacation request cannot be cancelled');
     }
 
@@ -903,6 +927,7 @@ export const cancelVacation = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'vacation.cancelled',
@@ -911,11 +936,13 @@ export const cancelVacation = mutation({
       entityTitle: `${employee.name} - Vacation Cancelled`,
       description: `Cancelled ${entry.days} days of ${entry.type} vacation`,
       metadata: {
-        startDate: entry.startDate,
-        endDate: entry.endDate,
-        days: entry.days,
-        type: entry.type,
-        reason,
+        data: {
+          startDate: entry.startDate,
+          endDate: entry.endDate,
+          days: entry.days,
+          type: entry.type,
+          reason: reason?.trim() ?? null,
+        },
       },
       createdAt: now,
       createdBy: user._id,

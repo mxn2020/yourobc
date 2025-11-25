@@ -1,7 +1,7 @@
 // convex/lib/system/audit_logs/types.ts
 // convex/auditLogs/types.ts
 
-import { EntityType } from '@/config/index';
+import type { EntityType } from '@/config/index';
 import type { Doc, Id } from '@/generated/dataModel';
 
 export type AuditLog = Doc<'auditLogs'>;
@@ -41,4 +41,3 @@ export interface AuditLogListOptions {
   filters?: AuditLogFilters;
   sortOrder?: 'asc' | 'desc';
 }
-

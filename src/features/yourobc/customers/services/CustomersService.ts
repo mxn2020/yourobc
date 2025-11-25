@@ -2,164 +2,187 @@
 
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
+import { api } from '@/convex/_generated/api'
 import type {
   CreateCustomerData,
   UpdateCustomerData,
   CustomerFormData,
   CustomerSearchFilters,
 } from '../types'
-import { CustomerId } from '@/convex/lib/yourobc'
+import { CustomerId } from '@/convex/lib/yourobc/customers/types'
 
 export class CustomersService {
-  // Query hooks for customer data fetching
-  useCustomers(
-    authUserId: string,
-    options?: {
-      limit?: number
-      offset?: number
-      sortBy?: string
-      sortOrder?: 'asc' | 'desc'
-      filters?: CustomerSearchFilters
-    }
+  // ==========================================
+  // QUERY OPTION FACTORIES
+  // These methods return query options for SSR cache compatibility
+  // ==========================================
+
+  getCustomersQueryOptions(options?: {
+    limit?: number
+    offset?: number
+    sortBy?: string
+    sortOrder?: 'asc' | 'desc'
+    filters?: CustomerSearchFilters
+  }) {
+    return convexQuery(api.lib.yourobc.customers.queries.getCustomers, {
+      options,
+    });
+  }
+
+  getCustomerQueryOptions(customerId: CustomerId) {
+    return convexQuery(api.lib.yourobc.customers.queries.getCustomer, {
+      customerId,
+    });
+  }
+
+  getCustomerStatsQueryOptions() {
+    return convexQuery(api.lib.yourobc.customers.queries.getCustomerStats, {});
+  }
+
+  getSearchCustomersQueryOptions(
+    searchTerm: string,
+    limit = 20,
+    includeInactive = false
   ) {
+    return convexQuery(api.lib.yourobc.customers.queries.searchCustomers, {
+      searchTerm,
+      limit,
+      includeInactive,
+    });
+  }
+
+  getCustomerActivityQueryOptions(customerId: CustomerId, limit = 50) {
+    return convexQuery(api.lib.yourobc.customers.queries.getCustomerActivity, {
+      customerId,
+      limit,
+    });
+  }
+
+  getTopCustomersQueryOptions(
+    limit = 10,
+    sortBy: 'revenue' | 'yourobcQuotes' | 'score' = 'revenue'
+  ) {
+    return convexQuery(api.lib.yourobc.customers.queries.getTopCustomers, {
+      limit,
+      sortBy,
+    });
+  }
+
+  getCustomerTagsQueryOptions() {
+    return convexQuery(api.lib.yourobc.customers.queries.getCustomerTags, {});
+  }
+
+  // ==========================================
+  // QUERY HOOKS
+  // ==========================================
+
+  // Query hooks for customer data fetching
+  useCustomers(options?: {
+    limit?: number
+    offset?: number
+    sortBy?: string
+    sortOrder?: 'asc' | 'desc'
+    filters?: CustomerSearchFilters
+  }) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getCustomers, {
-        authUserId,
-        options,
-      }),
-      staleTime: 300000, // 5 minutes
-      enabled: !!authUserId,
+      ...this.getCustomersQueryOptions(options),
+      staleTime: 30000, // 30 seconds
     })
   }
 
-  useCustomer(authUserId: string, customerId?: CustomerId) {
+  useCustomer(customerId?: CustomerId) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getCustomer, {
-        customerId,
-        authUserId,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId && !!customerId,
+      ...this.getCustomerQueryOptions(customerId!),
+      staleTime: 30000,
+      enabled: !!customerId,
     })
   }
 
-  useCustomerStats(authUserId: string) {
+  useCustomerStats() {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getCustomerStats, {
-        authUserId,
-      }),
+      ...this.getCustomerStatsQueryOptions(),
       staleTime: 60000,
-      enabled: !!authUserId,
     })
   }
 
   useSearchCustomers(
-    authUserId: string,
     searchTerm: string,
     limit = 20,
     includeInactive = false
   ) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.searchCustomers, {
-        authUserId,
-        searchTerm,
-        limit,
-        includeInactive,
-      }),
+      ...this.getSearchCustomersQueryOptions(searchTerm, limit, includeInactive),
       staleTime: 30000,
-      enabled: !!authUserId && searchTerm.length >= 2,
+      enabled: searchTerm.length >= 2,
     })
   }
 
-  useCustomerActivity(
-    authUserId: string,
-    customerId?: CustomerId,
-    limit = 50
-  ) {
+  useCustomerActivity(customerId?: CustomerId, limit = 50) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getCustomerActivity, {
-        authUserId,
-        customerId,
-        limit
-      }),
+      ...this.getCustomerActivityQueryOptions(customerId!, limit),
       staleTime: 60000,
-      enabled: !!authUserId && !!customerId,
+      enabled: !!customerId,
     })
   }
 
   useTopCustomers(
-    authUserId: string,
     limit = 10,
     sortBy: 'revenue' | 'yourobcQuotes' | 'score' = 'revenue'
   ) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getTopCustomers, {
-        authUserId,
-        limit,
-        sortBy,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId,
+      ...this.getTopCustomersQueryOptions(limit, sortBy),
+      staleTime: 30000,
     })
   }
 
-  useCustomerTags(authUserId: string) {
+  useCustomerTags() {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.customers.queries.getCustomerTags, {
-        authUserId,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId,
+      ...this.getCustomerTagsQueryOptions(),
+      staleTime: 30000,
     })
   }
 
-  // Mutation hooks for customer modifications
+  // ==========================================
+  // MUTATION HOOKS
+  // ==========================================
+
   useCreateCustomer() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.createCustomer),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.createCustomer);
+    return useMutation({ mutationFn });
   }
 
   useUpdateCustomer() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.updateCustomer),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.updateCustomer);
+    return useMutation({ mutationFn });
   }
 
   useDeleteCustomer() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.deleteCustomer),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.deleteCustomer);
+    return useMutation({ mutationFn });
   }
 
   useUpdateCustomerStats() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.updateCustomerStats),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.updateCustomerStats);
+    return useMutation({ mutationFn });
   }
 
   useAddCustomerTag() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.addCustomerTag),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.addCustomerTag);
+    return useMutation({ mutationFn });
   }
 
   useRemoveCustomerTag() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.yourobc.customers.mutations.removeCustomerTag),
-    })
+    const mutationFn = useConvexMutation(api.lib.yourobc.customers.mutations.removeCustomerTag);
+    return useMutation({ mutationFn });
   }
 
   // Business operations using mutations
   async createCustomer(
     mutation: ReturnType<typeof this.useCreateCustomer>,
-    authUserId: string,
     data: CreateCustomerData
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, data })
+      return await mutation.mutateAsync({ data })
     } catch (error: any) {
       throw new Error(`Failed to create customer: ${error.message}`)
     }
@@ -167,12 +190,11 @@ export class CustomersService {
 
   async updateCustomer(
     mutation: ReturnType<typeof this.useUpdateCustomer>,
-    authUserId: string,
     customerId: CustomerId,
     data: UpdateCustomerData
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, customerId, data })
+      return await mutation.mutateAsync({ customerId, data })
     } catch (error: any) {
       throw new Error(`Failed to update customer: ${error.message}`)
     }
@@ -180,11 +202,10 @@ export class CustomersService {
 
   async deleteCustomer(
     mutation: ReturnType<typeof this.useDeleteCustomer>,
-    authUserId: string,
     customerId: CustomerId
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, customerId })
+      return await mutation.mutateAsync({ customerId })
     } catch (error: any) {
       throw new Error(`Failed to delete customer: ${error.message}`)
     }
@@ -192,12 +213,11 @@ export class CustomersService {
 
   async addTag(
     mutation: ReturnType<typeof this.useAddCustomerTag>,
-    authUserId: string,
     customerId: CustomerId,
     tag: string
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, customerId, tag })
+      return await mutation.mutateAsync({ customerId, tag })
     } catch (error: any) {
       throw new Error(`Failed to add tag: ${error.message}`)
     }
@@ -205,12 +225,11 @@ export class CustomersService {
 
   async removeTag(
     mutation: ReturnType<typeof this.useRemoveCustomerTag>,
-    authUserId: string,
     customerId: CustomerId,
     tag: string
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, customerId, tag })
+      return await mutation.mutateAsync({ customerId, tag })
     } catch (error: any) {
       throw new Error(`Failed to remove tag: ${error.message}`)
     }

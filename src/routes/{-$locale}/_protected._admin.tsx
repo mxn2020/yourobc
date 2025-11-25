@@ -28,7 +28,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin')({
 
     // Check user profile and admin role
     const userProfile = await context.queryClient.ensureQueryData(
-      convexQuery(api.lib.system.user_profiles.queries.getProfileByAuthId, {})
+      convexQuery(api.lib.system.user.user_profiles.queries.getProfileByAuthId, {})
     )
 
     // Verify admin role and active status

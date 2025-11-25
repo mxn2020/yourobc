@@ -4,7 +4,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { auditFields, softDeleteFields } from '@/schema/base';
-import { emailValidators, emailFields } from './validators';
+import { emailConfigsFields, emailConfigsValidators } from './validators';
 
 export const emailConfigsTable = defineTable({
   // Required: Main display field
@@ -15,24 +15,24 @@ export const emailConfigsTable = defineTable({
   ownerId: v.id('userProfiles'),
 
   // Module-specific fields
-  provider: emailValidators.provider,
+  provider: emailConfigsValidators.provider,
   isActive: v.boolean(), // Only one config can be active at a time
-  status: emailValidators.status,
+  status: emailConfigsValidators.status,
 
   // Provider-specific configuration (encrypted sensitive data)
-  config: emailFields.providerConfig,
+  config: emailConfigsFields.providerConfig,
 
   // Connection status
   isVerified: v.boolean(), // Has the connection been tested
   lastTestAt: v.optional(v.number()),
-  lastTestStatus: v.optional(emailValidators.testStatus),
+  lastTestStatus: v.optional(emailConfigsValidators.testStatus),
   lastTestError: v.optional(v.string()),
 
   // Settings (flexible configuration)
-  settings: v.optional(emailFields.configSettings),
+  settings: v.optional(emailConfigsFields.configSettings),
 
   // Metadata (typed provider-specific settings)
-  metadata: v.optional(emailFields.configMetadata),
+  metadata: v.optional(emailConfigsFields.configMetadata),
 
   // Audit fields
   ...auditFields,
@@ -49,5 +49,4 @@ export const emailConfigsTable = defineTable({
   .index('by_active', ['isActive'])
   .index('by_status', ['status'])
   .index('by_created_at', ['createdAt'])
-  .index('by_last_activity', ['lastActivityAt'])
   .index('by_owner_and_status', ['ownerId', 'status']);

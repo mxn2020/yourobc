@@ -7,6 +7,7 @@ import { NOTIFICATION_CONSTANTS } from './constants';
 import { vNotificationType } from '@/shared/validators';
 import { validateCreateNotificationData, canDeleteNotification, isAdmin } from './utils';
 import { entityTypes } from '@/config/entityTypes';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create a notification
@@ -41,6 +42,7 @@ export const createNotification = mutation({
     }
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'appConfigs');
 
     // 4. Prepare notification data with trimmed strings
     const notificationData = {
@@ -78,14 +80,14 @@ export const createNotification = mutation({
 
     // 6. Audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'notification.created',
       entityType: 'notification',
       entityId: notificationId,
-      entityTitle: notificationData.title,
-      description: `Created notification: ${notificationData.title}`,
+      entityTitle: notificationData.displayName,
+      description: `Created notification: ${notificationData.displayName}`,
       createdAt: now,
     });
 
@@ -118,6 +120,7 @@ export const markAsRead = mutation({
     }
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'auditLogs');
 
     await ctx.db.patch(notificationId, {
       isRead: true,
@@ -127,7 +130,7 @@ export const markAsRead = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'notification.marked_read',
@@ -157,6 +160,8 @@ export const markAllAsRead = mutation({
       .collect();
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'auditLogs');
+
     await Promise.all(
       unreadNotifications.map((notification) =>
         ctx.db.patch(notification._id, {
@@ -169,7 +174,7 @@ export const markAllAsRead = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'notification.marked_all_read',
@@ -212,6 +217,7 @@ export const deleteNotification = mutation({
     }
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'auditLogs');
 
     // 5. Soft delete the notification
     await ctx.db.patch(notificationId, {
@@ -223,7 +229,7 @@ export const deleteNotification = mutation({
 
     // 6. Audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'notification.deleted',
@@ -270,6 +276,7 @@ export const cleanupOldNotifications = mutation({
       .collect();
 
     const now = Date.now();
+    const publicId = await generateUniquePublicId(ctx, 'auditLogs');
 
     // 5. Soft delete old notifications
     await Promise.all(
@@ -285,7 +292,7 @@ export const cleanupOldNotifications = mutation({
 
     // 6. Audit log
     await ctx.db.insert('auditLogs', {
-      id: crypto.randomUUID(),
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'notification.cleanup',

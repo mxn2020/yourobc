@@ -8,6 +8,7 @@ import { inquirySourcesValidators } from '@/schema/yourobc/supporting/inquiry_so
 import { INQUIRY_SOURCES_CONSTANTS } from './constants';
 import { trimInquirySourceData, validateInquirySourceData, generateInquirySourceCode } from './utils';
 import { requireEditInquirySourcesAccess, requireDeleteInquirySourcesAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create new inquiry source
@@ -17,7 +18,7 @@ export const createInquirySource = mutation({
     data: v.object({
       name: v.string(),
       code: v.optional(v.string()),
-      type: inquirySourcesValidators.inquirySourceType,
+      type: inquirySourcesValidators.sourceType,
       description: v.optional(v.string()),
       isActive: v.optional(v.boolean()),
     }),
@@ -51,6 +52,7 @@ export const createInquirySource = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'inquiry_sources.created',
@@ -76,7 +78,7 @@ export const updateInquirySource = mutation({
     updates: v.object({
       name: v.optional(v.string()),
       code: v.optional(v.string()),
-      type: v.optional(inquirySourcesValidators.inquirySourceType),
+      type: v.optional(inquirySourcesValidators.sourceType),
       description: v.optional(v.string()),
       isActive: v.optional(v.boolean()),
     }),
@@ -111,6 +113,7 @@ export const updateInquirySource = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'inquiry_sources.updated',
@@ -118,7 +121,7 @@ export const updateInquirySource = mutation({
       entityId: existing.code,
       entityTitle: existing.name,
       description: `Updated inquiry source: ${existing.name}`,
-      metadata: { changes: trimmed },
+      metadata: { data: { changes: trimmed } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -157,6 +160,7 @@ export const deleteInquirySource = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'inquiry_sources.deleted',

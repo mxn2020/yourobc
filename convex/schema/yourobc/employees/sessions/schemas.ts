@@ -1,8 +1,7 @@
 // convex/schema/yourobc/employees/sessions/schemas.ts
 // Schema exports for employeeSessions module
 
-import { employeeSessionsTable } from './employeeSessions';
-import { workHoursSummaryTable } from './workHoursSummary';
+import { employeeSessionsTable, workHoursSummaryTable } from './tables';
 
 export const yourobcEmployeeSessionsSchemas = {
   yourobcEmployeeSessions: employeeSessionsTable,

@@ -32,7 +32,7 @@ export const getComments = query({
 
     // Build indexed query
     const q = ctx.db
-      .query('comments')
+      .query('yourobcComments')
       .withIndex('by_entity', iq => iq.eq('entityType', entityType).eq('entityId', entityId))
       .filter(notDeleted);
 
@@ -83,7 +83,7 @@ export const getCommentReplies = query({
     const { parentCommentId, limit = 50, cursor } = args;
 
     const page = await ctx.db
-      .query('comments')
+      .query('yourobcComments')
       .withIndex('by_parent', iq => iq.eq('parentCommentId', parentCommentId))
       .filter(notDeleted)
       .order('desc')
@@ -109,7 +109,7 @@ export const getCommentReplies = query({
  * 🔒 Authorization: Creator or admin, or if public
  */
 export const getComment = query({
-  args: { id: v.id('comments') },
+  args: { id: v.id('yourobcComments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const doc = await ctx.db.get(id);
@@ -145,7 +145,7 @@ export const getCommentsByCreator = query({
     }
 
     const page = await ctx.db
-      .query('comments')
+      .query('yourobcComments')
       .withIndex('by_created_at', iq => iq.gte('createdAt', 0))
       .filter(doc => doc.createdBy === createdBy && !doc.deletedAt)
       .order('desc')
@@ -178,7 +178,7 @@ export const countCommentReplies = query({
     const user = await requireCurrentUser(ctx);
 
     const count = await ctx.db
-      .query('comments')
+      .query('yourobcComments')
       .withIndex('by_parent', iq => iq.eq('parentCommentId', parentCommentId))
       .filter(notDeleted)
       .count();

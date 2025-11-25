@@ -52,7 +52,7 @@ export function CommentsSectionRefactored({
     });
   };
 
-  const handleReply = async (parentCommentId: Id<'comments'>, content: string) => {
+  const handleReply = async (parentCommentId: Id<'systemSupportingComments'>, content: string) => {
     if (!user) return;
 
     await createComment({
@@ -66,7 +66,7 @@ export function CommentsSectionRefactored({
     });
   };
 
-  const handleDelete = async (commentId: Id<'comments'>) => {
+  const handleDelete = async (commentId: Id<'systemSupportingComments'>) => {
     if (!user) return;
 
     await deleteComment({
@@ -74,7 +74,7 @@ export function CommentsSectionRefactored({
     });
   };
 
-  const handleReaction = async (commentId: Id<'comments'>, reaction: string) => {
+  const handleReaction = async (commentId: Id<'systemSupportingComments'>, reaction: string) => {
     if (!user) return;
 
     // addReaction automatically toggles

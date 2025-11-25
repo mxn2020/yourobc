@@ -2,11 +2,13 @@
 // Schema exports for customers module
 
 import { v } from 'convex/values';
-import { contactLogTable } from './contactLog';
-import { customerAnalyticsTable } from './customerAnalytics';
-import { customerDunningConfigTable } from './customerDunningConfig';
-import { customerMarginsTable } from './customerMargins';
-import { customersTable } from './customers';
+import {
+  contactLogTable,
+  customerAnalyticsTable,
+  customerDunningConfigTable,
+  customerMarginsTable,
+  customersTable,
+} from './tables';
 
 export const customerIdSchema = v.id('yourobcCustomers');
 export const customerMarginIdSchema = v.id('yourobcCustomerMargins');

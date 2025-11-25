@@ -3,8 +3,8 @@
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 
 // Base types from Convex schema
-export type Comment = Doc<'comments'>
-export type CommentId = Id<'comments'>
+export type Comment = Doc<'yourobcComments'>
+export type CommentId = Id<'yourobcComments'>
 
 // Re-export types from convex for consistency
 export type {

@@ -466,8 +466,8 @@ export const auditFields = {
  * IMPORTANT: deletedBy stores Convex userProfileId (Id<'userProfiles'>), NOT authUserId.
  */
 export const softDeleteFields = {
-  deletedAt: v.number(),
-  deletedBy: v.id('userProfiles'),
+  deletedAt: v.optional(v.number()),
+  deletedBy: v.optional(v.id('userProfiles')),
 }
 
 export const classificationFields = {

@@ -9,8 +9,8 @@ import type {
   CommentAttachment,
 } from '@/schema/system/supporting/comments/types';
 
-export type SystemComment = Doc<'comments'>;
-export type SystemCommentId = Id<'comments'>;
+export type SystemComment = Doc<'systemSupportingComments'>;
+export type SystemCommentId = Id<'systemSupportingComments'>;
 
 export interface CreateSystemCommentData {
   name: string;
@@ -21,7 +21,7 @@ export interface CreateSystemCommentData {
   isInternal: boolean;
   mentions?: CommentMention[];
   attachments?: CommentAttachment[];
-  parentCommentId?: Id<'comments'> | null;
+  parentCommentId?: Id<'systemSupportingComments'> | null;
 }
 
 export interface UpdateSystemCommentData {
@@ -36,7 +36,7 @@ export interface SystemCommentFilters {
   entityType?: string;
   entityId?: string;
   isInternal?: boolean;
-  parentCommentId?: Id<'comments'> | null;
+  parentCommentId?: Id<'systemSupportingComments'> | null;
 }
 
 export interface SystemCommentListResponse {
@@ -48,5 +48,5 @@ export interface SystemCommentListResponse {
 
 export type SystemCommentSchema = CommentSchema;
 export type SystemCommentType = CommentType;
-export type SystemCommentCommentMention = CommentMention;
-export type SystemCommentCommentAttachment = CommentAttachment;
+export type SystemCommentMention = CommentMention;
+export type SystemCommentAttachment = CommentAttachment;

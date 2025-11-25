@@ -38,9 +38,9 @@ export const createSystemCounter = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'counters');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingCounters');
 
-    const id = await ctx.db.insert('counters', {
+    const id = await ctx.db.insert('systemSupportingCounters', {
       ...trimmed,
       step: trimmed.step ?? SYSTEM_COUNTERS_CONSTANTS.DEFAULTS.STEP,
       padLength: trimmed.padLength ?? SYSTEM_COUNTERS_CONSTANTS.DEFAULTS.PAD_LENGTH,
@@ -53,10 +53,11 @@ export const createSystemCounter = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.counters.created',
-      entityType: 'counters',
+      entityType: 'systemSupportingCounters',
       entityId: publicId,
       entityTitle: trimmed.name,
       description: 'Created counter',
@@ -71,7 +72,7 @@ export const createSystemCounter = mutation({
 
 export const updateSystemCounter = mutation({
   args: {
-    id: v.id('counters'),
+    id: v.id('systemSupportingCounters'),
     updates: v.object({
       name: v.optional(v.string()),
       currentValue: v.optional(v.number()),
@@ -107,14 +108,19 @@ export const updateSystemCounter = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.counters.updated',
-      entityType: 'counters',
+      entityType: 'systemSupportingCounters',
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: 'Updated counter',
-      metadata: { updates: trimmed },
+      metadata: {
+        data: {
+          updates: trimmed
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -125,7 +131,7 @@ export const updateSystemCounter = mutation({
 });
 
 export const getNextSystemCounterValue = mutation({
-  args: { id: v.id('counters'), year: v.optional(v.number()) },
+  args: { id: v.id('systemSupportingCounters'), year: v.optional(v.number()) },
   handler: async (ctx, { id, year }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -153,14 +159,19 @@ export const getNextSystemCounterValue = mutation({
     );
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.counters.incremented',
-      entityType: 'counters',
+      entityType: 'systemSupportingCounters',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: 'Incremented counter',
-      metadata: { nextValue, formatted },
+      metadata: {
+        data: {
+          nextValue, formatted
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,

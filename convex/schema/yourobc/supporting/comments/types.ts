@@ -1,7 +1,35 @@
 // convex/schema/yourobc/supporting/comments/types.ts
-// Type extractions from validators for comments module
+// Type definitions for comments module
 
-import { Infer } from 'convex/values';
-import { commentsValidators } from './validators';
+import { type Infer } from 'convex/values';
+import type { Doc, Id } from '@/generated/dataModel';
+import { commentsValidators, commentsFields } from './validators';
+import { commentsTable } from './tables';
+
+// ============================================
+// Document Types
+// ============================================
+
+export type Comment = Doc<'yourobcComments'>;
+export type CommentId = Id<'yourobcComments'>;
+
+// ============================================
+// Schema Type (from table validator)
+// ============================================
+
+export type CommentSchema = Infer<typeof commentsTable.validator>;
+
+// ============================================
+// Validator Types
+// ============================================
 
 export type CommentType = Infer<typeof commentsValidators.commentType>;
+
+// ============================================
+// Field Types
+// ============================================
+
+export type CommentMention = Infer<typeof commentsFields.mention>;
+export type CommentReaction = Infer<typeof commentsFields.reaction>;
+export type CommentAttachment = Infer<typeof commentsFields.attachment>;
+export type CommentEditHistory = Infer<typeof commentsFields.editHistoryEntry>;

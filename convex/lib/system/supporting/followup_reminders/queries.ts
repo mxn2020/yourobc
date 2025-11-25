@@ -33,7 +33,7 @@ export const getSystemFollowupReminders = query({
     const { limit = 50, cursor, filters = {} as SystemFollowupReminderFilters } = args;
 
     const page = await ctx.db
-      .query('followupReminders')
+      .query('systemSupportingFollowupReminders')
       .withIndex('by_created_at', (q) => q.gte('createdAt', 0))
       .filter(notDeleted)
       .order('desc')

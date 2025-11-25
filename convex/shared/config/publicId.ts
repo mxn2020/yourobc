@@ -46,6 +46,19 @@ export const PUBLIC_ID_PREFIXES = {
   userProfiles: 'user',
   appThemeSettings: 'theme',
   dashboards: 'dash',
+  permissionRequests: 'preq',
+  projects: 'proj',
+  projectMilestones: 'mile',
+  notifications: 'noti',
+
+  systemSupportingComments: 'comm',
+  systemSupportingCounters: 'cnt',
+  systemSupportingDocuments: 'sdoc',
+  systemSupportingExchangeRates: 'exch',
+  systemSupportingFollowupReminders: 'fur',
+  systemSupportingInquirySources: 'inqs',
+  systemSupportingNotifications: 'noti',
+  systemSupportingWikiEntries: 'wiki',
 
   emailLogs: 'emlog',
   emailConfigs: 'emcfg',
@@ -90,6 +103,7 @@ export const PUBLIC_ID_PREFIXES = {
   yourobcShipments: 'ship',
   yourobcQuotes: 'quot',
   yourobcCustomers: 'cust',
+  yourobcCustomerMargins: 'cmarg',
 
 } as const;
 

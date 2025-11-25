@@ -34,8 +34,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/settin
         if (convexClient) {
           // Fetch settings in parallel
           const [appSettings, aiSettings] = await Promise.all([
-            convexClient.query(api.lib.system.app_settings.queries.getAppSettings, {}),
-            convexClient.query(api.lib.system.app_settings.queries.getAISettings, {}),
+            convexClient.query(api.lib.system.app.app_settings.queries.getAppSettings, {}),
+            convexClient.query(api.lib.system.app.app_settings.queries.getAISettings, {}),
           ]);
 
           // Cache data using service query options

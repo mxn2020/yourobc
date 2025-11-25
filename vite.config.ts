@@ -11,6 +11,11 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  resolve: {
+    alias: {
+      '@/convex': '/convex',
+    },
+  },
   plugins: [
     tsConfigPaths({
       projects: ['./tsconfig.json'],

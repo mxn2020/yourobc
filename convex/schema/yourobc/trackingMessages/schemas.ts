@@ -2,7 +2,7 @@
 // Schema exports for trackingMessages module
 
 import { v } from 'convex/values';
-import { trackingMessagesTable } from './trackingMessages';
+import { trackingMessagesTable } from './tables';
 
 export const trackingMessageIdSchema = v.id('yourobcTrackingMessages')
 

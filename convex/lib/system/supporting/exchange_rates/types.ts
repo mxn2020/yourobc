@@ -4,8 +4,8 @@
 import type { Doc, Id } from '@/generated/dataModel';
 import type { Currency } from '@/schema/system/supporting/exchange_rates/types';
 
-export type SystemExchangeRate = Doc<'exchangeRates'>;
-export type SystemExchangeRateId = Id<'exchangeRates'>;
+export type SystemExchangeRate = Doc<'systemSupportingExchangeRates'>;
+export type SystemExchangeRateId = Id<'systemSupportingExchangeRates'>;
 
 export interface CreateSystemExchangeRateData {
   name?: string;

@@ -2,7 +2,7 @@
 
 // Export constants and types
 export { AUDIT_LOG_CONSTANTS } from './constants'
-export { entityTypes } from './entityTypes'
+export { entityTypes } from './entity_types'
 export * from './types'
 
 // Export utils
@@ -23,7 +23,7 @@ export {
 
 export {
   adminGetAuditLogs,
-} from './adminQueries'
+} from './admin_queries'
 
 // Export all mutations
 export {

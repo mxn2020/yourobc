@@ -2,7 +2,7 @@
 // TypeScript type definitions for tasks module
 
 import type { Doc, Id } from '@/generated/dataModel';
-import type { TasksStatus, TasksPriority, TasksType } from '@/schema/yourobc/tasks/types';
+import type { TaskStatus, TaskPriority, TaskType } from '@/schema/yourobc/tasks/types';
 
 // Entity types
 export type Task = Doc<'yourobcTasks'>;
@@ -21,9 +21,9 @@ export interface ChecklistItem {
 export interface CreateTaskData {
   title: string;
   description?: string;
-  status?: TasksStatus;
-  priority?: TasksPriority;
-  taskType?: TasksType;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  taskType?: TaskType;
   assignedTo?: Id<'userProfiles'>;
   dueDate?: number;
   relatedShipmentId?: Id<'yourobcShipments'>;
@@ -38,9 +38,9 @@ export interface CreateTaskData {
 export interface UpdateTaskData {
   title?: string;
   description?: string;
-  status?: TasksStatus;
-  priority?: TasksPriority;
-  taskType?: TasksType;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  taskType?: TaskType;
   assignedTo?: Id<'userProfiles'>;
   dueDate?: number;
   checklist?: ChecklistItem[];
@@ -67,9 +67,9 @@ export interface TaskListResponse {
 
 // Filter types
 export interface TaskFilters {
-  status?: TasksStatus[];
-  priority?: TasksPriority[];
-  taskType?: TasksType[];
+  status?: TaskStatus[];
+  priority?: TaskPriority[];
+  taskType?: TaskType[];
   assignedTo?: Id<'userProfiles'>;
   search?: string;
   relatedShipmentId?: Id<'yourobcShipments'>;

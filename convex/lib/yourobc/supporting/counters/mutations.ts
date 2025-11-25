@@ -8,6 +8,7 @@ import { countersValidators } from '@/schema/yourobc/supporting/counters/validat
 import { COUNTERS_CONSTANTS } from './constants';
 import { trimCounterData, validateCounterData, getNextCounterValue } from './utils';
 import { requireEditCountersAccess, requireDeleteCountersAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create a new counter
@@ -50,6 +51,7 @@ export const createCounter = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'counters.created',
@@ -97,6 +99,7 @@ export const incrementCounter = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'counters.incremented',
@@ -104,7 +107,11 @@ export const incrementCounter = mutation({
       entityId: existing.type,
       entityTitle: `${existing.prefix} (${existing.year})`,
       description: `Incremented counter to ${nextValue}`,
-      metadata: { previousValue: existing.lastNumber, nextValue },
+      metadata: {
+        data: {
+          previousValue: existing.lastNumber, nextValue
+        },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -158,6 +165,7 @@ export const updateCounter = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'counters.updated',
@@ -165,7 +173,7 @@ export const updateCounter = mutation({
       entityId: existing.type,
       entityTitle: `${trimmed.prefix ?? existing.prefix} (${trimmed.year ?? existing.year})`,
       description: `Updated counter: ${existing.prefix}`,
-      metadata: { changes: trimmed },
+      metadata: { data: { changes: trimmed } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -206,6 +214,7 @@ export const deleteCounter = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'counters.deleted',

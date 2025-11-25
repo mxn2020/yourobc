@@ -1,7 +1,35 @@
 // convex/schema/yourobc/supporting/followup_reminders/types.ts
-import { Infer } from 'convex/values';
-import { followupRemindersValidators } from './validators';
+// Type definitions for followup reminders module
+
+import { type Infer } from 'convex/values';
+import type { Doc, Id } from '@/generated/dataModel';
+import { followupRemindersValidators, followupRemindersFields } from './validators';
+import { followupRemindersTable } from './tables';
+
+// ============================================
+// Document Types
+// ============================================
+
+export type FollowupReminder = Doc<'yourobcFollowupReminders'>;
+export type FollowupReminderId = Id<'yourobcFollowupReminders'>;
+
+// ============================================
+// Schema Type (from table validator)
+// ============================================
+
+export type FollowupReminderSchema = Infer<typeof followupRemindersTable.validator>;
+
+// ============================================
+// Validator Types
+// ============================================
 
 export type ReminderType = Infer<typeof followupRemindersValidators.reminderType>;
 export type ReminderStatus = Infer<typeof followupRemindersValidators.reminderStatus>;
-export type ServicePriority = Infer<typeof followupRemindersValidators.servicePriority>;
+export type ServicePriority = Infer<typeof followupRemindersValidators.priority>;
+export type RecurrenceFrequency = Infer<typeof followupRemindersValidators.recurrenceFrequency>;
+
+// ============================================
+// Field Types
+// ============================================
+
+export type RecurrencePattern = Infer<typeof followupRemindersFields.recurrencePattern>;

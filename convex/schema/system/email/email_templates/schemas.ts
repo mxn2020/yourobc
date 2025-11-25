@@ -2,5 +2,5 @@
 import { emailTemplatesTable } from './tables';
 
 export const systemEmailTemplatesSchemas = {
-  templates: emailTemplatesTable,
+  emailTemplates: emailTemplatesTable,
 } as const;

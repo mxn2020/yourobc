@@ -100,14 +100,14 @@ grep -r "by_name\|by_title\|by_displayName" convex/schema/{category}/{entity}/{m
 
 **Audit logs use display field**:
 ```bash
-# Should find: entityTitle: trimmed.name or existing.name
+# Should find: entityTitle: trimmed.{displayField} or existing.{displayField}
 grep -r "entityTitle:" convex/lib/{category}/{entity}/{module}/mutations.ts
 ```
 
 **Search filters use display field**:
 ```bash
-# Should find: i.name.toLowerCase() or similar
-grep -r "\.name\.\|\.title\.\|\.displayName\." convex/lib/{category}/{entity}/{module}/queries.ts
+# Should find: i.{displayField}.toLowerCase() or similar
+grep -r "\.{displayField}\.\|\.title\.\|\.displayName\." convex/lib/{category}/{entity}/{module}/queries.ts
 ```
 
 ### Common Issues
@@ -118,12 +118,12 @@ grep -r "\.name\.\|\.title\.\|\.displayName\." convex/lib/{category}/{entity}/{m
 name: v.string()
 
 // Audit log (wrong)
-entityTitle: trimmed.title  // ❌ Should be trimmed.name
+entityTitle: trimmed.title  // ❌ Should be trimmed.{displayField}
 ```
 
 ✅ **Fix**: Use same field everywhere
 ```typescript
-entityTitle: trimmed.name  // ✅ Matches schema
+entityTitle: trimmed.{displayField}  // ✅ Matches schema
 ```
 
 ### Verification Command
@@ -144,7 +144,7 @@ echo "=== Audit Logs ==="
 grep "entityTitle:" convex/lib/$CATEGORY/$ENTITY/$MODULE/mutations.ts
 
 echo "=== Queries ==="
-grep "\.name\|\.title\|\.displayName" convex/lib/$CATEGORY/$ENTITY/$MODULE/queries.ts
+grep "\.{displayField}\|\.title\|\.displayName" convex/lib/$CATEGORY/$ENTITY/$MODULE/queries.ts
 ```
 
 ---
@@ -474,12 +474,12 @@ grep -A 5 "insert('auditLogs'" convex/lib/{category}/{entity}/{module}/mutations
 ```typescript
 await ctx.db.insert('auditLogs', {
   userId: user._id,
-  userName: user.name || user.email || 'Unknown',
+  userName: user.{displayField} || user.email || 'Unknown',
   action: '{module}.created',
   entityType: '{tableName}',      // ✅ Matches table name
   entityId: publicId,              // ✅ Uses publicId, not _id
-  entityTitle: trimmed.name,       // ✅ Uses display field
-  description: `Created {module}: ${trimmed.name}`,
+  entityTitle: trimmed.{displayField},       // ✅ Uses display field
+  description: `Created {module}: ${trimmed.{displayField}}`,
   createdAt: now,
   createdBy: user._id,
   updatedAt: now,
@@ -490,7 +490,7 @@ await ctx.db.insert('auditLogs', {
 ```typescript
 await ctx.db.insert('auditLogs', {
   userId: user._id,
-  userName: user.name || user.email || 'Unknown',
+  userName: user.{displayField} || user.email || 'Unknown',
   action: '{module}.bulk_updated',
   entityType: '{tableName}',
   entityId: 'bulk',                // ✅ Special ID for bulk
@@ -550,12 +550,12 @@ export const updateProject = mutation({
     // ✅ Add audit log
     await ctx.db.insert('auditLogs', {
       userId: user._id,
-      userName: user.name || user.email || 'Unknown',
+      userName: user.{displayField} || user.email || 'Unknown',
       action: 'projects.updated',
       entityType: 'freelancerProjects',
       entityId: existing.publicId,
-      entityTitle: existing.name,
-      description: `Updated project: ${existing.name}`,
+      entityTitle: existing.{displayField},
+      description: `Updated project: ${existing.{displayField}}`,
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -824,7 +824,7 @@ defineTable({
 ```typescript
 // Mutation
 await ctx.db.insert('tableName', {
-  name: trimmed.name,
+  {displayField}: trimmed.{displayField},
   // ❌ Missing: searchableText: buildSearchableText(trimmed)
 });
 ```
@@ -834,7 +834,7 @@ await ctx.db.insert('tableName', {
 const searchableText = buildSearchableText(trimmed);  // ✅
 
 await ctx.db.insert('tableName', {
-  name: trimmed.name,
+  {displayField}: trimmed.{displayField},
   searchableText,  // ✅
 });
 ```
@@ -852,7 +852,7 @@ await ctx.db.patch(id, {
 ✅ **Fix**: Rebuild with current values
 ```typescript
 const searchableText = buildSearchableText({
-  name: trimmed.name ?? existing.name,
+  {displayField}: trimmed.{displayField} ?? existing.{displayField},
   description: trimmed.description ?? existing.description,
 });
 
@@ -1400,7 +1400,7 @@ await ctx.db.patch(id, {
 ```typescript
 await ctx.db.insert('auditLogs', {
   userId: user._id,
-  userName: user.name || user.email || 'Unknown',
+  userName: user.{displayField} || user.email || 'Unknown',
   action: 'module.action',
   entityType: 'tableName',
   entityId: publicId,

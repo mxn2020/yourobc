@@ -50,9 +50,9 @@ export const createSystemFollowupReminder = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'followupReminders');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingFollowupReminders');
 
-    const id = await ctx.db.insert('followupReminders', {
+    const id = await ctx.db.insert('systemSupportingFollowupReminders', {
       ...trimmed,
       name: trimmed.name,
       status: trimmed.status ?? SYSTEM_FOLLOWUP_REMINDERS_CONSTANTS.DEFAULTS.STATUS,
@@ -67,6 +67,7 @@ export const createSystemFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.followup_reminders.created',
@@ -130,6 +131,7 @@ export const updateSystemFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.followup_reminders.updated',
@@ -167,6 +169,7 @@ export const deleteSystemFollowupReminder = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.followup_reminders.deleted',

@@ -2,7 +2,7 @@
 // Schema exports for quotes module
 
 import { v } from 'convex/values';
-import { quotesTable } from './quotes';
+import { quotesTable } from './tables';
 
 export const quoteIdSchema = v.id('yourobcQuotes')
 

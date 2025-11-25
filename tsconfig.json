@@ -1,7 +1,7 @@
 {
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
   ],
   "compilerOptions": {
     "strict": true,
@@ -31,7 +31,7 @@
       "@/components/*": ["src/components/*"],
       "@/routes/*": ["src/routes/*"],
       "@/convex/*": ["convex/*"],
-      "@/generated/*": ["convex/_generated/*"],  // Add this
+      "@/generated/*": ["convex/_generated/*"]
     },
     "noEmit": true
   },
@@ -45,6 +45,7 @@
     ".output",
     ".tanstack",
     "coverage",
+    "convex-implementation-guide/**/*",
     "convex/**/*"
   ]
 }

@@ -8,6 +8,7 @@ import { exchangeRatesValidators } from '@/schema/yourobc/supporting/exchange_ra
 import { EXCHANGE_RATES_CONSTANTS } from './constants';
 import { trimExchangeRateData, validateExchangeRateData } from './utils';
 import { requireEditExchangeRatesAccess, requireDeleteExchangeRatesAccess } from './permissions';
+import { generateUniquePublicId } from '@/shared/utils/publicId';
 
 /**
  * Create new exchange rate
@@ -47,6 +48,7 @@ export const createExchangeRate = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'exchange_rates.created',
@@ -105,6 +107,7 @@ export const updateExchangeRate = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'exchange_rates.updated',
@@ -112,7 +115,7 @@ export const updateExchangeRate = mutation({
       entityId: existing.fromCurrency,
       entityTitle: `${existing.fromCurrency} to ${existing.toCurrency}`,
       description: `Updated exchange rate: ${existing.fromCurrency} to ${existing.toCurrency}`,
-      metadata: { changes: trimmed },
+      metadata: { data: { changes: trimmed } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -151,6 +154,7 @@ export const deleteExchangeRate = mutation({
 
     // Audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'exchange_rates.deleted',

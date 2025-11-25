@@ -42,7 +42,7 @@ export const tasksTable = defineTable({
   .index('by_deleted_at', ['deletedAt'])
 
   // Parent relationship indexes
-  .index('by_project', ['projectId'])
+  .index('by_project_id', ['projectId'])
   .index('by_project_and_status', ['projectId', 'status'])
   .index('by_project_and_assigned', ['projectId', 'assignedTo'])
 

@@ -27,7 +27,7 @@ export const createSystemComment = mutation({
       isInternal: v.boolean(),
       mentions: v.optional(v.array(commentsFields.mention)),
       attachments: v.optional(v.array(commentsFields.attachment)),
-      parentCommentId: v.optional(v.id('comments')),
+      parentCommentId: v.optional(v.id('systemSupportingComments')),
     }),
   },
   handler: async (ctx, { data }) => {
@@ -39,9 +39,9 @@ export const createSystemComment = mutation({
     }
 
     const now = Date.now();
-    const publicId = await generateUniquePublicId(ctx, 'comments');
+    const publicId = await generateUniquePublicId(ctx, 'systemSupportingComments');
 
-    const id = await ctx.db.insert('comments', {
+    const id = await ctx.db.insert('systemSupportingComments', {
       ...trimmed,
       publicId,
       ownerId: user._id,
@@ -53,10 +53,11 @@ export const createSystemComment = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.comments.created',
-      entityType: 'comments',
+      entityType: 'systemSupportingComments',
       entityId: publicId,
       entityTitle: trimmed.name,
       description: `Created comment on ${trimmed.entityType}`,
@@ -71,7 +72,7 @@ export const createSystemComment = mutation({
 
 export const updateSystemComment = mutation({
   args: {
-    id: v.id('comments'),
+    id: v.id('systemSupportingComments'),
     updates: v.object({
       name: v.optional(v.string()),
       content: v.optional(v.string()),
@@ -104,14 +105,19 @@ export const updateSystemComment = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.comments.updated',
-      entityType: 'comments',
+      entityType: 'systemSupportingComments',
       entityId: existing.publicId,
       entityTitle: trimmed.name || existing.name,
       description: 'Updated comment',
-      metadata: { updates: trimmed },
+      metadata: { 
+        data: {
+        updates: trimmed 
+      },
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -123,7 +129,7 @@ export const updateSystemComment = mutation({
 
 export const addSystemCommentReaction = mutation({
   args: {
-    id: v.id('comments'),
+    id: v.id('systemSupportingComments'),
     reaction: v.string(),
   },
   handler: async (ctx, { id, reaction }) => {
@@ -148,10 +154,11 @@ export const addSystemCommentReaction = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.comments.reacted',
-      entityType: 'comments',
+      entityType: 'systemSupportingComments',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: `Added reaction ${reaction}`,
@@ -165,7 +172,7 @@ export const addSystemCommentReaction = mutation({
 });
 
 export const deleteSystemComment = mutation({
-  args: { id: v.id('comments') },
+  args: { id: v.id('systemSupportingComments') },
   handler: async (ctx, { id }) => {
     const user = await requireCurrentUser(ctx);
     const existing = await ctx.db.get(id);
@@ -184,10 +191,11 @@ export const deleteSystemComment = mutation({
     });
 
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown',
       action: 'system.comments.deleted',
-      entityType: 'comments',
+      entityType: 'systemSupportingComments',
       entityId: existing.publicId,
       entityTitle: existing.name,
       description: 'Deleted comment',

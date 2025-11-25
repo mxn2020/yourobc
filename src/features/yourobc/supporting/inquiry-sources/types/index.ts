@@ -2,8 +2,8 @@
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
 
-export type InquirySource = Doc<'inquirySources'>
-export type InquirySourceId = Id<'inquirySources'>
+export type InquirySource = Doc<'yourobcInquirySources'>
+export type InquirySourceId = Id<'yourobcInquirySources'>
 
 export interface CreateInquirySourceData {
   name: string

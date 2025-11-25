@@ -82,7 +82,7 @@ class UserManagementService {
     search?: string
   }) {
     return useQuery({
-      ...convexQuery(api.lib.system.user_profiles.queries.getAllProfiles, {
+      ...convexQuery(api.lib.system.user.user_profiles.queries.getAllProfiles, {
         options: filters,
       }),
       staleTime: 30000,
@@ -91,7 +91,7 @@ class UserManagementService {
 
   useUserStats() {
     return useQuery({
-      ...convexQuery(api.lib.system.user_profiles.queries.getProfileStats, {}),
+      ...convexQuery(api.lib.system.user.user_profiles.queries.getProfileStats, {}),
       staleTime: 60000,
     })
   }
@@ -188,19 +188,19 @@ class UserManagementService {
   // === Convex Profile Mutations ===
   useDeactivateUser() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user_profiles.mutations.deactivateUser),
+      mutationFn: useConvexMutation(api.lib.system.user.user_profiles.mutations.deactivateUser),
     })
   }
 
   useReactivateUser() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user_profiles.mutations.reactivateUser),
+      mutationFn: useConvexMutation(api.lib.system.user.user_profiles.mutations.reactivateUser),
     })
   }
 
   useUpdateUserRole() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user_profiles.mutations.updateUserRole),
+      mutationFn: useConvexMutation(api.lib.system.user.user_profiles.mutations.updateUserRole),
     })
   }
 

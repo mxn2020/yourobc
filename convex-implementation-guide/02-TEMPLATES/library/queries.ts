@@ -85,10 +85,13 @@ export const get{Module}s = query({
     // Simple text search (fallback for non-search-index tables)
     if (filters.search) {
       const term = filters.search.toLowerCase();
-      items = items.filter(i =>
-        i.name.toLowerCase().includes(term) ||
-        (i.description && i.description.toLowerCase().includes(term))
-      );
+      items = items.filter(i => {
+        const displayField = i.{displayField};
+        return (
+          displayField.toLowerCase().includes(term) ||
+          (i.description && i.description.toLowerCase().includes(term))
+        );
+      });
     }
 
     return {

@@ -1,5 +1,4 @@
-// Module barrel for email/configs
-export * from './tables';
+// Public exports for email configs module
 export * from './validators';
 export * from './types';
 export * from './schemas';

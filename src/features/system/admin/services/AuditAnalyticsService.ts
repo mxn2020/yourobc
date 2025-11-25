@@ -57,7 +57,7 @@ class AuditAnalyticsService {
   // === User Analytics Queries ===
   useUserProfileStats() {
     return useQuery({
-      ...convexQuery(api.lib.system.user_profiles.queries.getProfileStats, {}),
+      ...convexQuery(api.lib.system.user.user_profiles.queries.getProfileStats, {}),
       staleTime: 60000, // 1 minute
     })
   }

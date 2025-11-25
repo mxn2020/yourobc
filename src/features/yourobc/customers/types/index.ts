@@ -6,8 +6,8 @@ import { PaymentMethod } from '@/convex/schema/yourobc'
 // Base types from Convex schema
 export type Customer = Doc<'yourobcCustomers'>
 export type CustomerId = Id<'yourobcCustomers'>
-export type InquirySource = Doc<'inquirySources'>
-export type InquirySourceId = Id<'inquirySources'>
+export type InquirySource = Doc<'yourobcInquirySources'>
+export type InquirySourceId = Id<'yourobcInquirySources'>
 
 // Re-export types from convex for consistency
 export type {
@@ -68,7 +68,7 @@ export interface CustomerFormData {
   paymentTerms?: number
   paymentMethod?: PaymentMethod
   margin?: number
-  inquirySourceId?: Id<'inquirySources'>
+  inquirySourceId?: Id<'yourobcInquirySources'>
   tags?: string[]
   notes?: string
   internalNotes?: string
@@ -153,7 +153,7 @@ export interface CustomerSearchFilters {
   countries?: string[]
   currencies?: ('EUR' | 'USD')[]
   paymentMethods?: string[]
-  inquirySources?: Id<'inquirySources'>[]
+  inquirySources?: Id<'yourobcInquirySources'>[]
   tags?: string[]
   search?: string
   hasRecentActivity?: boolean

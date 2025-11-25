@@ -41,6 +41,7 @@ Create a placeholder reference table:
 | `{Module}` | `Projects` |
 | `{MODULE}` | `PROJECTS` |
 | `{tableName}` | `freelancerProjects` |
+| `{displayField}` | `name` | 
 
 ### 2. Copy Template Files
 

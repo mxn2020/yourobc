@@ -148,6 +148,7 @@ export const createShipment = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.created',
@@ -156,9 +157,11 @@ export const createShipment = mutation({
       entityTitle: trimmedData.shipmentNumber,
       description: `Created shipment: ${trimmedData.shipmentNumber}`,
       metadata: {
-        status: trimmedData.currentStatus || 'quoted',
-        serviceType: trimmedData.serviceType,
-        customerId: trimmedData.customerId,
+        data: {
+          status: trimmedData.currentStatus || 'quoted',
+          serviceType: trimmedData.serviceType,
+          customerId: trimmedData.customerId,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -296,6 +299,7 @@ export const updateShipment = mutation({
 
     // 7. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.updated',
@@ -303,7 +307,7 @@ export const updateShipment = mutation({
       entityId: shipment.publicId,
       entityTitle: updateData.shipmentNumber || shipment.shipmentNumber,
       description: `Updated shipment: ${updateData.shipmentNumber || shipment.shipmentNumber}`,
-      metadata: { changes: updates },
+      metadata: { data: { changes: updates } },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -366,6 +370,7 @@ export const updateShipmentStatus = mutation({
 
     // 6. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.status_updated',
@@ -373,7 +378,11 @@ export const updateShipmentStatus = mutation({
       entityId: shipment.publicId,
       entityTitle: shipment.shipmentNumber,
       description: `Updated shipment status to ${status}: ${shipment.shipmentNumber}`,
-      metadata: { oldStatus: shipment.currentStatus, newStatus: status },
+      metadata: {
+        data: {
+          oldStatus: shipment.currentStatus, newStatus: status
+        }
+      },
       createdAt: now,
       createdBy: user._id,
       updatedAt: now,
@@ -414,6 +423,7 @@ export const deleteShipment = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.deleted',
@@ -471,6 +481,7 @@ export const restoreShipment = mutation({
 
     // 5. AUDIT: Create audit log
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.restored',
@@ -560,6 +571,7 @@ export const bulkUpdateShipments = mutation({
 
     // 5. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.bulk_updated',
@@ -568,9 +580,11 @@ export const bulkUpdateShipments = mutation({
       entityTitle: `${results.length} shipments`,
       description: `Bulk updated ${results.length} shipments`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
-        updates,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+          updates,
+        },
       },
       createdAt: now,
       createdBy: user._id,
@@ -638,6 +652,7 @@ export const bulkDeleteShipments = mutation({
 
     // 4. AUDIT: Create single audit log for bulk operation
     await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'shipment.bulk_deleted',
@@ -646,8 +661,10 @@ export const bulkDeleteShipments = mutation({
       entityTitle: `${results.length} shipments`,
       description: `Bulk deleted ${results.length} shipments`,
       metadata: {
-        successful: results.length,
-        failed: failed.length,
+        data: {
+          successful: results.length,
+          failed: failed.length,
+        },
       },
       createdAt: now,
       createdBy: user._id,
