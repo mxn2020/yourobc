@@ -43,7 +43,7 @@ class UserSettingsManagementService {
 
   useUserModelPreferences(enabled = true) {
     return useQuery({
-      ...convexQuery(api.lib.system.user.user_settings.queries.getUserModelPreferences, {}),
+      ...convexQuery(api.lib.system.user.user_model_preferences.queries.getUserModelPreferences, {}),
       enabled, // Only run when enabled
       staleTime: 10 * 60 * 1000, // 10 minutes
       gcTime: 15 * 60 * 1000, // 15 minutes
@@ -65,25 +65,25 @@ class UserSettingsManagementService {
 
   useUpdateModelPreferences() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user.user_settings.mutations.updateUserModelPreferences),
+      mutationFn: useConvexMutation(api.lib.system.user.user_model_preferences.mutations.updateUserModelPreferences),
     })
   }
 
   useSetDefaultModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user.user_settings.mutations.setDefaultModel),
+      mutationFn: useConvexMutation(api.lib.system.user.user_model_preferences.mutations.setDefaultModel),
     })
   }
 
   useToggleFavoriteModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user.user_settings.mutations.toggleFavoriteModel),
+      mutationFn: useConvexMutation(api.lib.system.user.user_model_preferences.mutations.toggleFavoriteModel),
     })
   }
 
   useClearDefaultModel() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.user.user_settings.mutations.clearDefaultModel),
+      mutationFn: useConvexMutation(api.lib.system.user.user_model_preferences.mutations.clearDefaultModel),
     })
   }
 

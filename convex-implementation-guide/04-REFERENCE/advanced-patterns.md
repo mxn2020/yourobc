@@ -1184,7 +1184,7 @@ export const duplicateProject = mutation({
 
 ### Example 3: Audit Logs
 
-**Location**: `convex/lib/boilerplate/audit_logs/`
+**Location**: `convex/lib/system/audit_logs/`
 
 **Features**:
 - Flexible typed metadata

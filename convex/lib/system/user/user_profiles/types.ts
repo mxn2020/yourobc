@@ -3,7 +3,7 @@
 
 import type { Doc, Id } from '@/generated/dataModel';
 import type { USER_PROFILES_CONSTANTS } from './constants';
-import type { UserRole } from 'types';
+import type { UserRole } from '../../../../types';
 
 // Core entity types
 export type UserProfile = Doc<'userProfiles'>;

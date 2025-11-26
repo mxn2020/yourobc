@@ -11,6 +11,7 @@ import { Card, Loading } from '@/components/ui'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { Locale } from '@/features/system/i18n'
 import type { ShipmentId, StatusUpdateFormData } from '@/features/yourobc/shipments/types'
 
@@ -98,6 +99,7 @@ function ShipmentStatusUpdatePage() {
   const { shipmentId } = Route.useParams()
   const navigate = useNavigate()
   const toast = useToast()
+  const locale = getCurrentLocale()
 
   const { shipment, isLoading } = useShipment(shipmentId as ShipmentId)
 
@@ -107,9 +109,9 @@ function ShipmentStatusUpdatePage() {
     try {
       await updateShipmentStatus(shipmentId as ShipmentId, statusData)
       toast.success('Shipment status updated successfully')
-      navigate({ 
-        to: '/yourobc/shipments/$shipmentId', 
-        params: { shipmentId } 
+      navigate({
+        to: '/{-$locale}/yourobc/shipments/$shipmentId',
+        params: { shipmentId, locale },
       })
     } catch (error: any) {
       console.error('Status update error:', error)
@@ -119,9 +121,9 @@ function ShipmentStatusUpdatePage() {
   }
 
   const handleCancel = () => {
-    navigate({ 
-      to: '/yourobc/shipments/$shipmentId', 
-      params: { shipmentId } 
+    navigate({
+      to: '/{-$locale}/yourobc/shipments/$shipmentId',
+      params: { shipmentId, locale },
     })
   }
 
@@ -147,7 +149,11 @@ function ShipmentStatusUpdatePage() {
               <p className="text-gray-500 mb-4">
                 The shipment you are trying to update does not exist.
               </p>
-              <Link to="/yourobc/shipments" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link
+                to="/{-$locale}/yourobc/shipments"
+                params={{ locale }}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
                 ← Back to Shipments
               </Link>
             </div>
@@ -163,8 +169,8 @@ function ShipmentStatusUpdatePage() {
         {/* Navigation */}
         <div className="mb-6">
           <Link
-            to="/yourobc/shipments/$shipmentId"
-            params={{ shipmentId }}
+            to="/{-$locale}/yourobc/shipments/$shipmentId"
+            params={{ shipmentId, locale }}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to {shipment.shipmentNumber}
@@ -200,4 +206,3 @@ function ShipmentStatusUpdatePage() {
     </div>
   )
 }
-

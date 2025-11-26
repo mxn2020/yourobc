@@ -89,7 +89,7 @@ export const projectMembersTable = defineTable({
   jobTitle: v.optional(v.string()),
 
   // Extended metadata
-  extendedMetadata: v.optional(projectsFields.extendedMetadata),
+  extendedMetadata: v.optional(projectMembersFields.extendedMetadata),
 
   // Standard fields
   ...auditFields,

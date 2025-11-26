@@ -41,7 +41,7 @@ export const LinkCard: FC<LinkCardProps> = ({
       case 'archived':
         return 'secondary'
       default:
-        return 'default'
+        return 'secondary'
     }
   }
 

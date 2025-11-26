@@ -9,12 +9,11 @@ import { ProjectsFilters } from "../components/ProjectsFilters";
 import { ProjectsTable } from "../components/ProjectsTable";
 import { ProjectQuickFilterBadges } from "../components/ProjectQuickFilterBadges";
 import { ProjectsHelpSection } from "../components/ProjectsHelpSection";
-import { useProjectsList, useProjectStats, useUserProjects } from "../hooks/useProjects";
+import { useProjectsList, useProjectStatsSuspense, useUserProjects } from "../hooks/useProjects";
 import { useCanCreateProjects } from "../hooks/useProjectPermissions";
-import { useTranslation } from "@/features/boilerplate/i18n";
+import { useTranslation, getCurrentLocale } from "@/features/system/i18n";
 import { Loading, PermissionDenied, ErrorState, EmptyState } from "@/components/ui";
 import type { Project } from "../types";
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
 
 export const ProjectsPage: FC = () => {
   // Track component render performance (dev mode only)
@@ -51,7 +50,7 @@ export const ProjectsPage: FC = () => {
   // These use useSuspenseQuery internally with service-provided query options
   // SSR cache is automatically utilized when available
   const { data: projectsData } = useProjectsList({ limit: 100 })
-  const { data: stats } = useProjectStats()
+  const { data: stats } = useProjectStatsSuspense()
 
   const { t } = useTranslation("projects");
   const navigate = useNavigate();

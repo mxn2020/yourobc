@@ -93,6 +93,12 @@ export const projectMembersFields = {
     canInviteMembers: v.optional(v.boolean()),
     canEditProject: v.optional(v.boolean()),
   }),
+
+  extendedMetadata: v.object({
+    avatar: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    skills: v.optional(v.array(v.string())),
+  }),
 };
 
 // Project milestones validators

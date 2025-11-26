@@ -1,7 +1,7 @@
 // src/features/yourobc/tasks/types/index.ts
 
 import type { Doc, Id } from '@/convex/_generated/dataModel'
-import { TaskStatus } from '@/convex/lib/yourobc/tasks'
+import { TaskPriority, TaskStatus, TaskType } from '@/convex/lib/yourobc/tasks'
 
 // Re-export types from Convex
 export type Task = Doc<'yourobcTasks'>
@@ -22,6 +22,7 @@ export type {
 
 // UI-specific types
 export interface TaskListItem extends Task {
+  type?: Task['taskType'] // Alias for UI compatibility
   shipment?: {
     _id: Id<'yourobcShipments'>
     shipmentNumber: string
@@ -43,11 +44,10 @@ export interface TaskFormData {
   shipmentId?: Id<'yourobcShipments'>
   title: string
   description?: string
-  type?: 'manual' | 'automatic'
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  taskType?: TaskType
+  priority: TaskPriority
   assignedTo?: Id<'userProfiles'>
   dueDate?: number
-  metadata?: Record<string, any>
 }
 
 export interface TaskInsights {
@@ -59,16 +59,6 @@ export interface TaskInsights {
   canBeStarted: boolean
   canBeCancelled: boolean
   canBeEdited: boolean
-}
-
-export interface TaskSearchFilters {
-  status?: TaskStatus[]
-  priority?: ('low' | 'medium' | 'high' | 'critical')[]
-  assignedTo?: Id<'userProfiles'>[]
-  shipmentId?: Id<'yourobcShipments'>[]
-  type?: ('manual' | 'automatic')[]
-  overdue?: boolean
-  dueToday?: boolean
 }
 
 export interface TaskCardProps {

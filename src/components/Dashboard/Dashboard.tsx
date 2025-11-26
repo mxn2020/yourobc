@@ -1,21 +1,17 @@
 // src/components/Dashboard/Dashboard.tsx
-import React, { useState } from 'react'
-import { useQuery } from 'convex/react'
+import React, { useState, useMemo } from 'react'
 import { useRouter, useParams } from '@tanstack/react-router'
 import { useAuth } from '@/features/system/auth'
-import { api } from '@/generated/api';
 import { defaultLocale } from '@/features/system/i18n';
 import { StatsCard } from './StatsCard'
 import { ProjectChart } from './ProjectChart'
 import { QuickActions } from './QuickActions'
-import { Modal, ModalHeader, ModalBody, ModalFooter } from '../ui/Modal'
-import { Button } from '../ui/Button'
-// import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/system/projects'
+import { Modal, ModalBody } from '../ui/Modal'
+import { CreateProjectData, UpdateProjectData, Project, ProjectForm, useProjects } from '@/features/projects'
 import { Card, CardHeader, CardContent } from '../ui/Card'
 import { Progress } from '../ui/Progress'
-import { FolderOpen, CheckCircle, Clock, AlertTriangle, DollarSign, TrendingUp, Calendar, Target } from 'lucide-react'
+import { FolderOpen, CheckCircle, AlertTriangle, Target } from 'lucide-react'
 import type { ChartDataPoint } from '@/types'
-import { Id } from '@/convex/_generated/dataModel'
 import { parseConvexError, ParsedError } from '@/utils/errorHandling'
 import { PermissionDeniedModal } from '../Permission/PermissionDeniedModal'
 import { RequestAccessModal } from '@/components/Permission/RequestAccessModal'
@@ -32,19 +28,55 @@ export function Dashboard() {
   const [requestAccessOpen, setRequestAccessOpen] = useState(false)
   const toast = useToast()
 
-  /*
-  const { createProject, isCreating } = useProjects()
+  const {
+    projects,
+    stats,
+    createProject,
+    isCreating,
+    isPermissionError,
+    isLoading,
+    isStatsLoading
+  } = useProjects({ limit: 10 })
 
-  // TanStack Query will use prefetched data automatically if available
-  const dashboardStats = useQuery(
-    api.lib.system.projects.queries.getDashboardStats,
-    isReady && isAuthenticated ? {} : "skip"
-  )
+  const dashboardStats = useMemo(() => ({
+    totalProjects: stats?.totalProjects ?? 0,
+    activeProjects: stats?.projectsByStatus?.active ?? 0,
+    completedProjects: stats?.projectsByStatus?.completed ?? 0,
+    archivedProjects: stats?.projectsByStatus?.archived ?? 0,
+    onHoldProjects: stats?.projectsByStatus?.on_hold ?? 0,
+    overdueProjects: stats?.overdueProjects ?? 0,
+    atRiskProjects: stats?.atRiskProjects ?? 0,
+    averageProgress: stats?.averageProgress ?? 0,
+    totalBudget: stats?.totalBudget ?? 0,
+    projectsByStatus: stats?.projectsByStatus ?? {
+      active: 0,
+      completed: 0,
+      archived: 0,
+      on_hold: 0
+    },
+    projectsByPriority: stats?.projectsByPriority ?? {
+      low: 0,
+      medium: 0,
+      high: 0,
+      urgent: 0
+    }
+  }), [stats])
 
-  const projectsList = useQuery(
-    api.lib.system.projects.queries.getProjects,
-    isReady && isAuthenticated ? { options: { limit: 10 } } : "skip"
-  )
+  const statusChartData: ChartDataPoint[] = useMemo(() => ([
+    { name: 'Active', value: dashboardStats.projectsByStatus.active, color: '#10B981' },
+    { name: 'Completed', value: dashboardStats.projectsByStatus.completed, color: '#3B82F6' },
+    { name: 'On Hold', value: dashboardStats.projectsByStatus.on_hold, color: '#F59E0B' },
+    { name: 'Archived', value: dashboardStats.projectsByStatus.archived, color: '#9CA3AF' },
+  ]), [dashboardStats])
+
+  const priorityChartData: ChartDataPoint[] = useMemo(() => ([
+    { name: 'Urgent', value: dashboardStats.projectsByPriority.urgent, color: '#EF4444' },
+    { name: 'High', value: dashboardStats.projectsByPriority.high, color: '#F59E0B' },
+    { name: 'Medium', value: dashboardStats.projectsByPriority.medium, color: '#3B82F6' },
+    { name: 'Low', value: dashboardStats.projectsByPriority.low, color: '#10B981' },
+  ]), [dashboardStats])
+
+  const projectsList = projects || []
 
   const handleCreateProject = () => {
     setShowCreateProject(true)
@@ -52,61 +84,50 @@ export function Dashboard() {
 
   const handleViewProjects = () => {
     router.navigate({
-      to: '/{-$locale}/projects',
+      to: '/{-$locale}/yourobc/tasks',
       params: { locale: currentLocale === defaultLocale ? undefined : currentLocale }
     })
   }
 
   const handleViewReports = () => {
     router.navigate({
-      to: '/{-$locale}/projects',
+      to: '/{-$locale}/yourobc/statistics',
       params: { locale: currentLocale === defaultLocale ? undefined : currentLocale }
     })
   }
 
   const handleProjectCreated = async (project: CreateProjectData | UpdateProjectData) => {
-    const processedData = {
-      ...project,
-      priority: project.priority || 'medium',
-      visibility: project.visibility || 'private',
-      tags: project.tags || [],
-      settings: project.settings
-        ? {
-            allowComments: project.settings.allowComments ?? false,
-            requireApproval: project.settings.requireApproval ?? false,
-            autoArchive: project.settings.autoArchive ?? false,
-            emailNotifications: project.settings.emailNotifications ?? false,
-          }
-        : undefined,
+    const processedData: CreateProjectData = {
+      title: project.title || 'Untitled Project',
+      description: project.description,
+      priority: project.priority ?? 'medium',
+      visibility: project.visibility ?? 'private',
+      tags: project.tags ?? [],
+      category: project.category,
+      startDate: project.startDate,
+      dueDate: project.dueDate,
+      progress: project.progress,
+      collaborators: project.collaborators,
+      settings: project.settings,
+      extendedMetadata: project.extendedMetadata,
     }
 
     try {
-      const { _id: newProjectId, publicId } = await createProject(processedData as CreateProjectData)
-      toast.success(`Project "${project.title}" created successfully!`)
+      await createProject(processedData)
+      toast.success(`Project "${processedData.title}" created successfully!`)
       setShowCreateProject(false)
-      router.navigate({
-        to: '/{-$locale}/projects/$projectId',
-        params: {
-          locale: currentLocale === defaultLocale ? undefined : currentLocale,
-          projectId: newProjectId
-        }
-      })
     } catch (error: any) {
       const parsed = parseConvexError(error)
 
-      // Show permission modal for permission errors
-      if (parsed.type === 'permission') {
+      if (parsed.type === 'permission' || isPermissionError) {
         setShowCreateProject(false)
         setPermissionError(parsed)
       } else {
-        // Log unexpected errors for debugging
         console.error('Project creation error:', error)
-        // Show toast for other errors
         toast.error(parsed.message)
       }
     }
   }
-    */
 
   const handleRequestAccess = async (message?: string) => {
     try {
@@ -118,8 +139,10 @@ export function Dashboard() {
     }
   }
 
-  // Show loading state while auth is loading or data is not ready
-  if (!isReady || !isAuthenticated) { // || !dashboardStats || !projectsList) {
+  const isBusy = !isReady || !isAuthenticated || isLoading || isStatsLoading
+
+  // Show loading state while auth or data is loading
+  if (isBusy) {
     return (
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-pulse">
@@ -134,31 +157,6 @@ export function Dashboard() {
     )
   }
 
-  /*
-  const projects = projectsList.projects || []
-
-  const statusChartData: ChartDataPoint[] = [
-    { name: 'Active', value: dashboardStats.activeProjects, color: '#10B981' },
-    { name: 'Completed', value: dashboardStats.completedProjects, color: '#3B82F6' },
-    { name: 'On Hold', value: projects.filter((p: Project) => p.status === 'on_hold').length, color: '#F59E0B' },
-    { name: 'Cancelled', value: projects.filter((p: Project) => p.status === 'cancelled').length, color: '#EF4444' },
-  ]
-
-  const priorityChartData: ChartDataPoint[] = [
-    { name: 'Urgent', value: projects.filter((p: Project) => p.priority === 'urgent').length, color: '#EF4444' },
-    { name: 'High', value: projects.filter((p: Project) => p.priority === 'high').length, color: '#F59E0B' },
-    { name: 'Medium', value: projects.filter((p: Project) => p.priority === 'medium').length, color: '#3B82F6' },
-    { name: 'Low', value: projects.filter((p: Project) => p.priority === 'low').length, color: '#10B981' },
-  ]
-
-  const projectsCompletedThisMonth = projects.filter((p: Project) => {
-    if (p.status !== 'completed' || !p.completedAt) return false
-    const completedDate = new Date(p.completedAt)
-    const now = new Date()
-    return completedDate.getMonth() === now.getMonth() && completedDate.getFullYear() === now.getFullYear()
-  }).length
-  */
-
   return (
     <>
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -172,7 +170,6 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/*
           <StatsCard
             title="Total Projects"
             value={dashboardStats.totalProjects}
@@ -190,11 +187,6 @@ export function Dashboard() {
             value={dashboardStats.completedProjects}
             icon={CheckCircle}
             color="blue"
-            change={{
-              value: projectsCompletedThisMonth,
-              label: 'this month',
-              trend: 'up'
-            }}
           />
           <StatsCard
             title="Overdue"
@@ -202,30 +194,6 @@ export function Dashboard() {
             icon={AlertTriangle}
             color="red"
           />
-          */}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {/*
-          <StatsCard
-            title="Total Budget"
-            value={`$${dashboardStats.totalBudget.toLocaleString()}`}
-            icon={DollarSign}
-            color="purple"
-          />
-          <StatsCard
-            title="Average Progress"
-            value={`${Math.round(dashboardStats.averageProgress)}%`}
-            icon={TrendingUp}
-            color="green"
-          />
-          <StatsCard
-            title="Completed This Month"
-            value={projectsCompletedThisMonth}
-            icon={Calendar}
-            color="blue"
-          />
-          */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -250,19 +218,13 @@ export function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
               </CardHeader>
               <CardContent>
-                {projects.length > 0 ? (
+                {projectsList.length > 0 ? (
                   <div className="space-y-4">
-                    {projects.slice(0, 5).map((project: Project) => (
+                    {projectsList.slice(0, 5).map((project: Project) => (
                       <div 
                         key={project._id} 
                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                        onClick={() => router.navigate({
-                          to: '/{-$locale}/projects/$projectId',
-                          params: {
-                            locale: currentLocale === defaultLocale ? undefined : currentLocale,
-                            projectId: project._id
-                          }
-                        })}
+                        onClick={handleViewProjects}
                       >
                         <div>
                           <h4 className="font-medium text-gray-900 hover:text-blue-600">{project.title}</h4>

@@ -3,7 +3,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@/generated/api';
-import { useAuth } from '@/features/system/auth';
 import type { EmailRequest, EmailResponse, SendEmailOptions } from '../types';
 import { validateEmailRequest } from '../utils';
 import { Id } from "@/convex/_generated/dataModel";
@@ -13,7 +12,6 @@ import { Id } from "@/convex/_generated/dataModel";
  * This is the main hook you'll use throughout your app to send emails
  */
 export function useSendEmail() {
-  const { auth } = useAuth();
   const logEmail = useConvexMutation(api.lib.system.email.mutations.logEmail);
 
   return useMutation({
@@ -100,7 +98,6 @@ export function useSendSimpleEmail() {
  * Hook to send an email using a template
  */
 export function useSendTemplateEmail() {
-  const { auth } = useAuth();
   const sendEmail = useSendEmail();
   const incrementUsage = useConvexMutation(api.lib.system.email.mutations.incrementTemplateUsage);
 

@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 import { Card, Alert, AlertDescription } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 export const ProjectsHelpSection: FC = () => {
   const { t } = useTranslation('projects')

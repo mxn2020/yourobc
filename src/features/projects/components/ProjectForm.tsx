@@ -3,8 +3,8 @@
 import { FC, useState } from 'react'
 import { Button, Checkbox, Input, Label, SimpleSelect, Textarea } from '@/components/ui'
 import { PROJECT_CONSTANTS } from '../constants'
-import { useToast } from '@/features/boilerplate/notifications'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useToast } from '@/features/system/notifications'
+import { useTranslation } from '@/features/system/i18n'
 import type { CreateProjectData, UpdateProjectData, Project } from '../types'
 
 interface ProjectFormProps {
@@ -206,7 +206,7 @@ export const ProjectForm: FC<ProjectFormProps> = ({
                 id="priority"
                 value={formData.priority}
                 onChange={(e) => handleInputChange('priority', e.target.value)}
-                options={Object.values(PROJECT_CONSTANTS.PRIORITY).map(priority => ({
+                options={(Object.values(PROJECT_CONSTANTS.PRIORITY) as string[]).map(priority => ({
                   value: priority,
                   label: t(`priority.${priority}`)
                 }))}
@@ -219,7 +219,7 @@ export const ProjectForm: FC<ProjectFormProps> = ({
                 id="visibility"
                 value={formData.visibility}
                 onChange={(e) => handleInputChange('visibility', e.target.value)}
-                options={Object.values(PROJECT_CONSTANTS.VISIBILITY).map(visibility => ({
+                options={(Object.values(PROJECT_CONSTANTS.VISIBILITY) as string[]).map(visibility => ({
                   value: visibility,
                   label: t(`visibility.${visibility}`)
                 }))}

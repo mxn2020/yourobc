@@ -71,10 +71,6 @@ export { ResetPasswordPage } from './pages/ResetPasswordPage'
 
 // === Types ===
 export type {
-  // ID types
-  AuthUserId,
-  UserProfileId,
-
   // Core types
   AuthUser,
   UserProfile,
@@ -117,6 +113,8 @@ export type {
   PermissionCheck,
 } from './types/auth.types'
 
+// Shared identifier types used across features
+export type { AuthUserId, UserProfileId } from '../_shared/types'
+
 // === Query Keys ===
 export { queryKeys } from './types/auth.types'
-

@@ -23,7 +23,7 @@ export function Header() {
 
   // Check if we're in special sections
   const isInAdminSection = location.pathname.startsWith('/admin');
-  const isInProjectsSection = location.pathname.startsWith('/projects');
+  const isInProjectsSection = location.pathname.startsWith('/yourobc');
 
   // Dynamically detect which addon section we're in based on config
   const addonSections = useMemo(() =>
@@ -191,7 +191,7 @@ export function Header() {
                   {isProjectsDropdownOpen && (
                     <div className="absolute top-full mt-2 right-0 py-2 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[200px] z-[100]">
                       <Link
-                        to="/{-$locale}/projects/tasks"
+                        to="/{-$locale}/yourobc/tasks"
                         params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
                         onClick={() => setIsProjectsDropdownOpen(false)}
                         className="flex items-center space-x-3 px-4 py-2 hover:bg-blue-50 transition-colors"
@@ -200,7 +200,7 @@ export function Header() {
                         <span className="text-sm font-medium text-blue-700">Tasks</span>
                       </Link>
                       <Link
-                        to="/{-$locale}/projects/team"
+                        to="/{-$locale}/yourobc/employees"
                         params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
                         onClick={() => setIsProjectsDropdownOpen(false)}
                         className="flex items-center space-x-3 px-4 py-2 hover:bg-blue-50 transition-colors"
@@ -209,7 +209,7 @@ export function Header() {
                         <span className="text-sm font-medium text-blue-700">Team</span>
                       </Link>
                       <Link
-                        to="/{-$locale}/projects/timeline"
+                        to="/{-$locale}/yourobc/statistics"
                         params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
                         onClick={() => setIsProjectsDropdownOpen(false)}
                         className="flex items-center space-x-3 px-4 py-2 hover:bg-blue-50 transition-colors"
@@ -234,12 +234,12 @@ export function Header() {
                 </Link>
               ) : (
                 <Link
-                  to="/{-$locale}/projects"
+                  to="/{-$locale}/yourobc"
                   params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
                   className="flex flex-col items-center px-3 py-2 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <Building className="h-4 w-4 mb-1" />
-                  <span>Projects System</span>
+                  <span>YourOBC</span>
                 </Link>
               )}
 
@@ -317,12 +317,12 @@ export function Header() {
 
             {!isInAdminSection && (
               <Link
-                to="/{-$locale}/projects/new"
+                to="/{-$locale}/yourobc/shipments/new"
                 params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg flex flex-col items-center transition-colors font-medium"
               >
                 <Plus className="h-4 w-4 mb-1" />
-                <span className="text-xs">New Project</span>
+                <span className="text-xs">New Shipment</span>
               </Link>
             )}
 
@@ -399,16 +399,16 @@ export function Header() {
               className="flex items-center justify-center space-x-2 w-full py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
             >
               <BarChart3 className="h-4 w-4" />
-              <span>Exit Projects System</span>
+              <span>Exit YourOBC</span>
             </Link>
           ) : (
             <Link
-              to="/{-$locale}/projects"
+              to="/{-$locale}/yourobc"
               params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
               className="flex items-center justify-center space-x-2 w-full py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
             >
               <Building className="h-4 w-4" />
-              <span>Projects System</span>
+              <span>YourOBC</span>
             </Link>
           )}
 
@@ -441,4 +441,3 @@ export function Header() {
     </header>
   );
 }
-

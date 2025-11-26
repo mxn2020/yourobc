@@ -4,10 +4,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ProjectTasksPage } from '@/features/projects/pages/ProjectTasksPage'
 import { tasksService } from '@/features/projects/services/TasksService'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
-export const Route = createFileRoute('/{-$locale}/_protected/_projects/tasks')({
+export const Route = createFileRoute('/{-$locale}/_protected/projects/tasks')({
   loader: async ({ context }) => {
     const isServer = typeof window === 'undefined'
 

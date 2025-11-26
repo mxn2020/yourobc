@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from '@/generated/api'
-import { GetMetricParams, MetricData, DateRangePreset } from "../types";
+import { GetMetricParams, MetricData, DateRangePreset, AnalyticsSummary } from "../types";
 import { getDateRangeFromPreset } from "../utils/date-utils";
 import { useMemo } from "react";
 
@@ -10,7 +10,7 @@ import { useMemo } from "react";
  * Hook to fetch metric data
  */
 export function useMetric(params: GetMetricParams) {
-  const data = useQuery(api.lib.system.analytics.queries.getMetric, {
+  const data = useQuery(api.lib.system.core.analytics.queries.getMetric, {
     metricType: params.metricType,
     period: params.period,
     startDate: params.startDate,
@@ -33,7 +33,7 @@ export function useMetric(params: GetMetricParams) {
 export function useMetrics(metricTypes: string[], params: Omit<GetMetricParams, "metricType">) {
   // Fetch each metric
   const results = metricTypes.map((metricType) =>
-    useQuery(api.lib.system.analytics.queries.getMetric, {
+    useQuery(api.lib.system.core.analytics.queries.getMetric, {
       metricType,
       period: params.period,
       startDate: params.startDate,
@@ -143,8 +143,8 @@ export function useMetricTrend(
  * Hook to fetch analytics summary
  */
 export function useAnalyticsSummary(preset: DateRangePreset = "last_30_days") {
-  const data = useQuery(
-    api.lib.system.analytics.queries.getAnalyticsSummary,
+  const data = useQuery<AnalyticsSummary | null>(
+    api.lib.system.core.analytics.queries.getAnalyticsSummary,
     { period: preset }
   );
 
@@ -166,7 +166,7 @@ export function usePageViews(
   pagePath?: string,
   limit?: number
 ) {
-  const data = useQuery(api.lib.system.analytics.queries.getPageViews, {
+  const data = useQuery(api.lib.system.core.analytics.queries.getPageViews, {
     startDate,
     endDate,
     pagePath,
@@ -186,7 +186,7 @@ export function usePageViews(
  * Hook to fetch active sessions (real-time)
  */
 export function useActiveSessions() {
-  const data = useQuery(api.lib.system.analytics.queries.getActiveSessions);
+  const data = useQuery(api.lib.system.core.analytics.queries.getActiveSessions);
 
   return useMemo(
     () => ({
@@ -201,7 +201,7 @@ export function useActiveSessions() {
  * Hook to fetch unique users
  */
 export function useUniqueUsers(startDate: number, endDate: number) {
-  const data = useQuery(api.lib.system.analytics.queries.getUniqueUsers, {
+  const data = useQuery(api.lib.system.core.analytics.queries.getUniqueUsers, {
     startDate,
     endDate,
   });

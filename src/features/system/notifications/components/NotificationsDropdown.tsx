@@ -1,5 +1,5 @@
 // src/features/notifications/components/NotificationsDropdown.tsx
-import { useRef, useEffect, FC } from 'react'
+import { useRef, useEffect, FC, MouseEvent as ReactMouseEvent } from 'react'
 import { Bell, X, Zap, Trophy, Users, Calendar } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useNotifications } from '../hooks/useNotifications'
@@ -55,7 +55,7 @@ export const NotificationsDropdown: FC<NotificationsDropdownProps> = ({
     markAllAsRead()
   }
 
-  const handleDeleteNotification = (notificationId: NotificationId, e: React.MouseEvent) => {
+  const handleDeleteNotification = (notificationId: NotificationId, e: ReactMouseEvent) => {
     e.stopPropagation()
     deleteNotification(notificationId)
   }

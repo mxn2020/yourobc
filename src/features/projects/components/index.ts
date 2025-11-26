@@ -11,8 +11,8 @@ export { ProjectsPageHeader } from './ProjectsPageHeader'
 export { ProjectsHelpSection } from './ProjectsHelpSection'
 
 // Permission components
-export { PermissionButton } from '../../../../components/Permission/PermissionButton'
-export { PermissionGate } from '../../../../components/Permission/PermissionGate'
+export { PermissionButton } from '@/components/Permission/PermissionButton'
+export { PermissionGate } from '@/components/Permission/PermissionGate'
 export { ProjectRoleBadge } from './ProjectRoleBadge'
-export { PermissionWarningBanner, PermissionWarningInline } from '../../../../components/Permission/PermissionWarningBanner'
-export { RequestAccessModal } from '../../../../components/Permission/RequestAccessModal'
+export { PermissionWarningBanner, PermissionWarningInline } from '@/components/Permission/PermissionWarningBanner'
+export { RequestAccessModal } from '@/components/Permission/RequestAccessModal'

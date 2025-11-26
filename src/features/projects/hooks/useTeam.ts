@@ -22,10 +22,10 @@ export interface AddMemberData {
 }
 
 export interface UpdateMemberData {
-  role?: 'owner' | 'admin' | 'member' | 'viewer';
+  role: 'owner' | 'admin' | 'member' | 'viewer';
   department?: string;
   jobTitle?: string;
-  status?: 'active' | 'invited' | 'inactive';
+  status: 'active' | 'invited' | 'removed';
   permissions?: string[];
   settings?: {
     emailNotifications?: boolean;

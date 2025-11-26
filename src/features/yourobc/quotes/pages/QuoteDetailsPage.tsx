@@ -277,7 +277,7 @@ export const QuoteDetailsPage: FC<QuoteDetailsPageProps> = ({ quoteId }) => {
               <p className="text-gray-500 mb-4">
                 {error?.message || 'The quote you are looking for does not exist or has been deleted.'}
               </p>
-              <Link to="/yourobc/quotes" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/quotes" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Quotes
               </Link>
             </div>
@@ -292,7 +292,7 @@ export const QuoteDetailsPage: FC<QuoteDetailsPageProps> = ({ quoteId }) => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Link to="/yourobc/quotes" className="text-blue-600 hover:text-blue-800 font-medium">
+          <Link to="/{-$locale}/yourobc/quotes" className="text-blue-600 hover:text-blue-800 font-medium">
             ← Back to Quotes
           </Link>
 

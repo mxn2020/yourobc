@@ -113,6 +113,13 @@ export const PUBLIC_ID_PREFIXES = {
   yourobcStatisticsOfficeCosts: 'ocost',
   yourobcStatisticsMiscExpenses: 'mexp',
 
+  marketingEmailSignatures: 'emsgn',
+  marketingLandingPages: 'landp',
+  marketingLinks: 'mlink',
+  marketingSocialPosts: 'msocp',
+  marketingNewsletters: 'mnewl',
+  marketingNewsletterCampaigns: 'mncamp',
+
 } as const;
 
 export type PublicIdTable = keyof typeof PUBLIC_ID_PREFIXES;

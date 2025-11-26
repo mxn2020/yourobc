@@ -23,7 +23,7 @@ export {
   useProjects,
   useProject,
   useProjectsList,
-  useProjectStats,
+  useProjectStatsSuspense,
   useProjectSuspense,
   useProjectActions,
   useCreateProject,

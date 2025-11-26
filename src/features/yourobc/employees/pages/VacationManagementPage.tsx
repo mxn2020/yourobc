@@ -217,7 +217,7 @@ export const VacationManagementPage: FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/employees">
+            <Link to="/{-$locale}/yourobc/employees">
               <Button variant="secondary">👥 View Employees</Button>
             </Link>
             <Button variant="primary" onClick={() => navigate({ to: '/yourobc/employees/vacations/new' })}>

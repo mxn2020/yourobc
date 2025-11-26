@@ -9,6 +9,7 @@ import { projectsValidators, projectsFields } from '@/schema/projects/validators
 import { PROJECTS_CONSTANTS } from './constants';
 import { validateProjectData, trimProjectData, buildSearchableText } from './utils';
 import {
+  canViewProject,
   requireEditProjectAccess,
   requireDeleteProjectAccess,
   canEditProject,
@@ -19,6 +20,135 @@ import { Id } from '@/generated/dataModel';
 
 type ProjectUpdatePatch = Partial<UpdateProjectData> &
   Pick<Project, 'updatedAt' | 'updatedBy' | 'lastActivityAt' | 'completedAt'>;
+
+type ProjectIdentifier = { _id: ProjectId; publicId: string };
+
+/**
+ * Request access to a project
+ * Creates a permission request and notifies the project owner
+ */
+export const requestAccess = mutation({
+  args: {
+    projectId: v.id('projects'),
+    message: v.optional(v.string()),
+  },
+  handler: async (
+    ctx,
+    { projectId, message }
+  ): Promise<{ _id: Id<'permissionRequests'>; publicId: string }> => {
+    const user = await requireCurrentUser(ctx);
+
+    const project = await ctx.db.get(projectId);
+    if (!project || project.deletedAt) {
+      throw new Error('Project not found');
+    }
+
+    // If the user already has access, don't create a request
+    if (await canViewProject(ctx, project, user)) {
+      throw new Error('You already have access to this project');
+    }
+
+    const trimmedMessage = message?.trim();
+    const requesterName = (user.name || user.email || 'Unknown User').trim();
+    const requesterEmail = user.email?.trim();
+    const permissionKey = `${PROJECTS_CONSTANTS.PERMISSIONS.VIEW}:${projectId}`;
+
+    // Prevent duplicate pending requests for the same project
+    const existingRequest = await ctx.db
+      .query('permissionRequests')
+      .withIndex('by_owner_status', (q) => q.eq('ownerId', user._id).eq('status', 'pending'))
+      .filter((q) => q.eq(q.field('request.permission'), permissionKey))
+      .first();
+
+    if (existingRequest) {
+      throw new Error('You already have a pending access request for this project');
+    }
+
+    const now = Date.now();
+    const permissionPublicId = await generateUniquePublicId(ctx, 'permissionRequests');
+
+    const requestId = await ctx.db.insert('permissionRequests', {
+      publicId: permissionPublicId,
+      displayName: `${project.title} Access - ${requesterName}`,
+      ownerId: user._id,
+      requester: {
+        userId: user._id,
+        userName: requesterName,
+        userEmail: requesterEmail,
+      },
+      request: {
+        permission: permissionKey,
+        module: 'projects',
+        message: trimmedMessage,
+      },
+      status: 'pending',
+      review: {},
+      createdAt: now,
+      updatedAt: now,
+      createdBy: user._id,
+      updatedBy: user._id,
+      deletedAt: undefined,
+      deletedBy: undefined,
+    });
+
+    // Notify the project owner about the access request
+    if (project.ownerId !== user._id) {
+      await ctx.db.insert('notifications', {
+        publicId: await generateUniquePublicId(ctx, 'notifications'),
+        ownerId: project.ownerId,
+        type: 'request',
+        displayName: 'Project Access Request',
+        content: {
+          title: 'Project Access Request',
+          message: `${requesterName} has requested access to ${project.title}`,
+          emoji: '🔒',
+          actionUrl: `/projects/${project._id}`,
+        },
+        isRead: false,
+        entityType: 'project_access_request',
+        entityId: requestId,
+        metadata: {
+          data: {
+            projectId,
+            requestId,
+            requesterName,
+          },
+        },
+        createdAt: now,
+        updatedAt: now,
+        createdBy: user._id,
+        updatedBy: user._id,
+        deletedAt: undefined,
+        deletedBy: undefined,
+      });
+    }
+
+    // Audit log for traceability
+    await ctx.db.insert('auditLogs', {
+      publicId: await generateUniquePublicId(ctx, 'auditLogs'),
+      userId: user._id,
+      userName: requesterName,
+      action: 'project.access_requested',
+      entityType: 'project',
+      entityId: project.publicId ?? project._id,
+      entityTitle: project.title,
+      description: `Requested access to project "${project.title}"`,
+      metadata: {
+        data: {
+          projectId,
+          requestId,
+          message: trimmedMessage ?? null,
+        },
+      },
+      createdAt: now,
+      createdBy: user._id,
+      updatedAt: now,
+      updatedBy: user._id,
+    });
+
+    return { _id: requestId, publicId: permissionPublicId };
+  },
+});
 
 /**
  * Create new project
@@ -54,7 +184,7 @@ export const createProject = mutation({
       ),
     }),
   },
-  handler: async (ctx, { data }): Promise<ProjectId> => {
+  handler: async (ctx, { data }): Promise<ProjectIdentifier> => {
     // 1. AUTH: Get authenticated user
     const user = await requirePermission(
       ctx,
@@ -154,8 +284,8 @@ export const createProject = mutation({
       updatedAt: now,
     });
 
-    // 6. RETURN: Return entity ID
-    return projectId;
+    // 6. RETURN: Return entity ID and Public ID
+    return { _id: projectId, publicId };
   },
 });
 
@@ -196,7 +326,7 @@ export const updateProject = mutation({
       ),
     }),
   },
-  handler: async (ctx, { projectId, updates }): Promise<ProjectId> => {
+  handler: async (ctx, { projectId, updates }): Promise<ProjectIdentifier> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -300,8 +430,8 @@ export const updateProject = mutation({
       updatedAt: now,
     });
 
-    // 8. RETURN: Return entity ID
-    return projectId;
+    // 8. RETURN: Return entity ID and public ID
+    return { _id: projectId, publicId: project.publicId };
   },
 });
 
@@ -313,7 +443,7 @@ export const deleteProject = mutation({
     projectId: v.id('projects'),
     hardDelete: v.optional(v.boolean()),
   },
-  handler: async (ctx, { projectId, hardDelete = false }): Promise<ProjectId> => {
+  handler: async (ctx, { projectId, hardDelete = false }): Promise<ProjectIdentifier> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -364,8 +494,9 @@ export const deleteProject = mutation({
       updatedAt: now,
     });
 
-    // 6. RETURN: Return entity ID
-    return projectId;
+    // 6. RETURN: Return entity ID and public ID
+    return { _id: projectId, publicId: project.publicId };
+
   },
 });
 
@@ -376,7 +507,7 @@ export const restoreProject = mutation({
   args: {
     projectId: v.id('projects'),
   },
-  handler: async (ctx, { projectId }): Promise<ProjectId> => {
+  handler: async (ctx, { projectId }): Promise<ProjectIdentifier> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -421,8 +552,8 @@ export const restoreProject = mutation({
       updatedAt: now,
     });
 
-    // 6. RETURN: Return entity ID
-    return projectId;
+    // 6. RETURN: Return entity ID and public ID
+    return { _id: projectId, publicId: project.publicId };
   },
 });
 
@@ -433,7 +564,7 @@ export const archiveProject = mutation({
   args: {
     projectId: v.id('projects'),
   },
-  handler: async (ctx, { projectId }): Promise<ProjectId> => {
+  handler: async (ctx, { projectId }): Promise<ProjectIdentifier> => {
     // 1. AUTH: Get authenticated user
     const user = await requireCurrentUser(ctx);
 
@@ -469,8 +600,8 @@ export const archiveProject = mutation({
       updatedAt: now,
     });
 
-    // 6. RETURN: Return entity ID
-    return projectId;
+    // 6. RETURN: Return entity ID and public ID
+    return { _id: projectId, publicId: project.publicId };
   },
 });
 

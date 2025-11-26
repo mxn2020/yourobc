@@ -1,9 +1,10 @@
 // src/features/projects/hooks/useProjectPermissions.ts
 
 import { useMemo } from "react";
-import { useCurrentUser } from "@/features/boilerplate/auth";
+import { useAuth } from "@/features/system/auth/hooks/useAuth";
 import { PROJECT_CONSTANTS } from "../constants";
-import type { Project } from "../types";
+import { useProject } from "./useProjects";
+import type { Project, ProjectId } from "../types";
 
 export type ProjectMemberRole = 'owner' | 'admin' | 'member' | 'viewer';
 
@@ -14,7 +15,7 @@ export type ProjectMemberRole = 'owner' | 'admin' | 'member' | 'viewer';
  * Note: Uses memberDetails from the project query (projectMembers table)
  */
 export function useProjectPermissions(project?: Project & { memberDetails?: Array<{ userId: string; role?: string }> }) {
-  const { profile: currentUser } = useCurrentUser();
+  const { profile: currentUser } = useAuth();
 
   return useMemo(() => {
     if (!currentUser || !project) {
@@ -84,7 +85,7 @@ export function useProjectPermissions(project?: Project & { memberDetails?: Arra
  * Check if user can create projects
  */
 export function useCanCreateProjects() {
-  const { profile: currentUser } = useCurrentUser();
+  const { profile: currentUser } = useAuth();
 
   return useMemo(() => {
     if (!currentUser) return false;
@@ -99,10 +100,44 @@ export function useCanCreateProjects() {
 }
 
 /**
+ * Check if user can edit specific project
+ */
+export function useCanEditProject(projectId?: ProjectId) {
+  const { profile: currentUser } = useAuth();
+  const { data: project } = useProject(projectId);
+
+  return useMemo(() => {
+    if (!currentUser || !project) return false;
+
+    const isOwner = project.ownerId === currentUser._id;
+    const isAdmin = currentUser.role === "admin" || currentUser.role === "superadmin";
+
+    return isAdmin || isOwner;
+  }, [currentUser, project]);
+}
+
+/**
+ * Check if user can delete specific project
+ */
+export function useCanDeleteProject(projectId?: ProjectId) {
+  const { profile: currentUser } = useAuth();
+  const { data: project } = useProject(projectId);
+
+  return useMemo(() => {
+    if (!currentUser || !project) return false;
+
+    const isOwner = project.ownerId === currentUser._id;
+    const isAdmin = currentUser.role === "admin" || currentUser.role === "superadmin";
+
+    return isAdmin || isOwner;
+  }, [currentUser, project]);
+}
+
+/**
  * Get user's role in a specific project
  */
 export function useProjectRole(project?: Project & { memberDetails?: Array<{ userId: string; role?: string }> }) {
-  const { profile: currentUser } = useCurrentUser();
+  const { profile: currentUser } = useAuth();
 
   return useMemo(() => {
     if (!currentUser || !project) return null;

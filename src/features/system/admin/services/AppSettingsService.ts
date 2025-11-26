@@ -1,517 +1,493 @@
-// src/features/admin/services/AppSettingsService.ts
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import { api } from '@/generated/api'
-import { Id } from "@/convex/_generated/dataModel";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query';
+import { api } from '@/generated/api';
+
 import type {
-  AISettings,
-  SystemSettings,
-  AppSetting
-} from '../types/admin.types'
-import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
+  AppSetting,
+  AppSettingCategory,
+  AppSettingId,
+  AppSettingValue,
+  AppSettingValueType,
+} from '@/convex/schema/system';
+import {
+  getSettingDescription,
+  validateSettingByCategory,
+} from '@/convex/lib/system/app/app_settings/utils';
 
 /**
- * App settings service - handles system-wide settings management
- * Admin-only functionality for managing application configuration
+ * New App settings service (new Convex pattern).
+ * No legacy signatures.
  */
 class AppSettingsService {
+  private inferValueType(value: AppSettingValue): AppSettingValueType {
+    if (value === null) return 'null';
+    if (Array.isArray(value)) return 'array';
+    if (typeof value === 'boolean') return 'boolean';
+    if (typeof value === 'number') return 'number';
+    if (typeof value === 'object') return 'object';
+    return 'string';
+  }
 
-  // ==========================================
-  // QUERY OPTION FACTORIES
-  // These methods return query options that can be used in both loaders and hooks
-  // ensuring consistent query keys for SSR cache hits
-  // ==========================================
+  // ---------------------------------------------------------------------------
+  // Query option factories (SSR + stable keys)
+  // ---------------------------------------------------------------------------
 
-  getAppSettingsQueryOptions(category?: SettingCategory) {
+  getAppSettingsQueryOptions(params?: {
+    category?: AppSettingCategory;
+    limit?: number;
+    cursor?: string | null;
+    search?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
     return convexQuery(api.lib.system.app.app_settings.queries.getAppSettings, {
-      category,
+      category: params?.category,
+      limit: params?.limit,
+      cursor: params?.cursor ?? undefined,
+      search: params?.search,
+      sortOrder: params?.sortOrder,
     });
   }
 
-  getAppSettingQueryOptions(key: string) {
-    return convexQuery(api.lib.system.app.app_settings.queries.getAppSetting, {
-      key,
-    });
+  getAppSettingQueryOptions(id: AppSettingId) {
+    return convexQuery(api.lib.system.app.app_settings.queries.getAppSetting, { id });
+  }
+
+  getAppSettingByKeyQueryOptions(key: string) {
+    return convexQuery(api.lib.system.app.app_settings.queries.getAppSettingByKey, { key });
   }
 
   getAISettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getAISettings, {});
   }
-
   getGeneralSettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getGeneralSettings, {});
   }
-
   getSecuritySettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getSecuritySettings, {});
   }
-
   getNotificationSettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getNotificationSettings, {});
   }
-
   getBillingSettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getBillingSettings, {});
   }
-
   getIntegrationSettingsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getIntegrationSettings, {});
   }
 
-  getPublicSettingsQueryOptions(category?: SettingCategory) {
-    return convexQuery(api.lib.system.app.app_settings.queries.getPublicSettings, {
-      category,
-    });
+  getPublicSettingsQueryOptions(category?: AppSettingCategory) {
+    return convexQuery(api.lib.system.app.app_settings.queries.getPublicSettings, { category });
   }
 
   getSettingsStatsQueryOptions() {
     return convexQuery(api.lib.system.app.app_settings.queries.getSettingsStats, {});
   }
 
-  // === Settings Queries ===
-  useAllSettings(category?: SettingCategory) {
-    return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getAppSettings, {
-        category,
-      }),
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    })
+  getSettingsHistoryQueryOptions(key?: string, limit?: number) {
+    return convexQuery(api.lib.system.app.app_settings.queries.getSettingsHistory, { key, limit });
   }
 
-  useAppSetting(key: string) {
+  // ---------------------------------------------------------------------------
+  // Hooks
+  // ---------------------------------------------------------------------------
+
+  useAppSettings(params?: {
+    category?: AppSettingCategory;
+    limit?: number;
+    cursor?: string | null;
+    search?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getAppSetting, {
-        key,
-      }),
+      ...this.getAppSettingsQueryOptions(params),
       staleTime: 5 * 60 * 1000,
-    })
+    });
+  }
+
+  useAllSettings(params?: {
+    category?: AppSettingCategory;
+    limit?: number;
+    cursor?: string | null;
+    search?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    return this.useAppSettings(params);
+  }
+
+  useAppSetting(id: AppSettingId) {
+    return useQuery({
+      ...this.getAppSettingQueryOptions(id),
+      enabled: !!id,
+      staleTime: 5 * 60 * 1000,
+    });
+  }
+
+  useAppSettingByKey(key: string) {
+    return useQuery({
+      ...this.getAppSettingByKeyQueryOptions(key),
+      enabled: !!key,
+      staleTime: 5 * 60 * 1000,
+    });
   }
 
   useAISettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getAISettings, {}),
-      staleTime: 10 * 60 * 1000, // 10 minutes
-    })
+      ...this.getAISettingsQueryOptions(),
+      staleTime: 10 * 60 * 1000,
+    });
   }
-
   useGeneralSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getGeneralSettings, {}),
-      staleTime: 15 * 60 * 1000, // 15 minutes
-    })
+      ...this.getGeneralSettingsQueryOptions(),
+      staleTime: 15 * 60 * 1000,
+    });
   }
-
   useSecuritySettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getSecuritySettings, {}),
+      ...this.getSecuritySettingsQueryOptions(),
       staleTime: 15 * 60 * 1000,
-    })
+    });
   }
-
   useNotificationSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getNotificationSettings, {}),
+      ...this.getNotificationSettingsQueryOptions(),
       staleTime: 10 * 60 * 1000,
-    })
+    });
   }
-
   useBillingSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getBillingSettings, {}),
+      ...this.getBillingSettingsQueryOptions(),
       staleTime: 15 * 60 * 1000,
-    })
+    });
   }
-
   useIntegrationSettings() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getIntegrationSettings, {}),
+      ...this.getIntegrationSettingsQueryOptions(),
       staleTime: 10 * 60 * 1000,
-    })
+    });
   }
 
-  usePublicSettings(category?: SettingCategory) {
+  usePublicSettings(category?: AppSettingCategory) {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getPublicSettings, {
-        category,
-      }),
-      staleTime: 30 * 60 * 1000, // 30 minutes
-    })
+      ...this.getPublicSettingsQueryOptions(category),
+      staleTime: 30 * 60 * 1000,
+    });
   }
 
-  useSearchSettings(searchTerm: string, categories?: SettingCategory[]) {
+  useSearchSettings(searchTerm: string, categories?: AppSettingCategory[], limit?: number) {
     return useQuery({
       ...convexQuery(api.lib.system.app.app_settings.queries.searchSettings, {
         searchTerm,
         categories,
+        limit,
       }),
       enabled: searchTerm.length > 2,
-      staleTime: 2 * 60 * 1000, // 2 minutes
-    })
+      staleTime: 2 * 60 * 1000,
+    });
   }
 
   useSettingsStats() {
     return useQuery({
-      ...convexQuery(api.lib.system.app.app_settings.queries.getSettingsStats, {}),
+      ...this.getSettingsStatsQueryOptions(),
       staleTime: 10 * 60 * 1000,
-    })
+    });
   }
 
-  // === Settings Mutations ===
+  useSettingsHistory(key?: string, limit?: number) {
+    return useQuery({
+      ...this.getSettingsHistoryQueryOptions(key, limit),
+      staleTime: 2 * 60 * 1000,
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Mutations hooks
+  // ---------------------------------------------------------------------------
+
   useCreateOrUpdateSetting() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.createOrUpdateAppSetting),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.createOrUpdateAppSetting
+      ),
+    });
+  }
+
+  useCreateSetting() {
+    return useMutation({
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.createAppSetting
+      ),
+    });
+  }
+
+  useUpdateSetting() {
+    return useMutation({
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.updateAppSetting
+      ),
+    });
   }
 
   useDeleteSetting() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.deleteAppSetting),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.deleteAppSetting
+      ),
+    });
   }
 
-  useUpdateAISettings() {
+  useDeleteSettingByKey() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateAISettings),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.deleteAppSettingByKey
+      ),
+    });
   }
 
-  useUpdateGeneralSettings() {
+  useBatchUpsertSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateGeneralSettings),
-    })
-  }
-
-  useUpdateSecuritySettings() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateSecuritySettings),
-    })
-  }
-
-  useUpdateNotificationSettings() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateNotificationSettings),
-    })
-  }
-
-  useUpdateBillingSettings() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateBillingSettings),
-    })
-  }
-
-  useUpdateIntegrationSettings() {
-    return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.updateIntegrationSettings),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.batchUpsertSettings
+      ),
+    });
   }
 
   useBatchUpdateSettings() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.batchUpdateSettings),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.batchUpdateSettings
+      ),
+    });
+  }
+
+  useUpdateCategorySettings(category: AppSettingCategory) {
+    const map = {
+      ai: api.lib.system.app.app_settings.mutations.updateAISettings,
+      general: api.lib.system.app.app_settings.mutations.updateGeneralSettings,
+      security: api.lib.system.app.app_settings.mutations.updateSecuritySettings,
+      notifications: api.lib.system.app.app_settings.mutations.updateNotificationSettings,
+      billing: api.lib.system.app.app_settings.mutations.updateBillingSettings,
+      integrations: api.lib.system.app.app_settings.mutations.updateIntegrationSettings,
+    } as const;
+
+    return useMutation({
+      mutationFn: useConvexMutation(map[category]),
+    });
+  }
+
+  useUpdateAISettings() {
+    return this.useUpdateCategorySettings('ai');
+  }
+
+  useUpdateGeneralSettings() {
+    return this.useUpdateCategorySettings('general');
+  }
+
+  useUpdateSecuritySettings() {
+    return this.useUpdateCategorySettings('security');
+  }
+
+  useUpdateNotificationSettings() {
+    return this.useUpdateCategorySettings('notifications');
+  }
+
+  useUpdateBillingSettings() {
+    return this.useUpdateCategorySettings('billing');
+  }
+
+  useUpdateIntegrationSettings() {
+    return this.useUpdateCategorySettings('integrations');
   }
 
   useResetCategoryToDefaults() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.resetCategoryToDefaults),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.resetCategoryToDefaults
+      ),
+    });
   }
 
   useTestAIConnection() {
     return useMutation({
-      mutationFn: useConvexMutation(api.lib.system.app.app_settings.mutations.testAIConnection),
-    })
+      mutationFn: useConvexMutation(
+        api.lib.system.app.app_settings.mutations.testAIConnection
+      ),
+    });
   }
 
-  // === Settings Operations ===
-  async createOrUpdateSetting(
-    mutation: ReturnType<typeof this.useCreateOrUpdateSetting>,
-    key: string,
-    value: any,
-    category: SettingCategory,
-    description?: string,
-    isPublic: boolean = false
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        key,
-        value,
-        category,
-        description,
-        isPublic,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  // ---------------------------------------------------------------------------
+  // Async helpers (optional DX)
+  // ---------------------------------------------------------------------------
+
+  async upsertSetting(
+    mutation: ReturnType<AppSettingsService['useCreateOrUpdateSetting']>,
+    input: {
+      name?: string;
+      key: string;
+      value: AppSettingValue;
+      valueType?: AppSettingValueType;
+      category: AppSettingCategory;
+      description?: string;
+      isPublic?: boolean;
     }
+  ) {
+    const valueType = input.valueType ?? this.inferValueType(input.value);
+    return mutation.mutateAsync({ ...input, valueType });
+  }
+
+  async deleteSettingById(
+    mutation: ReturnType<AppSettingsService['useDeleteSetting']>,
+    id: AppSettingId
+  ) {
+    return mutation.mutateAsync({ id });
+  }
+
+  async deleteSettingByKey(
+    mutation: ReturnType<AppSettingsService['useDeleteSettingByKey']>,
+    key: string
+  ) {
+    return mutation.mutateAsync({ key });
+  }
+
+  async batchUpsert(
+    mutation: ReturnType<AppSettingsService['useBatchUpsertSettings']>,
+    settings: Array<{
+      name?: string;
+      key: string;
+      value: AppSettingValue;
+      valueType?: AppSettingValueType;
+      category: AppSettingCategory;
+      description?: string;
+      isPublic?: boolean;
+    }>
+  ) {
+    const normalized = settings.map((setting) => ({
+      ...setting,
+      valueType: setting.valueType ?? this.inferValueType(setting.value),
+    }));
+    return mutation.mutateAsync({ settings: normalized });
+  }
+
+  async createOrUpdateSetting(
+    mutation: ReturnType<AppSettingsService['useCreateOrUpdateSetting']>,
+    key: string,
+    value: AppSettingValue,
+    category: AppSettingCategory,
+    description?: string,
+    isPublic = false,
+    name?: string
+  ) {
+    return mutation.mutateAsync({
+      name: name ?? key,
+      key,
+      value,
+      valueType: this.inferValueType(value),
+      category,
+      description,
+      isPublic,
+    });
   }
 
   async deleteSetting(
-    mutation: ReturnType<typeof this.useDeleteSetting>,
+    mutation: ReturnType<AppSettingsService['useDeleteSettingByKey']>,
     key: string
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        key,
-      })
-    } catch (error) {
-      throw new Error(`Failed to delete setting: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateAISettings(
-    mutation: ReturnType<typeof this.useUpdateAISettings>,
-    settings: Partial<AISettings>
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update AI settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateGeneralSettings(
-    mutation: ReturnType<typeof this.useUpdateGeneralSettings>,
-    settings: Partial<SystemSettings['general']>
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update general settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateSecuritySettings(
-    mutation: ReturnType<typeof this.useUpdateSecuritySettings>,
-    settings: Partial<SystemSettings['security']>
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update security settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateNotificationSettings(
-    mutation: ReturnType<typeof this.useUpdateNotificationSettings>,
-    settings: Partial<SystemSettings['notifications']>
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update notification settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateBillingSettings(
-    mutation: ReturnType<typeof this.useUpdateBillingSettings>,
-    settings: any
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update billing settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async updateIntegrationSettings(
-    mutation: ReturnType<typeof this.useUpdateIntegrationSettings>,
-    settings: any
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to update integration settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
+  ) {
+    return mutation.mutateAsync({ key });
   }
 
   async batchUpdateSettings(
-    mutation: ReturnType<typeof this.useBatchUpdateSettings>,
-    settings: Array<{ key: string; value: any; category: SettingCategory }>
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        settings,
-      })
-    } catch (error) {
-      throw new Error(`Failed to batch update settings: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
+    mutation: ReturnType<AppSettingsService['useBatchUpdateSettings']>,
+    settings: Array<{ key: string; value: AppSettingValue; category: AppSettingCategory }>
+  ) {
+    const payload = settings.map((setting) => ({
+      ...setting,
+      valueType: this.inferValueType(setting.value),
+      name: setting.key,
+    }));
+    return mutation.mutateAsync({ settings: payload });
   }
 
-  async resetCategoryToDefaults(
-    mutation: ReturnType<typeof this.useResetCategoryToDefaults>,
-    category: SettingCategory
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        category,
-      })
-    } catch (error) {
-      throw new Error(`Failed to reset category: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
+  validateSettingValue(
+    key: string,
+    value: AppSettingValue,
+    category: AppSettingCategory
+  ): { valid: boolean; errors: string[] } {
+    const errors = validateSettingByCategory(key, value, category);
+    return { valid: errors.length === 0, errors };
   }
 
-  async testAIConnection(
-    mutation: ReturnType<typeof this.useTestAIConnection>,
-    modelId?: string
-  ): Promise<void> {
-    try {
-      await mutation.mutateAsync({
-        modelId,
-      })
-    } catch (error) {
-      throw new Error(`Failed to test AI connection: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  // === Settings Utilities ===
-  validateSettingValue(key: string, value: any, category: SettingCategory): { valid: boolean, errors: string[] } {
-    const errors: string[] = []
-
-    // Basic validation rules
-    if (value === null || value === undefined) {
-      errors.push('Value cannot be null or undefined')
-      return { valid: false, errors }
-    }
-
-    // Category-specific validation
-    switch (category) {
-      case 'ai':
-        if (key === 'maxTokensDefault' && (typeof value !== 'number' || value < 1 || value > 100000)) {
-          errors.push('Max tokens must be between 1 and 100,000')
-        }
-        if (key === 'temperatureDefault' && (typeof value !== 'number' || value < 0 || value > 2)) {
-          errors.push('Temperature must be between 0 and 2')
-        }
-        break
-
-      case 'security':
-        if (key === 'sessionTimeout' && (typeof value !== 'number' || value < 300 || value > 86400)) {
-          errors.push('Session timeout must be between 5 minutes and 24 hours')
-        }
-        if (key === 'maxLoginAttempts' && (typeof value !== 'number' || value < 1 || value > 20)) {
-          errors.push('Max login attempts must be between 1 and 20')
-        }
-        break
-
-      case 'general':
-        if (key === 'siteName' && (typeof value !== 'string' || value.length < 1 || value.length > 100)) {
-          errors.push('Site name must be between 1 and 100 characters')
-        }
-        break
-    }
-
-    return { valid: errors.length === 0, errors }
-  }
-
-  getSettingDisplayInfo(key: string, category: SettingCategory): { name: string, description: string, type: string } {
-    const settingInfo = {
-      // AI Settings
-      defaultModel: { name: 'Default Model', description: 'Default AI model for text generation', type: 'string' },
-      defaultProvider: { name: 'Default Provider', description: 'Default AI provider', type: 'string' },
-      maxTokensDefault: { name: 'Max Tokens', description: 'Default maximum tokens for AI requests', type: 'number' },
-      temperatureDefault: { name: 'Temperature', description: 'Default temperature for AI requests', type: 'number' },
-      enableAILogging: { name: 'Enable Logging', description: 'Enable logging of AI usage', type: 'boolean' },
-      
-      // General Settings
-      siteName: { name: 'Site Name', description: 'Name of the application', type: 'string' },
-      siteDescription: { name: 'Site Description', description: 'Description of the application', type: 'string' },
-      maintenanceMode: { name: 'Maintenance Mode', description: 'Enable maintenance mode', type: 'boolean' },
-      registrationEnabled: { name: 'Registration Enabled', description: 'Allow new user registrations', type: 'boolean' },
-      
-      // Security Settings
-      sessionTimeout: { name: 'Session Timeout', description: 'Session timeout in seconds', type: 'number' },
-      maxLoginAttempts: { name: 'Max Login Attempts', description: 'Maximum failed login attempts', type: 'number' },
-      passwordMinLength: { name: 'Password Min Length', description: 'Minimum password length', type: 'number' },
-      requireTwoFactor: { name: 'Require 2FA', description: 'Require two-factor authentication', type: 'boolean' },
-    }
-
-    return settingInfo[key as keyof typeof settingInfo] || {
-      name: key,
-      description: `Setting for ${key}`,
-      type: 'string'
-    }
-  }
-
-  categorizeSettings(settings: AppSetting[]): Record<string, AppSetting[]> {
-    return settings.reduce((acc, setting) => {
-      if (!acc[setting.category]) {
-        acc[setting.category] = []
-      }
-      acc[setting.category].push(setting)
-      return acc
-    }, {} as Record<string, AppSetting[]>)
-  }
-
-  filterSettingsByCategory(settings: AppSetting[], category: SettingCategory): AppSetting[] {
-    return settings.filter(setting => setting.category === category)
-  }
-
-  searchSettings(settings: AppSetting[], searchTerm: string): AppSetting[] {
-    const lowerSearch = searchTerm.toLowerCase()
-    return settings.filter(setting =>
-      setting.key.toLowerCase().includes(lowerSearch) ||
-      setting.description?.toLowerCase().includes(lowerSearch) ||
-      setting.category.toLowerCase().includes(lowerSearch)
-    )
+  getSettingDisplayInfo(key: string) {
+    return {
+      key,
+      description: getSettingDescription(key),
+    };
   }
 
   exportSettings(settings: AppSetting[]): string {
-    const exportData = {
-      version: '1.0',
-      exportedAt: new Date().toISOString(),
-      settings: settings.map(setting => ({
-        key: setting.key,
-        value: setting.value,
-        category: setting.category,
-        description: setting.description,
-        isPublic: setting.isPublic,
-      }))
-    }
-
-    return JSON.stringify(exportData, null, 2)
+    return JSON.stringify(settings, null, 2);
   }
 
-  validateImportedSettings(data: any): { valid: boolean, errors: string[] } {
-    const errors: string[] = []
-
-    if (!data || typeof data !== 'object') {
-      errors.push('Invalid data format')
-      return { valid: false, errors }
+  validateImportedSettings(
+    data: unknown
+  ): { valid: boolean; errors: string[]; settings: AppSetting[] } {
+    if (!Array.isArray(data)) {
+      return { valid: false, errors: ['Expected an array of settings'], settings: [] };
     }
 
-    if (!data.version) {
-      errors.push('Missing version information')
-    }
+    const errors: string[] = [];
+    const settings: AppSetting[] = [];
 
-    if (!Array.isArray(data.settings)) {
-      errors.push('Settings must be an array')
-      return { valid: false, errors }
-    }
-
-    // Validate each setting
-    for (const setting of data.settings) {
-      if (!setting.key || typeof setting.key !== 'string') {
-        errors.push(`Invalid setting key: ${setting.key}`)
+    data.forEach((item, index) => {
+      if (
+        typeof item === 'object' &&
+        item !== null &&
+        'key' in item &&
+        'value' in item &&
+        'category' in item
+      ) {
+        const casted = item as AppSetting;
+        const validation = this.validateSettingValue(
+          casted.key,
+          casted.value as AppSettingValue,
+          casted.category as AppSettingCategory
+        );
+        if (!validation.valid) {
+          errors.push(`Item ${index}: ${validation.errors.join(', ')}`);
+        } else {
+          settings.push(casted);
+        }
+      } else {
+        errors.push(`Item ${index} is not a valid setting object`);
       }
-      if (!setting.category || typeof setting.category !== 'string') {
-        errors.push(`Invalid category for setting: ${setting.key}`)
-      }
-    }
+    });
 
-    return { valid: errors.length === 0, errors }
+    return { valid: errors.length === 0, errors, settings };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Local utilities
+  // ---------------------------------------------------------------------------
+
+  categorizeSettings(settings: AppSetting[]): Record<string, AppSetting[]> {
+    return settings.reduce((acc, s) => {
+      (acc[s.category] ||= []).push(s);
+      return acc;
+    }, {} as Record<string, AppSetting[]>);
+  }
+
+  filterSettingsByCategory(settings: AppSetting[], category: AppSettingCategory) {
+    return settings.filter((s) => s.category === category);
+  }
+
+  searchLocal(settings: AppSetting[], searchTerm: string) {
+    const term = searchTerm.toLowerCase();
+    return settings.filter(
+      (s) =>
+        s.key.toLowerCase().includes(term) ||
+        s.category.toLowerCase().includes(term) ||
+        (s.description?.toLowerCase().includes(term) ?? false)
+    );
   }
 }
 
-export const appSettingsService = new AppSettingsService()
+export const appSettingsService = new AppSettingsService();

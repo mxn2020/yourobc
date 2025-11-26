@@ -79,7 +79,7 @@ export const InvoicesPageHeader: FC<InvoicesPageHeaderProps> = ({
 
         {/* Create Button */}
         {canCreate && (
-          <Link to="/yourobc/invoices/new">
+          <Link to="/{-$locale}/yourobc/invoices/new">
             <Button variant="primary">
               + New Invoice
             </Button>

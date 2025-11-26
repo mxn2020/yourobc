@@ -1,7 +1,7 @@
 // features/projects/components/ProjectStats.tsx
 import { FC } from 'react'
 import { Card, Badge, Loading } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 import { ProjectStats as ProjectStatsType } from '@/convex/lib/projects'
 
 interface ProjectStatsProps {

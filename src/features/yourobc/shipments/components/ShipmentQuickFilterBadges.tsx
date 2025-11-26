@@ -94,7 +94,7 @@ export const ShipmentQuickFilterBadges: FC<ShipmentQuickFilterBadgesProps> = ({
 
       {/* Overdue Badge with Link */}
       {overdueCount && overdueCount > 0 && (
-        <Link to="/yourobc/shipments/overdue">
+        <Link to="/{-$locale}/yourobc/shipments/overdue">
           <Badge variant="danger" className="cursor-pointer">
             🚨 Overdue ({overdueCount})
           </Badge>

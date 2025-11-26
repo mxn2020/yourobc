@@ -9,6 +9,7 @@ import { Card, Alert, AlertDescription, Button, Loading } from '@/components/ui'
 import { Link } from '@tanstack/react-router'
 import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 import type { Locale } from '@/features/system/i18n'
 
 export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/overdue')({
@@ -30,6 +31,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/o
 
     // ✅ Use service-provided query options
     const overdueQueryOptions = shipmentService.getOverdueShipmentsQueryOptions({ limit: 100 })
+    const [, , overdueArgs] = overdueQueryOptions.queryKey as [string, unknown, any]
 
     // SERVER: SSR prefetching
     if (typeof window === 'undefined') {
@@ -40,8 +42,8 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/o
 
         if (convexClient) {
           const overdueShipments = await convexClient.query(
-            api.lib.yourobc.shipments.queries.getOverdueShipments,
-            { limit: 100 }
+            api.lib.yourobc.shipments.queries.getShipments,
+            overdueArgs
           )
 
           context.queryClient.setQueryData(overdueQueryOptions.queryKey, overdueShipments)
@@ -94,6 +96,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/o
 
 function OverdueShipmentsIndexPage() {
   const { shipments, isLoading, hasOverdue } = useOverdueShipments(100)
+  const locale = getCurrentLocale()
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -106,7 +109,7 @@ function OverdueShipmentsIndexPage() {
               Shipments requiring immediate attention to meet customer commitments
             </p>
           </div>
-          <Link to="/yourobc/shipments">
+          <Link to="/{-$locale}/yourobc/shipments" params={{ locale }}>
             <Button variant="outline">← Back to All Shipments</Button>
           </Link>
         </div>
@@ -146,7 +149,7 @@ function OverdueShipmentsIndexPage() {
                 <p className="text-gray-400">
                   Great work! All shipments are on track or completed.
                 </p>
-                <Link to="/yourobc/shipments" className="mt-4 inline-block">
+                <Link to="/{-$locale}/yourobc/shipments" params={{ locale }} className="mt-4 inline-block">
                   <Button variant="primary">View All Shipments</Button>
                 </Link>
               </div>
@@ -157,4 +160,3 @@ function OverdueShipmentsIndexPage() {
     </div>
   )
 }
-

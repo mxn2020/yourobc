@@ -1,12 +1,16 @@
-// features/projects/pages/ProjectDetailsPage.tsx
+// src/features/projects/pages/ProjectDetailsPage.tsx
 
 import { FC, useState, useCallback, useEffect, useRef } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useProjectSuspense, useProjectMembersSuspense } from '../hooks/useProjects'
-import { useUpdateProject, useDeleteProject } from '../hooks/useProjects'
+import { useNavigate } from '@tanstack/react-router'
+import { 
+  useProjectSuspense, 
+  useProjectMembersSuspense,
+  useUpdateProject,
+  useDeleteProject
+} from '../hooks/useProjects'
 import { useProjectAudit } from '../hooks/useProjectAudit'
 import { useProjectPermissions } from '../hooks/useProjectPermissions'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { parseConvexError, ParsedError } from '@/utils/errorHandling'
 import type { ProjectId, UpdateProjectData } from '../types'
 import * as projectHelpers from '../utils/projectHelpers'
@@ -27,11 +31,11 @@ import {
 } from '@/components/ui'
 import { DeleteConfirmationModal } from '@/components/ui'
 import { PermissionDeniedModal } from '@/components/Permission/PermissionDeniedModal'
-import { PermissionButton } from '@/components/Permission//PermissionButton'
-import { PermissionGate } from '@/components/Permission//PermissionGate'
+import { PermissionButton } from '@/components/Permission/PermissionButton'
+import { PermissionGate } from '@/components/Permission/PermissionGate'
 import { ProjectRoleBadge } from '../components/ProjectRoleBadge'
-import { PermissionWarningBanner } from '@/components/Permission//PermissionWarningBanner'
-import { RequestAccessModal } from '@/components/Permission//RequestAccessModal'
+import { PermissionWarningBanner } from '@/components/Permission/PermissionWarningBanner'
+import { RequestAccessModal } from '@/components/Permission/RequestAccessModal'
 import { TaskFormModal } from '../components/tasks/TaskFormModal'
 import { TaskCard } from '../components/tasks/TaskCard'
 import { TaskDetailModal } from '../components/tasks/TaskDetailModal'
@@ -55,9 +59,9 @@ import { useProjectMilestones } from '../hooks/useMilestones'
 import { tasksService } from '../services/TasksService'
 import { milestonesService } from '../services/MilestonesService'
 import { teamService } from '../services/TeamService'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { projectsService } from '../services/ProjectsService'
+import { getCurrentLocale } from "@/features/system/i18n/utils/path"
 import type { Id } from '@/convex/_generated/dataModel'
-import { useAuth } from '@/features/boilerplate/auth/hooks/useAuth'
 
 interface ProjectDetailsPageProps {
   projectId: ProjectId
@@ -70,12 +74,11 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
   useEffect(() => {
     if (import.meta.env.DEV) {
       mountTimeRef.current = performance.now();
-      console.log('🎨 ProjectDetailsPage: Component mounted')
 
       const logInteractive = () => {
         if (mountTimeRef.current) {
           const duration = performance.now() - mountTimeRef.current;
-          console.log(`🎨 ProjectDetailsPage: Became interactive in ${duration.toFixed(2)}ms`);
+          console.log(`ProjectDetailsPage: Became interactive in ${duration.toFixed(2)}ms`);
         }
       };
 
@@ -85,7 +88,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
         clearTimeout(timeoutId);
         if (mountTimeRef.current) {
           const duration = performance.now() - mountTimeRef.current;
-          console.log(`🎨 ProjectDetailsPage: Unmounted after ${duration.toFixed(2)}ms`);
+          console.log(`ProjectDetailsPage: Unmounted after ${duration.toFixed(2)}ms`);
         }
       };
     }
@@ -116,42 +119,33 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
   const [memberModalOpen, setMemberModalOpen] = useState(false)
 
   const navigate = useNavigate()
-  const locale = getCurrentLocale();
+  const locale = getCurrentLocale()
   const toast = useToast()
 
   // ✅ Use Suspense hooks - data is guaranteed to be available from SSR cache or fetch
   const { data: project } = useProjectSuspense(projectId)
   const { data: members } = useProjectMembersSuspense(projectId)
 
-  // Get current user
-  const { user } = useAuth()
-  // ✅ Use service hooks instead of direct Convex queries
+  // ✅ Use service hooks
   const { data: currentUserProfile } = teamService.useCurrentUserProfile()
-
-  // Fetch project members (new system)
-  const { data: members } = teamService.useProjectMembers(projectId as Id<'projects'>)
-
-  // Fetch all user profiles for member assignment
   const { data: allUsers } = teamService.useAllUserProfiles()
 
-  // Fetch tasks, milestones, and members for the project
+  // Fetch tasks, milestones
   const { data: tasks = [] } = useProjectTasks(projectId)
   const { data: taskStats } = tasksService.useTaskStats(projectId)
   const createTaskMutation = tasksService.useCreateTask()
   const updateTaskMutation = tasksService.useUpdateTask()
   const deleteTaskMutation = tasksService.useDeleteTask()
-  // ✅ Use service hooks instead of direct mutation calls
   const updateTaskStatusMutation = tasksService.useUpdateTaskStatus()
   const updateTaskOrderMutation = tasksService.useUpdateTaskOrder()
 
   // Fetch milestones
   const { data: milestones = [] } = useProjectMilestones(projectId)
-
   const createMilestoneMutation = milestonesService.useCreateMilestone()
   const updateMilestoneMutation = milestonesService.useUpdateMilestone()
   const deleteMilestoneMutation = milestonesService.useDeleteMilestone()
 
-  // ✅ Use service hooks instead of direct mutation calls
+  // Team mutations
   const addMemberMutation = teamService.useAddMember()
   const removeMemberMutation = teamService.useRemoveMember()
   const updateMemberRoleMutation = teamService.useUpdateMemberRole()
@@ -161,9 +155,12 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
   const deleteProjectMutation = useDeleteProject()
   const { logProjectUpdated, logProjectDeleted } = useProjectAudit()
 
+  // ✅ Use service hook
+  const requestAccessMutation = projectsService.useRequestAccess()
+
   const updateProject = useCallback(
     async (projectId: ProjectId, updates: UpdateProjectData) => {
-      // ✅ Use utility helper directly instead of through service
+      // ✅ Use utility helper directly
       const errors = projectHelpers.validateProjectData(updates);
       if (errors.length > 0) {
         throw new Error(`Validation failed: ${errors.join(", ")}`);
@@ -179,8 +176,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
       });
 
       // Log audit
-      logProjectUpdated(projectId, project.title, project, updates);
-
+      logProjectUpdated(project.publicId, project.title, project, updates);
       return result;
     },
     [updateProjectMutation, logProjectUpdated, project]
@@ -196,9 +192,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
         const result = await deleteProjectMutation.mutateAsync({ projectId, hardDelete });
 
         // Log deletion
-        logProjectDeleted(projectId, project.title, project, hardDelete).catch(
-          console.warn
-        );
+        logProjectDeleted(project.publicId, project.title, project, hardDelete);
 
         return result;
       } catch (error) {
@@ -211,16 +205,13 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
   const isUpdating = updateProjectMutation.isPending
   const isDeleting = deleteProjectMutation.isPending
 
-  // ✅ Use utility helpers directly instead of through service
+  // ✅ Use utility helpers directly
   const isOverdue = projectHelpers.isProjectOverdue(project)
   const daysUntilDue = project.dueDate ? projectHelpers.getDaysUntilDue(project.dueDate) : null
   const health = projectHelpers.calculateProjectHealth(project)
 
   // Get permissions
   const permissions = useProjectPermissions(project)
-
-  // ✅ Use service hook instead of direct mutation call
-  const requestAccessMutation = projectsService.useRequestAccess()
 
   const handleEdit = async (data: UpdateProjectData) => {
     const processedData = {
@@ -279,12 +270,12 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
 
   const handleRequestAccess = async (message?: string) => {
     try {
-      await requestAccessMutation({ projectId, message })
+      await requestAccessMutation.mutateAsync({ projectId, message })
       toast.success('Access request sent successfully!')
       setRequestAccessOpen(false)
     } catch (error: any) {
       console.error('Request access error:', error)
-      throw error // Let the modal handle the error
+      throw error
     }
   }
 
@@ -717,7 +708,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                     <ProjectAnalytics
                       tasks={tasks}
                       milestones={milestones}
-                      members={members.members || []}
+                      members={members || []}
                       project={project}
                     />
                   ) : (
@@ -738,7 +729,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">
-                          Team Members ({members?.members?.length || 0})
+                          Team Members ({members?.length || 0})
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
                           Manage project team and permissions
@@ -763,13 +754,12 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                       }
                     >
                       {members === undefined ? (
-                        // Loading state
                         <div className="space-y-3">
                           {[1, 2, 3].map((i) => (
                             <MemberCardSkeleton key={i} />
                           ))}
                         </div>
-                      ) : !members?.members || members.members.length === 0 ? (
+                      ) : !members || members.length === 0 ? (
                         <div className="text-center py-12 bg-gray-50 rounded-lg">
                           <div className="text-gray-400 mb-3">
                             <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -789,7 +779,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {members.members.map((member: any) => (
+                          {members.map((member: any) => (
                             <MemberCard
                               key={member._id}
                               member={member}
@@ -797,7 +787,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                               canManageMembers={permissions.canManageTeam}
                               onChangeRole={async (memberId, newRole) => {
                                 try {
-                                  await updateMemberRoleMutation({
+                                  await updateMemberRoleMutation.mutateAsync({
                                     memberId,
                                     role: newRole,
                                   })
@@ -809,14 +799,13 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                               onRemove={async (memberId) => {
                                 if (confirm('Are you sure you want to remove this member from the project?')) {
                                   try {
-                                    await removeMemberMutation({ memberId })
+                                    await removeMemberMutation.mutateAsync({ memberId })
                                     toast.success('Member removed successfully')
                                   } catch (error: any) {
                                     toast.error(error.message || 'Failed to remove member')
                                   }
                                 }
-                              }
-                              }
+                              }}
                             />
                           ))}
                         </div>
@@ -906,9 +895,8 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                     </div>
                   )}
 
-                  {/* Tasks Display - List or Board View */}
+                  {/* Tasks Display */}
                   {tasks === undefined ? (
-                    // Loading state
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
                         <TaskCardSkeleton key={i} />
@@ -983,7 +971,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                       }}
                       onTaskMove={async (taskId, newStatus) => {
                         try {
-                          await updateTaskStatusMutation({ taskId, status: newStatus })
+                          await updateTaskStatusMutation.mutateAsync({ taskId, status: newStatus })
                           toast.success(`Task moved to ${newStatus.replace('_', ' ')}`)
                         } catch (error: any) {
                           toast.error(error.message || 'Failed to move task')
@@ -991,7 +979,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                       }}
                       onTaskReorder={async (taskId, newOrder) => {
                         try {
-                          await updateTaskOrderMutation({ taskId, order: newOrder })
+                          await updateTaskOrderMutation.mutateAsync({ taskId, order: newOrder })
                         } catch (error: any) {
                           toast.error(error.message || 'Failed to reorder task')
                         }
@@ -1047,9 +1035,8 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
                     </div>
                   </div>
 
-                  {/* Milestones Display - Timeline or List View */}
+                  {/* Milestones Display */}
                   {milestones === undefined ? (
-                    // Loading state
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
                         <MilestoneCardSkeleton key={i} />
@@ -1219,11 +1206,11 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
           mode={taskModalMode}
           initialData={selectedTask}
           projectId={projectId as Id<'projects'>}
-          projectMembers={members?.map(c => ({
-            userId: c.userId,
-            name: c.name,
-            email: c.email,
-            role: c.role,
+          projectMembers={members?.map((member) => ({
+            userId: member.userId,
+            name: member.name,
+            email: member.email,
+            role: member.role,
           }))}
         />
 
@@ -1236,7 +1223,6 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
           }}
           onSubmit={async (data) => {
             if (milestoneModalMode === 'create') {
-              // In create mode, title, startDate, and dueDate are required by the form
               await createMilestoneMutation.mutateAsync({
                 data: {
                   ...data,
@@ -1256,11 +1242,11 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
           mode={milestoneModalMode}
           initialData={selectedMilestone}
           projectId={projectId as Id<'projects'>}
-          projectMembers={members?.map(c => ({
-            userId: c.userId,
-            name: c.name,
-            email: c.email,
-            role: c.role,
+          projectMembers={members?.map((m) => ({
+            userId: m.userId,
+            name: m.name,
+            email: m.email,
+            role: m.role,
           }))}
         />
 
@@ -1270,7 +1256,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
           onClose={() => setMemberModalOpen(false)}
           onAddMember={async (data) => {
             try {
-              await addMemberMutation({ data })
+              await addMemberMutation.mutateAsync({ data })
               toast.success('Member added successfully')
               setMemberModalOpen(false)
             } catch (error: any) {
@@ -1280,7 +1266,7 @@ export const ProjectDetailsPage: FC<ProjectDetailsPageProps> = ({ projectId }) =
           }}
           mode="add"
           projectId={projectId as Id<'projects'>}
-          existingMemberIds={members?.members?.map((m: any) => m.userId) || []}
+          existingMemberIds={members?.map((m: any) => m.userId) || []}
           availableUsers={allUsers?.profiles || []}
         />
 

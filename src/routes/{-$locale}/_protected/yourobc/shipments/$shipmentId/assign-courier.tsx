@@ -165,7 +165,7 @@ function AssignCourierPage() {
           <Card>
             <div className="text-center py-12 p-6">
               <div className="text-red-500 text-lg mb-4">Shipment Not Found</div>
-              <Link to="/yourobc/shipments" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/shipments" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Shipments
               </Link>
             </div>

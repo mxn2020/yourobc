@@ -5,7 +5,7 @@
  * into the projects feature to track SSR cache hit rates and query performance
  */
 
-import { PerformanceMonitor } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceMonitor } from '@/features/system/performance-monitoring'
 import type { QueryClient } from '@tanstack/react-query'
 
 /**

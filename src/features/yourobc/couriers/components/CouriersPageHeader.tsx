@@ -83,7 +83,7 @@ export const CouriersPageHeader: FC<CouriersPageHeaderProps> = ({
 
         {/* Create Button */}
         {canCreate && (
-          <Link to="/yourobc/couriers/new">
+          <Link to="/{-$locale}/yourobc/couriers/new">
             <Button variant="primary">
               + New Courier
             </Button>

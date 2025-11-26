@@ -1,6 +1,6 @@
 // src/features/marketing/email-signatures/hooks/useSignatures.ts
 
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { useSuspenseQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/generated/api'
 import { emailSignaturesService } from '../service'
@@ -12,10 +12,12 @@ export function useSignatures(options?: { limit?: number }) {
 
 export function useCreateSignature() {
   const queryClient = useQueryClient()
+  const signaturesQueryKey = emailSignaturesService.getSignaturesQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.email_signatures.mutations.createEmailSignature, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.email_signatures.mutations.createEmailSignature),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.email_signatures.queries.getEmailSignatures] })
+      queryClient.invalidateQueries({ queryKey: signaturesQueryKey })
       toast.success('Email signature created successfully')
     },
     onError: (error) => {
@@ -26,10 +28,12 @@ export function useCreateSignature() {
 
 export function useUpdateSignature() {
   const queryClient = useQueryClient()
+  const signaturesQueryKey = emailSignaturesService.getSignaturesQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.email_signatures.mutations.updateEmailSignature, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.email_signatures.mutations.updateEmailSignature),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.email_signatures.queries.getEmailSignatures] })
+      queryClient.invalidateQueries({ queryKey: signaturesQueryKey })
       toast.success('Email signature updated successfully')
     },
     onError: (error) => {
@@ -40,10 +44,12 @@ export function useUpdateSignature() {
 
 export function useDeleteSignature() {
   const queryClient = useQueryClient()
+  const signaturesQueryKey = emailSignaturesService.getSignaturesQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.email_signatures.mutations.deleteEmailSignature, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.email_signatures.mutations.deleteEmailSignature),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.email_signatures.queries.getEmailSignatures] })
+      queryClient.invalidateQueries({ queryKey: signaturesQueryKey })
       toast.success('Email signature deleted successfully')
     },
     onError: (error) => {

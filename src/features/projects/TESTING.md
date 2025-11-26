@@ -356,7 +356,7 @@ export const loader = async (context) => {
 #### Use Monitored Queries
 
 ```typescript
-import { useMonitoredQuery } from '@/features/boilerplate/performance-monitoring/integrations/useMonitoredQuery'
+import { useMonitoredQuery } from '@/features/system/performance-monitoring/integrations/useMonitoredQuery'
 
 function useProjects() {
   return useMonitoredQuery({
@@ -371,7 +371,7 @@ function useProjects() {
 Add the performance dashboard to your app:
 
 ```typescript
-import { PerformanceDashboard } from '@/features/boilerplate/performance-monitoring'
+import { PerformanceDashboard } from '@/features/system/performance-monitoring'
 
 function PerformancePage() {
   return <PerformanceDashboard timeRange={24 * 60 * 60 * 1000} />

@@ -1,10 +1,14 @@
 // filepath: src/features/system/admin/types/admin.types.ts
-import type { Id } from '@/convex/_generated/dataModel'
+
 import { EntityType } from '@/config'
 import { UserProfile, UserRole, } from '@/features/system/auth/types/auth.types'
 import { UserProfileId, AuthUserId } from '@/types'
 import { LucideIcon } from 'lucide-react'
-import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
+import {
+  AppSetting as ConvexAppSetting,
+  AppSettingCategory,
+  AppSettingValue,
+} from '@/convex/schema/system'
 
 // === Admin Component Types ===
 export interface AdminLayoutProps {
@@ -189,7 +193,7 @@ export interface AuditLogEntry {
   entityTitle?: string
   description: string
   createdAt: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface AuditLogFilters {
@@ -264,7 +268,7 @@ export interface CreateUserResponse {
 
 export interface AdminOperationResponse {
   success: boolean
-  data?: any
+  data?: unknown
   error?: {
     message: string
     code?: string
@@ -294,14 +298,14 @@ export interface DashboardMetric {
 
 // === App Settings Types ===
 export interface AppSetting {
-  key: string
-  value: any
-  category: SettingCategory
-  description?: string
-  isPublic: boolean
-  createdAt: number
-  updatedAt: number
-  updatedBy: string
+  key: ConvexAppSetting['key']
+  value: AppSettingValue
+  category: AppSettingCategory
+  description?: ConvexAppSetting['description']
+  isPublic: ConvexAppSetting['isPublic']
+  createdAt: ConvexAppSetting['createdAt']
+  updatedAt: ConvexAppSetting['updatedAt']
+  updatedBy: ConvexAppSetting['updatedBy']
 }
 
 export interface AISettings {
@@ -333,13 +337,30 @@ export interface SystemSettings {
     securityNotifications: boolean
   }
   ai: AISettings
+  billing: BillingSettings
+  integrations: IntegrationSettings
+}
+
+export interface BillingSettings {
+  billingEnabled?: boolean
+  defaultCurrency?: string
+  stripeEnabled?: boolean
+  invoicePrefix?: string
+  taxRate?: number
+}
+
+export interface IntegrationSettings {
+  slackEnabled?: boolean
+  discordEnabled?: boolean
+  githubEnabled?: boolean
+  googleDriveEnabled?: boolean
 }
 
 // === Error Handling ===
 export interface AdminError {
   code: string
   message: string
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 // === Session Management Types ===
@@ -405,26 +426,26 @@ export const adminQueryKeys = {
     impersonation: {
       active: () => ['admin', 'impersonation', 'active'] as const,
       stats: () => ['admin', 'impersonation', 'stats'] as const,
-      history: (filters?: any) => ['admin', 'impersonation', 'history', filters] as const,
+      history: (filters?: Record<string, unknown>) => ['admin', 'impersonation', 'history', filters] as const,
     },
   },
 } as const
 
 // === Utility Types ===
-export type ServiceResponse<T = any> = {
+export type ServiceResponse<T = unknown> = {
   success: boolean
   data?: T
   error?: AdminError
 }
 
-export type MutationOptions<T = any> = {
+export type MutationOptions<T = unknown> = {
   onSuccess?: (data: T) => void
   onError?: (error: Error) => void
   onSettled?: () => void
 }
 
 // === Better Auth API Response Types ===
-export interface BetterAuthResponse<T = any> {
+export interface BetterAuthResponse<T = unknown> {
   data?: T
   error?: {
     message: string

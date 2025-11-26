@@ -91,7 +91,7 @@ export const ExecutiveReportPage: FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to="/yourobc/statistics/reports">
+          <Link to="/{-$locale}/yourobc/statistics/reports">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Reports

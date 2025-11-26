@@ -1,4 +1,4 @@
-// convex/lib/system/appSettings/permissions.ts
+// convex/lib/system/app_settings/permissions.ts
 
 import type { QueryCtx, MutationCtx } from '@/generated/server';
 import type { Doc } from '@/generated/dataModel';

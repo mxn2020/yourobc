@@ -4,12 +4,12 @@ import { FC, useCallback } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useCreateProject } from '../hooks/useProjects'
 import { useProjectAudit } from '../hooks/useProjectAudit'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
 import { ProjectForm } from '../components/ProjectForm'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui'
 import type { CreateProjectData, UpdateProjectData } from '../types'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 import * as projectHelpers from '../utils/projectHelpers';
 
 export const CreateProjectPage: FC = () => {

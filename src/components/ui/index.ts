@@ -29,7 +29,7 @@ export { Breadcrumb, useProjectBreadcrumbs, type BreadcrumbItem, type Breadcrumb
 
 // Interactive components
 export { Modal, ModalHeader, ModalBody, ModalFooter } from './Modal'
-export { Tabs, TabsList, TabsTrigger, TabsContent, SimpleTabs } from './Tabs'
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
 export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel, SelectSeparator, SimpleSelect } from './Select'
 export { Progress } from './Progress'
 export { Slider } from './Slider'

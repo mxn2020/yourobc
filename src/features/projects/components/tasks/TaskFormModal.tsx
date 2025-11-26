@@ -17,7 +17,7 @@ import { SimpleSelect } from '@/components/ui/Select'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import type { Id } from '@/convex/_generated/dataModel'
 
 export interface TaskFormData {

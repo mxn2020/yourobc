@@ -210,7 +210,7 @@ export const CommissionsManagementPage: FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/couriers">
+            <Link to="/{-$locale}/yourobc/couriers">
               <Button variant="secondary">👥 View Couriers</Button>
             </Link>
             <Button variant="primary" onClick={() => navigate({ to: '/yourobc/couriers/commissions/new' })}>

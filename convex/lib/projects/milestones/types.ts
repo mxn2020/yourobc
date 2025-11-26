@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/milestones/types.ts
+// convex/lib/system/milestones/types.ts
 
 import type { Doc, Id } from '@/generated/dataModel';
 

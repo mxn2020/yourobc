@@ -64,7 +64,7 @@ export const SLAWarningBanner: FC<SLAWarningBannerProps> = ({
             <AlertTitle className="mb-0">{getTitle()}</AlertTitle>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/yourobc/shipments" search={{ filter: 'sla-warning' }}>
+            <Link to="/{-$locale}/yourobc/shipments" search={{ filter: 'sla-warning' }}>
               <Button size="sm" variant="outline">
                 View All
               </Button>
@@ -207,7 +207,7 @@ export const SLAWarningWidget: FC<{ warnings: SLAWarning[] }> = ({ warnings }) =
   const urgent = warnings.filter((w) => w.remainingMinutes >= 5 && w.remainingMinutes < 15).length
 
   return (
-    <Link to="/yourobc/shipments" search={{ filter: 'sla-warning' }}>
+    <Link to="/{-$locale}/yourobc/shipments" search={{ filter: 'sla-warning' }}>
       <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 hover:bg-yellow-100 transition-colors cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

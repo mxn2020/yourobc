@@ -3,8 +3,8 @@
 import { FC } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Button, Badge } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
-import { getCurrentLocale } from '@/features/boilerplate/i18n/utils/path'
+import { useTranslation } from '@/features/system/i18n'
+import { getCurrentLocale } from '@/features/system/i18n/utils/path'
 
 interface ProjectStats {
   totalProjects: number

@@ -27,7 +27,12 @@ import { Route as ApiAuthTestJwtRouteImport } from './routes/api/auth/test-jwt'
 import { Route as ApiAuthTestConvexRouteImport } from './routes/api/auth/test-convex'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as Char123LocaleChar125ProtectedYourobcIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/index'
+import { Route as Char123LocaleChar125ProtectedProjectsIndexRouteImport } from './routes/{-$locale}/_protected/projects/index'
 import { Route as Char123LocaleChar125ProtectedYourobcSupportingRouteImport } from './routes/{-$locale}/_protected/yourobc/supporting'
+import { Route as Char123LocaleChar125ProtectedProjectsTimelineRouteImport } from './routes/{-$locale}/_protected/projects/timeline'
+import { Route as Char123LocaleChar125ProtectedProjectsTeamRouteImport } from './routes/{-$locale}/_protected/projects/team'
+import { Route as Char123LocaleChar125ProtectedProjectsTasksRouteImport } from './routes/{-$locale}/_protected/projects/tasks'
+import { Route as Char123LocaleChar125ProtectedProjectsNewRouteImport } from './routes/{-$locale}/_protected/projects/new'
 import { Route as Char123LocaleChar125ProtectedSystemSettingsRouteImport } from './routes/{-$locale}/_protected/_system/settings'
 import { Route as Char123LocaleChar125ProtectedSystemDashboardRouteImport } from './routes/{-$locale}/_protected/_system/dashboard'
 import { Route as Char123LocaleChar125ProtectedYourobcTasksIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/tasks/index'
@@ -40,6 +45,7 @@ import { Route as Char123LocaleChar125ProtectedYourobcInvoicesIndexRouteImport }
 import { Route as Char123LocaleChar125ProtectedYourobcEmployeesIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/index'
 import { Route as Char123LocaleChar125ProtectedYourobcCustomersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/index'
 import { Route as Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/index'
+import { Route as Char123LocaleChar125ProtectedProjectsProjectIdIndexRouteImport } from './routes/{-$locale}/_protected/projects/$projectId/index'
 import { Route as Char123LocaleChar125ProtectedSystemNotificationsIndexRouteImport } from './routes/{-$locale}/_protected/_system/notifications/index'
 import { Route as Char123LocaleChar125ProtectedSystemEmailIndexRouteImport } from './routes/{-$locale}/_protected/_system/email/index'
 import { Route as Char123LocaleChar125ProtectedAdminAdminIndexRouteImport } from './routes/{-$locale}/_protected/_admin/admin/index'
@@ -58,6 +64,7 @@ import { Route as Char123LocaleChar125ProtectedYourobcInvoicesNewRouteImport } f
 import { Route as Char123LocaleChar125ProtectedYourobcEmployeesNewRouteImport } from './routes/{-$locale}/_protected/yourobc/employees/new'
 import { Route as Char123LocaleChar125ProtectedYourobcCustomersNewRouteImport } from './routes/{-$locale}/_protected/yourobc/customers/new'
 import { Route as Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport } from './routes/{-$locale}/_protected/yourobc/couriers/new'
+import { Route as Char123LocaleChar125ProtectedProjectsProjectIdEditRouteImport } from './routes/{-$locale}/_protected/projects/$projectId/edit'
 import { Route as Char123LocaleChar125ProtectedSystemSettingsNotificationsRouteImport } from './routes/{-$locale}/_protected/_system/settings/notifications'
 import { Route as Char123LocaleChar125ProtectedSystemEmailTemplatesRouteImport } from './routes/{-$locale}/_protected/_system/email/templates'
 import { Route as Char123LocaleChar125ProtectedSystemEmailLogsRouteImport } from './routes/{-$locale}/_protected/_system/email/logs'
@@ -194,10 +201,40 @@ const Char123LocaleChar125ProtectedYourobcIndexRoute =
     path: '/yourobc/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
+const Char123LocaleChar125ProtectedProjectsIndexRoute =
+  Char123LocaleChar125ProtectedProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
 const Char123LocaleChar125ProtectedYourobcSupportingRoute =
   Char123LocaleChar125ProtectedYourobcSupportingRouteImport.update({
     id: '/yourobc/supporting',
     path: '/yourobc/supporting',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsTimelineRoute =
+  Char123LocaleChar125ProtectedProjectsTimelineRouteImport.update({
+    id: '/projects/timeline',
+    path: '/projects/timeline',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsTeamRoute =
+  Char123LocaleChar125ProtectedProjectsTeamRouteImport.update({
+    id: '/projects/team',
+    path: '/projects/team',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsTasksRoute =
+  Char123LocaleChar125ProtectedProjectsTasksRouteImport.update({
+    id: '/projects/tasks',
+    path: '/projects/tasks',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsNewRoute =
+  Char123LocaleChar125ProtectedProjectsNewRouteImport.update({
+    id: '/projects/new',
+    path: '/projects/new',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemSettingsRoute =
@@ -270,6 +307,12 @@ const Char123LocaleChar125ProtectedYourobcCouriersIndexRoute =
   Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport.update({
     id: '/yourobc/couriers/',
     path: '/yourobc/couriers/',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute =
+  Char123LocaleChar125ProtectedProjectsProjectIdIndexRouteImport.update({
+    id: '/projects/$projectId/',
+    path: '/projects/$projectId/',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemNotificationsIndexRoute =
@@ -380,6 +423,12 @@ const Char123LocaleChar125ProtectedYourobcCouriersNewRoute =
   Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport.update({
     id: '/yourobc/couriers/new',
     path: '/yourobc/couriers/new',
+    getParentRoute: () => Char123LocaleChar125ProtectedRoute,
+  } as any)
+const Char123LocaleChar125ProtectedProjectsProjectIdEditRoute =
+  Char123LocaleChar125ProtectedProjectsProjectIdEditRouteImport.update({
+    id: '/projects/$projectId/edit',
+    path: '/projects/$projectId/edit',
     getParentRoute: () => Char123LocaleChar125ProtectedRoute,
   } as any)
 const Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute =
@@ -679,7 +728,12 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
   '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
+  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedProjectsNewRoute
+  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedProjectsTasksRoute
+  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedProjectsTeamRoute
+  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedProjectsTimelineRoute
   '/{-$locale}/yourobc/supporting': typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedProjectsIndexRoute
   '/{-$locale}/yourobc': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
@@ -688,6 +742,7 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
   '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
+  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedProjectsProjectIdEditRoute
   '/{-$locale}/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
   '/{-$locale}/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
   '/{-$locale}/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
@@ -706,6 +761,7 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
   '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
   '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute
   '/{-$locale}/yourobc/couriers': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
   '/{-$locale}/yourobc/customers': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
   '/{-$locale}/yourobc/employees': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
@@ -765,6 +821,11 @@ export interface FileRoutesByTo {
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
   '/{-$locale}/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
+  '/{-$locale}/projects/new': typeof Char123LocaleChar125ProtectedProjectsNewRoute
+  '/{-$locale}/projects/tasks': typeof Char123LocaleChar125ProtectedProjectsTasksRoute
+  '/{-$locale}/projects/team': typeof Char123LocaleChar125ProtectedProjectsTeamRoute
+  '/{-$locale}/projects/timeline': typeof Char123LocaleChar125ProtectedProjectsTimelineRoute
+  '/{-$locale}/projects': typeof Char123LocaleChar125ProtectedProjectsIndexRoute
   '/{-$locale}/yourobc': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
@@ -773,6 +834,7 @@ export interface FileRoutesByTo {
   '/{-$locale}/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
   '/{-$locale}/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
+  '/{-$locale}/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedProjectsProjectIdEditRoute
   '/{-$locale}/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
   '/{-$locale}/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
   '/{-$locale}/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
@@ -791,6 +853,7 @@ export interface FileRoutesByTo {
   '/{-$locale}/admin': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
   '/{-$locale}/email': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
   '/{-$locale}/notifications': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/projects/$projectId': typeof Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute
   '/{-$locale}/yourobc/couriers': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
   '/{-$locale}/yourobc/customers': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
   '/{-$locale}/yourobc/employees': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
@@ -854,7 +917,12 @@ export interface FileRoutesById {
   '/{-$locale}/test/auth': typeof Char123LocaleChar125TestAuthRoute
   '/{-$locale}/_protected/_system/dashboard': typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   '/{-$locale}/_protected/_system/settings': typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
+  '/{-$locale}/_protected/projects/new': typeof Char123LocaleChar125ProtectedProjectsNewRoute
+  '/{-$locale}/_protected/projects/tasks': typeof Char123LocaleChar125ProtectedProjectsTasksRoute
+  '/{-$locale}/_protected/projects/team': typeof Char123LocaleChar125ProtectedProjectsTeamRoute
+  '/{-$locale}/_protected/projects/timeline': typeof Char123LocaleChar125ProtectedProjectsTimelineRoute
   '/{-$locale}/_protected/yourobc/supporting': typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  '/{-$locale}/_protected/projects/': typeof Char123LocaleChar125ProtectedProjectsIndexRoute
   '/{-$locale}/_protected/yourobc/': typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   '/{-$locale}/_protected/_admin/admin/audit-logs': typeof Char123LocaleChar125ProtectedAdminAdminAuditLogsRoute
   '/{-$locale}/_protected/_admin/admin/permission-requests': typeof Char123LocaleChar125ProtectedAdminAdminPermissionRequestsRoute
@@ -863,6 +931,7 @@ export interface FileRoutesById {
   '/{-$locale}/_protected/_system/email/logs': typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   '/{-$locale}/_protected/_system/email/templates': typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
   '/{-$locale}/_protected/_system/settings/notifications': typeof Char123LocaleChar125ProtectedSystemSettingsNotificationsRoute
+  '/{-$locale}/_protected/projects/$projectId/edit': typeof Char123LocaleChar125ProtectedProjectsProjectIdEditRoute
   '/{-$locale}/_protected/yourobc/couriers/new': typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
   '/{-$locale}/_protected/yourobc/customers/new': typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
   '/{-$locale}/_protected/yourobc/employees/new': typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
@@ -881,6 +950,7 @@ export interface FileRoutesById {
   '/{-$locale}/_protected/_admin/admin/': typeof Char123LocaleChar125ProtectedAdminAdminIndexRoute
   '/{-$locale}/_protected/_system/email/': typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
   '/{-$locale}/_protected/_system/notifications/': typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  '/{-$locale}/_protected/projects/$projectId/': typeof Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute
   '/{-$locale}/_protected/yourobc/couriers/': typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
   '/{-$locale}/_protected/yourobc/customers/': typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
   '/{-$locale}/_protected/yourobc/employees/': typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
@@ -943,7 +1013,12 @@ export interface FileRouteTypes {
     | '/{-$locale}/test/auth'
     | '/{-$locale}/dashboard'
     | '/{-$locale}/settings'
+    | '/{-$locale}/projects/new'
+    | '/{-$locale}/projects/tasks'
+    | '/{-$locale}/projects/team'
+    | '/{-$locale}/projects/timeline'
     | '/{-$locale}/yourobc/supporting'
+    | '/{-$locale}/projects'
     | '/{-$locale}/yourobc'
     | '/{-$locale}/admin/audit-logs'
     | '/{-$locale}/admin/permission-requests'
@@ -952,6 +1027,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/email/logs'
     | '/{-$locale}/email/templates'
     | '/{-$locale}/settings/notifications'
+    | '/{-$locale}/projects/$projectId/edit'
     | '/{-$locale}/yourobc/couriers/new'
     | '/{-$locale}/yourobc/customers/new'
     | '/{-$locale}/yourobc/employees/new'
@@ -970,6 +1046,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/admin'
     | '/{-$locale}/email'
     | '/{-$locale}/notifications'
+    | '/{-$locale}/projects/$projectId'
     | '/{-$locale}/yourobc/couriers'
     | '/{-$locale}/yourobc/customers'
     | '/{-$locale}/yourobc/employees'
@@ -1029,6 +1106,11 @@ export interface FileRouteTypes {
     | '/{-$locale}/test/auth'
     | '/{-$locale}/dashboard'
     | '/{-$locale}/settings'
+    | '/{-$locale}/projects/new'
+    | '/{-$locale}/projects/tasks'
+    | '/{-$locale}/projects/team'
+    | '/{-$locale}/projects/timeline'
+    | '/{-$locale}/projects'
     | '/{-$locale}/yourobc'
     | '/{-$locale}/admin/audit-logs'
     | '/{-$locale}/admin/permission-requests'
@@ -1037,6 +1119,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/email/logs'
     | '/{-$locale}/email/templates'
     | '/{-$locale}/settings/notifications'
+    | '/{-$locale}/projects/$projectId/edit'
     | '/{-$locale}/yourobc/couriers/new'
     | '/{-$locale}/yourobc/customers/new'
     | '/{-$locale}/yourobc/employees/new'
@@ -1055,6 +1138,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/admin'
     | '/{-$locale}/email'
     | '/{-$locale}/notifications'
+    | '/{-$locale}/projects/$projectId'
     | '/{-$locale}/yourobc/couriers'
     | '/{-$locale}/yourobc/customers'
     | '/{-$locale}/yourobc/employees'
@@ -1117,7 +1201,12 @@ export interface FileRouteTypes {
     | '/{-$locale}/test/auth'
     | '/{-$locale}/_protected/_system/dashboard'
     | '/{-$locale}/_protected/_system/settings'
+    | '/{-$locale}/_protected/projects/new'
+    | '/{-$locale}/_protected/projects/tasks'
+    | '/{-$locale}/_protected/projects/team'
+    | '/{-$locale}/_protected/projects/timeline'
     | '/{-$locale}/_protected/yourobc/supporting'
+    | '/{-$locale}/_protected/projects/'
     | '/{-$locale}/_protected/yourobc/'
     | '/{-$locale}/_protected/_admin/admin/audit-logs'
     | '/{-$locale}/_protected/_admin/admin/permission-requests'
@@ -1126,6 +1215,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/_protected/_system/email/logs'
     | '/{-$locale}/_protected/_system/email/templates'
     | '/{-$locale}/_protected/_system/settings/notifications'
+    | '/{-$locale}/_protected/projects/$projectId/edit'
     | '/{-$locale}/_protected/yourobc/couriers/new'
     | '/{-$locale}/_protected/yourobc/customers/new'
     | '/{-$locale}/_protected/yourobc/employees/new'
@@ -1144,6 +1234,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/_protected/_admin/admin/'
     | '/{-$locale}/_protected/_system/email/'
     | '/{-$locale}/_protected/_system/notifications/'
+    | '/{-$locale}/_protected/projects/$projectId/'
     | '/{-$locale}/_protected/yourobc/couriers/'
     | '/{-$locale}/_protected/yourobc/customers/'
     | '/{-$locale}/_protected/yourobc/employees/'
@@ -1318,11 +1409,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
+    '/{-$locale}/_protected/projects/': {
+      id: '/{-$locale}/_protected/projects/'
+      path: '/projects'
+      fullPath: '/{-$locale}/projects'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
     '/{-$locale}/_protected/yourobc/supporting': {
       id: '/{-$locale}/_protected/yourobc/supporting'
       path: '/yourobc/supporting'
       fullPath: '/{-$locale}/yourobc/supporting'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/timeline': {
+      id: '/{-$locale}/_protected/projects/timeline'
+      path: '/projects/timeline'
+      fullPath: '/{-$locale}/projects/timeline'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsTimelineRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/team': {
+      id: '/{-$locale}/_protected/projects/team'
+      path: '/projects/team'
+      fullPath: '/{-$locale}/projects/team'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsTeamRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/tasks': {
+      id: '/{-$locale}/_protected/projects/tasks'
+      path: '/projects/tasks'
+      fullPath: '/{-$locale}/projects/tasks'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsTasksRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/new': {
+      id: '/{-$locale}/_protected/projects/new'
+      path: '/projects/new'
+      fullPath: '/{-$locale}/projects/new'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsNewRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/settings': {
@@ -1407,6 +1533,13 @@ declare module '@tanstack/react-router' {
       path: '/yourobc/couriers'
       fullPath: '/{-$locale}/yourobc/couriers'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/$projectId/': {
+      id: '/{-$locale}/_protected/projects/$projectId/'
+      path: '/projects/$projectId'
+      fullPath: '/{-$locale}/projects/$projectId'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsProjectIdIndexRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/notifications/': {
@@ -1533,6 +1666,13 @@ declare module '@tanstack/react-router' {
       path: '/yourobc/couriers/new'
       fullPath: '/{-$locale}/yourobc/couriers/new'
       preLoaderRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersNewRouteImport
+      parentRoute: typeof Char123LocaleChar125ProtectedRoute
+    }
+    '/{-$locale}/_protected/projects/$projectId/edit': {
+      id: '/{-$locale}/_protected/projects/$projectId/edit'
+      path: '/projects/$projectId/edit'
+      fullPath: '/{-$locale}/projects/$projectId/edit'
+      preLoaderRoute: typeof Char123LocaleChar125ProtectedProjectsProjectIdEditRouteImport
       parentRoute: typeof Char123LocaleChar125ProtectedRoute
     }
     '/{-$locale}/_protected/_system/settings/notifications': {
@@ -1920,10 +2060,16 @@ interface Char123LocaleChar125ProtectedRouteChildren {
   Char123LocaleChar125ProtectedAdminRoute: typeof Char123LocaleChar125ProtectedAdminRouteWithChildren
   Char123LocaleChar125ProtectedSystemDashboardRoute: typeof Char123LocaleChar125ProtectedSystemDashboardRoute
   Char123LocaleChar125ProtectedSystemSettingsRoute: typeof Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren
+  Char123LocaleChar125ProtectedProjectsNewRoute: typeof Char123LocaleChar125ProtectedProjectsNewRoute
+  Char123LocaleChar125ProtectedProjectsTasksRoute: typeof Char123LocaleChar125ProtectedProjectsTasksRoute
+  Char123LocaleChar125ProtectedProjectsTeamRoute: typeof Char123LocaleChar125ProtectedProjectsTeamRoute
+  Char123LocaleChar125ProtectedProjectsTimelineRoute: typeof Char123LocaleChar125ProtectedProjectsTimelineRoute
   Char123LocaleChar125ProtectedYourobcSupportingRoute: typeof Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren
+  Char123LocaleChar125ProtectedProjectsIndexRoute: typeof Char123LocaleChar125ProtectedProjectsIndexRoute
   Char123LocaleChar125ProtectedYourobcIndexRoute: typeof Char123LocaleChar125ProtectedYourobcIndexRoute
   Char123LocaleChar125ProtectedSystemEmailLogsRoute: typeof Char123LocaleChar125ProtectedSystemEmailLogsRoute
   Char123LocaleChar125ProtectedSystemEmailTemplatesRoute: typeof Char123LocaleChar125ProtectedSystemEmailTemplatesRoute
+  Char123LocaleChar125ProtectedProjectsProjectIdEditRoute: typeof Char123LocaleChar125ProtectedProjectsProjectIdEditRoute
   Char123LocaleChar125ProtectedYourobcCouriersNewRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersNewRoute
   Char123LocaleChar125ProtectedYourobcCustomersNewRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersNewRoute
   Char123LocaleChar125ProtectedYourobcEmployeesNewRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesNewRoute
@@ -1941,6 +2087,7 @@ interface Char123LocaleChar125ProtectedRouteChildren {
   Char123LocaleChar125ProtectedYourobcTasksDashboardRoute: typeof Char123LocaleChar125ProtectedYourobcTasksDashboardRoute
   Char123LocaleChar125ProtectedSystemEmailIndexRoute: typeof Char123LocaleChar125ProtectedSystemEmailIndexRoute
   Char123LocaleChar125ProtectedSystemNotificationsIndexRoute: typeof Char123LocaleChar125ProtectedSystemNotificationsIndexRoute
+  Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute: typeof Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute
   Char123LocaleChar125ProtectedYourobcCouriersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCouriersIndexRoute
   Char123LocaleChar125ProtectedYourobcCustomersIndexRoute: typeof Char123LocaleChar125ProtectedYourobcCustomersIndexRoute
   Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute: typeof Char123LocaleChar125ProtectedYourobcEmployeesIndexRoute
@@ -1980,14 +2127,26 @@ const Char123LocaleChar125ProtectedRouteChildren: Char123LocaleChar125ProtectedR
       Char123LocaleChar125ProtectedSystemDashboardRoute,
     Char123LocaleChar125ProtectedSystemSettingsRoute:
       Char123LocaleChar125ProtectedSystemSettingsRouteWithChildren,
+    Char123LocaleChar125ProtectedProjectsNewRoute:
+      Char123LocaleChar125ProtectedProjectsNewRoute,
+    Char123LocaleChar125ProtectedProjectsTasksRoute:
+      Char123LocaleChar125ProtectedProjectsTasksRoute,
+    Char123LocaleChar125ProtectedProjectsTeamRoute:
+      Char123LocaleChar125ProtectedProjectsTeamRoute,
+    Char123LocaleChar125ProtectedProjectsTimelineRoute:
+      Char123LocaleChar125ProtectedProjectsTimelineRoute,
     Char123LocaleChar125ProtectedYourobcSupportingRoute:
       Char123LocaleChar125ProtectedYourobcSupportingRouteWithChildren,
+    Char123LocaleChar125ProtectedProjectsIndexRoute:
+      Char123LocaleChar125ProtectedProjectsIndexRoute,
     Char123LocaleChar125ProtectedYourobcIndexRoute:
       Char123LocaleChar125ProtectedYourobcIndexRoute,
     Char123LocaleChar125ProtectedSystemEmailLogsRoute:
       Char123LocaleChar125ProtectedSystemEmailLogsRoute,
     Char123LocaleChar125ProtectedSystemEmailTemplatesRoute:
       Char123LocaleChar125ProtectedSystemEmailTemplatesRoute,
+    Char123LocaleChar125ProtectedProjectsProjectIdEditRoute:
+      Char123LocaleChar125ProtectedProjectsProjectIdEditRoute,
     Char123LocaleChar125ProtectedYourobcCouriersNewRoute:
       Char123LocaleChar125ProtectedYourobcCouriersNewRoute,
     Char123LocaleChar125ProtectedYourobcCustomersNewRoute:
@@ -2022,6 +2181,8 @@ const Char123LocaleChar125ProtectedRouteChildren: Char123LocaleChar125ProtectedR
       Char123LocaleChar125ProtectedSystemEmailIndexRoute,
     Char123LocaleChar125ProtectedSystemNotificationsIndexRoute:
       Char123LocaleChar125ProtectedSystemNotificationsIndexRoute,
+    Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute:
+      Char123LocaleChar125ProtectedProjectsProjectIdIndexRoute,
     Char123LocaleChar125ProtectedYourobcCouriersIndexRoute:
       Char123LocaleChar125ProtectedYourobcCouriersIndexRoute,
     Char123LocaleChar125ProtectedYourobcCustomersIndexRoute:

@@ -29,7 +29,7 @@ export const PageCard: FC<PageCardProps> = ({
       case 'archived':
         return 'destructive'
       default:
-        return 'default'
+        return 'secondary'
     }
   }
 

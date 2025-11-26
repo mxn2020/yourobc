@@ -125,7 +125,7 @@ export const PartnerDetailsPage: FC<PartnerDetailsPageProps> = ({ partnerId }) =
               <p className="text-gray-500 mb-4">
                 {error?.message || 'The partner you are looking for does not exist or has been deleted.'}
               </p>
-              <Link to="/yourobc/partners" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/partners" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Partners
               </Link>
             </div>
@@ -140,12 +140,12 @@ export const PartnerDetailsPage: FC<PartnerDetailsPageProps> = ({ partnerId }) =
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Link to="/yourobc/partners" className="text-blue-600 hover:text-blue-800 font-medium">
+          <Link to="/{-$locale}/yourobc/partners" className="text-blue-600 hover:text-blue-800 font-medium">
             ← Back to Partners
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/quotes/new" search={{ partnerId }}>
+            <Link to="/{-$locale}/yourobc/quotes/new" search={{ partnerId }}>
               <Button variant="primary">💼 Request Quote</Button>
             </Link>
 
@@ -386,7 +386,7 @@ export const PartnerDetailsPage: FC<PartnerDetailsPageProps> = ({ partnerId }) =
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
                         <div className="space-y-2">
-                          <Link to="/yourobc/quotes/new" search={{ partnerId }} className="block w-full">
+                          <Link to="/{-$locale}/yourobc/quotes/new" search={{ partnerId }} className="block w-full">
                             <Button variant="primary" className="w-full">
                               💼 Request Quote
                             </Button>

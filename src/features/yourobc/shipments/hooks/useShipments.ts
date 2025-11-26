@@ -37,12 +37,12 @@ export function useShipments(options?: {
     isPending,
     error,
     refetch,
-  } = shipmentsService.useShipments(authUser?.id!, options)
+  } = shipmentsService.useShipments(options)
 
   const {
     data: stats,
     isPending: isStatsLoading,
-  } = shipmentsService.useShipmentStats(authUser?.id!)
+  } = shipmentsService.useShipmentStats()
 
   const createMutation = shipmentsService.useCreateShipment()
   const updateMutation = shipmentsService.useUpdateShipment()
@@ -88,7 +88,7 @@ export function useShipments(options?: {
       actualCosts: shipmentData.actualCosts,
     }
 
-    return await shipmentsService.createShipment(createMutation, authUser.id, createData)
+    return await shipmentsService.createShipment(createMutation, createData)
   }, [authUser, createMutation])
 
   const updateShipment = useCallback(async (
@@ -122,7 +122,7 @@ export function useShipments(options?: {
     if (updates.agreedPrice !== undefined) updateData.agreedPrice = updates.agreedPrice
     if (updates.actualCosts !== undefined) updateData.actualCosts = updates.actualCosts
 
-    return await shipmentsService.updateShipment(updateMutation, authUser.id, shipmentId, updateData)
+    return await shipmentsService.updateShipment(updateMutation, shipmentId, updateData)
   }, [authUser, updateMutation])
 
   const updateShipmentStatus = useCallback(async (
@@ -130,7 +130,7 @@ export function useShipments(options?: {
     statusData: StatusUpdateFormData
   ) => {
     if (!authUser) throw new Error('Authentication required')
-    return await shipmentsService.updateShipmentStatus(updateStatusMutation, authUser.id, shipmentId, statusData)
+    return await shipmentsService.updateShipmentStatus(updateStatusMutation, shipmentId, statusData)
   }, [authUser, updateStatusMutation])
 
   const assignCourier = useCallback(async (
@@ -139,12 +139,12 @@ export function useShipments(options?: {
     instructions?: string
   ) => {
     if (!authUser) throw new Error('Authentication required')
-    return await shipmentsService.assignCourier(assignCourierMutation, authUser.id, shipmentId, courierId, instructions)
+    return await shipmentsService.assignCourier(assignCourierMutation, shipmentId, courierId, instructions)
   }, [authUser, assignCourierMutation])
 
   const deleteShipment = useCallback(async (shipmentId: ShipmentId) => {
     if (!authUser) throw new Error('Authentication required')
-    return await shipmentsService.deleteShipment(deleteMutation, authUser.id, shipmentId)
+    return await shipmentsService.deleteShipment(deleteMutation, shipmentId)
   }, [authUser, deleteMutation])
 
   const canCreateShipments = useMemo(() => {
@@ -221,19 +221,17 @@ export function useShipments(options?: {
  * Hook for managing a single shipment
  */
 export function useShipment(shipmentId?: ShipmentId) {
-  const authUser = useAuthenticatedUser()
-
   const {
     data: shipment,
     isPending,
     error,
     refetch,
-  } = shipmentsService.useShipment(authUser?.id!, shipmentId)
+  } = shipmentsService.useShipment(shipmentId)
 
   const {
     data: statusHistory,
     isPending: isLoadingHistory,
-  } = shipmentsService.useShipmentStatusHistory(authUser?.id!, shipmentId)
+  } = shipmentsService.useShipmentStatusHistory(shipmentId)
 
   const shipmentInsights = useMemo((): ShipmentInsights | null => {
     if (!shipment) return null
@@ -291,13 +289,11 @@ export function useShipment(shipmentId?: ShipmentId) {
  * Hook for searching shipments
  */
 export function useShipmentSearch(searchTerm: string) {
-  const authUser = useAuthenticatedUser()
-
   const {
     data: searchResults,
     isPending,
     error,
-  } = shipmentsService.useSearchShipments(authUser?.id!, searchTerm)
+  } = shipmentsService.useSearchShipments(searchTerm)
 
   return {
     results: searchResults || [],
@@ -311,14 +307,12 @@ export function useShipmentSearch(searchTerm: string) {
  * Hook for overdue shipments
  */
 export function useOverdueShipments(limit = 50) {
-  const authUser = useAuthenticatedUser()
-
   const {
     data: overdueShipments,
     isPending,
     error,
     refetch,
-  } = shipmentsService.useOverdueShipments(authUser?.id!, limit)
+  } = shipmentsService.useOverdueShipments(limit)
 
   return {
     shipments: overdueShipments || [],

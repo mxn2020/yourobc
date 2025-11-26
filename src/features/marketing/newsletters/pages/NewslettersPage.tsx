@@ -11,7 +11,7 @@ export const NewslettersPage: FC = () => {
   const { data: newslettersData } = useNewsletters({ limit: 100 })
   const { data: stats } = useNewsletterStats()
 
-  const filteredNewsletters = newslettersData?.items?.filter((newsletter: Newsletter) =>
+  const filteredNewsletters = newslettersData?.newsletters?.filter((newsletter: Newsletter) =>
     newsletter.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -42,16 +42,16 @@ export const NewslettersPage: FC = () => {
             <p className="text-2xl font-bold">{stats.totalNewsletters || 0}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600">Active</p>
-            <p className="text-2xl font-bold">{stats.activeNewsletters || 0}</p>
+            <p className="text-sm text-gray-600">Active Subscribers</p>
+            <p className="text-2xl font-bold">{stats.activeSubscribers || 0}</p>
           </Card>
           <Card className="p-6">
             <p className="text-sm text-gray-600">Total Subscribers</p>
             <p className="text-2xl font-bold">{stats.totalSubscribers || 0}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600">Avg. Open Rate</p>
-            <p className="text-2xl font-bold">{stats.avgOpenRate?.toFixed(1) || 0}%</p>
+            <p className="text-sm text-gray-600">Total Campaigns</p>
+            <p className="text-2xl font-bold">{stats.totalCampaigns || 0}</p>
           </Card>
         </div>
       )}
@@ -96,7 +96,15 @@ export const NewslettersPage: FC = () => {
           icon={Mail}
           title="No newsletters found"
           description={searchTerm ? 'Try adjusting your search' : 'Create your first newsletter to get started'}
-          action={!searchTerm ? <Button onClick={() => console.log('Create')}><Plus className="h-5 w-5 mr-2" />Create Newsletter</Button> : undefined}
+          action={
+            !searchTerm
+              ? {
+                  label: 'Create Newsletter',
+                  onClick: () => console.log('Create'),
+                  icon: Plus,
+                }
+              : undefined
+          }
         />
       )}
     </div>

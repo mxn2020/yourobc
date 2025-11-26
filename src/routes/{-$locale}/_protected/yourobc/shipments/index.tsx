@@ -13,7 +13,6 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
     console.log(`🔄 Route Loader STARTED (${isServer ? 'SERVER' : 'CLIENT'})`)
     console.time('Route Loader: Shipments')
 
-    // Auth is verified by _protected layout - use user from context
     const { user } = context
     const locale = (context.locale || defaultLocale) as Locale
 
@@ -21,10 +20,10 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
     // For shipments: typically accessible to all authenticated users
     if (!user) {
       throw redirect({
-        to: '/{-$locale}/login',
+        to: '/{-$locale}/auth/login',
         params: {
-          locale: locale === defaultLocale ? undefined : locale
-        }
+          locale: locale === defaultLocale ? undefined : locale,
+        },
       })
     }
 
@@ -32,6 +31,9 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
     const shipmentsQueryOptions = shipmentService.getShipmentsQueryOptions({ limit: 25 })
     const statsQueryOptions = shipmentService.getShipmentStatsQueryOptions()
     const overdueQueryOptions = shipmentService.getOverdueShipmentsQueryOptions({ limit: 10 })
+    const [, , shipmentsArgs] = shipmentsQueryOptions.queryKey as [string, unknown, any]
+    const [, , statsArgs] = statsQueryOptions.queryKey as [string, unknown, any]
+    const [, , overdueArgs] = overdueQueryOptions.queryKey as [string, unknown, any]
 
     // SERVER: SSR prefetching with authenticated Convex client
     if (typeof window === 'undefined') {
@@ -42,9 +44,9 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
 
         if (convexClient) {
           const [shipments, stats, overdue] = await Promise.all([
-            convexClient.query(api.lib.yourobc.shipments.queries.getShipments, { limit: 25 }),
-            convexClient.query(api.lib.yourobc.shipments.queries.getShipmentStats, {}),
-            convexClient.query(api.lib.yourobc.shipments.queries.getOverdueShipments, { limit: 10 })
+            convexClient.query(api.lib.yourobc.shipments.queries.getShipments, shipmentsArgs),
+            convexClient.query(api.lib.yourobc.shipments.queries.getShipmentStats, statsArgs || {}),
+            convexClient.query(api.lib.yourobc.shipments.queries.getShipments, overdueArgs),
           ])
 
           // Cache data using service query options (ensures same keys as hooks)
@@ -126,4 +128,3 @@ export const Route = createFileRoute('/{-$locale}/_protected/yourobc/shipments/'
 function ShipmentsIndexPage() {
   return <ShipmentsPage />
 }
-

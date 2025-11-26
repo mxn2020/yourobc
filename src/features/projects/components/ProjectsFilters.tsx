@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 import { Card, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Button } from '@/components/ui'
-import { useTranslation } from '@/features/boilerplate/i18n'
+import { useTranslation } from '@/features/system/i18n'
 
 interface ProjectsFiltersProps {
   searchTerm: string

@@ -1,6 +1,6 @@
 // src/features/marketing/social-scheduler/hooks/usePosts.ts
 
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { useSuspenseQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/generated/api'
 import { socialSchedulerService } from '../service'
@@ -16,9 +16,12 @@ export function usePostStats() {
 
 export function useCreatePost() {
   const queryClient = useQueryClient()
-  return useConvexMutation(api.lib.addons.marketing.social_scheduler.mutations.createSocialPost, {
+  const postsQueryKey = socialSchedulerService.getPostsQueryOptions().queryKey
+
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.social_scheduler.mutations.createSocialPost),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.social_scheduler.queries.getSocialPosts] })
+      queryClient.invalidateQueries({ queryKey: postsQueryKey })
       toast.success('Post created successfully')
     },
     onError: (error) => {

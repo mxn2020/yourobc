@@ -362,7 +362,7 @@ This structure follows AI best practices:
    - Copy consistency review to `04-REFERENCE/`
    - Copy advanced patterns to `04-REFERENCE/`
 
-2. **Create template files** with placeholders from your boilerplate
+2. **Create template files** with placeholders from your system
 
 3. **Add real examples** from your existing codebase
 
@@ -370,4 +370,4 @@ This structure follows AI best practices:
 
 5. **Test with AI**: Start fresh chat → "Read .context/PROJECT.md" → observe results
 
-Would you like me to help you create any specific files, like turning your existing boilerplate into templates or writing the initial `.context/PROJECT.md`?
+Would you like me to help you create any specific files, like turning your existing system into templates or writing the initial `.context/PROJECT.md`?

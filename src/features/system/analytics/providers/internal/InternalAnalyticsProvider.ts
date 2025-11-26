@@ -39,7 +39,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    * Track a custom event
    */
   async trackEvent(params: TrackEventParams): Promise<void> {
-    const mutation = useMutation(api.lib.system.analytics.mutations.trackEvent);
+    const mutation = useMutation(api.lib.system.core.analytics.mutations.trackEvent);
 
     await mutation({
       eventName: params.eventName,
@@ -62,7 +62,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    * Track a page view
    */
   async trackPageView(params: PageViewParams): Promise<void> {
-    const mutation = useMutation(api.lib.system.analytics.mutations.trackPageView);
+    const mutation = useMutation(api.lib.system.core.analytics.mutations.trackPageView);
 
     await mutation({
       pageUrl: window.location.href,
@@ -89,7 +89,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    * Get metric data
    */
   async getMetric(params: GetMetricParams): Promise<MetricData[]> {
-    const query = useQuery(api.lib.system.analytics.queries.getMetric, {
+    const query = useQuery(api.lib.system.core.analytics.queries.getMetric, {
       metricType: params.metricType,
       period: params.period,
       startDate: params.startDate,
@@ -134,7 +134,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    * Get dashboards
    */
   async getDashboards(filters?: DashboardFilters): Promise<Dashboard[]> {
-    const query = useQuery(api.lib.system.analytics.queries.getDashboards, {
+    const query = useQuery(api.lib.system.core.analytics.queries.getDashboards, {
       type: filters?.type,
       includePublic: filters?.includePublic,
     });
@@ -149,7 +149,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
     dashboardId: Id<"analyticsDashboards">
   ): Promise<Dashboard | null> {
     const query = useQuery(
-      api.lib.system.analytics.queries.getDashboard,
+      api.lib.system.core.analytics.queries.getDashboard,
       { dashboardId }
     );
 
@@ -163,7 +163,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
     data: CreateDashboardData
   ): Promise<Id<"analyticsDashboards">> {
     const mutation = useMutation(
-      api.lib.system.analytics.mutations.createDashboard
+      api.lib.system.core.analytics.mutations.createDashboard
     );
 
     const userId = this.getCurrentUserId();
@@ -182,7 +182,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
     data: UpdateDashboardData
   ): Promise<void> {
     const mutation = useMutation(
-      api.lib.system.analytics.mutations.updateDashboard
+      api.lib.system.core.analytics.mutations.updateDashboard
     );
 
     const userId = this.getCurrentUserId();
@@ -201,7 +201,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    */
   async deleteDashboard(dashboardId: Id<"analyticsDashboards">): Promise<void> {
     const mutation = useMutation(
-      api.lib.system.analytics.mutations.deleteDashboard
+      api.lib.system.core.analytics.mutations.deleteDashboard
     );
 
     const userId = this.getCurrentUserId();
@@ -216,7 +216,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
    * Get reports
    */
   async getReports(filters?: ReportFilters): Promise<Report[]> {
-    const query = useQuery(api.lib.system.analytics.queries.getReports, {
+    const query = useQuery(api.lib.system.core.analytics.queries.getReports, {
       reportType: filters?.reportType,
       includePublic: filters?.includePublic,
     });
@@ -231,7 +231,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
     reportId: Id<"analyticsReports">
   ): Promise<ReportResult> {
     // Get the report configuration
-    const reportQuery = useQuery(api.lib.system.analytics.queries.getReport, {
+    const reportQuery = useQuery(api.lib.system.core.analytics.queries.getReport, {
       reportId,
     });
 
@@ -240,7 +240,7 @@ export class InternalAnalyticsProvider implements AnalyticsProvider {
     }
 
     // Fetch data for each metric in the report
-    const data: any[] = [];
+    const data: Array<{ metric: string; data: MetricData[] }> = [];
     for (const metricType of reportQuery.query.metrics) {
       const metricData = await this.getMetric({
         metricType,

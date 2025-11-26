@@ -3,15 +3,14 @@
 import { FC, useState } from 'react'
 import { Button, Input, EmptyState, Card } from '@/components/ui'
 import { Plus, Search, Mail } from 'lucide-react'
-import { useSignatures, useCreateSignature, useUpdateSignature, useDeleteSignature } from '../hooks/useSignatures'
-import type { EmailSignature, CreateSignatureData } from '../types'
+import { useSignatures } from '../hooks/useSignatures'
+import type { EmailSignature } from '../types'
 
 export const EmailSignaturesPage: FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const { data: signaturesData } = useSignatures({ limit: 100 })
-  const createSignature = useCreateSignature()
 
-  const filteredSignatures = signaturesData?.items?.filter((sig: EmailSignature) =>
+  const filteredSignatures = (signaturesData?.signatures || []).filter((sig: EmailSignature) =>
     sig.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sig.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -65,7 +64,11 @@ export const EmailSignaturesPage: FC = () => {
           icon={Mail}
           title="No signatures found"
           description={searchTerm ? 'Try adjusting your search' : 'Create your first email signature'}
-          action={!searchTerm ? <Button onClick={() => console.log('Create')}><Plus className="h-5 w-5 mr-2" />Create Signature</Button> : undefined}
+          action={!searchTerm ? {
+            label: 'Create Signature',
+            onClick: () => console.log('Create'),
+            icon: Plus,
+          } : undefined}
         />
       )}
     </div>

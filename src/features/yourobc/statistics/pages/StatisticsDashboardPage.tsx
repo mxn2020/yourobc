@@ -131,7 +131,7 @@ export const StatisticsDashboardPage: FC = () => {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Revenue Trend ({selectedYear})</h2>
-          <Link to="/yourobc/statistics/revenue">
+          <Link to="/{-$locale}/statistics/revenue">
             <Button variant="outline" size="sm">
               View Details
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -171,7 +171,7 @@ export const StatisticsDashboardPage: FC = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Top Employees</h2>
-            <Link to="/yourobc/statistics/employee-kpis">
+            <Link to="/{-$locale}/yourobc/statistics/employee-kpis">
               <Button variant="outline" size="sm">
                 View All
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -204,7 +204,7 @@ export const StatisticsDashboardPage: FC = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Top Customers</h2>
-            <Link to="/yourobc/statistics/top-customers">
+            <Link to="/{-$locale}/yourobc/statistics/top-customers">
               <Button variant="outline" size="sm">
                 View All
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -236,7 +236,7 @@ export const StatisticsDashboardPage: FC = () => {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Link to="/yourobc/statistics/revenue">
+        <Link to="/{-$locale}/yourobc/statistics/revenue">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -250,7 +250,7 @@ export const StatisticsDashboardPage: FC = () => {
           </Card>
         </Link>
 
-        <Link to="/yourobc/statistics/employee-kpis">
+        <Link to="/{-$locale}/yourobc/statistics/employee-kpis">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
@@ -264,7 +264,7 @@ export const StatisticsDashboardPage: FC = () => {
           </Card>
         </Link>
 
-        <Link to="/yourobc/statistics/operating-costs">
+        <Link to="/{-$locale}/yourobc/statistics/operating-costs">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center">
@@ -286,7 +286,7 @@ export const StatisticsDashboardPage: FC = () => {
             <FileText className="h-5 w-5" />
             <h2 className="text-lg font-semibold">Reports</h2>
           </div>
-          <Link to="/yourobc/statistics/reports">
+          <Link to="/{-$locale}/yourobc/statistics/reports">
             <Button variant="outline" size="sm">
               View All Reports
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -296,19 +296,19 @@ export const StatisticsDashboardPage: FC = () => {
 
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <Button variant="outline" className="justify-start" asChild>
-            <Link to="/yourobc/statistics/reports/monthly">
+            <Link to="/{-$locale}/yourobc/statistics/reports/monthly">
               <FileText className="h-4 w-4 mr-2" />
               Monthly Report
             </Link>
           </Button>
           <Button variant="outline" className="justify-start" asChild>
-            <Link to="/yourobc/statistics/reports/executive">
+            <Link to="/{-$locale}/yourobc/statistics/reports/executive">
               <Award className="h-4 w-4 mr-2" />
               Executive Report
             </Link>
           </Button>
           <Button variant="outline" className="justify-start" asChild>
-            <Link to="/yourobc/statistics/reports">
+            <Link to="/{-$locale}/yourobc/statistics/reports">
               <FileText className="h-4 w-4 mr-2" />
               All Reports
             </Link>

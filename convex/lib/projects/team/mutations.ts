@@ -97,7 +97,7 @@ export const updateMember = mutation({
       status: projectMembersValidators.status,
       permissions: v.optional(v.array(v.string())),
       settings: v.optional(projectMembersFields.settings),
-      extendedMetadata: v.optional(projectsFields.extendedMetadata),
+      extendedMetadata: v.optional(projectMembersFields.extendedMetadata),
     }),
   },
   handler: async (ctx, { memberId, updates }) => {
@@ -175,7 +175,7 @@ export const updateMember = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'member.updated',
-      entityType: 'boilerplate_project_member',
+      entityType: 'system_project_member',
       entityId: memberId,
       entityTitle: `Member updated in ${project.title}`,
       description: `Updated member in project '${project.title}'${changes.length > 0 ? ': ' + changes.join(', ') : ''}`,

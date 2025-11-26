@@ -6,7 +6,7 @@ import type {
   UserAnalytics,
   AdminStats
 } from '../types/admin.types'
-import { UserProfile, AuthUserId } from '../../auth/types/auth.types'
+import { UserProfile } from '../../auth/types/auth.types'
 
 /**
  * Analytics and audit hook - handles admin audit logs, analytics, and reporting

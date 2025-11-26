@@ -2,7 +2,7 @@
 // All feature packages are organized under this central export
 
 // Core Features
-export * as Projects from './system/projects'
+export * as Projects from './projects'
 export * as Notifications from './system/notifications'
 export * as Dashboard from './system/dashboard'
 // export * as Settings from './settings'
@@ -22,9 +22,9 @@ export * as Audit from './system/audit-logs'
 // Existing Features (already implemented)
 export * as Auth from './system/auth'
 export * as Admin from './system/admin'
-export * as AILogging from './system/ai-logging'
-export * as AIModels from './system/ai-models'
-export * as AITesting from './system/ai-testing'
+// export * as AILogging from './system/ai-logging'
+// export * as AIModels from './system/ai-models'
+// export * as AITesting from './system/ai-testing'
 
 // Re-export common utilities
 export * from '../lib/query-keys'
@@ -33,7 +33,7 @@ export * from '../lib/feature-base'
 // Feature package registry for dynamic loading
 export const FEATURE_PACKAGES = {
   // Core
-  projects: () => import('./system/projects'),
+  projects: () => import('./projects'),
   notifications: () => import('./system/notifications'),
   dashboard: () => import('./system/dashboard'),
   // settings: () => import('./settings'),
@@ -53,9 +53,9 @@ export const FEATURE_PACKAGES = {
   // Existing
   auth: () => import('./system/auth'),
   admin: () => import('./system/admin'),
-  'ai-logging': () => import('./system/ai-logging'),
-  'ai-models': () => import('./system/ai-models'),
-  'ai-testing': () => import('./system/ai-testing'),
+  // 'ai-logging': () => import('./system/ai-logging'),
+  // 'ai-models': () => import('./system/ai-models'),
+  // 'ai-testing': () => import('./system/ai-testing'),
 } as const
 
 export type FeaturePackageName = keyof typeof FEATURE_PACKAGES

@@ -65,7 +65,7 @@ export const CustomersPageHeader: FC<CustomersPageHeaderProps> = ({
 
         {/* Create Button */}
         {canCreate && (
-          <Link to="/yourobc/customers/new">
+          <Link to="/{-$locale}/yourobc/customers/new">
             <Button variant="primary">
               + New Customer
             </Button>

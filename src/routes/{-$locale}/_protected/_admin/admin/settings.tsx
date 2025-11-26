@@ -45,7 +45,7 @@ export const Route = createFileRoute('/{-$locale}/_protected/_admin/admin/settin
           console.log('✅ SSR: Settings data cached:', {
             appSettings: appSettingsQueryOptions.queryKey,
             aiSettings: aiSettingsQueryOptions.queryKey,
-            settingsCount: appSettings?.settings.length || 0,
+            settingsCount: appSettings?.items.length || 0,
           });
 
           console.timeEnd('Route Loader: SSR Data Fetch');

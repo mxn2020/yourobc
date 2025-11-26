@@ -25,7 +25,7 @@ export function Sidebar({ isCollapsed = false, onToggleCollapse }: SidebarProps)
 
   // Check if we're in special sections
   const isInAdminSection = location.pathname.startsWith('/admin');
-  const isInProjectsSection = location.pathname.startsWith('/projects');
+  const isInProjectsSection = location.pathname.startsWith('/yourobc');
 
   // Dynamically detect which addon section we're in based on config
   const addonSections = useMemo(() =>
@@ -225,24 +225,24 @@ export function Sidebar({ isCollapsed = false, onToggleCollapse }: SidebarProps)
             params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
             className={`w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${isCollapsed ? 'justify-center' : ''
               }`}
-            title={isCollapsed ? 'Exit Projects System' : undefined}
+            title={isCollapsed ? 'Exit YourOBC' : undefined}
           >
             <BarChart3 className={`h-5 w-5 text-gray-500 ${isCollapsed ? '' : 'mr-3'}`} />
             {!isCollapsed && (
-              <span className="flex-1 text-sm font-medium text-gray-700">Exit Projects</span>
+              <span className="flex-1 text-sm font-medium text-gray-700">Exit YourOBC</span>
             )}
           </Link>
         ) : (
           <Link
-            to="/{-$locale}/projects"
+            to="/{-$locale}/yourobc"
             params={{ locale: currentLocale === defaultLocale ? undefined : currentLocale }}
             className={`w-full flex items-center px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors ${isCollapsed ? 'justify-center' : ''
               }`}
-            title={isCollapsed ? 'Projects System' : undefined}
+            title={isCollapsed ? 'YourOBC' : undefined}
           >
             <Building className={`h-5 w-5 text-blue-600 ${isCollapsed ? '' : 'mr-3'}`} />
             {!isCollapsed && (
-              <span className="flex-1 text-sm font-medium text-blue-700">Projects System</span>
+              <span className="flex-1 text-sm font-medium text-blue-700">YourOBC</span>
             )}
           </Link>
         )}

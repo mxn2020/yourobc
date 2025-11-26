@@ -11,8 +11,8 @@ import {
 } from "@/components/ui";
 import { useProjectActions } from "../hooks/useProjects";
 import type { Project } from "../types";
-import { useTranslation } from "@/features/boilerplate/i18n";
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { useTranslation } from "@/features/system/i18n";
+import { defaultLocale, getCurrentLocale } from "@/features/system/i18n";
 import * as projectHelpers from "../utils/projectHelpers";
 
 interface ProjectCardProps {
@@ -107,8 +107,8 @@ export const ProjectCard: FC<ProjectCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-2">
               <Link
-                to="/{-$locale}/projects/$projectId"
-                params={{ locale, projectId: project._id }}
+                to="/{-$locale}/yourobc"
+                params={{ locale: locale === defaultLocale ? undefined : locale }}
                 className={`font-semibold text-gray-900 hover:text-blue-600 transition-colors truncate ${
                   compact ? "text-base" : "text-lg"
                 }`}
@@ -280,8 +280,8 @@ export const ProjectCard: FC<ProjectCardProps> = ({
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2">
               <Link
-                to="/{-$locale}/projects/$projectId"
-                params={{ locale, projectId: project._id }}
+                to="/{-$locale}/yourobc"
+                params={{ locale: locale === defaultLocale ? undefined : locale }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <Button size="sm" variant="primary">

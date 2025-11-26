@@ -191,11 +191,14 @@ export interface ShipmentSearchFilters {
   serviceType?: ('OBC' | 'NFO')[]
   priority?: ('standard' | 'urgent' | 'critical')[]
   slaStatus?: ('on_time' | 'warning' | 'overdue')[]
-  customerId?: Id<'yourobcCustomers'>[]
-  assignedCourierId?: Id<'yourobcCouriers'>[]
-  partnerId?: Id<'yourobcPartners'>[]
+  customerId?: Id<'yourobcCustomers'> | Id<'yourobcCustomers'>[]
+  assignedCourierId?: Id<'yourobcCouriers'> | Id<'yourobcCouriers'>[]
+  employeeId?: Id<'yourobcEmployees'>
+  partnerId?: Id<'yourobcPartners'> | Id<'yourobcPartners'>[]
   originCountry?: string[]
   destinationCountry?: string[]
+  dateFrom?: number
+  dateTo?: number
   dateRange?: {
     start: number
     end: number

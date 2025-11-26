@@ -11,10 +11,25 @@ import type {
   TaskId,
   TaskListItem,
   TaskInsights,
-  TaskSearchFilters,
   TaskStatus,
+  TaskFilters,
 } from '../types'
 import type { Id } from '@/convex/_generated/dataModel'
+
+const enrichTasks = (
+  tasks?: TaskListItem[],
+  options?: { forceOverdue?: boolean }
+): TaskListItem[] => {
+  return (tasks ?? []).map((task) => {
+    const isOverdue = options?.forceOverdue ? true : tasksService.isTaskOverdue(task)
+    return {
+      ...task,
+      type: (task as TaskListItem).type ?? task.taskType,
+      isOverdue,
+      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
+    }
+  })
+}
 
 /**
  * Main hook for task management (all tasks)
@@ -24,7 +39,7 @@ export function useTasks(options?: {
   offset?: number
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
-  filters?: TaskSearchFilters
+  filters?: TaskFilters
   autoRefresh?: boolean
 }) {
   const authUser = useAuthenticatedUser()
@@ -72,14 +87,13 @@ export function useTasks(options?: {
     }
 
     const createData: CreateTaskData = {
-      shipmentId: taskData.shipmentId!,
+      relatedShipmentId: taskData.shipmentId,
       title: taskData.title.trim(),
       description: taskData.description?.trim(),
-      type: taskData.type || TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
+      taskType: taskData.taskType || TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
       priority: taskData.priority,
       assignedTo: taskData.assignedTo,
       dueDate: taskData.dueDate,
-      metadata: taskData.metadata,
     }
 
     return await tasksService.createTask(createMutation, authUser.id, createData)
@@ -103,7 +117,7 @@ export function useTasks(options?: {
     if (updates.priority !== undefined) updateData.priority = updates.priority
     if (updates.assignedTo !== undefined) updateData.assignedTo = updates.assignedTo
     if (updates.dueDate !== undefined) updateData.dueDate = updates.dueDate
-    if (updates.metadata !== undefined) updateData.metadata = updates.metadata
+    if (updates.taskType !== undefined) updateData.taskType = updates.taskType
 
     return await tasksService.updateTask(updateMutation, authUser.id, taskId, updateData)
   }, [authUser, updateMutation])
@@ -153,14 +167,10 @@ export function useTasks(options?: {
   // COMPUTED VALUES
   // ========================================
 
-  const enrichedTasks = useMemo(() => {
-    const tasks = tasksQuery || []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasksQuery])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasksQuery as TaskListItem[] | undefined),
+    [tasksQuery]
+  )
 
   // ========================================
   // PERMISSION CHECKS
@@ -244,18 +254,24 @@ export function useTask(taskId?: TaskId) {
     refetch,
   } = tasksService.useTask(authUser?.id!, taskId)
 
-  const taskInsights = useMemo((): TaskInsights | null => {
-    if (!task) return null
+  const typedTask = task as TaskListItem | undefined
+  const normalizedTask = useMemo(
+    () => (typedTask ? { ...typedTask, type: typedTask.type ?? typedTask.taskType } : undefined),
+    [typedTask]
+  )
 
-    const isOverdue = tasksService.isTaskOverdue(task)
-    const isDueSoon = task.dueDate
-      ? (task.dueDate - Date.now()) < (TASK_CONSTANTS.DUE_SOON_HOURS * 60 * 60 * 1000)
+  const taskInsights = useMemo((): TaskInsights | null => {
+    if (!normalizedTask) return null
+
+    const isOverdue = tasksService.isTaskOverdue(normalizedTask)
+    const isDueSoon = normalizedTask.dueDate
+      ? (normalizedTask.dueDate - Date.now()) < (TASK_CONSTANTS.DUE_SOON_HOURS * 60 * 60 * 1000)
       : false
 
-    const urgencyLevel = tasksService.calculateTaskUrgency(task)
+    const urgencyLevel = tasksService.calculateTaskUrgency(normalizedTask)
 
-    const daysUntilDue = task.dueDate
-      ? Math.ceil((task.dueDate - Date.now()) / (24 * 60 * 60 * 1000))
+    const daysUntilDue = normalizedTask.dueDate
+      ? Math.ceil((normalizedTask.dueDate - Date.now()) / (24 * 60 * 60 * 1000))
       : undefined
 
     return {
@@ -268,10 +284,10 @@ export function useTask(taskId?: TaskId) {
       canBeCancelled: tasksService.canTaskBeCancelled(task),
       canBeEdited: tasksService.canTaskBeEdited(task),
     }
-  }, [task])
+  }, [normalizedTask])
 
   return {
-    task,
+    task: normalizedTask,
     taskInsights,
     isLoading: isPending,
     error,
@@ -321,14 +337,10 @@ export function useTasksByShipment(
     isPending: isLoadingNext,
   } = tasksService.useNextTask(authUser?.id!, shipmentId)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -356,14 +368,10 @@ export function useTasksByAssignee(
     error,
   } = tasksService.useTasksByAssignee(authUser?.id!, userId, status)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -386,14 +394,10 @@ export function useOverdueTasks() {
     refetch,
   } = tasksService.useOverdueTasks(authUser?.id!)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: true,
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined, { forceOverdue: true }),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -417,14 +421,10 @@ export function useTasksDueToday() {
     refetch,
   } = tasksService.useTasksDueToday(authUser?.id!)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -448,14 +448,10 @@ export function useAllPendingTasks() {
     refetch,
   } = tasksService.useAllPendingTasks(authUser?.id!)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -478,14 +474,10 @@ export function useTasksByStatus(status: TaskStatus) {
     error,
   } = tasksService.useTasksByStatus(authUser?.id!, status)
 
-  const enrichedTasks = useMemo(() => {
-    if (!tasks) return []
-    return tasks.map((task: any): TaskListItem => ({
-      ...task,
-      isOverdue: tasksService.isTaskOverdue(task),
-      dueIn: task.dueDate ? tasksService.getTimeUntilDue(task.dueDate) : undefined,
-    }))
-  }, [tasks])
+  const enrichedTasks = useMemo(
+    () => enrichTasks(tasks as TaskListItem[] | undefined),
+    [tasks]
+  )
 
   return {
     tasks: enrichedTasks,
@@ -500,7 +492,7 @@ export function useTasksByStatus(status: TaskStatus) {
 export function useTaskForm(initialData?: Partial<TaskFormData>) {
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
-    type: TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
+    taskType: TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
     priority: TASK_CONSTANTS.DEFAULT_VALUES.PRIORITY,
     ...initialData,
   })
@@ -508,13 +500,16 @@ export function useTaskForm(initialData?: Partial<TaskFormData>) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isDirty, setIsDirty] = useState(false)
 
-  const updateField = useCallback((field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    setIsDirty(true)
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
-    }
-  }, [errors])
+  const updateField = useCallback(
+    <K extends keyof TaskFormData>(field: K, value: TaskFormData[K]) => {
+      setFormData((prev) => ({ ...prev, [field]: value }))
+      setIsDirty(true)
+      if (errors[field as string]) {
+        setErrors((prev) => ({ ...prev, [field as string]: '' }))
+      }
+    },
+    [errors]
+  )
 
   const validateForm = useCallback(() => {
     const validationErrors = tasksService.validateTaskData(formData)
@@ -535,7 +530,7 @@ export function useTaskForm(initialData?: Partial<TaskFormData>) {
   const resetForm = useCallback(() => {
     const defaultFormData: TaskFormData = {
       title: '',
-      type: TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
+      taskType: TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
       priority: TASK_CONSTANTS.DEFAULT_VALUES.PRIORITY,
     }
     setFormData(initialData ? { ...defaultFormData, ...initialData } : defaultFormData)
@@ -612,14 +607,13 @@ export function useTaskMutations() {
     }
 
     const createData: CreateTaskData = {
-      shipmentId: taskData.shipmentId!,
+      relatedShipmentId: taskData.shipmentId,
       title: taskData.title.trim(),
       description: taskData.description?.trim(),
-      type: taskData.type || TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
+      taskType: taskData.taskType || TASK_CONSTANTS.DEFAULT_VALUES.TYPE,
       priority: taskData.priority,
       assignedTo: taskData.assignedTo,
       dueDate: taskData.dueDate,
-      metadata: taskData.metadata,
     }
 
     return await tasksService.createTask(createMutation, authUser.id, createData)
@@ -642,7 +636,7 @@ export function useTaskMutations() {
     if (updates.priority !== undefined) updateData.priority = updates.priority
     if (updates.assignedTo !== undefined) updateData.assignedTo = updates.assignedTo
     if (updates.dueDate !== undefined) updateData.dueDate = updates.dueDate
-    if (updates.metadata !== undefined) updateData.metadata = updates.metadata
+    if (updates.taskType !== undefined) updateData.taskType = updates.taskType
 
     return await tasksService.updateTask(updateMutation, authUser.id, taskId, updateData)
   }, [authUser, updateMutation])

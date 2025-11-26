@@ -1,9 +1,15 @@
 // filepath: src/features/system/admin/hooks/useAppSettingsManagement.ts
 import { useCallback, useMemo } from 'react'
 import { appSettingsService } from '../services/AppSettingsService'
-import type { AISettings, SystemSettings, AppSetting } from '../types/admin.types'
-import type { SettingCategory } from '@/convex/lib/system/app_settings/types'
-import { AuthUserId } from '@/features/system/auth'
+import type {
+  AISettings,
+  SystemSettings,
+  AppSetting,
+  BillingSettings,
+  IntegrationSettings,
+  AppSettingValue,
+} from '../types/admin.types'
+import { AppSettingCategory } from '@/convex/schema/system'
 
 /**
  * App settings management hook - handles system-wide settings for admins
@@ -22,7 +28,7 @@ export function useAppSettingsManagement() {
 
   // === Settings Mutations ===
   const createOrUpdateMutation = appSettingsService.useCreateOrUpdateSetting()
-  const deleteMutation = appSettingsService.useDeleteSetting()
+  const deleteMutation = appSettingsService.useDeleteSettingByKey()
   const updateAIMutation = appSettingsService.useUpdateAISettings()
   const updateGeneralMutation = appSettingsService.useUpdateGeneralSettings()
   const updateSecurityMutation = appSettingsService.useUpdateSecuritySettings()
@@ -36,8 +42,8 @@ export function useAppSettingsManagement() {
   // === Individual Setting Operations ===
   const updateSetting = useCallback(async (
     key: string,
-    value: any,
-    category: SettingCategory,
+    value: AppSettingValue,
+    category: AppSettingCategory,
     description?: string,
     isPublic: boolean = false
   ) => {
@@ -96,14 +102,14 @@ export function useAppSettingsManagement() {
     )
   }, [updateNotificationsMutation])
 
-  const updateBillingSettings = useCallback(async (settings: any) => {
+  const updateBillingSettings = useCallback(async (settings: Partial<BillingSettings>) => {
     return await appSettingsService.updateBillingSettings(
       updateBillingMutation,
       settings
     )
   }, [updateBillingMutation])
 
-  const updateIntegrationSettings = useCallback(async (settings: any) => {
+  const updateIntegrationSettings = useCallback(async (settings: Partial<IntegrationSettings>) => {
     return await appSettingsService.updateIntegrationSettings(
       updateIntegrationsMutation,
       settings
@@ -112,7 +118,7 @@ export function useAppSettingsManagement() {
 
   // === Bulk Operations ===
   const batchUpdateSettings = useCallback(async (
-    settings: Array<{ key: string; value: any; category: SettingCategory }>
+    settings: Array<{ key: string; value: AppSettingValue; category: AppSettingCategory }>
   ) => {
     // Validate all settings before updating
     for (const setting of settings) {
@@ -132,7 +138,7 @@ export function useAppSettingsManagement() {
     )
   }, [batchUpdateMutation])
 
-  const resetCategoryToDefaults = useCallback(async (category: SettingCategory) => {
+  const resetCategoryToDefaults = useCallback(async (category: AppSettingCategory) => {
     if (!window.confirm(`Are you sure you want to reset all ${category} settings to defaults?`)) {
       return
     }
@@ -153,25 +159,25 @@ export function useAppSettingsManagement() {
 
   // === Data Processing ===
   const categorizedSettings = useMemo(() => {
-    if (!allSettings?.settings) return {}
-    return appSettingsService.categorizeSettings(allSettings.settings as AppSetting[])
+    if (!allSettings?.items) return {}
+    return appSettingsService.categorizeSettings(allSettings.items as AppSetting[])
   }, [allSettings])
 
-  const getSettingsByCategory = useCallback((category: SettingCategory) => {
-    if (!allSettings?.settings) return []
-    return appSettingsService.filterSettingsByCategory(allSettings.settings as AppSetting[], category)
+  const getSettingsByCategory = useCallback((category: AppSettingCategory) => {
+    if (!allSettings?.items) return []
+    return appSettingsService.filterSettingsByCategory(allSettings.items as AppSetting[], category)
   }, [allSettings])
 
   // === Export/Import ===
-  const exportSettings = useCallback((category?: SettingCategory) => {
+  const exportSettings = useCallback((category?: AppSettingCategory) => {
     const settingsToExport = category
       ? getSettingsByCategory(category)
-      : (allSettings?.settings as AppSetting[]) || []
+      : (allSettings?.items as AppSetting[]) || []
 
     return appSettingsService.exportSettings(settingsToExport)
   }, [allSettings, getSettingsByCategory])
 
-  const validateImportedSettings = useCallback((data: any) => {
+  const validateImportedSettings = useCallback((data: unknown) => {
     return appSettingsService.validateImportedSettings(data)
   }, [])
 
@@ -228,7 +234,7 @@ export function useAppSettingsManagement() {
 
   return {
     // === Data ===
-    allSettings: allSettings?.settings || [],
+    allSettings: allSettings?.items || [],
     total: allSettings?.total || 0,
     hasMore: allSettings?.hasMore || false,
     aiSettings,

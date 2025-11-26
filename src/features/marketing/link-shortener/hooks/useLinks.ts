@@ -25,11 +25,14 @@ export function useLinkStats() {
 
 export function useCreateLink() {
   const queryClient = useQueryClient()
+  const linksQueryKey = linkShortenerService.getLinksQueryOptions().queryKey
+  const statsQueryKey = linkShortenerService.getLinkStatsQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.link_shortener.mutations.createMarketingLink, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.link_shortener.mutations.createMarketingLink),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLinks] })
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLinkStats] })
+      queryClient.invalidateQueries({ queryKey: linksQueryKey })
+      queryClient.invalidateQueries({ queryKey: statsQueryKey })
       toast.success('Link created successfully')
     },
     onError: (error) => {
@@ -40,11 +43,12 @@ export function useCreateLink() {
 
 export function useUpdateLink() {
   const queryClient = useQueryClient()
+  const linksQueryKey = linkShortenerService.getLinksQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.link_shortener.mutations.updateMarketingLink, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.link_shortener.mutations.updateMarketingLink),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLinks] })
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLink] })
+      queryClient.invalidateQueries({ queryKey: linksQueryKey })
       toast.success('Link updated successfully')
     },
     onError: (error) => {
@@ -55,11 +59,14 @@ export function useUpdateLink() {
 
 export function useDeleteLink() {
   const queryClient = useQueryClient()
+  const linksQueryKey = linkShortenerService.getLinksQueryOptions().queryKey
+  const statsQueryKey = linkShortenerService.getLinkStatsQueryOptions().queryKey
 
-  return useConvexMutation(api.lib.addons.marketing.link_shortener.mutations.deleteMarketingLink, {
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.link_shortener.mutations.deleteMarketingLink),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLinks] })
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.link_shortener.queries.getMarketingLinkStats] })
+      queryClient.invalidateQueries({ queryKey: linksQueryKey })
+      queryClient.invalidateQueries({ queryKey: statsQueryKey })
       toast.success('Link deleted successfully')
     },
     onError: (error) => {

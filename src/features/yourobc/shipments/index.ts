@@ -48,7 +48,7 @@ export {
 } from './types'
 
 // === Services ===
-export { ShipmentsService, shipmentsService } from './services/ShipmentsService'
+export { ShipmentsService, shipmentsService, shipmentsService as shipmentService } from './services/ShipmentsService'
 
 // === Hooks ===
 export {

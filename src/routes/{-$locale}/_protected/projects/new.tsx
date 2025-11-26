@@ -3,10 +3,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CreateProjectPage } from '@/features/projects'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
-export const Route = createFileRoute('/{-$locale}/_protected/_projects/new')({
+export const Route = createFileRoute('/{-$locale}/_protected/projects/new')({
   // No loader needed for create mode - no data to prefetch
   component: CreateProjectIndexPage,
   pendingComponent: () => (

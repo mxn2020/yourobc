@@ -13,7 +13,6 @@ import type {
   EmailProvider,
   SendEmailOptions,
 } from '../types';
-import type { Id } from '@/convex/_generated/dataModel';
 
 export interface EmailServiceConfig {
   enableLogging?: boolean;

@@ -78,11 +78,11 @@ export class TeamService {
 
   // User profile queries for member management
   getCurrentUserProfileQueryOptions() {
-    return convexQuery(api.lib.boilerplate.user_profiles.queries.getProfileByAuthId, {});
+    return convexQuery(api.lib.system.user.user_profiles.queries.getProfileByAuthId, {});
   }
 
   getAllUserProfilesQueryOptions() {
-    return convexQuery(api.lib.boilerplate.user_profiles.queries.getAllProfiles, {});
+    return convexQuery(api.lib.system.user.user_profiles.queries.getAllProfiles, {});
   }
 
   // ==========================================

@@ -301,7 +301,7 @@ function Example11_ConditionalTracking() {
         eventType: "user_action",    // Required discriminator
         action: "use_feature",       // Required field
         feature: "advanced_export",
-        userPlan: profile?.metadata?.plan || "free", // camelCase
+        userPlan: profile?.role ?? "free", // camelCase
         category: "premium_features",
       },
     });

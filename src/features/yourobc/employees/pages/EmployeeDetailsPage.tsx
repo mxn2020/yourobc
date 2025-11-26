@@ -141,7 +141,7 @@ export const EmployeeDetailsPage: FC<EmployeeDetailsPageProps> = ({ employeeId }
               <p className="text-gray-500 mb-4">
                 {error?.message || 'The employee you are looking for does not exist or has been deleted.'}
               </p>
-              <Link to="/yourobc/employees" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/employees" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Employees
               </Link>
             </div>
@@ -156,12 +156,12 @@ export const EmployeeDetailsPage: FC<EmployeeDetailsPageProps> = ({ employeeId }
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Link to="/yourobc/employees" className="text-blue-600 hover:text-blue-800 font-medium">
+          <Link to="/{-$locale}/yourobc/employees" className="text-blue-600 hover:text-blue-800 font-medium">
             ← Back to Employees
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/employees/vacations/new" search={{ employeeId }}>
+            <Link to="/{-$locale}/yourobc/employees/vacations/new" search={{ employeeId }}>
               <Button variant="primary">🏖️ Request Vacation</Button>
             </Link>
 
@@ -434,7 +434,7 @@ export const EmployeeDetailsPage: FC<EmployeeDetailsPageProps> = ({ employeeId }
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
                         <div className="space-y-2">
-                          <Link to="/yourobc/employees/vacations/new" search={{ employeeId }} className="block w-full">
+                          <Link to="/{-$locale}/yourobc/employees/vacations/new" search={{ employeeId }} className="block w-full">
                             <Button variant="primary" className="w-full">
                               🏖️ Request Vacation
                             </Button>
@@ -580,7 +580,7 @@ export const EmployeeDetailsPage: FC<EmployeeDetailsPageProps> = ({ employeeId }
                   <Card className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-semibold text-gray-900">Vacation Request History</h4>
-                      <Link to="/yourobc/employees/vacations/new" search={{ employeeId }}>
+                      <Link to="/{-$locale}/yourobc/employees/vacations/new" search={{ employeeId }}>
                         <Button variant="primary" size="sm">
                           + New Request
                         </Button>

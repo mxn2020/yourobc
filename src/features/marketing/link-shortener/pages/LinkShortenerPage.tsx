@@ -32,7 +32,7 @@ export const LinkShortenerPage: FC = () => {
   const deleteLink = useDeleteLink()
 
   // Filter links based on search
-  const filteredLinks = linksData?.items?.filter(
+  const filteredLinks = linksData?.links?.filter(
     (link: MarketingLink) =>
       link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       link.originalUrl.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -108,7 +108,7 @@ export const LinkShortenerPage: FC = () => {
             totalLinks={stats.totalLinks || 0}
             activeLinks={stats.activeLinks || 0}
             totalClicks={stats.totalClicks || 0}
-            avgClicksPerLink={stats.avgClicksPerLink || 0}
+            avgClicksPerLink={stats.totalLinks ? stats.totalClicks / stats.totalLinks : 0}
           />
         </div>
       )}
@@ -150,12 +150,13 @@ export const LinkShortenerPage: FC = () => {
               : 'Create your first short link to get started'
           }
           action={
-            !searchTerm ? (
-              <Button onClick={() => setIsFormOpen(true)}>
-                <Plus className="h-5 w-5 mr-2" />
-                Create Link
-              </Button>
-            ) : undefined
+            !searchTerm
+              ? {
+                  label: 'Create Link',
+                  onClick: () => setIsFormOpen(true),
+                  icon: Plus,
+                }
+              : undefined
           }
         />
       )}
@@ -175,12 +176,12 @@ export const LinkShortenerPage: FC = () => {
       {/* Delete Confirmation */}
       {deletingLink && (
         <DeleteConfirmationModal
-          isOpen={true}
-          onClose={() => setDeletingLink(undefined)}
+          open={true}
+          onOpenChange={(open) => !open && setDeletingLink(undefined)}
           onConfirm={handleDeleteLink}
           title="Delete Link"
           description={`Are you sure you want to delete "${deletingLink.title}"? This action cannot be undone.`}
-          isDeleting={deleteLink.isPending}
+          isLoading={deleteLink.isPending}
         />
       )}
     </div>

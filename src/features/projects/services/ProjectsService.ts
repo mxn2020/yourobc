@@ -5,13 +5,13 @@ import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
 import { api } from "@/convex/_generated/api";
 import type { CreateProjectData, UpdateProjectData, ProjectId, ProjectsListOptions } from "../types";
 import type { Id } from "@/convex/_generated/dataModel";
-import * as projectHelpers from "../utils/projectHelpers";
 
 /**
  * Projects Service
  *
  * Handles data fetching and mutations.
  * ⚠️ NO authentication/authorization logic here - that's in the backend!
+ * ⚠️ NO business logic - use utils/projectHelpers for calculations
  */
 export class ProjectsService {
   // ==========================================
@@ -21,9 +21,7 @@ export class ProjectsService {
   // ==========================================
 
   getProjectsQueryOptions(options?: ProjectsListOptions) {
-    return convexQuery(api.lib.projects.queries.getProjects, {
-      options,
-    });
+     return convexQuery(api.lib.projects.queries.getProjects, options ?? {});
   }
 
   getProjectQueryOptions(projectId: ProjectId) {
@@ -158,7 +156,6 @@ export class ProjectsService {
   formatProjectName(project: { title: string; _id?: ProjectId }): string {
     return project.title || `Project ${project._id || "Unknown"}`;
   }
-
 }
 
 export const projectsService = new ProjectsService();

@@ -115,7 +115,7 @@ export const ShipmentsPage: FC = () => {
                   ⚠️ <strong>{overdueShipments.length} shipment{overdueShipments.length !== 1 ? 's' : ''} overdue</strong> -
                   Immediate attention required to meet customer commitments.
                 </div>
-                <Link to="/yourobc/shipments/overdue">
+                <Link to="/{-$locale}/yourobc/shipments/overdue">
                   <Button variant="outline" size="sm">
                     View Overdue
                   </Button>

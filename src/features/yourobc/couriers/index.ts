@@ -39,7 +39,7 @@ export {
 } from './types'
 
 // === Services ===
-export { CouriersService, couriersService } from './services/CouriersService'
+export { CouriersService, couriersService, couriersService as courierService } from './services/CouriersService'
 
 // === Hooks ===
 export {

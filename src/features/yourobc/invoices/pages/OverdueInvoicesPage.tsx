@@ -177,7 +177,7 @@ export const OverdueInvoicesPage: FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/invoices">
+            <Link to="/{-$locale}/yourobc/invoices">
               <Button variant="secondary">📄 All Invoices</Button>
             </Link>
             <Button variant="primary" onClick={() => refetch()}>

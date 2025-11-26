@@ -197,7 +197,7 @@ export const CouriersPage: FC = () => {
         {/* Quick Actions (Fixed Position) */}
         <div className="fixed bottom-6 right-6 flex flex-col gap-3">
           {canCreateCouriers && (
-            <Link to="/yourobc/couriers/new">
+            <Link to="/{-$locale}/yourobc/couriers/new">
               <button
                 className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-xl hover:scale-110 transition-all"
                 title="Add New Courier"

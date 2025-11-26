@@ -164,7 +164,7 @@ export const CustomerDetailsPage: FC<CustomerDetailsPageProps> = ({ customerId }
               <p className="text-gray-500 mb-4">
                 {error?.message || 'The customer you are looking for does not exist or has been deleted.'}
               </p>
-              <Link to="/yourobc/customers" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/{-$locale}/yourobc/customers" className="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Customers
               </Link>
             </div>
@@ -179,12 +179,12 @@ export const CustomerDetailsPage: FC<CustomerDetailsPageProps> = ({ customerId }
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Link to="/yourobc/customers" className="text-blue-600 hover:text-blue-800 font-medium">
+          <Link to="/{-$locale}/yourobc/customers" className="text-blue-600 hover:text-blue-800 font-medium">
             ← Back to Customers
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/yourobc/quotes/new" search={{ customerId }}>
+            <Link to="/{-$locale}/yourobc/quotes/new" search={{ customerId }}>
               <Button variant="primary">📄 New Quote</Button>
             </Link>
 

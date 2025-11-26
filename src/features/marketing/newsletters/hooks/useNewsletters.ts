@@ -1,6 +1,6 @@
 // src/features/marketing/newsletters/hooks/useNewsletters.ts
 
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { useSuspenseQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/generated/api'
 import { newslettersService } from '../service'
@@ -16,9 +16,12 @@ export function useNewsletterStats() {
 
 export function useCreateNewsletter() {
   const queryClient = useQueryClient()
-  return useConvexMutation(api.lib.addons.marketing.newsletters.mutations.createNewsletter, {
+  const newslettersQueryKey = newslettersService.getNewslettersQueryOptions().queryKey
+
+  return useMutation({
+    mutationFn: useConvexMutation(api.lib.marketing.newsletters.mutations.createNewsletter),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.lib.addons.marketing.newsletters.queries.getNewsletters] })
+      queryClient.invalidateQueries({ queryKey: newslettersQueryKey })
       toast.success('Newsletter created successfully')
     },
     onError: (error) => {

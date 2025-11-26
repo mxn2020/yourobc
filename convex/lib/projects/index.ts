@@ -62,6 +62,7 @@ export {
   createProject,
   updateProject,
   deleteProject,
+  requestAccess,
   restoreProject,
   archiveProject,
   updateProjectProgress,

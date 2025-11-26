@@ -1,4 +1,4 @@
-// src/features/boilerplate/logging/types/logging.types.ts
+// src/features/system/logging/types/logging.types.ts
 
 import { Id } from "@/generated/dataModel"
 import type * as Sentry from '@sentry/react'

@@ -86,7 +86,7 @@ export const QuotesPageHeader: FC<QuotesPageHeaderProps> = ({
 
         {/* Create Button */}
         {canCreate && (
-          <Link to="/yourobc/quotes/new">
+          <Link to="/{-$locale}/yourobc/quotes/new">
             <Button variant="primary">
               + New Quote
             </Button>

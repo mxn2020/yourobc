@@ -35,7 +35,7 @@
       "@/shared/*": ["convex/shared/*"],
       "@/schema/*": ["convex/schema/*"],
       "@/config/*": ["convex/config/*"],
-      "@/lib/*": ["convex/lib/*"]
+      "@/lib/*": ["./src/lib/*"]
     },
     "noEmit": true
   },

@@ -5,12 +5,12 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useProjectSuspense } from '../hooks/useProjects'
 import { useUpdateProject } from '../hooks/useProjects'
 import { useProjectAudit } from '../hooks/useProjectAudit'
-import { useToast } from '@/features/boilerplate/notifications'
+import { useToast } from '@/features/system/notifications'
 import { useErrorContext } from '@/contexts/ErrorContext'
 import { Card } from '@/components/ui'
 import { ProjectForm } from '../components/ProjectForm'
 import type { CreateProjectData, UpdateProjectData, ProjectId } from '../types'
-import { getCurrentLocale } from "@/features/boilerplate/i18n/utils/path";
+import { getCurrentLocale } from "@/features/system/i18n/utils/path";
 import * as projectHelpers from '../utils/projectHelpers';
 
 interface EditProjectPageProps {

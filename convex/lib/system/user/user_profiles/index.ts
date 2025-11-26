@@ -64,3 +64,11 @@ export {
   updateProfileMetadata,
   updateMetadataTags,
 } from './mutations';
+
+// Recovery utilities
+export {
+  recoverMissingProfile,
+  batchRecoverProfiles,
+  findMissingProfiles,
+  profileSyncHealthCheck,
+} from './recovery';

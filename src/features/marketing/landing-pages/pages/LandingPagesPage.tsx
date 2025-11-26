@@ -27,7 +27,7 @@ export const LandingPagesPage: FC = () => {
   const updatePage = useUpdatePage()
   const deletePage = useDeletePage()
 
-  const filteredPages = pagesData?.items?.filter(
+  const filteredPages = pagesData?.pages?.filter(
     (page: LandingPage) =>
       page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       page.slug.toLowerCase().includes(searchTerm.toLowerCase())
@@ -107,7 +107,7 @@ export const LandingPagesPage: FC = () => {
           <div className="bg-white p-6 rounded-lg border">
             <p className="text-sm text-gray-600">Avg. Conversion</p>
             <p className="text-2xl font-bold">
-              {stats.avgConversionRate?.toFixed(1) || 0}%
+              {stats.totalViews ? ((stats.totalConversions || 0) / stats.totalViews * 100).toFixed(1) : '0.0'}%
             </p>
           </div>
         </div>
@@ -148,12 +148,13 @@ export const LandingPagesPage: FC = () => {
               : 'Create your first landing page to get started'
           }
           action={
-            !searchTerm ? (
-              <Button onClick={() => setIsFormOpen(true)}>
-                <Plus className="h-5 w-5 mr-2" />
-                Create Page
-              </Button>
-            ) : undefined
+            !searchTerm
+              ? {
+                  label: 'Create Page',
+                  onClick: () => setIsFormOpen(true),
+                  icon: Plus,
+                }
+              : undefined
           }
         />
       )}
@@ -171,12 +172,12 @@ export const LandingPagesPage: FC = () => {
 
       {deletingPage && (
         <DeleteConfirmationModal
-          isOpen={true}
-          onClose={() => setDeletingPage(undefined)}
+          open={true}
+          onOpenChange={(open) => !open && setDeletingPage(undefined)}
           onConfirm={handleDeletePage}
           title="Delete Landing Page"
           description={`Are you sure you want to delete "${deletingPage.title}"? This action cannot be undone.`}
-          isDeleting={deletePage.isPending}
+          isLoading={deletePage.isPending}
         />
       )}
     </div>

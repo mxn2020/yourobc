@@ -1,8 +1,7 @@
 // src/features/audit-logs/utils/audit-logs.helpers.ts
 
+import { ProjectId } from "@/features/projects";
 import { AuditAction, AuditOperation } from "../types/audit-logs.types";
-import type { ProjectId } from '@/features/system/projects/types';
-import { Id } from '@/convex/_generated/dataModel'
 
 // === Audit Log Helpers ===
 export const AuditLogHelpers = {

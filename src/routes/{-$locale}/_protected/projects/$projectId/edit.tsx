@@ -5,11 +5,11 @@ import { EditProjectPage } from '@/features/projects/pages/EditProjectPage'
 import { projectsService } from '@/features/projects/services/ProjectsService'
 import { Loading } from '@/components/ui'
 import { api } from '@/convex/_generated/api'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 import type { ProjectId } from '@/features/projects/types'
 
-export const Route = createFileRoute('/{-$locale}/_protected/_projects/$projectId/edit')({
+export const Route = createFileRoute('/{-$locale}/_protected/projects/$projectId/edit')({
   loader: async ({ params, context }) => {
     const isServer = typeof window === 'undefined'
     const projectId = params.projectId as ProjectId

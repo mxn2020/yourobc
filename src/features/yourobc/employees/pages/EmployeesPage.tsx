@@ -191,7 +191,7 @@ export const EmployeesPage: FC = () => {
         {/* Quick Actions (Fixed Position) */}
         <div className="fixed bottom-6 right-6 flex flex-col gap-3">
           {canCreateEmployees && (
-            <Link to="/yourobc/employees/new">
+            <Link to="/{-$locale}/yourobc/employees/new">
               <button
                 className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-xl hover:scale-110 transition-all"
                 title="Add New Employee"
@@ -201,7 +201,7 @@ export const EmployeesPage: FC = () => {
             </Link>
           )}
 
-          <Link to="/yourobc/employees/vacations">
+          <Link to="/{-$locale}/yourobc/employees/vacations">
             <button
               className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 flex items-center justify-center text-xl hover:scale-110 transition-all"
               title="Vacation Requests"

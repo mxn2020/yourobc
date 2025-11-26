@@ -130,7 +130,7 @@ export const VacationBalance: FC<VacationBalanceProps> = ({ employeeId }) => {
               {balance.remaining} days available to request
             </div>
           </div>
-          <Link to="/yourobc/employees/vacations/new" search={{ employeeId }}>
+          <Link to="/{-$locale}/yourobc/employees/vacations/new" search={{ employeeId }}>
             <Button variant="primary">
               + Request Vacation
             </Button>

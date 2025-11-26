@@ -11,7 +11,7 @@ export const SocialSchedulerPage: FC = () => {
   const { data: postsData } = usePosts({ limit: 100 })
   const { data: stats } = usePostStats()
 
-  const filteredPosts = postsData?.items?.filter((post: SocialPost) =>
+  const filteredPosts = postsData?.posts?.filter((post: SocialPost) =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     post.content.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -51,8 +51,8 @@ export const SocialSchedulerPage: FC = () => {
             <p className="text-2xl font-bold">{stats.publishedPosts || 0}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600">Avg. Engagement</p>
-            <p className="text-2xl font-bold">{stats.avgEngagementRate?.toFixed(1) || 0}%</p>
+            <p className="text-sm text-gray-600">Platforms</p>
+            <p className="text-2xl font-bold">{Object.keys(stats.byPlatform || {}).length}</p>
           </Card>
         </div>
       )}
@@ -93,7 +93,15 @@ export const SocialSchedulerPage: FC = () => {
           icon={Calendar}
           title="No posts found"
           description={searchTerm ? 'Try adjusting your search' : 'Schedule your first social media post'}
-          action={!searchTerm ? <Button onClick={() => console.log('Create')}><Plus className="h-5 w-5 mr-2" />Create Post</Button> : undefined}
+          action={
+            !searchTerm
+              ? {
+                  label: 'Create Post',
+                  onClick: () => console.log('Create'),
+                  icon: Plus,
+                }
+              : undefined
+          }
         />
       )}
     </div>

@@ -4,10 +4,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ProjectsPage, projectsService } from '@/features/projects'
 import { api } from '@/convex/_generated/api'
 import { Loading } from '@/components/ui'
-import { defaultLocale } from '@/features/boilerplate/i18n'
+import { defaultLocale } from '@/features/system/i18n'
 import { createI18nSeo } from '@/utils/seo'
 
-export const Route = createFileRoute('/{-$locale}/_protected/_projects/')({
+export const Route = createFileRoute('/{-$locale}/_protected/projects/')({
   loader: async ({ context }) => {
     const isServer = typeof window === 'undefined'
     console.log(`🔄 Route Loader STARTED (${isServer ? 'SERVER' : 'CLIENT'})`)

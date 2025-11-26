@@ -1,6 +1,6 @@
 // src/features/yourobc/shipments/services/ShipmentsService.ts
 
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query'
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { api } from '@/generated/api'
 import type { Id } from '@/convex/_generated/dataModel'
@@ -13,170 +13,240 @@ import type {
   ShipmentSearchFilters,
   ShipmentFormData,
   StatusUpdateFormData,
+  Shipment,
 } from '../types'
+import { SHIPMENT_CONSTANTS } from '../types'
+
+type ShipmentListOptions = {
+  limit?: number
+  cursor?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  filters?: ShipmentSearchFilters
+}
 
 export class ShipmentsService {
-  // Query hooks for shipment data fetching
-  useShipments(
-    authUserId: string,
-    options?: {
-      limit?: number
-      offset?: number
-      sortBy?: string
-      sortOrder?: 'asc' | 'desc'
-      filters?: ShipmentSearchFilters
+  private normalizeFilters(filters?: ShipmentSearchFilters) {
+    if (!filters) return undefined
+
+    const { status, serviceType, priority, customerId, assignedCourierId, employeeId, partnerId, search, dateFrom, dateTo } =
+      filters
+
+    return {
+      status,
+      serviceType,
+      priority,
+      customerId: Array.isArray(customerId) ? customerId[0] : customerId,
+      assignedCourierId: Array.isArray(assignedCourierId) ? assignedCourierId[0] : assignedCourierId,
+      employeeId,
+      partnerId: Array.isArray(partnerId) ? partnerId[0] : partnerId,
+      search,
+      dateFrom,
+      dateTo,
     }
-  ) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipments, {
-        authUserId,
-        options,
-      }),
+  }
+
+  getShipmentsQueryOptions(options?: ShipmentListOptions) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipments, {
+      limit: options?.limit,
+      cursor: options?.cursor,
+      filters: this.normalizeFilters(options?.filters),
+    })
+  }
+
+  getShipmentQueryOptions(shipmentId: Id<'yourobcShipments'>) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipment, { shipmentId })
+  }
+
+  getShipmentStatusHistoryQueryOptions(shipmentId: Id<'yourobcShipments'>) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipmentStatusHistory, { shipmentId })
+  }
+
+  getShipmentStatsQueryOptions() {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipmentStats, {})
+  }
+
+  getOverdueShipmentsQueryOptions(options?: { limit?: number }) {
+    return this.getShipmentsQueryOptions({
+      ...options,
+      filters: {
+        status: [
+          SHIPMENT_CONSTANTS.STATUS.PICKUP,
+          SHIPMENT_CONSTANTS.STATUS.IN_TRANSIT,
+          SHIPMENT_CONSTANTS.STATUS.CUSTOMS,
+        ],
+      },
+    })
+  }
+
+  getShipmentsByCustomerQueryOptions(customerId: Id<'yourobcCustomers'>, limit = 20) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipmentsByCustomer, {
+      customerId,
+      limit,
+    })
+  }
+
+  getShipmentsByCourierQueryOptions(courierId: Id<'yourobcCouriers'>, limit = 20) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipmentsByCourier, {
+      courierId,
+      limit,
+    })
+  }
+
+  getShipmentsByEmployeeQueryOptions(employeeId: Id<'yourobcEmployees'>) {
+    return convexQuery(api.lib.yourobc.shipments.queries.getShipmentsByEmployee, {
+      employeeId,
+    })
+  }
+
+  // Query hooks for shipment data fetching
+  useShipments(options?: ShipmentListOptions) {
+    return useSuspenseQuery({
+      ...this.getShipmentsQueryOptions(options),
       staleTime: 300000, // 5 minutes
-      enabled: !!authUserId,
     })
   }
 
-  useShipment(authUserId: string, shipmentId?: Id<'yourobcShipments'>) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipment, {
-        shipmentId,
-        authUserId,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId && !!shipmentId,
-    })
+  useShipment(shipmentId?: Id<'yourobcShipments'>) {
+    return useQuery(
+      shipmentId
+        ? {
+            ...this.getShipmentQueryOptions(shipmentId),
+            staleTime: 300000,
+          }
+        : skipToken
+    )
   }
 
-  useShipmentsByCustomer(
-    authUserId: string,
-    customerId: Id<'yourobcCustomers'>,
-    limit = 20,
-    includeCompleted = true
-  ) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipmentsByCustomer, {
-        authUserId,
-        customerId,
-        limit,
-        includeCompleted,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId && !!customerId,
-    })
+  useShipmentsByCustomer(customerId?: Id<'yourobcCustomers'>, limit = 20) {
+    return useQuery(
+      customerId
+        ? {
+            ...this.getShipmentsByCustomerQueryOptions(customerId, limit),
+            staleTime: 300000,
+          }
+        : skipToken
+    )
   }
 
-  useShipmentsByCourier(
-    authUserId: string,
-    courierId?: Id<'yourobcCouriers'>,
-    limit = 20,
-    includeCompleted = false
-  ) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipmentsByCourier, {
-        authUserId,
-        courierId,
-        limit,
-        includeCompleted,
-      }),
-      staleTime: 300000,
-      enabled: !!authUserId,
-    })
+  useShipmentsByCourier(courierId?: Id<'yourobcCouriers'>, limit = 20) {
+    return useQuery(
+      courierId
+        ? {
+            ...this.getShipmentsByCourierQueryOptions(courierId, limit),
+            staleTime: 300000,
+          }
+        : skipToken
+    )
   }
 
-  useShipmentStats(
-    authUserId: string,
-    dateRange?: { start: number; end: number }
-  ) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipmentStats, {
-        authUserId,
-        dateRange,
-      }),
+  useShipmentStats() {
+    return useSuspenseQuery({
+      ...this.getShipmentStatsQueryOptions(),
       staleTime: 60000,
-      enabled: !!authUserId,
     })
   }
 
-  useShipmentStatusHistory(authUserId: string, shipmentId?: Id<'yourobcShipments'>) {
+  useShipmentStatusHistory(shipmentId?: Id<'yourobcShipments'>) {
+    return useQuery(
+      shipmentId
+        ? {
+            ...this.getShipmentStatusHistoryQueryOptions(shipmentId),
+            staleTime: 30000,
+          }
+        : skipToken
+    )
+  }
+
+  useSearchShipments(searchTerm: string, limit = 20) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getShipmentStatusHistory, {
-        authUserId,
-        shipmentId,
+      ...this.getShipmentsQueryOptions({
+        limit,
+        filters: { search: searchTerm.length >= 2 ? searchTerm : undefined },
       }),
       staleTime: 30000,
-      enabled: !!authUserId && !!shipmentId,
+      enabled: searchTerm.length >= 2,
     })
   }
 
-  useSearchShipments(
-    authUserId: string,
-    searchTerm: string,
-    limit = 20,
-    includeCompleted = true
-  ) {
+  useOverdueShipments(limit = 50) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.searchShipments, {
-        authUserId,
-        searchTerm,
-        limit,
-        includeCompleted,
-      }),
-      staleTime: 30000,
-      enabled: !!authUserId && searchTerm.length >= 2,
-    })
-  }
-
-  useOverdueShipments(authUserId: string, limit = 50) {
-    return useQuery({
-      ...convexQuery(api.lib.yourobc.shipments.queries.getOverdueShipments, {
-        authUserId,
-        limit,
-      }),
+      ...this.getOverdueShipmentsQueryOptions({ limit }),
       staleTime: 60000,
-      enabled: !!authUserId,
     })
   }
 
   // Mutation hooks for shipment modifications
   useCreateShipment() {
+    const queryClient = useQueryClient()
     return useMutation({
       mutationFn: useConvexMutation(api.lib.yourobc.shipments.mutations.createShipment),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: this.getShipmentsQueryOptions().queryKey })
+        queryClient.invalidateQueries({ queryKey: this.getShipmentStatsQueryOptions().queryKey })
+      },
     })
   }
 
   useUpdateShipment() {
+    const queryClient = useQueryClient()
     return useMutation({
       mutationFn: useConvexMutation(api.lib.yourobc.shipments.mutations.updateShipment),
+      onSuccess: (_, { shipmentId }) => {
+        if (shipmentId) {
+          queryClient.invalidateQueries({ queryKey: this.getShipmentQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+          queryClient.invalidateQueries({ queryKey: this.getShipmentStatusHistoryQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+        }
+        queryClient.invalidateQueries({ queryKey: this.getShipmentsQueryOptions().queryKey })
+      },
     })
   }
 
   useUpdateShipmentStatus() {
+    const queryClient = useQueryClient()
     return useMutation({
       mutationFn: useConvexMutation(api.lib.yourobc.shipments.mutations.updateShipmentStatus),
+      onSuccess: (_, { shipmentId }) => {
+        if (shipmentId) {
+          queryClient.invalidateQueries({ queryKey: this.getShipmentQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+          queryClient.invalidateQueries({ queryKey: this.getShipmentStatusHistoryQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+        }
+      },
     })
   }
 
   useAssignCourier() {
+    const queryClient = useQueryClient()
     return useMutation({
       mutationFn: useConvexMutation(api.lib.yourobc.shipments.mutations.assignCourier),
+      onSuccess: (_, { shipmentId }) => {
+        if (shipmentId) {
+          queryClient.invalidateQueries({ queryKey: this.getShipmentQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+        }
+      },
     })
   }
 
   useDeleteShipment() {
+    const queryClient = useQueryClient()
     return useMutation({
       mutationFn: useConvexMutation(api.lib.yourobc.shipments.mutations.deleteShipment),
+      onSuccess: (_, { shipmentId }) => {
+        queryClient.invalidateQueries({ queryKey: this.getShipmentsQueryOptions().queryKey })
+        if (shipmentId) {
+          queryClient.removeQueries({ queryKey: this.getShipmentQueryOptions(shipmentId as Id<'yourobcShipments'>).queryKey })
+        }
+      },
     })
   }
 
   // Business operations using mutations
   async createShipment(
     mutation: ReturnType<typeof this.useCreateShipment>,
-    authUserId: string,
     data: CreateShipmentData
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, data })
+      return await mutation.mutateAsync({ data })
     } catch (error: any) {
       throw new Error(`Failed to create shipment: ${error.message}`)
     }
@@ -184,12 +254,11 @@ export class ShipmentsService {
 
   async updateShipment(
     mutation: ReturnType<typeof this.useUpdateShipment>,
-    authUserId: string,
     shipmentId: Id<'yourobcShipments'>,
     data: UpdateShipmentData
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, shipmentId, data })
+      return await mutation.mutateAsync({ shipmentId, updates: data })
     } catch (error: any) {
       throw new Error(`Failed to update shipment: ${error.message}`)
     }
@@ -197,13 +266,11 @@ export class ShipmentsService {
 
   async updateShipmentStatus(
     mutation: ReturnType<typeof this.useUpdateShipmentStatus>,
-    authUserId: string,
     shipmentId: Id<'yourobcShipments'>,
     statusData: StatusUpdateFormData
   ) {
     try {
       return await mutation.mutateAsync({
-        authUserId,
         shipmentId,
         status: statusData.status,
         location: statusData.location,
@@ -217,14 +284,12 @@ export class ShipmentsService {
 
   async assignCourier(
     mutation: ReturnType<typeof this.useAssignCourier>,
-    authUserId: string,
     shipmentId: Id<'yourobcShipments'>,
     courierId: Id<'yourobcCouriers'>,
     instructions?: string
   ) {
     try {
       return await mutation.mutateAsync({
-        authUserId,
         shipmentId,
         courierId,
         instructions,
@@ -236,11 +301,10 @@ export class ShipmentsService {
 
   async deleteShipment(
     mutation: ReturnType<typeof this.useDeleteShipment>,
-    authUserId: string,
     shipmentId: Id<'yourobcShipments'>
   ) {
     try {
-      return await mutation.mutateAsync({ authUserId, shipmentId })
+      return await mutation.mutateAsync({ shipmentId })
     } catch (error: any) {
       throw new Error(`Failed to delete shipment: ${error.message}`)
     }

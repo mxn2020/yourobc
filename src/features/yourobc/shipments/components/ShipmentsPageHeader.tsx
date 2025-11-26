@@ -89,7 +89,7 @@ export const ShipmentsPageHeader: FC<ShipmentsPageHeaderProps> = ({
 
         {/* Create Button */}
         {canCreate && (
-          <Link to="/yourobc/shipments/new">
+          <Link to="/{-$locale}/yourobc/shipments/new">
             <Button variant="primary">
               + New Shipment
             </Button>

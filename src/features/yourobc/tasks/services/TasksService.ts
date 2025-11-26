@@ -87,7 +87,7 @@ export class TasksService {
 
   useAllTasks(authUserId: string, filters?: TaskFilters) {
     return useQuery({
-      ...convexQuery(api.lib.yourobc.tasks.queries.getAllTasks, { authUserId }),
+      ...convexQuery(api.lib.yourobc.tasks.queries.getAllTasks, { authUserId, filters }),
       staleTime: 60000,
       enabled: !!authUserId,
     })

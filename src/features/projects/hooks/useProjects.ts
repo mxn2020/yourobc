@@ -12,7 +12,7 @@ import type {
   ProjectsListOptions,
   UpdateProjectData,
 } from "../types";
-import { Id } from "@/convex/_generated/dataModel";
+import type { Id } from "@/convex/_generated/dataModel";
 
 // Generate unique ID for each hook instance
 let instanceCounter = 0;
@@ -50,7 +50,7 @@ export function useProjects(options?: ProjectsListOptions) {
             projectsQuery.projects?.length || 0
           } projects ${source}`
         );
-        startTimeRef.current = undefined; // Clear to prevent duplicate logs
+        startTimeRef.current = undefined;
       }
     }
   }, [isPending, projectsQuery, timerLabel]);
@@ -88,7 +88,7 @@ export function useProjects(options?: ProjectsListOptions) {
       const result = await createProjectMutation.mutateAsync({ data });
 
       // ✅ No try-catch needed - audit hook handles failures internally
-      logProjectCreated(result._id, data.title, data);
+      logProjectCreated(result.publicId, data.title, data);
 
       return result;
     },
@@ -113,7 +113,7 @@ export function useProjects(options?: ProjectsListOptions) {
       });
 
       // ✅ Clean - no error handling needed
-      logProjectUpdated(projectId, currentProject.title, currentProject, updates);
+      logProjectUpdated(currentProject.publicId, currentProject.title, currentProject, updates);
 
       return result;
     },
@@ -130,9 +130,7 @@ export function useProjects(options?: ProjectsListOptions) {
       const result = await deleteProjectMutation.mutateAsync({ projectId, hardDelete });
 
       // Log deletion
-      logProjectDeleted(projectId, projectToDelete.title, projectToDelete, hardDelete).catch(
-        console.warn
-      );
+      logProjectDeleted(projectToDelete.publicId, projectToDelete.title, projectToDelete, hardDelete);
 
       return result;
     },
@@ -162,11 +160,11 @@ export function useProjects(options?: ProjectsListOptions) {
 
       // Log progress update
       logProgressUpdated(
-        projectId,
+        currentProject.publicId,
         currentProject.title,
         currentProject.progress,
         newProgress
-      ).catch(console.warn);
+      );
 
       return result;
     },
@@ -177,7 +175,7 @@ export function useProjects(options?: ProjectsListOptions) {
     async (projectId: ProjectId) => {
       const project = projectsQuery?.projects?.find((p) => p._id === projectId);
       if (project && project.visibility === "private") {
-        logProjectViewed(projectId, project.title).catch(console.warn);
+        logProjectViewed(project.publicId, project.title);
       }
     },
     [logProjectViewed, projectsQuery]
@@ -223,7 +221,9 @@ export function useProjects(options?: ProjectsListOptions) {
   };
 }
 
-// Additional hooks
+/**
+ * Get single project by ID
+ */
 export function useProject(projectId: ProjectId | undefined) {
   const result = projectsService.useProject(projectId);
   const { logProjectViewed } = useProjectAudit();
@@ -231,13 +231,16 @@ export function useProject(projectId: ProjectId | undefined) {
   // Auto-log project views for private projects
   useEffect(() => {
     if (projectId && result.data && result.data.visibility === "private") {
-      logProjectViewed(projectId, result.data.title).catch(console.warn);
+      logProjectViewed(result.data.publicId, result.data.title);
     }
   }, [result.data, projectId, logProjectViewed]);
 
   return result;
 }
 
+/**
+ * Get user's projects (owned + collaborated)
+ */
 export function useUserProjects(options?: {
   targetUserId?: Id<"userProfiles">;
   includeArchived?: boolean;
@@ -247,12 +250,15 @@ export function useUserProjects(options?: {
 }
 
 /**
- * Hook for project members
+ * Get project members
  */
 export function useProjectMembers(projectId?: ProjectId) {
   return projectsService.useProjectMembers(projectId);
 }
 
+/**
+ * Mutation hooks
+ */
 export function useCreateProject() {
   return projectsService.useCreateProject();
 }
@@ -272,16 +278,14 @@ export function useUpdateProjectProgress() {
 /**
  * Lightweight hook for project actions WITHOUT data subscription
  * Use this in components that only need to perform actions (like ProjectCard)
- * This avoids creating unnecessary data subscriptions
  */
 export function useProjectActions() {
   const { logProjectViewed } = useProjectAudit();
 
   const viewProject = useCallback(
-    async (projectId: ProjectId, projectTitle?: string) => {
-      // Log the view - no need to fetch project data
+    async (publicId: string, projectTitle?: string) => {
       if (projectTitle) {
-        logProjectViewed(projectId, projectTitle).catch(console.warn);
+        logProjectViewed(publicId, projectTitle);
       }
     },
     [logProjectViewed]
@@ -301,55 +305,73 @@ export function useProjectActions() {
 /**
  * Hook for projects list data using Suspense
  * Uses SSR cache when available, suspends and fetches if not
- *
- * @example
- * const { data: projectsData } = useProjectsList({ limit: 100 })
  */
 export function useProjectsList(options?: ProjectsListOptions) {
   const startTime = performance.now();
   const result = useSuspenseQuery(projectsService.getProjectsQueryOptions(options));
 
-  // Log data access timing
-  const duration = performance.now() - startTime;
-  const source = duration < 10 ? "SSR cache" : "WebSocket";
-
   useEffect(() => {
     if (import.meta.env.DEV) {
+      const duration = performance.now() - startTime;
+      const source = duration < 10 ? "SSR cache" : "WebSocket";
       console.log(`useProjectsList: Accessed data in ${duration.toFixed(2)}ms from ${source}`);
       console.log(`useProjectsList: Loaded ${result.data?.projects?.length || 0} projects`);
     }
-  }, [duration, source, result.data?.projects?.length]);
+  }, [result.data?.projects?.length, startTime]);
 
   return result;
 }
 
 /**
  * Hook for project stats using Suspense
- * Uses SSR cache when available, suspends and fetches if not
- *
- * @example
- * const { data: stats } = useProjectStats()
  */
-export function useProjectStats(targetUserId?: Id<"userProfiles">) {
-  return useSuspenseQuery(projectsService.getProjectStatsQueryOptions(targetUserId));
+export function useProjectStatsSuspense(targetUserId?: Id<"userProfiles">) {
+  const startTime = performance.now();
+  const result = useSuspenseQuery(projectsService.getProjectStatsQueryOptions(targetUserId));
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const duration = performance.now() - startTime;
+      const source = duration < 10 ? "SSR cache" : "WebSocket";
+      console.log(`useProjectStatsSuspense: Accessed data in ${duration.toFixed(2)}ms from ${source}`);
+    }
+  }, [startTime]);
+
+  return result;
 }
 
 /**
  * Hook for single project data using Suspense
- *
- * @example
- * const { data: project } = useProjectSuspense(projectId)
  */
 export function useProjectSuspense(projectId: ProjectId) {
-  return useSuspenseQuery(projectsService.getProjectQueryOptions(projectId));
+  const startTime = performance.now();
+  const result = useSuspenseQuery(projectsService.getProjectQueryOptions(projectId));
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const duration = performance.now() - startTime;
+      const source = duration < 10 ? "SSR cache" : "WebSocket";
+      console.log(`useProjectSuspense: Accessed data in ${duration.toFixed(2)}ms from ${source}`);
+    }
+  }, [startTime]);
+
+  return result;
 }
 
 /**
  * Hook for project members using Suspense
- *
- * @example
- * const { data: members } = useProjectMembersSuspense(projectId)
  */
 export function useProjectMembersSuspense(projectId: ProjectId) {
-  return useSuspenseQuery(projectsService.getProjectMembersQueryOptions(projectId));
+  const startTime = performance.now();
+  const result = useSuspenseQuery(projectsService.getProjectMembersQueryOptions(projectId));
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const duration = performance.now() - startTime;
+      const source = duration < 10 ? "SSR cache" : "WebSocket";
+      console.log(`useProjectMembersSuspense: Accessed data in ${duration.toFixed(2)}ms from ${source}`);
+    }
+  }, [startTime]);
+
+  return result;
 }

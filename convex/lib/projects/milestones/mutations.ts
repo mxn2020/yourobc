@@ -1,4 +1,4 @@
-// convex/lib/boilerplate/milestones/mutations.ts
+// convex/lib/system/milestones/mutations.ts
 
 import { mutation } from '@/generated/server';
 import { v } from 'convex/values';
@@ -140,7 +140,7 @@ export const createMilestone = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'milestone.created',
-      entityType: 'boilerplate_milestone',
+      entityType: 'system_milestone',
       entityId: publicId, // ✅ Use publicId instead of _id
       entityTitle: data.title,
       description: `Created milestone '${data.title}'`,
@@ -254,7 +254,7 @@ export const updateMilestone = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'milestone.updated',
-      entityType: 'boilerplate_milestone',
+      entityType: 'system_milestone',
       entityId: milestone.publicId, // ✅ Use publicId
       entityTitle: milestone.title,
       description: `Updated milestone '${milestone.title}'`,
@@ -308,7 +308,7 @@ export const deleteMilestone = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'milestone.deleted',
-      entityType: 'boilerplate_milestone',
+      entityType: 'system_milestone',
       entityId: milestone.publicId, // ✅ Use publicId
       entityTitle: milestone.title,
       description: `Deleted milestone '${milestone.title}'`,
@@ -383,7 +383,7 @@ export const updateMilestoneProgress = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'milestone.progress_updated',
-      entityType: 'boilerplate_milestone',
+      entityType: 'system_milestone',
       entityId: milestone.publicId, // ✅ Use publicId
       entityTitle: milestone.title,
       description: `Updated progress of milestone '${milestone.title}' to ${progress}%`,
@@ -453,7 +453,7 @@ export const updateMilestoneStatus = mutation({
       userId: user._id,
       userName: user.name || user.email || 'Unknown User',
       action: 'milestone.status_changed',
-      entityType: 'boilerplate_milestone',
+      entityType: 'system_milestone',
       entityId: milestone.publicId, // ✅ Use publicId
       entityTitle: milestone.title,
       description: `Changed milestone '${milestone.title}' status to ${status}`,
